@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مركز البحث في العلوم الإسلامية والحضارة | CRSIC</title>
+  <meta name="description"
+    content="الموقع الرسمي لمركز البحث في العلوم الإسلامية والحضارة — مؤسسة بحثية علمية وتكنولوجية تابعة لوزارة التعليم العالي والبحث العلمي، الأغواط، الجزائر.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="مركز البحث في العلوم الإسلامية والحضارة | CRSIC">
+  <meta property="og:image" content="img/crsic_logo.png">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Organization","name":"مركز البحث في العلوم الإسلامية والحضارة","url":"https://crsic.dz","logo":"img/crsic_logo.png","email":"contact@crsic.dz","telephone":"+21329146190","address":{"@type":"PostalAddress","addressLocality":"الأغواط","addressCountry":"DZ"}}
+  </script>
+</head>
+
+<body>
+
+  <a href="#app" class="skip-link">تخطى إلى المحتوى · Skip to Content</a>
+
+  <!-- ════════════════════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════════════════ -->
+  <nav class="site-nav" aria-label="القائمة الرئيسية">
+    <!-- Logo -->
+    <a class="nav-logo" href="#" data-page="home" title="مركز البحث في العلوم الإسلامية والحضارة">
+      <img src="img/nav-crsic-logo.png" alt="CRSIC" height="42" style="object-fit:contain;display:block;flex-shrink:0;">
+    </a>
+
+    <!-- Primary nav — 5 items -->
+    <ul class="nav-links" id="navLinks">
+      <li>
+        <a href="#" data-page="home" class="active" data-i18n="nav_home">الرئيسية</a>
+      </li>
+
+      <!-- عن المركز — mega panel -->
+      <li class="has-mega" id="ddAbout">
+        <a href="#" data-page="about" aria-haspopup="true" aria-expanded="false" data-i18n="nav_about">
+          عن المركز <span class="drop-arrow" aria-hidden="true">▾</span>
+        </a>
+        <div class="mega-panel" role="region">
+          <a href="#" data-page="about" class="mega-link">
+            <div class="mega-icon">🏛️</div>
+            <div>
+              <div class="mega-text-label" data-i18n="nav_presentation">تقديم المركز</div>
+              <div class="mega-text-sub" data-i18n="nav_presentation_sub">المؤسسة، الرسالة، الرؤية، الأهداف</div>
+            </div>
+          </a>
+          <a href="#" data-page="org" class="mega-link">
+            <div class="mega-icon">📋</div>
+            <div>
+              <div class="mega-text-label" data-i18n="nav_org">الهيكل التنظيمي</div>
+              <div class="mega-text-sub" data-i18n="nav_org_sub">المدير · الأقسام الأربعة</div>
+            </div>
+          </a>
+          <a href="#" data-page="research" class="mega-link">
+            <div class="mega-icon">🔬</div>
+            <div>
+              <div class="mega-text-label" data-i18n="nav_research">البحث العلمي</div>
+              <div class="mega-text-sub" data-i18n="nav_research_sub">4 أقسام · 8 فرق بحثية</div>
+            </div>
+          </a>
+          <a href="#" data-page="contact" class="mega-link">
+            <div class="mega-icon">📞</div>
+            <div>
+              <div class="mega-text-label" data-i18n="nav_contact_label">اتصل بالمركز</div>
+              <div class="mega-text-sub">الأغواط، الجزائر</div>
+            </div>
+          </a>
+          <div class="mega-footer">
+            <a href="#" data-page="about" class="mega-footer-link" data-i18n="nav_about_all">← عرض كل صفحات المركز</a>
+          </div>
+        </div>
+      </li>
+
+      <!-- البحث والإصدارات — mega panel -->
+      <li class="has-mega" id="ddOutput">
+        <a href="#" data-page="publications" aria-haspopup="true" aria-expanded="false" data-i18n="nav_output">
+          البحث والإصدارات <span class="drop-arrow" aria-hidden="true">▾</span>
+        </a>
+        <div class="mega-panel" role="region">
+          <a href="#" data-page="research" class="mega-link">
+            <div class="mega-icon">🔬</div>
+            <div>
+              <div class="mega-text-label" data-i18n="nav_research">البحث العلمي</div>
+              <div class="mega-text-sub" data-i18n="nav_research_sub">4 أقسام · 8 فرق بحثية</div>
+            </div>
+          </a>
+          <a href="#" data-page="publications" data-filter="collective" class="mega-link">
+            <div class="mega-icon">📚</div>
+            <div>
+              <div class="mega-text-label" data-i18n="nav_collective">المؤلفات الجماعية</div>
+              <div class="mega-text-sub" data-i18n="nav_collective_sub">+28 مؤلفاً جماعياً محكّماً</div>
+            </div>
+          </a>
+          <a href="#" data-page="publications" data-filter="individual" class="mega-link">
+            <div class="mega-icon">📖</div>
+            <div>
+              <div class="mega-text-label" data-i18n="nav_individual">المؤلفات الفردية</div>
+              <div class="mega-text-sub" data-i18n="nav_individual_sub">8 مؤلفات فردية متخصصة</div>
+            </div>
+          </a>
+          <a href="#" data-page="journals" class="mega-link">
+            <div class="mega-icon">📰</div>
+            <div>
+              <div class="mega-text-label" data-i18n="nav_journals_label">المجلات العلمية</div>
+              <div class="mega-text-sub" data-i18n="nav_journals_sub">4 مجلات محكمة مفتوحة الوصول</div>
+            </div>
+          </a>
+          <div class="mega-footer">
+            <a href="#" data-page="publications" class="mega-footer-link" data-i18n="nav_pubs_all">← عرض كل
+              الإصدارات</a>
+          </div>
+        </div>
+      </li>
+
+      <!-- الفعاليات والتعاون — mega panel -->
+      <li class="has-mega" id="ddEvents">
+        <a href="#" data-page="events" aria-haspopup="true" aria-expanded="false" data-i18n="nav_events_coop">
+          الفعاليات والتعاون <span class="drop-arrow" aria-hidden="true">▾</span>
+        </a>
+        <div class="mega-panel mega-panel--single" role="region">
+          <a href="#" data-page="events" data-tab="intl" class="mega-link">
+            <div class="mega-icon">🌍</div>
+            <div>
+              <div class="mega-text-label" data-i18n="nav_events_intl">ملتقيات دولية</div>
+              <div class="mega-text-sub" data-i18n="nav_events_intl_sub">+10 ملتقيات دولية منعقدة</div>
+            </div>
+          </a>
+          <a href="#" data-page="events" data-tab="nat" class="mega-link">
+            <div class="mega-icon">🗺️</div>
+            <div>
+              <div class="mega-text-label" data-i18n="nav_events_nat">ملتقيات وطنية</div>
+              <div class="mega-text-sub" data-i18n="nav_events_nat_sub">+10 ملتقيات وطنية ويوم دراسي</div>
+            </div>
+          </a>
+          <a href="#" data-page="cooperation" class="mega-link">
+            <div class="mega-icon">🤝</div>
+            <div>
+              <div class="mega-text-label" data-i18n="nav_cooperation">الشراكات والتعاون</div>
+              <div class="mega-text-sub" data-i18n="nav_cooperation_sub">شراكات وطنية ودولية</div>
+            </div>
+          </a>
+          <div class="mega-footer">
+            <a href="#" data-page="events" class="mega-footer-link" data-i18n="nav_events_all">← عرض كل الفعاليات</a>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <a href="#" data-page="journals" data-i18n="nav_journals">المجلات العلمية</a>
+      </li>
+    </ul>
+
+    <!-- Utility rail -->
+    <div class="nav-utility" id="navUtility">
+      <a href="#" data-page="contact" class="nav-util-btn" data-i18n="nav_contact_short">اتصل بنا</a>
+      <div class="lang-toggle" id="langToggle" role="group" aria-label="اختيار اللغة / Language">
+        <button class="lang-btn active" data-lang="ar" aria-pressed="true" aria-label="عربي — Arabic">AR</button>
+        <button class="lang-btn" data-lang="en" aria-pressed="false" aria-label="Switch to English">EN</button>
+      </div>
+    </div>
+
+    <a href="#" data-page="journals" class="nav-cta" data-i18n="nav_cta">المجلات العلمية</a>
+
+    <button class="nav-mobile-toggle" id="navToggle" aria-label="فتح القائمة" aria-expanded="false"
+      aria-controls="navDrawer">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+  </nav>
+
+  <!-- BREADCRUMB BAR -->
+  <div class="breadcrumb-bar" id="breadcrumbBar" aria-label="مسار التنقل" role="navigation"></div>
+
+  <!-- LANGUAGE DETECTION BANNER -->
+  <div class="lang-banner hidden" id="langBanner" role="alert">
+    <span>🌐 This site is available in English.</span>
+    <button type="button" class="lang-banner-switch">Switch to English</button>
+    <button type="button" class="lang-banner-dismiss" aria-label="Dismiss">✕</button>
+  </div>
+
+  <!-- DATA LOAD ERROR BANNER (P1) -->
+  <div class="data-error-banner hidden" id="dataErrorBanner" role="alert">
+    <span id="dataErrorBannerMsg"></span>
+  </div>
+
+  <!-- [ANIM A1] Scroll progress bar — JS drives scaleX(0→1) -->
+  <div class="scroll-progress-bar" id="scrollProgressBar" aria-hidden="true"></div>
+
+  <!-- [ANIM A8] Back-to-top button — JS adds/removes .visible after 400px scroll -->
+  <button class="back-to-top" id="backToTop" aria-label="العودة إلى الأعلى" title="العودة إلى الأعلى">
+    ↑
+  </button>
+
+  <!-- ════════════════════════════════════════════════════
+     APP CONTAINER
+════════════════════════════════════════════════════ -->
+  <div id="app">
+
+    <!-- ▌ PAGE: HOME ▐ -->
+    <section class="page active" id="page-home">
+
+      <!-- HERO -->
+      <section class="hero-main">
+        <div class="hero-inner">
+          <div class="hero-eyebrow">
+            <div class="hero-eyebrow-dot"></div>
+            <span data-i18n="hero_eyebrow">مؤسسة عمومية ذات طابع علمي وتكنولوجي · وزارة التعليم العالي والبحث
+              العلمي</span>
+          </div>
+          <h1><span data-i18n="hero_h1_1">صرحٌ علميٌّ في خدمة</span><br><em data-i18n="hero_h1_em">العلوم الإسلامية
+              والحضارة</em></h1>
+          <p class="hero-desc" data-i18n="hero_desc">يعمل المركز على إجراء البحوث النظرية والتطبيقية في مجالات العلوم
+            الإسلامية والحضارية، ونشر النور المتوازن، وإبراز خصائص الحضارة العربية الإسلامية على المستويين الوطني
+            والدولي.</p>
+          <div class="hero-cta">
+            <a href="#" data-page="publications" class="btn-primary-cta" data-i18n="hero_btn_pubs">استعرض الإصدارات</a>
+            <a href="#" data-page="about" class="btn-ghost-cta" data-i18n="hero_btn_about">تعرّف على المركز</a>
+          </div>
+        </div>
+        <svg class="hero-wave" viewBox="0 0 1200 40" xmlns="http://www.w3.org/2000/svg" height="40"
+          preserveAspectRatio="none">
+          <path d="M0 40 Q300 0 600 40 Q900 80 1200 40 L1200 40 L0 40Z" fill="#FAF8F3" />
+        </svg>
+      </section>
+
+      <!-- STATS -->
+      <div class="stats-bar">
+        <a class="stat" href="#" data-page="about" style="text-decoration:none;">
+          <span class="stat-num">2015</span>
+          <span class="stat-label" data-i18n-html="stat1_label">سنة التأسيس بموجب<br>المرسوم التنفيذي 15-136</span>
+          <span class="stat-accent"></span>
+        </a>
+        <a class="stat" href="#" data-page="research" style="text-decoration:none;">
+          <span class="stat-num">+40</span>
+          <span class="stat-label" data-i18n-html="stat2_label">باحثاً دائماً في<br>تخصصات متعددة</span>
+          <span class="stat-accent"></span>
+        </a>
+        <a class="stat" href="#" data-page="research" style="text-decoration:none;">
+          <span class="stat-num">4</span>
+          <span class="stat-label" data-i18n-html="stat3_label">أقسام بحثية<br>و8 فرق بحثية</span>
+          <span class="stat-accent"></span>
+        </a>
+        <a class="stat" href="#" data-page="publications" style="text-decoration:none;">
+          <span class="stat-num">+45</span>
+          <span class="stat-label" data-i18n-html="stat4_label">إصداراً علمياً<br>و4 مجلات محكمة</span>
+          <span class="stat-accent"></span>
+        </a>
+      </div>
+
+      <!-- DEPARTMENTS -->
+      <section class="departments">
+        <div class="section-label" aria-hidden="true" data-i18n="dept_section_title">أقسام البحث العلمي</div>
+        <h2 class="section-title mb3" data-i18n="dept_section_h2">أقسام البحث العلمي</h2>
+        <div class="dept-grid">
+          <div class="dept-card" data-page="research" data-tab="r1"
+            role="button" tabindex="0">
+            <div class="dept-icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M9 1L17 5V13L9 17L1 13V5L9 1Z" stroke="#1B4332" stroke-width="1.2" fill="none" />
+                <circle cx="9" cy="9" r="2.5" fill="#C9A84C" />
+              </svg>
+            </div>
+            <div>
+              <div class="dept-name" data-i18n="dept1_name">الدراسات القرآنية والفقهية</div>
+              <div class="dept-desc" data-i18n="dept1_desc">التأصيل العلمي والاجتهاد القضائي والفقه الإسلامي</div>
+            </div>
+          </div>
+          <div class="dept-card" data-page="research" data-tab="r2"
+            role="button" tabindex="0">
+            <div class="dept-icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <rect x="2" y="3" width="14" height="12" rx="1.5" stroke="#1B4332" stroke-width="1.2" fill="none" />
+                <line x1="5" y1="8" x2="13" y2="8" stroke="#C9A84C" stroke-width="1.2" />
+                <line x1="5" y1="11" x2="10" y2="11" stroke="#C9A84C" stroke-width="1" />
+              </svg>
+            </div>
+            <div>
+              <div class="dept-name" data-i18n="dept2_name">الفكر والعقيدة والحوار مع الغير</div>
+              <div class="dept-desc" data-i18n="dept2_desc">الأمن الفكري وقضايا التسامح والتعايش السلمي</div>
+            </div>
+          </div>
+          <div class="dept-card" data-page="research" data-tab="r3"
+            role="button" tabindex="0">
+            <div class="dept-icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <circle cx="9" cy="9" r="7" stroke="#1B4332" stroke-width="1.2" fill="none" />
+                <path d="M9 2C6.5 5 6.5 13 9 16" stroke="#C9A84C" stroke-width="1" fill="none" />
+                <line x1="2" y1="9" x2="16" y2="9" stroke="#1B4332" stroke-width="0.8" />
+              </svg>
+            </div>
+            <div>
+              <div class="dept-name" data-i18n="dept3_name">التاريخ الثقافي للجزائر</div>
+              <div class="dept-desc" data-i18n="dept3_desc">المخطوطات والتراث الوطني لفترة الاحتلال الفرنسي</div>
+            </div>
+          </div>
+          <div class="dept-card" data-page="research" data-tab="r4"
+            role="button" tabindex="0">
+            <div class="dept-icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M9 1L11 6.5L17 7.4L13 11.3L14.1 17L9 14.2L3.9 17L5 11.3L1 7.4L7 6.5L9 1Z" stroke="#1B4332"
+                  stroke-width="1.2" fill="none" />
+                <path d="M9 4.5L10.3 8L14 8.5L11.5 10.9L12.2 14.5L9 12.8L5.8 14.5L6.5 10.9L4 8.5L7.7 8L9 4.5Z"
+                  fill="#C9A84C" opacity="0.35" />
+              </svg>
+            </div>
+            <div>
+              <div class="dept-name" data-i18n="dept4_name">الحضارة الإسلامية</div>
+              <div class="dept-desc" data-i18n="dept4_desc">إبراز خصائص الحضارة العربية الإسلامية</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LATEST PUBLICATIONS (home) -->
+      <section class="publications">
+        <div class="section-header">
+          <h2 class="section-title" data-i18n="home_latest_pubs">آخر الإصدارات العلمية</h2>
+          <a class="section-link" href="#" data-page="publications" data-i18n="home_view_all_pubs">عرض كل الإصدارات
+            ←</a>
+        </div>
+        <div class="pub-grid" id="home-pub-grid"></div>
+      </section>
+
+      <!-- LATEST EVENTS (home) -->
+      <section class="events">
+        <div class="section-header">
+          <h2 class="section-title" data-i18n="home_events_section">الملتقيات والفعاليات</h2>
+          <a class="section-link" href="#" data-page="events" data-i18n="home_view_all_events">عرض كل الفعاليات ←</a>
+        </div>
+        <div class="events-grid">
+          <article class="event-card">
+            <div class="event-thumb event-thumb-bg2">
+              <img src="img/Holders/1.jpg" alt="الملتقى الدولي: حماية المدنيين أثناء النزاعات المسلحة" loading="lazy">
+              <span class="event-badge event-badge-past" data-i18n="ev_badge_done">منتهي</span>
+              <div class="event-thumb-label">الملتقى الدولي: حماية المدنيين أثناء النزاعات المسلحة</div>
+            </div>
+            <div class="event-info">
+              <div class="event-type">ملتقى دولي</div>
+              <div class="event-title">حماية المدنيين أثناء النزاعات المسلحة: الواقع والمأمول</div>
+              <div class="event-footer-row">
+                <span class="event-date">أكتوبر 2024 – الأغواط</span>
+                <a href="#" data-page="events" class="event-album-link"><span class="event-album-dot"></span><span
+                    data-i18n="ev_details">التفاصيل</span></a>
+              </div>
+            </div>
+          </article>
+          <article class="event-card">
+            <div class="event-thumb event-thumb-bg1">
+              <img src="img/Holders/0.jpg" alt="الندوة الدولية: ترجمة المصطلحات العلمية" loading="lazy">
+              <span class="event-badge event-badge-past" data-i18n="ev_badge_done">منتهي</span>
+              <div class="event-thumb-label">الندوة الدولية: ترجمة المصطلحات العلمية والأدبية والقانونية</div>
+            </div>
+            <div class="event-info">
+              <div class="event-type">ندوة دولية</div>
+              <div class="event-title">ترجمة المصطلحات العلمية والأدبية والقانونية في العالم العربي</div>
+              <div class="event-footer-row">
+                <span class="event-date">ديسمبر 2024 – الأغواط</span>
+                <a href="#" data-page="events" class="event-album-link"><span class="event-album-dot"></span><span
+                    data-i18n="ev_details">التفاصيل</span></a>
+              </div>
+            </div>
+          </article>
+          <article class="event-card">
+            <div class="event-thumb event-thumb-bg3">
+              <img src="img/Holders/5.jpg" alt="اللقاء التنسيقي الوطني" loading="lazy">
+              <span class="event-badge event-badge-past" data-i18n="ev_badge_done">منتهي</span>
+              <div class="event-thumb-label">اللقاء التنسيقي الوطني للإصغاء والتشاور مع الشركاء</div>
+            </div>
+            <div class="event-info">
+              <div class="event-type">لقاء وطني</div>
+              <div class="event-title">اللقاء التنسيقي الوطني للإصغاء والتشاور مع الشركاء الإجتماعيين والاقتصاديين</div>
+              <div class="event-footer-row">
+                <span class="event-date">فبراير 2025 – الأغواط</span>
+                <a href="#" data-page="events" class="event-album-link"><span class="event-album-dot"></span><span
+                    data-i18n="ev_details">التفاصيل</span></a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- NEWS (home) -->
+      <section class="news-section">
+        <div class="section-header">
+          <h2 class="section-title" data-i18n="home_news_section">أخبار المركز</h2>
+        </div>
+        <div class="g3" id="home-news-grid"></div>
+      </section>
+
+    </section><!-- /page-home -->
+
+
+    <!-- ▌ PAGE: ABOUT ▐ -->
+    <section class="page" id="page-about">
+      <div class="page-hero">
+        <div class="page-hero-inner">
+          <div class="page-hero-tag" data-i18n="about_hero_tag">تأسّس بالمرسوم التنفيذي 15-136 بتاريخ 23 مايو 2015</div>
+          <h1 data-i18n="about_hero_h1">تقديم مركز البحث في العلوم الإسلامية والحضارة</h1>
+          <p data-i18n="about_hero_p">المركز الوطني الوحيد المتخصص في حقل العلوم الإسلامية والحضارية في الجزائر، يعمل
+            على إنتاج البحث العلمي الأصيل وتكوين الباحثين وتعزيز الشراكات الدولية.</p>
+        </div>
+      </div>
+      <div class="page-body">
+        <div style="max-width:900px;margin:0 auto;">
+
+          <!-- nature -->
+          <div class="mb5">
+            <h2 class="inner-section-title" data-i18n="about_nature_h">طبيعة المركز وتأسيسه</h2>
+            <p class="body-copy" data-i18n="about_nature_p1">مركز البحث في العلوم الإسلامية والحضارة بالأغواط مؤسسة
+              عمومية ذات طابع علمي وتكنولوجي، أُنشئ بموجب المرسوم التنفيذي رقم 15-136 المؤرخ في 23 مايو 2015، وافتُتح
+              رسمياً في 27 يناير 2016. يُعدّ المركز المؤسسة الوطنية الوحيدة في هذا الحقل الرائد.</p>
+            <p class="body-copy" data-i18n="about_nature_p2">يخضع المركز في تنظيمه لأحكام المرسوم التنفيذي رقم 11-396
+              المؤرخ في 24 نوفمبر 2011، ويتبع إدارياً لمديرية البحث العلمي والتطوير التكنولوجي التابعة لوزارة التعليم
+              العالي والبحث العلمي في الجزائر.</p>
+            <p class="body-copy" style="margin-bottom:0" data-i18n="about_nature_p3">تتمحور مهام المركز حول تسيير مشاريع
+              البحث من خلال جمع المعطيات وبرمجتها وتنفيذها وتقييمها، ومتابعة تطور العلوم والتكنولوجيا في مجال تخصصه،
+              وجمع المعلومات التقنية وتثمين نتائج البحث وضمان التكوين المستمر.</p>
+          </div>
+
+          <!-- Mission/Vision/Values/Goals -->
+          <div class="mb5">
+            <h2 class="inner-section-title" data-i18n="about_rvgo_h">الرؤية والرسالة والقيم والأهداف</h2>
+            <div class="g2 gap-lg">
+              <div class="c-card c-card-accent c-card-accent--vision">
+                <div class="c-card-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="10" cy="10" r="8" stroke="#1B4332" stroke-width="1.2" fill="none" />
+                    <circle cx="10" cy="10" r="3" fill="#C9A84C" />
+                  </svg></div>
+                <h3 data-i18n="about_vision_h">الرؤية</h3>
+                <p data-i18n="about_vision_p">أن يكون المركز مرجعاً علمياً وبحثياً رائداً ومتميزاً في العلوم الإسلامية
+                  والحضارة على المستويين الوطني والدولي.</p>
+              </div>
+              <div class="c-card c-card-accent c-card-accent--mission">
+                <div class="c-card-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <rect x="3" y="4" width="14" height="12" rx="2" stroke="#1B4332" stroke-width="1.2" fill="none" />
+                    <line x1="6" y1="9" x2="14" y2="9" stroke="#C9A84C" stroke-width="1.2" />
+                    <line x1="6" y1="12" x2="11" y2="12" stroke="#C9A84C" stroke-width="1" />
+                  </svg></div>
+                <h3 data-i18n="about_mission_h">الرسالة</h3>
+                <p data-i18n="about_mission_p">إجراء البحوث العلمية الأصيلة في فروع العلوم الإسلامية والحضارة، وتكوين
+                  الباحثين وتأهيلهم، وتقديم الاستشارات العلمية والخبرات المتخصصة.</p>
+              </div>
+              <div class="c-card c-card-accent c-card-accent--values">
+                <div class="c-card-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 2L12.5 7.5H18L13.5 11L15.5 17L10 13.5L4.5 17L6.5 11L2 7.5H7.5L10 2Z" stroke="#1B4332"
+                      stroke-width="1.2" fill="none" />
+                    <path d="M10 5L11.5 8.5L15 9L12.5 11.5L13 15L10 13.5L7 15L7.5 11.5L5 9L8.5 8.5L10 5Z" fill="#C9A84C"
+                      opacity="0.3" />
+                  </svg></div>
+                <h3 data-i18n="about_values_h">القيم</h3>
+                <p data-i18n="about_values_p">التميّز العلمي، الأصالة والتجديد، التعاون والشراكة، النزاهة الأكاديمية،
+                  المسؤولية الاجتماعية، والابتكار في البحث.</p>
+              </div>
+              <div class="c-card c-card-accent c-card-accent--goals">
+                <div class="c-card-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <polygon points="10,2 18,6 18,14 10,18 2,14 2,6" stroke="#1B4332" stroke-width="1.2" fill="none" />
+                    <circle cx="10" cy="10" r="3" fill="#C9A84C" opacity="0.5" />
+                  </svg></div>
+                <h3 data-i18n="about_goals_h">الأهداف</h3>
+                <p data-i18n="about_goals_p">تنمية البحث العلمي في العلوم الإسلامية، نشر الإنتاج العلمي، تكوين الباحثين،
+                  إبراز خصائص الحضارة الإسلامية، ومعالجة الإشكاليات المجتمعية المعاصرة.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Research scope -->
+          <div class="mb5">
+            <h2 class="inner-section-title" data-i18n="about_axes_h">محاور البحث العلمي</h2>
+            <div class="g3">
+              <div class="c-card c-card--axis">
+                <div class="axis-num">01</div>
+                <p data-i18n="about_axis1">علوم القرآن الكريم وعلوم الحديث النبوي الشريف</p>
+              </div>
+              <div class="c-card c-card--axis">
+                <div class="axis-num">02</div>
+                <p data-i18n="about_axis2">أصول العقيدة الإسلامية والفقه وأصوله</p>
+              </div>
+              <div class="c-card c-card--axis">
+                <div class="axis-num">03</div>
+                <p data-i18n="about_axis3">الفكر الإسلامي المعاصر والتاريخ الثقافي للجزائر</p>
+              </div>
+              <div class="c-card c-card--axis">
+                <div class="axis-num">04</div>
+                <p data-i18n="about_axis4">الدراسات الحضارية وخصائص الحضارة العربية الإسلامية</p>
+              </div>
+              <div class="c-card c-card--axis">
+                <div class="axis-num">05</div>
+                <p data-i18n="about_axis5">الحوار بين الحضارات ومسائل التسامح والتعايش</p>
+              </div>
+              <div class="c-card c-card--axis">
+                <div class="axis-num">06</div>
+                <p data-i18n="about_axis6">الاقتصاد الإسلامي والصيرفة الإسلامية</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Strategic objectives -->
+          <div>
+            <h2 class="inner-section-title" data-i18n="about_strategy_h">التوجهات الاستراتيجية</h2>
+            <ul class="strat-list">
+              <li class="strat-item"><span class="strat-item-bullet">◆</span><span><strong>تطوير المعارف الفكرية
+                    والدينية</strong> المرتبطة بالتحديات الكبرى للمجتمع</span></li>
+              <li class="strat-item"><span class="strat-item-bullet">◆</span><span><strong>الترويج للفكر
+                    المعتدل</strong> وتعزيز التسامح الحضاري</span></li>
+              <li class="strat-item"><span class="strat-item-bullet">◆</span><span><strong>ربط البحث العلمي</strong>
+                  باحتياجات التنمية الوطنية</span></li>
+              <li class="strat-item"><span class="strat-item-bullet">◆</span><span><strong>صون التراث الإسلامي
+                    والعربي</strong> وحمايته من الاندثار</span></li>
+              <li class="strat-item"><span class="strat-item-bullet">◆</span><span><strong>إقامة شراكات بحثية</strong>
+                  وطنية ودولية</span></li>
+              <li class="strat-item"><span class="strat-item-bullet">◆</span><span><strong>بناء كفاءات بحثية
+                    متخصصة</strong> في مجال العلوم الإسلامية والحضارية</span></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ▌ PAGE: ORG ▐ -->
+    <section class="page" id="page-org">
+      <div class="page-hero">
+        <div class="page-hero-inner">
+          <div class="page-hero-tag" data-i18n="org_hero_tag">وفقاً لقرار 12 يوليو 2018 المحدِّد للتنظيم الداخلي</div>
+          <h1 data-i18n="org_hero_h1">الهيكل التنظيمي للمركز</h1>
+          <p data-i18n="org_hero_p">يتكون المركز من مديرية، مجلسَي إدارة وعلم، قسمَي تقنيَّين، وأربعة أقسام بحثية
+            متخصصة.</p>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="org-wrap" role="img" aria-label="مخطط الهيكل التنظيمي للمركز">
+          <div class="org-tree">
+            <!-- Director -->
+            <div class="org-node org-node-root">
+              <div class="org-label" data-i18n="org_director">المدير</div>
+              <div class="org-sub" data-i18n="org_director_en">Director</div>
+            </div>
+            <div class="org-vline"></div>
+
+            <!-- Councils row -->
+            <div class="org-hbar" style="gap:32px;">
+              <div class="org-col">
+                <div class="org-vline"></div>
+                <div class="org-node org-node-gold">
+                  <div class="org-label" data-i18n="org_admin_council">مجلس الإدارة</div>
+                  <div class="org-sub" data-i18n="org_admin_council_en">Administrative Council</div>
+                </div>
+              </div>
+              <div class="org-col">
+                <div class="org-vline"></div>
+                <div class="org-node org-node--sec">
+                  <div class="org-label" data-i18n="org_general_sec">الأمانة العامة</div>
+                  <div class="org-sub" data-i18n="org_general_sec_en">General Secretariat</div>
+                </div>
+              </div>
+              <div class="org-col">
+                <div class="org-vline"></div>
+                <div class="org-node org-node-gold">
+                  <div class="org-label" data-i18n="org_sci_council">المجلس العلمي</div>
+                  <div class="org-sub" data-i18n="org_sci_council_en">Scientific Council</div>
+                </div>
+              </div>
+            </div>
+            <div class="org-vline"></div>
+
+            <!-- Technical depts row -->
+            <div class="org-hbar">
+              <div class="org-col">
+                <div class="org-vline"></div>
+                <div class="org-node org-node-blue">
+                  <div class="org-label" data-i18n="org_ext_rel">قسم العلاقات الخارجية</div>
+                  <div class="org-sub" data-i18n="org_ext_rel_sub">وتثمين نتائج البحث</div>
+                </div>
+              </div>
+              <div class="org-col">
+                <div class="org-vline"></div>
+                <div class="org-node org-node-blue">
+                  <div class="org-label" data-i18n="org_research_mon">قسم متابعة نشاطات البحث</div>
+                  <div class="org-sub" data-i18n="org_research_mon_sub">في العلوم الإسلامية والحضارة</div>
+                </div>
+              </div>
+            </div>
+            <div class="org-vline"></div>
+
+            <!-- Research divisions -->
+            <div class="org-hbar" style="gap:8px;">
+              <div class="org-col">
+                <div class="org-vline"></div>
+                <div class="org-node org-node--div">
+                  <div class="org-label" data-i18n="org_div1">الدراسات القرآنية والفقهية</div>
+                </div>
+              </div>
+              <div class="org-col">
+                <div class="org-vline"></div>
+                <div class="org-node org-node--div">
+                  <div class="org-label" data-i18n="org_div2">الفكر والعقيدة والحوار</div>
+                </div>
+              </div>
+              <div class="org-col">
+                <div class="org-vline"></div>
+                <div class="org-node org-node--div">
+                  <div class="org-label" data-i18n="org_div3">التاريخ الثقافي للجزائر</div>
+                </div>
+              </div>
+              <div class="org-col">
+                <div class="org-vline"></div>
+                <div class="org-node org-node--div">
+                  <div class="org-label" data-i18n="org_div4">الحضارة الإسلامية</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ▌ PAGE: RESEARCH ▐ -->
+    <section class="page" id="page-research">
+      <div class="page-hero">
+        <div class="page-hero-inner">
+          <div class="page-hero-tag" data-i18n="research_hero_tag">4 أقسام بحثية · 8 فرق بحثية متخصصة</div>
+          <h1 data-i18n="research_hero_h1">البحث العلمي</h1>
+          <p data-i18n="research_hero_p">يعمل المركز وفق رؤية منهجية تجمع بين الأصالة والمعاصرة من خلال أربعة أقسام
+            علمية متخصصة وثمانية فرق بحثية.</p>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="tab-bar" id="research-tabs">
+          <button type="button" class="tab-btn active" data-tab="r1"
+            data-i18n="research_tab1">الدراسات القرآنية والفقهية</button>
+          <button type="button" class="tab-btn" data-tab="r2" data-i18n="research_tab2">الفكر
+            والعقيدة والحوار مع الغير</button>
+          <button type="button" class="tab-btn" data-tab="r3" data-i18n="research_tab3">التاريخ
+            الثقافي للجزائر</button>
+          <button type="button" class="tab-btn" data-tab="r4" data-i18n="research_tab4">الحضارة
+            الإسلامية</button>
+        </div>
+
+        <!-- Dept 1 -->
+        <div class="tab-panel active" id="rtab-r1">
+          <div class="c-card c-card--dept mb4">
+            <h3 data-i18n="research_dept1_h">قسم الدراسات القرآنية والفقهية</h3>
+            <p data-i18n="research_dept1_p">يتخصص هذا القسم في التأصيل العلمي لعلوم القرآن الكريم والسنة النبوية والفقه
+              الإسلامي وأصوله، ويعمل على إبراز الإعجاز القرآني والاجتهاد القضائي في ضوء المستجدات المعاصرة.</p>
+          </div>
+          <div class="g2 gap-lg">
+            <div class="team-card">
+              <div class="team-card-name" data-i18n="research_team1a_name">فريق الإعجاز القرآني</div>
+              <div class="team-card-desc" data-i18n="research_team1a_desc">يُعنى بالبحث في وجوه الإعجاز القرآني من
+                جوانبه اللغوية والبيانية والعلمية والتشريعية، ويسعى إلى تقديم مقاربات معاصرة في دراسة النص القرآني.
+              </div>
+            </div>
+            <div class="team-card">
+              <div class="team-card-name" data-i18n="research_team1b_name">فريق الدراسات الفقهية</div>
+              <div class="team-card-desc" data-i18n="research_team1b_desc">يتناول مسائل الفقه الإسلامي وأصوله ومناهج
+                الاجتهاد، مع التركيز على المستجدات الفقهية المعاصرة وفقه النوازل.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dept 2 -->
+        <div class="tab-panel" id="rtab-r2">
+          <div class="c-card c-card--dept mb4">
+            <h3 data-i18n="research_dept2_h">قسم الفكر والعقيدة والحوار مع الغير</h3>
+            <p data-i18n="research_dept2_p">يختص بدراسة منظومة الفكر الإسلامي والعقائد والمذاهب، ويُعنى بقضايا الأمن
+              الفكري والحوار بين الحضارات والأديان ومسائل التسامح والتعايش السلمي.</p>
+          </div>
+          <div class="g2 gap-lg">
+            <div class="team-card">
+              <div class="team-card-name" data-i18n="research_team2a_name">فريق حوار الحضارات</div>
+              <div class="team-card-desc" data-i18n="research_team2a_desc">يبحث في مناهج الحوار بين الحضارات والأديان
+                والثقافات، ويدرس قضايا التسامح والتعايش السلمي وآليات الحوار الفعّال.</div>
+            </div>
+            <div class="team-card">
+              <div class="team-card-name" data-i18n="research_team2b_name">فريق العقائد والمذاهب</div>
+              <div class="team-card-desc" data-i18n="research_team2b_desc">يدرس أصول العقيدة الإسلامية والمذاهب الفكرية
+                المختلفة ويعالج إشكاليات الأمن الفكري في العالم الإسلامي المعاصر.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dept 3 -->
+        <div class="tab-panel" id="rtab-r3">
+          <div class="c-card c-card--dept mb4">
+            <h3 data-i18n="research_dept3_h">قسم التاريخ الثقافي للجزائر</h3>
+            <p data-i18n="research_dept3_p">يتخصص في دراسة تاريخ الجزائر الثقافي والفكري، مع التركيز على فترة الاحتلال
+              الفرنسي (1830-1962) وجهود صون التراث الوطني والمخطوطات.</p>
+          </div>
+          <div class="g2 gap-lg">
+            <div class="team-card">
+              <div class="team-card-name" data-i18n="research_team3a_name">فريق التراث الثقافي</div>
+              <div class="team-card-desc" data-i18n="research_team3a_desc">يُعنى بالبحث في المخطوطات الجزائرية وفهرستها
+                ورقمنتها، والتراث الثقافي المادي وغير المادي لولايات الجنوب الجزائري.</div>
+            </div>
+            <div class="team-card">
+              <div class="team-card-name" data-i18n="research_team3b_name">فريق الأعلام الجزائريين</div>
+              <div class="team-card-desc" data-i18n="research_team3b_desc">يرصد ويوثق الشخصيات العلمية والثقافية
+                الجزائرية عبر التاريخ، ويُبرز دورها في الحفاظ على الهوية الوطنية.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dept 4 -->
+        <div class="tab-panel" id="rtab-r4">
+          <div class="c-card c-card--dept mb4">
+            <h3 data-i18n="research_dept4_h">قسم الحضارة الإسلامية</h3>
+            <p data-i18n="research_dept4_p">يتخصص في إبراز خصائص الحضارة العربية الإسلامية وقيمها الكونية، ويبحث في
+              الاقتصاد الإسلامي والصيرفة الإسلامية ومسائل التنمية المستدامة من منظور إسلامي.</p>
+          </div>
+          <div class="g2 gap-lg">
+            <div class="team-card">
+              <div class="team-card-name" data-i18n="research_team4a_name">فريق الحضارة الإسلامية والمجتمع</div>
+              <div class="team-card-desc" data-i18n="research_team4a_desc">يدرس إسهامات الحضارة الإسلامية في بناء الوعي
+                الإنساني ويُبرز خصائصها الكونية في مجالات العلم والفن والفكر.</div>
+            </div>
+            <div class="team-card">
+              <div class="team-card-name" data-i18n="research_team4b_name">فريق الاقتصاد الإسلامي</div>
+              <div class="team-card-desc" data-i18n="research_team4b_desc">يبحث في أسس الاقتصاد الإسلامي والصيرفة
+                الإسلامية ومؤسسة الوقف وتطبيقاتها في الجزائر والعالم الإسلامي.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ▌ PAGE: PUBLICATIONS ▐ -->
+    <section class="page" id="page-publications">
+      <div class="page-hero">
+        <div class="page-hero-inner">
+          <div class="page-hero-tag" data-i18n="pubs_hero_tag">+45 إصداراً علمياً · مؤلفات فردية وجماعية ومجلات</div>
+          <h1 data-i18n="pubs_hero_h1">الإصدارات العلمية</h1>
+          <p data-i18n="pubs_hero_p">منتجات علمية متنوعة تُعالج قضايا العلوم الإسلامية والحضارية والاجتماعية وفق مناهج
+            بحثية رصينة.</p>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="pub-toolbar">
+          <div class="pub-search-wrap">
+            <span class="pub-search-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16"
+                fill="none">
+                <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.3" />
+                <path d="M10 10L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg></span>
+            <input class="pub-search-input" type="search" id="pub-search" data-i18n-placeholder="pub_search_ph"
+              placeholder="ابحث في الإصدارات..." aria-label="بحث في الإصدارات"
+              autocomplete="off">
+          </div>
+          <div class="dept-tabs" id="pub-filter">
+            <button type="button" class="dept-tab active" data-pub-type="all" data-i18n="filter_all">الكل</button>
+            <button type="button" class="dept-tab" data-pub-type="collective" data-i18n="filter_collective">مؤلفات
+              جماعية</button>
+            <button type="button" class="dept-tab" data-pub-type="individual" data-i18n="filter_individual">مؤلفات
+              فردية</button>
+          </div>
+        </div>
+        <div class="pub-count" id="pub-count"></div>
+        <div class="pub-grid" id="pub-grid"></div>
+      </div>
+    </section>
+
+
+    <!-- ▌ PAGE: EVENTS ▐ -->
+    <section class="page" id="page-events">
+      <div class="page-hero">
+        <div class="page-hero-inner">
+          <div class="page-hero-tag" data-i18n="events_hero_tag">ملتقيات دولية ووطنية · محاضرات ولقاءات علمية</div>
+          <h1 data-i18n="events_hero_h1">الفعاليات والملتقيات العلمية</h1>
+          <p data-i18n="events_hero_p">ينظم المركز سنوياً ملتقيات علمية وطنية ودولية تُعالج قضايا بحثية راهنة وتجمع
+            الباحثين والأكاديميين.</p>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="tab-bar">
+          <button type="button" class="tab-btn active" data-tab="intl" data-i18n="tab_intl_events">الملتقيات
+            الدولية</button>
+          <button type="button" class="tab-btn" data-tab="nat" data-i18n="tab_nat_events">الملتقيات الوطنية</button>
+        </div>
+        <div class="tab-panel active" id="ev-intl">
+          <div class="ev-list" id="ev-intl-list"></div>
+        </div>
+        <div class="tab-panel" id="ev-nat">
+          <div class="ev-list" id="ev-nat-list"></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ▌ PAGE: COOPERATION ▐ -->
+    <section class="page" id="page-cooperation">
+      <div class="page-hero">
+        <div class="page-hero-inner">
+          <div class="page-hero-tag" data-i18n="coop_hero_tag">شراكات وطنية ودولية متعددة</div>
+          <h1 data-i18n="coop_hero_h1">التعاون العلمي والشراكات</h1>
+          <p data-i18n="coop_hero_p">يسعى المركز إلى بناء شراكات بحثية فاعلة مع المؤسسات الوطنية والدولية في مجال العلوم
+            الإسلامية والحضارية.</p>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="g2 gap-lg" style="align-items:start;">
+          <!-- National -->
+          <div>
+            <h2 class="inner-section-title" data-i18n="coop_nat_h">الشراكات الوطنية</h2>
+            <div class="partner-list" id="nat-partners"></div>
+          </div>
+          <!-- International -->
+          <div>
+            <h2 class="inner-section-title" data-i18n="coop_intl_h">الشراكات الدولية</h2>
+            <div class="partner-list" id="intl-partners"></div>
+          </div>
+        </div>
+        <div class="coop-cta-banner">
+          <p data-i18n="coop_cta_p">يرحب المركز بطلبات الشراكة من المؤسسات البحثية الوطنية والدولية في مجال العلوم
+            الإسلامية والحضارية.</p>
+          <a href="#" data-page="contact" class="btn-primary-cta" style="display:inline-block;"
+            data-i18n="coop_cta_btn">تقديم طلب شراكة ←</a>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ▌ PAGE: JOURNALS ▐ -->
+    <section class="page" id="page-journals">
+      <div class="page-hero">
+        <div class="page-hero-inner">
+          <div class="page-hero-tag" data-i18n="journals_hero_tag">4 مجلات علمية محكمة · نشر مفتوح ومجاني</div>
+          <h1 data-i18n="journals_hero_h1">المجلات العلمية للمركز</h1>
+          <p data-i18n="journals_hero_p">يُصدر المركز أربع مجلات علمية محكمة مفتوحة الوصول في مجالات العلوم الإسلامية
+            والاجتماعية والقانونية والصوفية.</p>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="g2 gap-lg" id="journals-grid"></div>
+      </div>
+    </section>
+
+
+    <!-- ▌ PAGE: CONTACT ▐ -->
+    <section class="page" id="page-contact">
+      <div class="page-hero">
+        <div class="page-hero-inner">
+          <div class="page-hero-tag" data-i18n="contact_hero_tag">نرحب بالتواصل والتعاون العلمي</div>
+          <h1 data-i18n="contact_hero_h1">اتصل بالمركز</h1>
+          <p data-i18n="contact_hero_p">للاستفسارات البحثية والشراكات العلمية والتواصل مع فريق المركز، يسعدنا سماعكم.
+          </p>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="g2 gap-lg" style="align-items:start;">
+
+          <!-- Contact info -->
+          <div>
+            <h2 class="inner-section-title" data-i18n="contact_info_h">معلومات الاتصال</h2>
+            <div class="c-card" style="margin-bottom:1.5rem;">
+              <div class="contact-info-item">
+                <div class="contact-icon-wrap"><svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path
+                      d="M8 1.5C5.5 1.5 3.5 3.5 3.5 6C3.5 9.5 8 14.5 8 14.5S12.5 9.5 12.5 6C12.5 3.5 10.5 1.5 8 1.5Z"
+                      stroke="#1B4332" stroke-width="1" fill="none" />
+                    <circle cx="8" cy="6" r="1.5" stroke="#1B4332" stroke-width="1" fill="none" />
+                  </svg></div>
+                <div>
+                  <div class="contact-info-label" data-i18n="contact_addr_label">العنوان</div>
+                  <a href="https://www.google.com/maps/search/الأغواط+مركز+البحث+في+العلوم+الإسلامية" target="_blank"
+                    rel="noopener" class="contact-info-value" style="text-decoration:none;"
+                    data-i18n-html="contact_addr_val">مقابل المستشفى المختلط الشهيد بن علي دغمان<br>ص.ب 9002 بريد
+                    الصادقية – الأغواط، الجزائر</a>
+                </div>
+              </div>
+              <div class="contact-info-item">
+                <div class="contact-icon-wrap"><svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path
+                      d="M2 4.5C2 3.7 2.7 3 3.5 3H12.5C13.3 3 14 3.7 14 4.5V11.5C14 12.3 13.3 13 12.5 13H3.5C2.7 13 2 12.3 2 11.5V4.5Z"
+                      stroke="#1B4332" stroke-width="1" fill="none" />
+                    <path d="M2 5L8 9L14 5" stroke="#1B4332" stroke-width="1" />
+                  </svg></div>
+                <div>
+                  <div class="contact-info-label" data-i18n="contact_email_label">البريد الإلكتروني</div>
+                  <div class="contact-info-value"><a href="mailto:contact@crsic.dz">contact@crsic.dz</a></div>
+                </div>
+              </div>
+              <div class="contact-info-item">
+                <div class="contact-icon-wrap"><svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path
+                      d="M3 3S2 3 2 4s0.5 4 4 7.5S13.5 14 13.5 14 14 14 14 13L12.5 10.5S12 10 11.5 10.5L10 11.5S9 12 8 11 5.5 8 5 7s0 -2 0 -2L6 3.5S6.5 3 6 2.5L3.5 1S3 1 3 3Z"
+                      stroke="#1B4332" stroke-width="1" fill="none" />
+                  </svg></div>
+                <div>
+                  <div class="contact-info-label" data-i18n="contact_phone_label">الهاتف</div>
+                  <div class="contact-info-value"><a href="tel:+21329146190">+213 29 14 61 90</a></div>
+                </div>
+              </div>
+              <div class="contact-info-item">
+                <div class="contact-icon-wrap">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <rect x="1" y="3" width="14" height="10" rx="2" stroke="#1B4332" stroke-width="1" fill="none" />
+                    <line x1="1" y1="6" x2="15" y2="6" stroke="#1B4332" stroke-width="0.8" />
+                    <line x1="5" y1="3" x2="5" y2="6" stroke="#1B4332" stroke-width="0.8" />
+                    <line x1="11" y1="3" x2="11" y2="6" stroke="#1B4332" stroke-width="0.8" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="contact-info-label" data-i18n="contact_webmail_label">البريد المهني</div>
+                  <div class="contact-info-value"><a href="https://www.crsic.dz:2096/" target="_blank"
+                      rel="noopener">webmail.crsic.dz</a></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Social -->
+            <h3 style="font-family:'Amiri',serif;font-size:18px;color:var(--green-deep);margin-bottom:1rem;"
+              data-i18n="contact_social_h">تابعونا على مواقع التواصل</h3>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <a href="https://www.facebook.com/crsiclagh03/" target="_blank" rel="noopener"
+                class="social-btn--labeled">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path d="M8.5 2H10V0H8.5C7 0 6 1 6 2.5V4H4.5V6H6V14H8V6H9.5L10 4H8V2.5C8 2.2 8.2 2 8.5 2Z"
+                    fill="currentColor" />
+                </svg>
+                Facebook
+              </a>
+              <a href="https://x.com/crsiclagh03" target="_blank" rel="noopener" class="social-btn--labeled">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <path d="M1 1L6 7.5L1 13H2.5L6.7 8.4L10 13H13L7.8 6.2L12.5 1H11L7.1 5.3L4 1H1Z" fill="currentColor" />
+                </svg>
+                Twitter / X
+              </a>
+              <a href="https://dz.linkedin.com/company/crsic-laghouat" target="_blank" rel="noopener"
+                class="social-btn--labeled">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                  <rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1" fill="none" />
+                  <circle cx="4" cy="4.5" r="0.8" fill="currentColor" />
+                  <line x1="4" y1="6.5" x2="4" y2="11" stroke="currentColor" stroke-width="1" />
+                  <path d="M6.5 6.5V11M6.5 8C6.5 7 7 6.5 8 6.5S9.5 7 9.5 8V11" stroke="currentColor" stroke-width="1"
+                    fill="none" />
+                </svg>
+                LinkedIn
+              </a>
+            </div>
+          </div>
+
+          <!-- Contact form -->
+          <div>
+            <h2 class="inner-section-title" data-i18n="contact_form_h">أرسل رسالة</h2>
+            <div class="c-card">
+              <form id="contactForm">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label" for="f-name"><span class="field-required">*</span><span
+                        data-i18n="form_name_label">الاسم الكامل</span></label>
+                    <input class="form-input" type="text" id="f-name" placeholder="أدخل اسمك الكامل"
+                      data-i18n-placeholder="form_name_ph" autocomplete="name" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="f-email"><span class="field-required">*</span><span
+                        data-i18n="form_email_label">البريد الإلكتروني</span></label>
+                    <input class="form-input" type="email" id="f-email" placeholder="example@email.com"
+                      data-i18n-placeholder="form_email_ph" autocomplete="email" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="f-inst" data-i18n="form_inst_label">المؤسسة / الجامعة</label>
+                    <input class="form-input" type="text" id="f-inst" placeholder="اختياري"
+                      data-i18n-placeholder="form_inst_ph" autocomplete="organization">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="f-subject"><span class="field-required">*</span><span
+                        data-i18n="form_subject_label">موضوع الرسالة</span></label>
+                    <input class="form-input" type="text" id="f-subject" placeholder="موضوع رسالتك"
+                      data-i18n-placeholder="form_subject_ph" required>
+                  </div>
+                  <div class="form-group full">
+                    <label class="form-label" for="f-msg"><span class="field-required">*</span><span
+                        data-i18n="form_msg_label">نص الرسالة</span></label>
+                    <textarea class="form-textarea" id="f-msg" placeholder="اكتب رسالتك هنا..."
+                      data-i18n-placeholder="form_msg_ph" required></textarea>
+                  </div>
+                </div>
+                <p class="form-required-note" data-i18n="form_required_note">* حقول إلزامية</p>
+                <button type="submit" class="form-submit" data-i18n="form_submit">إرسال الرسالة</button>
+              </form>
+              <div id="form-success" class="form-success" style="display:none;" data-i18n="form_success">
+                ✓ تم إرسال رسالتك بنجاح. سنتواصل معك في أقرب وقت.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /app -->
+
+  <!-- ════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════ -->
+  <footer class="site-footer" id="footer">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-head">
+          <div class="footer-brand-mark">
+            <img src="img/crsic_logo.png" alt="شعار المركز" width="36" height="36"
+              style="object-fit:contain;display:block;">
+          </div>
+          <div>
+            <div class="footer-brand-name" data-i18n="footer_brand_name">مركز البحث في العلوم الإسلامية والحضارة</div>
+            <div class="footer-brand-sub">CRSIC — Laghouat, Algeria</div>
+          </div>
+        </div>
+        <p class="footer-brand-desc" data-i18n="footer_brand_desc">المركز الوطني الوحيد المتخصص في البحث في العلوم
+          الإسلامية والحضارية، يعمل على إنتاج المعرفة ونشرها وتكوين الباحثين.</p>
+      </div>
+      <div>
+        <div class="footer-col-title" data-i18n="footer_links_h">روابط سريعة</div>
+        <ul class="footer-links">
+          <li><a href="#" data-page="about" data-i18n="footer_link_about">تقديم المركز</a></li>
+          <li><a href="#" data-page="org" data-i18n="footer_link_org">الهيكل التنظيمي</a></li>
+          <li><a href="#" data-page="research" data-i18n="footer_link_research">البحث العلمي</a></li>
+          <li><a href="#" data-page="publications" data-i18n="footer_link_pubs">الإصدارات العلمية</a></li>
+          <li><a href="#" data-page="events" data-i18n="footer_link_events">الملتقيات والفعاليات</a></li>
+          <li><a href="#" data-page="cooperation" data-i18n="footer_link_cooperation">الشراكات والتعاون</a></li>
+          <li><a href="#" data-page="journals" data-i18n="footer_link_journals">المجلات العلمية</a></li>
+          <li><a href="#" data-page="contact" data-i18n="footer_link_contact">اتصل بالمركز</a></li>
+          <li><a href="https://www.crsic.dz/bib/opac_css/" target="_blank" rel="noopener"
+              data-i18n="footer_link_library">المكتبة الرقمية</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title" data-i18n="footer_contact_h">اتصل بنا</div>
+        <div class="footer-contact-item">
+          <svg class="footer-contact-icon" viewBox="0 0 16 16" fill="none">
+            <path d="M8 1.5C5.5 1.5 3.5 3.5 3.5 6C3.5 9.5 8 14.5 8 14.5S12.5 9.5 12.5 6C12.5 3.5 10.5 1.5 8 1.5Z"
+              stroke="#C9A84C" stroke-width="1" fill="none" />
+            <circle cx="8" cy="6" r="1.5" stroke="#C9A84C" stroke-width="1" fill="none" />
+          </svg>
+          <span class="footer-contact-text" data-i18n-html="footer_contact_addr">مقابل المستشفى الشهيد بن علي
+            دغمان<br>ص.ب 9002 – الأغواط، الجزائر</span>
+        </div>
+        <div class="footer-contact-item">
+          <svg class="footer-contact-icon" viewBox="0 0 16 16" fill="none">
+            <path
+              d="M2 4.5C2 3.7 2.7 3 3.5 3H12.5C13.3 3 14 3.7 14 4.5V11.5C14 12.3 13.3 13 12.5 13H3.5C2.7 13 2 12.3 2 11.5V4.5Z"
+              stroke="#C9A84C" stroke-width="1" fill="none" />
+            <path d="M2 5L8 9L14 5" stroke="#C9A84C" stroke-width="1" />
+          </svg>
+          <span class="footer-contact-text"><a href="mailto:contact@crsic.dz">contact@crsic.dz</a></span>
+        </div>
+        <div class="footer-contact-item">
+          <svg class="footer-contact-icon" viewBox="0 0 16 16" fill="none">
+            <path
+              d="M3 3S2 3 2 4 2.5 9 6 12.5 13.5 14 13.5 14 14 14 14 13L12.5 10.5S12 10 11.5 10.5L10 11.5S9 12 8 11 5.5 8 5 7s0-2 0-2L6 3.5S6.5 3 6 2.5L3.5 1S3 1 3 3Z"
+              stroke="#C9A84C" stroke-width="1" fill="none" />
+          </svg>
+          <span class="footer-contact-text">+213 29 14 61 90</span>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title" data-i18n="footer_journal_h">المجلة العلمية</div>
+        <div class="footer-journal-box">
+          <div class="footer-journal-label" data-i18n="footer_journal_label">مجلة محكمة — فصل سنوية</div>
+          <div class="footer-journal-name" data-i18n="footer_journal_name">مجلة العلوم الإسلامية والحضارة</div>
+          <a href="https://crsic.dz/ojsre/" target="_blank" rel="noopener" class="footer-journal-btn"
+            data-i18n="footer_journal_btn">الوصول إلى المجلة ←</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy" data-i18n="footer_copy">© 2024 <span>مركز البحث في العلوم الإسلامية والحضارة</span> —
+        جميع الحقوق محفوظة</div>
+      <div class="footer-social">
+        <a class="footer-social-btn" href="https://www.facebook.com/crsiclagh03/" target="_blank" rel="noopener"
+          title="Facebook">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+            <path d="M8.5 2H10V0H8.5C7 0 6 1 6 2.5V4H4.5V6H6V14H8V6H9.5L10 4H8V2.5C8 2.2 8.2 2 8.5 2Z" fill="#9DBFB2" />
+          </svg>
+        </a>
+        <a class="footer-social-btn" href="https://x.com/crsiclagh03" target="_blank" rel="noopener" title="X">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+            <path d="M1 1L6 7.5L1 13H2.5L6.7 8.4L10 13H13L7.8 6.2L12.5 1H11L7.1 5.3L4 1H1Z" fill="#9DBFB2" />
+          </svg>
+        </a>
+        <a class="footer-social-btn" href="https://dz.linkedin.com/company/crsic-laghouat" target="_blank"
+          rel="noopener" title="LinkedIn">
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+            <rect x="1" y="1" width="12" height="12" rx="2" stroke="#9DBFB2" stroke-width="1" fill="none" />
+            <circle cx="4" cy="4.5" r="0.8" fill="#9DBFB2" />
+            <line x1="4" y1="6.5" x2="4" y2="11" stroke="#9DBFB2" stroke-width="1" />
+            <path d="M6.5 6.5V11M6.5 8C6.5 7 7 6.5 8 6.5S9.5 7 9.5 8V11" stroke="#9DBFB2" stroke-width="1"
+              fill="none" />
+          </svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-ministry" data-i18n="footer_ministry">
+      تابع للـ <span>المديرية العامة للبحث العلمي والتطوير التكنولوجي – وزارة التعليم العالي والبحث العلمي،
+        الجزائر</span>
+    </div>
+  </footer>
+
+  <!-- PUBLICATION LIGHTBOX -->
+  <div class="lightbox-overlay" id="lightbox" role="dialog" aria-modal="true">
+    <div style="position:relative;max-width:580px;width:100%;">
+      <div class="lightbox-panel">
+        <button type="button" class="lightbox-close" aria-label="إغلاق">&times;</button>
+        <div class="lightbox-top">
+          <div class="lightbox-cover" id="lb-cover"></div>
+          <div style="flex:1;min-width:0;">
+            <span class="lightbox-dept-badge" id="lb-dept"></span>
+            <div class="lightbox-title" id="lb-title"></div>
+            <div class="lightbox-year" id="lb-year"></div>
+          </div>
+        </div>
+        <div class="lightbox-body">
+          <p class="lightbox-desc" id="lb-desc"></p>
+          <div class="lightbox-actions">
+            <a href="https://www.crsic.dz/?page_id=643" target="_blank" rel="noopener" class="lb-btn-primary"
+              data-i18n="lb_view_btn">عرض في المنصة</a>
+            <button type="button" class="lb-btn-ghost" data-i18n="lb_close_btn">إغلاق</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+     MOBILE DRAWER
+════════════════════════════════════════════════════ -->
+  <div class="nav-overlay" id="navOverlay"></div>
+  <div class="nav-drawer" id="navDrawer" role="dialog" aria-modal="true" aria-label="القائمة">
+    <div class="drawer-header">
+      <div class="drawer-brand" data-i18n="nav_title_short">CRSIC<span data-i18n="nav_subtitle">الأغواط، الجزائر</span>
+      </div>
+      <button class="drawer-close" id="drawerClose" aria-label="إغلاق القائمة">✕</button>
+    </div>
+    <nav class="drawer-nav">
+      <a class="drawer-item" href="#" data-page="home" data-i18n="nav_home">الرئيسية</a>
+      <div class="drawer-section-label" data-i18n="drawer_about">عن المركز</div>
+      <a class="drawer-item sub" href="#" data-page="about" data-i18n="nav_presentation">تقديم المركز</a>
+      <a class="drawer-item sub" href="#" data-page="org" data-i18n="nav_org">الهيكل التنظيمي</a>
+      <a class="drawer-item sub" href="#" data-page="research" data-i18n="nav_research">البحث العلمي</a>
+      <div class="drawer-divider"></div>
+      <div class="drawer-section-label" data-i18n="drawer_output">البحث والإصدارات</div>
+      <a class="drawer-item sub" href="#" data-page="publications" data-i18n="nav_publications">الإصدارات العلمية</a>
+      <a class="drawer-item sub" href="#" data-page="journals" data-i18n="nav_journals">المجلات العلمية</a>
+      <div class="drawer-divider"></div>
+      <div class="drawer-section-label" data-i18n="drawer_events">الفعاليات والتعاون</div>
+      <a class="drawer-item sub" href="#" data-page="events" data-tab="intl" data-i18n="nav_events_intl">ملتقيات
+        دولية</a>
+      <a class="drawer-item sub" href="#" data-page="events" data-tab="nat" data-i18n="nav_events_nat">ملتقيات وطنية</a>
+      <a class="drawer-item sub" href="#" data-page="cooperation" data-i18n="nav_cooperation">الشراكات والتعاون</a>
+      <div class="drawer-divider"></div>
+      <a class="drawer-item" href="#" data-page="contact" data-i18n="nav_contact_short">اتصل بنا</a>
+    </nav>
+    <div class="drawer-footer">
+      <a class="drawer-contact-link" href="mailto:contact@crsic.dz">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+          <path
+            d="M2 4.5C2 3.7 2.7 3 3.5 3H12.5C13.3 3 14 3.7 14 4.5V11.5C14 12.3 13.3 13 12.5 13H3.5C2.7 13 2 12.3 2 11.5V4.5Z"
+            stroke="#C9A84C" stroke-width="1" />
+          <path d="M2 5L8 9L14 5" stroke="#C9A84C" stroke-width="1" />
+        </svg>
+        contact@crsic.dz
+      </a>
+      <a class="drawer-contact-link" href="tel:+21329146190">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+          <path
+            d="M3 3S2 3 2 4s0.5 4 4 7.5S13.5 14 13.5 14 14 14 14 13L12.5 10.5S12 10 11.5 10.5L10 11.5S9 12 8 11 5.5 8 5 7s0-2 0-2L6 3.5S6.5 3 6 2.5L3.5 1S3 1 3 3Z"
+            stroke="#C9A84C" stroke-width="1" />
+        </svg>
+        +213 29 14 61 90
+      </a>
+      <div class="drawer-lang-row">
+        <span class="drawer-lang-label" data-i18n="lang_label">اللغة:</span>
+        <div class="lang-toggle" id="langToggleMobile" role="group" aria-label="اختيار اللغة">
+          <button class="lang-btn active" data-lang="ar" aria-pressed="true" aria-label="عربي — Arabic">AR</button>
+          <button class="lang-btn" data-lang="en" aria-pressed="false" aria-label="Switch to English">EN</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+     BOTTOM TAB BAR (mobile)
+════════════════════════════════════════════════════ -->
+  <nav class="bottom-tabs" id="bottomTabs" aria-label="التنقل السريع">
+    <div class="bottom-tabs-inner">
+      <a class="bottom-tab active" data-page="home" href="#" aria-label="الرئيسية">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M3 9.5L10 3L17 9.5V17H13V13H7V17H3V9.5Z" stroke="currentColor" stroke-width="1.3" fill="none"
+            stroke-linejoin="round" />
+        </svg>
+        <span data-i18n="nav_home">الرئيسية</span>
+      </a>
+      <a class="bottom-tab" data-page="publications" href="#" aria-label="الإصدارات">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="3" y="2" width="11" height="16" rx="1.5" stroke="currentColor" stroke-width="1.3" />
+          <path d="M6 6h5M6 9h5M6 12h3" stroke="currentColor" stroke-width="1.1" />
+          <rect x="14" y="5" width="3" height="13" rx="1" stroke="currentColor" stroke-width="1.1" />
+        </svg>
+        <span data-i18n="nav_pubs_short">الإصدارات</span>
+      </a>
+      <a class="bottom-tab" data-page="journals" href="#" aria-label="المجلات">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.3" />
+          <path d="M2 8h16" stroke="currentColor" stroke-width="1" />
+          <path d="M7 12.5h6" stroke="currentColor" stroke-width="1.3" />
+        </svg>
+        <span data-i18n="nav_journals_short">المجلات</span>
+      </a>
+      <a class="bottom-tab" data-page="events" href="#" aria-label="الفعاليات">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="2" y="4" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.3" />
+          <path d="M2 9h16" stroke="currentColor" stroke-width="1" />
+          <path d="M6.5 2v3M13.5 2v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+        </svg>
+        <span data-i18n="nav_events_short">الفعاليات</span>
+      </a>
+      <button class="bottom-tab" id="moreTabBtn" aria-label="المزيد">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <circle cx="4" cy="10" r="1.5" fill="currentColor" />
+          <circle cx="10" cy="10" r="1.5" fill="currentColor" />
+          <circle cx="16" cy="10" r="1.5" fill="currentColor" />
+        </svg>
+        <span data-i18n="nav_more">المزيد</span>
+      </button>
+    </div>
+  </nav>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+
+</html>

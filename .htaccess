@@ -1,0 +1,4 @@
+RewriteEngine On
+# Legacy about page → SPA about section (NE keeps # unencoded)
+RewriteRule ^about\.html$ /index.html#about [R=301,NE,L]
+RewriteRule ^about/?$ /index.html#about [R=301,NE,L]

@@ -1,0 +1,3 @@
+# Netlify redirects — legacy about page → SPA about section
+/about.html  /index.html#about  301!
+/about       /index.html#about  301!
