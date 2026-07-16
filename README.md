@@ -170,12 +170,15 @@ erDiagram
 
 #### `events.json`
 
-| Field                  | Type       | Rules                                              |
-| ---------------------- | ---------- | -------------------------------------------------- | ------------ |
-| `intl` / `nat`         | `object[]` | International vs national                          |
-| `day`, `month`, `year` | string     | Display fragments (month often abbreviated Arabic) |
-| `title`, `type`        | string     | Title and event kind label                         |
-| `status`               | `"done"`   | `"upcoming"`                                       | Status badge |
+| Field | Type | Rules |
+|-------|------|--------|
+| `intl` / `nat` | `object[]` | International vs national |
+| `day`, `month`, `year` | string | Display fragments (month often abbreviated Arabic) |
+| `title`, `type` | string | Title and event kind label |
+| `status` | `"done"` \| `"upcoming"` | Status badge |
+| `img` | string (optional) | Home teaser photo; if omitted, Holders `0`–`5` cycle |
+
+Home teaser `#home-events-grid` uses `getHomeEvents(3)` (intl + nat merged, newest first). Full events page still lists all items by year.
 
 #### `partners.json`
 
@@ -226,11 +229,11 @@ Approximate inventory of shipped content:
 | Partners           | **11** — 3 international + 8 national                                                 |
 | Journals           | **4** — all link to `https://crsic.dz/ojsre/`                                         |
 | News               | **9** items (6 with `img/Holders/*.jpg`, 3 with `img: null`)                          |
-| Locale keys        | **~235** per language                                                                 |
+| Locale keys        | **~237** per language (incl. `ev_badge_upcoming`, `home_event_loc`)               |
 | Admin accounts     | **None** — no auth                                                                    |
 | Sample credentials | **None**                                                                              |
 
-**Hard-coded in HTML (not JSON):** hero copy (via i18n keys), about / mission / vision / values, organisational chart, research department tabs (`r1`–`r4`) and team descriptions, some home teaser blocks. Changing those requires editing `index.html` and/or locale strings.
+**Hard-coded in HTML (not JSON):** hero copy (via i18n keys), about / mission / vision / values, organisational chart, research department tabs (`r1`–`r4`) and team descriptions. Home publications, **events**, and news teasers are JSON-driven.
 
 **Client-only persistence:**
 
@@ -419,8 +422,9 @@ Deep links may pass `data-tab` / `data-filter` on navigable elements.
 - **Desktop:** sticky nav, mega-menus, language toggle, journals CTA
 - **Mobile:** drawer + bottom tab bar (home / publications / journals / events / more)
 - **Breadcrumb** bar (hidden on home)
+- **Publications / events / news (home):** JSON-filled grids (`#home-pub-grid`, `#home-events-grid`, `#home-news-grid`)
 - **Publications:** type filter + search; lightbox with cover and CTA to external library page
-- **Events / research:** tab switching
+- **Events / research:** tab switching; home shows 3 newest from `events.json`
 - **Language:** AR (RTL) ↔ EN (LTR); optional banner suggesting English when browser language is `en`/`fr` and no stored preference
 - **Contact:** client-side required-field shake; success message; opens mail client
 - **A11y:** skip link, ARIA on nav/drawer, `prefers-reduced-motion` respected in animations
@@ -583,7 +587,7 @@ No separate staging config files exist in-repo.
 | Step | Work | Status |
 |------|------|--------|
 | 1 | Git workflow (init, ignore, branching/commits docs) | **Done** — local `main` + initial commit; see §5 |
-| 2 | Home content fully from data (events teaser) | Pending |
+| 2 | Home content fully from data (events teaser) | **Done** (2026-07-16) — `#home-events-grid` ← `getHomeEvents(3)` |
 | 3 | Smoke-check habit before merges | Pending (checklist in §5.5) |
 | 3.5 | Full UI/UX audit → responsiveness → animation smoothness | Pending |
 | 4 | Internal web app + database (users, roles, publish news/books/etc.) — **no external CMS** | Pending (design after 3.5) |
@@ -593,15 +597,13 @@ No separate staging config files exist in-repo.
 1. **No remote** — local `main` only until `origin` is added.
 2. **Content language** — dynamic JSON bodies are Arabic-only; English UI still shows Arabic titles/descriptions for pubs/events/news.
 3. **Contact depends on a local mail client** — no server-side mailer or form API.
-4. **Home events teaser** may still include partially hard-coded markup vs fully JSON-driven lists on the events page.
-5. **Audit TODOs are closed**; no `TODO`/`FIXME` markers remain in app JS for open defects.
+4. **Audit TODOs are closed**; no `TODO`/`FIXME` markers remain in app JS for open defects.
 
 ### Technical debt
 
 | Priority | Item |
 |----------|------|
 | High | Add remote + confirm first push when hosting is ready |
-| High | Step 2 — home events from JSON only |
 | Medium | Step 3.5 — UI/UX audit, responsiveness, motion polish |
 | Medium | Dual-field or locale-keyed content if EN parity is required |
 | Medium | Further image compression / WebP for covers and Holders |

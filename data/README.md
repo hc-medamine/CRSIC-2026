@@ -55,12 +55,15 @@ Append to `intl` or `nat` in `events.json`:
   "year": "2026",
   "title": "عنوان الملتقى",
   "type": "ملتقى وطني",
-  "status": "done"
+  "status": "done",
+  "img": "img/Holders/0.jpg"
 }
 ```
 
-`status`: `"done"` or `"upcoming"`.
+`status`: `"done"` or `"upcoming"`.  
+`img` is **optional** — used by the home teaser cards; if omitted, the home grid cycles `img/Holders/0.jpg`–`5.jpg`.
 
+The home section `#home-events-grid` shows the **3 newest** events (intl + nat merged, sorted by date). The full events page still lists every item by year.
 ## Add news
 
 ```json

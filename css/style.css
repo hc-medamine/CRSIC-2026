@@ -2016,6 +2016,10 @@ footer.site-footer { background: var(--green-deep); }
   min-height: 260px;
   border-radius: 10px;
 }
+.skeleton-event {
+  min-height: 280px;
+  border-radius: 8px;
+}
 /* Phase 3 Dynamic Content Cross-fade */
 @media (prefers-reduced-motion: no-preference) {
   [data-loaded="1"] > *:not(.skeleton) {

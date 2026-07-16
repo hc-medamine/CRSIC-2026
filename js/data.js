@@ -142,6 +142,52 @@ export function getNatEvents() {
   return natEvents;
 }
 
+/** Arabic month abbreviations used in events.json → sort rank (1–12). */
+const MONTH_RANK = {
+  يان: 1, ينا: 1, جان: 1,
+  فيف: 2, فبر: 2,
+  مار: 3, مارس: 3,
+  أفر: 4, افر: 4, أبر: 4,
+  ماي: 5, مايو: 5,
+  جون: 6, يون: 6,
+  جوي: 7, يول: 7,
+  أوت: 8, اوت: 8, أغس: 8,
+  سبت: 9, سبتمبر: 9,
+  أكت: 10, اكت: 10, أكتو: 10,
+  نوف: 11,
+  ديس: 12,
+};
+
+/**
+ * Sort key YYYYMMDD from event day/month/year fields (best-effort).
+ * @param {object} e
+ * @returns {number}
+ */
+function eventSortKey(e) {
+  const y = parseInt(e && e.year, 10) || 0;
+  const m = MONTH_RANK[String((e && e.month) || '').trim()] || 0;
+  const d = parseInt(e && e.day, 10) || 0;
+  return y * 10000 + m * 100 + d;
+}
+
+/**
+ * Merge international + national events, newest first.
+ * @returns {object[]}
+ */
+export function getAllEvents() {
+  return [...intlEvents, ...natEvents].sort((a, b) => eventSortKey(b) - eventSortKey(a));
+}
+
+/**
+ * Latest events for the home teaser (default 3).
+ * @param {number} [limit=3]
+ * @returns {object[]}
+ */
+export function getHomeEvents(limit = 3) {
+  const n = Math.max(0, Number(limit) || 0);
+  return getAllEvents().slice(0, n);
+}
+
 /** @returns {object[]} */
 export function getNatPartners() {
   return natPartners;

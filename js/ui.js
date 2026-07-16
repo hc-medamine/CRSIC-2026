@@ -10,6 +10,7 @@ import {
   getJournals,
   getIntlEvents,
   getNatEvents,
+  getHomeEvents,
   getNatPartners,
   getIntlPartners
 } from './data.js';
@@ -21,7 +22,7 @@ import {
   safeImageSrc
 } from './utils.js';
 import { createPubCard } from './components/pubCard.js';
-import { createEventYearGroups } from './components/eventCard.js';
+import { createEventYearGroups, createHomeEventCard } from './components/eventCard.js';
 import { createPartnerCard } from './components/partnerCard.js';
 import { createJournalCard } from './components/journalCard.js';
 import { createNewsCard } from './components/newsCard.js';
@@ -67,7 +68,7 @@ const SECTION_CONTAINERS = {
   publications: ['home-pub-grid', 'pub-grid'],
   news: ['home-news-grid'],
   journals: ['journals-grid'],
-  events: ['ev-intl-list', 'ev-nat-list'],
+  events: ['home-events-grid', 'ev-intl-list', 'ev-nat-list'],
   partners: ['nat-partners', 'intl-partners'],
 };
 
@@ -75,6 +76,7 @@ const SECTION_CONTAINERS = {
 export function primeSkeletons() {
   fillSkeletons(document.getElementById('home-pub-grid'), 'skeleton-pub', 4);
   fillSkeletons(document.getElementById('home-news-grid'), 'skeleton-news', 6);
+  fillSkeletons(document.getElementById('home-events-grid'), 'skeleton-event', 3);
   fillSkeletons(document.getElementById('pub-grid'), 'skeleton-pub', 8);
   fillSkeletons(document.getElementById('journals-grid'), 'skeleton-journal', 4);
 }
@@ -115,11 +117,13 @@ export function showDataLoadErrors(errors) {
 export function renderAll() {
   const hpg = document.getElementById('home-pub-grid');
   const hng = document.getElementById('home-news-grid');
+  const heg = document.getElementById('home-events-grid');
   const pg = document.getElementById('pub-grid');
   const jg = document.getElementById('journals-grid');
 
   fillSkeletons(hpg, 'skeleton-pub', 4);
   fillSkeletons(hng, 'skeleton-news', 6);
+  fillSkeletons(heg, 'skeleton-event', 3);
   fillSkeletons(pg, 'skeleton-pub', 8);
   fillSkeletons(jg, 'skeleton-journal', 4);
 
@@ -127,6 +131,7 @@ export function renderAll() {
     const pubs = getPubs();
     const news = getNews();
     const journals = getJournals();
+    const homeEvents = getHomeEvents(3);
     const evIntl = document.getElementById('ev-intl-list');
     const evNat = document.getElementById('ev-nat-list');
     const natP = document.getElementById('nat-partners');
@@ -139,6 +144,10 @@ export function renderAll() {
     if (hng) {
       replaceChildren(hng, news.slice(0, 6).map(createNewsCard));
       hng.dataset.loaded = '1';
+    }
+    if (heg) {
+      replaceChildren(heg, homeEvents.map(createHomeEventCard));
+      heg.dataset.loaded = '1';
     }
     if (pg) {
       replaceChildren(pg, pubs.map(createPubCard));
