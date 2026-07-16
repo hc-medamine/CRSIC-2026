@@ -6,6 +6,7 @@ Living single source of truth for the public site of **مركز البحث في 
 |--------------|------|
 | [WORKLOG.md](./WORKLOG.md) | Changelog and status snapshot |
 | [AUDIT.md](./AUDIT.md) | Closed architecture audit (P0–P3) |
+| [SMOKE.md](./SMOKE.md) | Pre-merge smoke checklist (~5 minutes) |
 | [data/README.md](./data/README.md) | Content-editor guide for JSON / locales |
 | [data/CMS.md](./data/CMS.md) | Remote JSON publish contract (`CONTENT_BASE_URL`) |
 
@@ -366,12 +367,15 @@ Minimum WORKLOG entry shape:
 
 ### 5.5 Code review checklist (before merge to `main`)
 
+Short gate (always):
+
 - [ ] Site loads over HTTP; no data-error banner for expected files
 - [ ] `covers.length === pubs.length` if publications changed
 - [ ] AR + EN locale keys still match if chrome strings changed
 - [ ] No raw HTML in JSON content string fields
 - [ ] README / WORKLOG updated when structure or process changed
-- [ ] Smoke: home, lang toggle, publications filter, contact, `#about`
+
+**Full smoke run:** use **[SMOKE.md](./SMOKE.md)** (~5 minutes) before merging to `main`. Habit: no merge without at least sections A–D checked.
 
 ### 5.6 First-time identity (required once per machine)
 
@@ -588,7 +592,7 @@ No separate staging config files exist in-repo.
 |------|------|--------|
 | 1 | Git workflow (init, ignore, branching/commits docs) | **Done** — local `main` + initial commit; see §5 |
 | 2 | Home content fully from data (events teaser) | **Done** (2026-07-16) — `#home-events-grid` ← `getHomeEvents(3)` |
-| 3 | Smoke-check habit before merges | Pending (checklist in §5.5) |
+| 3 | Smoke-check habit before merges | **Done** — [SMOKE.md](./SMOKE.md) + README §5.5 |
 | 3.5 | Full UI/UX audit → responsiveness → animation smoothness | Pending |
 | 4 | Internal web app + database (users, roles, publish news/books/etc.) — **no external CMS** | Pending (design after 3.5) |
 

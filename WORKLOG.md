@@ -8,6 +8,7 @@ Living record of architectural and feature work. **Append new changelog entries 
 | [data/README.md](./data/README.md) | Public JSON / locale editor guide |
 | [data/CMS.md](./data/CMS.md) | `CONTENT_BASE_URL` publish contract |
 | [README.md](./README.md) | Living project source of truth (incl. Git workflow §5) |
+| [SMOKE.md](./SMOKE.md) | Pre-merge smoke checklist (~5 min) |
 | **WORKLOG.md** | This file |
 
 ---
@@ -21,13 +22,28 @@ Living record of architectural and feature work. **Append new changelog entries 
 | Git repository (`main`) | **Initialised** — initial commit `5bfb745`; no remote yet |
 | Git workflow docs | **Done** — [README.md §5](./README.md) |
 | Step 2 — home events from JSON | **Done** (branch `feature/home-events-json`) |
-| Step 3 — smoke checklist habit | Pending (see README §5.5) |
-| Step 3.5 — UI/UX audit / responsive / motion | Pending |
+| Step 3 — smoke checklist habit | **Done** — [SMOKE.md](./SMOKE.md) |
+| Step 3.5 — UI/UX audit / responsive / motion | **In progress** |
 | Step 4 — internal app + DB (no external CMS) | Pending (after 3.5) |
 
 ---
 
 ## Changelog
+
+### 2026-07-16 — Smoke checklist habit (step 3)
+
+**Why:** No automated tests; merges need a repeatable human gate so data/routing/i18n regressions are caught early.
+
+**Done:**
+- Added [SMOKE.md](./SMOKE.md) — sections A–F (boot, routes, i18n, features, content invariants, motion/layout)
+- Pointed README §5.5 at SMOKE.md; rule: no merge to `main` without at least A–D
+- Marked delivery sequence step 3 **Done** in README §10
+
+**Files:** `SMOKE.md`, `README.md`, `WORKLOG.md`
+
+**Next:** Step 3.5 — full UI/UX audit, responsiveness, animation smoothness.
+
+---
 
 ### 2026-07-16 — Home events teaser from JSON (step 2)
 
