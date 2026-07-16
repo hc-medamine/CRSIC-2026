@@ -7,6 +7,7 @@ Living single source of truth for the public site of **مركز البحث في 
 | [WORKLOG.md](./WORKLOG.md) | Changelog and status snapshot |
 | [AUDIT.md](./AUDIT.md) | Closed architecture audit (P0–P3) |
 | [SMOKE.md](./SMOKE.md) | Pre-merge smoke checklist (~5 minutes) |
+| [UIUX.md](./UIUX.md) | UI/UX audit log (step 3.5) |
 | [data/README.md](./data/README.md) | Content-editor guide for JSON / locales |
 | [data/CMS.md](./data/CMS.md) | Remote JSON publish contract (`CONTENT_BASE_URL`) |
 
@@ -593,8 +594,8 @@ No separate staging config files exist in-repo.
 | 1 | Git workflow (init, ignore, branching/commits docs) | **Done** — local `main` + initial commit; see §5 |
 | 2 | Home content fully from data (events teaser) | **Done** (2026-07-16) — `#home-events-grid` ← `getHomeEvents(3)` |
 | 3 | Smoke-check habit before merges | **Done** — [SMOKE.md](./SMOKE.md) + README §5.5 |
-| 3.5 | Full UI/UX audit → responsiveness → animation smoothness | Pending |
-| 4 | Internal web app + database (users, roles, publish news/books/etc.) — **no external CMS** | Pending (design after 3.5) |
+| 3.5 | Full UI/UX audit → responsiveness → animation smoothness | **Done** — [UIUX.md](./UIUX.md) |
+| 4 | Internal web app + database (users, roles, publish news/books/etc.) — **no external CMS** | Pending (design next) |
 
 ### Known issues / gaps
 
@@ -608,7 +609,6 @@ No separate staging config files exist in-repo.
 | Priority | Item |
 |----------|------|
 | High | Add remote + confirm first push when hosting is ready |
-| Medium | Step 3.5 — UI/UX audit, responsiveness, motion polish |
 | Medium | Dual-field or locale-keyed content if EN parity is required |
 | Medium | Further image compression / WebP for covers and Holders |
 | Low | Introduce linting/formatting once the team grows |

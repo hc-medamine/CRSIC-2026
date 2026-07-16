@@ -261,8 +261,12 @@ export function updateTabIndicator(bar) {
   if (!active) return;
   const barRect = bar.getBoundingClientRect();
   const activeRect = active.getBoundingClientRect();
-  bar.style.setProperty('--ind-left', (activeRect.left - barRect.left) + 'px');
-  bar.style.setProperty('--ind-width', activeRect.width + 'px');
+  const x = activeRect.left - barRect.left;
+  const w = activeRect.width;
+  const barW = barRect.width || 1;
+  /* transform: translateX + scaleX (avoids animating left/width) */
+  bar.style.setProperty('--ind-x', `${x}px`);
+  bar.style.setProperty('--ind-sx', String(w / barW));
 }
 
 /* ── LIGHTBOX ────────────────────────────────────────── */

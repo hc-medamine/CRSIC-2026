@@ -165,6 +165,7 @@ function initHeroCursorGlow() {
 
 /* ── [ANIM A6] RIPPLE ────────────────────────────────── */
 function initRippleEffect() {
+  if (prefersReducedMotion()) return;
   const TARGETS = '.btn-primary-cta, .btn-ghost-cta, .nav-util-btn, .nav-cta, .tab-btn, .dept-tab';
   document.addEventListener('click', (e) => {
     const btn = e.target.closest(TARGETS);
@@ -192,7 +193,10 @@ function initBackToTop() {
     }
   }, { passive: true });
   btn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({
+      top: 0,
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    });
   });
 }
 
@@ -220,8 +224,8 @@ function initParallaxHero() {
       requestAnimationFrame(() => {
         const hero = document.querySelector('.page.active .page-hero-inner');
         if (hero) {
-          const parallax = (window.scrollY * 0.28).toFixed(1);
-          hero.style.setProperty('--parallax-y', parallax + 'px');
+          const max = Math.min(window.scrollY * 0.28, 120);
+          hero.style.setProperty('--parallax-y', max.toFixed(1) + 'px');
         }
         ticking = false;
       });
