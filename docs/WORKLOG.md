@@ -35,11 +35,31 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | Pending (design next — start in [prds/](./prds/)) |
+| Step 4 — internal app + DB (no external CMS) | **PRD in Review** — [2026-07-19-internal-content-management.md](./prds/2026-07-19-internal-content-management.md) |
+| Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-19 — Step 4 PRD decisions locked (Review)
+
+**Why:** Close open discovery questions before implementation.
+
+**Decisions recorded in PRD:**
+- Success = end-to-end CMS publish works (no minimum news volume **N**)
+- Public schema **P1** (compatible JSON subset); richer public detail pages deferred
+- Manual publish only (no scheduling in MVP)
+- Roles: Super Admin; Reviewer = centre-wide + all research depts; Editor = defined scopes and/or centre-wide; users can edit name/info after account creation
+- Preferred stack: **Node + local Postgres** (hosted Supabase rejected for Algeria residency)
+
+**Pending (not MVP):** more detailed public pages for **news** and **publications** (schema + SPA UI). Do not start until CMS publish path is stable under P1.
+
+**Files:** `docs/prds/2026-07-19-internal-content-management.md`, `docs/prds/README.md`, `docs/WORKLOG.md`
+
+**Next:** Stakeholder PRD review (next session) → Approved → Phase 0 host check (Node + Postgres on `crsic.dz`).
+
+---
 
 ### 2026-07-19 — Docs sync with project status
 

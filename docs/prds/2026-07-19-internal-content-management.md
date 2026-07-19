@@ -1,0 +1,600 @@
+# PRD: Internal Content Management App / تطبيق إدارة المحتوى الداخلي
+
+| Field | Value |
+|-------|--------|
+| Status | Review |
+| Date | 2026-07-19 |
+| Author | Product discovery (CRSIC 2026) |
+| Owners | _(to be assigned — CRSIC + implementing team)_ |
+| Related roadmap step | Step 4 — Internal web app + database (no external CMS) |
+| Supersedes | — |
+| Related | [data/CMS.md](../../data/CMS.md), [README.md §10](../../README.md), [docs/prds/TEMPLATE.md](./TEMPLATE.md) |
+
+**Document rule:** Facts confirmed in discovery are unmarked. Items that are not yet verified are labeled **Assumption**, **Open question**, or **Proposed**.
+
+---
+
+## 1. Problem
+
+### Problem statement
+
+CRSIC’s public website is a static SPA that loads institutional content from UTF-8 JSON files (`news.json`, `events.json`, `publications.json`, etc.). Staff who need to publish news, events, and publication metadata today must edit those files (or ask someone who can). There is no authenticated interface, no review workflow, no version history, and no audit trail.
+
+This creates operational risk for a public research centre under MESRS: slow updates, accidental broken JSON, unclear authorship, and no four-eyes control before content becomes public.
+
+### Who feels it
+
+| Actor | Pain today |
+|-------|------------|
+| Content editors / communications staff (primary) | Cannot publish independently; depend on file access or a technical intermediary |
+| Reviewers / managers | No structured review queue or approval record |
+| IT / webmaster | Manual JSON edits, deploy/cache risk, no permission model |
+| Public visitors (indirect) | Stale or inconsistent information when updates lag |
+
+### Confirmed context
+
+- Trigger: roadmap goal (Step 4), not an ad-hoc request.
+- Team size (first 6 months): **3–5** people who create or approve content.
+- Editors and reviewers are **usually different people**.
+- Journals remain on **OJS** (`https://crsic.dz/ojsre/`) — out of CMS ownership for journal issues/articles.
+- Arabic may go live while English is still **pending**.
+- App and published assets must run on the **same host as `crsic.dz`**, with data staying **in Algeria**.
+- Logins are **greenfield** (no LDAP/AD assumed).
+- Emergency publish bypass is **Phase 2**, not MVP.
+
+### Current workaround (corrected)
+
+**Assumption challenged and replaced:** the workaround is not “nothing.” Today content is maintained by editing static files under `/data` (and related images), optionally served via `CONTENT_BASE_URL`. See [data/README.md](../../data/README.md) and [data/CMS.md](../../data/CMS.md).
+
+---
+
+## 2. Goals
+
+### Goals (MVP)
+
+1. Authorized CRSIC staff can create, review, and publish **news**, **events**, and **publication metadata** without editing JSON by hand.
+2. Every publish/unpublish path is **authenticated**, **role-gated**, and **audit-logged**.
+3. Public site continues to consume the existing JSON contract (`CONTENT_BASE_URL`) with minimal visitor-facing change.
+4. Arabic content can be published when ready; English can remain pending without blocking AR.
+5. The publish path **works end-to-end**: staff can take news from draft → review → public site **without** hand-editing production JSON. A numeric “≥ N items” quota is **not** required (stakeholder choice 2026-07-19).
+
+### Non-goals (MVP)
+
+- Replacing or integrating **OJS** as the journal CMS.
+- Managing the digital library / **OPAC**.
+- Editing static marketing copy currently hard-coded via locales/HTML (About hero, org chart narrative, research department long copy) — unless explicitly pulled into CMS later.
+- Third-party / external hosted CMS products (WordPress, etc.) as the product — conflicts with roadmap “no external CMS.”
+- Emergency immediate-publish bypass.
+- **Scheduled / timed auto-publish** (manual Approve → Publish only).
+- Multi-step legal/comms dual approval chains.
+- Partners, FAQs, tenders, photo galleries, homepage composition studio as first-class managed types.
+- Enriching public news/publication **detail pages** beyond current SPA cards (tracked separately — see WORKLOG pending).
+- Full malware scanning pipeline if host cannot provide it on day one (**risk** — see §12).
+- Public-site rewrite to a dynamic API-first architecture.
+
+---
+
+## 3. Users & personas
+
+### Organisational units (from official org page + site copy)
+
+Source: [الإطار التنظيمي](https://www.crsic.dz/?page_id=165) and public-site org/locale content.
+
+**Governance / support**
+
+- المديرية (Directorate)
+- مجلس الإدارة / المجلس العلمي (councils — typically not day-to-day CMS users)
+- الأمانة العامة (General Secretariat)
+- قسم العلاقات الخارجية وتثمين نتائج البحث
+- قسم متابعة نشاطات البحث في العلوم الإسلامية والحضارة
+
+**Research departments (content scope candidates)**
+
+1. قسم الدراسات القرآنية والفقهية  
+2. قسم الفكر والعقيدة والحوار مع الغير  
+3. قسم التاريخ الثقافي للجزائر  
+4. قسم الحضارة الإسلامية  
+
+**Confirmed scope model (2026-07-19):**
+
+| Role | Default scope |
+|------|----------------|
+| **Super Admin** | System-wide (users, roles, config, audit, overrides) |
+| **Reviewer** | **Centre-wide + all four research departments** |
+| **Editor** | **Defined scopes** (selected dept(s) and/or content types) **and/or centre-wide**, assigned at account creation by Super Admin |
+
+Concrete person↔scope mapping for the first 3–5 accounts is an **implementation dependency** (fill at account provisioning). Names are not required in this PRD.
+
+### Personas
+
+| Persona | Role in system | Needs |
+|---------|----------------|-------|
+| **Editor** | Creates/edits drafts in allowed types and departments | Simple forms, save draft, submit, see comments, revise; edit own profile name/info after account creation |
+| **Reviewer** | Approves/rejects within centre-wide + all research depts | Queue, compare versions, approve/publish/unpublish (manual only) |
+| **Super Admin** | System owner (very few people) | Create users, assign roles/scopes, workflow config, audit, publish pipeline health |
+| **Auditor** (Phase 2+) | Read-only compliance | History and reports only |
+
+**MVP role set:** Super Admin, Editor, Reviewer.  
+**Configurable later:** Content Administrator, Publisher, Translator, Auditor — keep data model ready, do not ship separate UX for all in MVP.
+
+**Profile self-service (MVP):** after Super Admin creates the account, the user may edit their **display name and personal info** (not their own role/scopes).
+
+**Four-eyes principle (MVP):** a user who authored an item must not approve/publish that same item, even if they also hold the Reviewer role.
+
+---
+
+## 4. User journeys
+
+### Journey A — Standard news (happy path)
+
+1. Editor signs in → Dashboard shows “My drafts” and “Needs revision.”
+2. Editor creates **News**, fills AR fields (required), optionally EN fields, department, label, image + alt text.
+3. System validates required fields and editorial checklist prompts.
+4. Editor submits → status `submitted`.
+5. Reviewer is notified in-app → opens item → reviews → **Approves** and **Publishes** (manual; no schedule).
+6. System writes updated public `news.json` (+ media) on the Algeria-hosted publish path.
+7. Public SPA shows the item after cache refresh/TTL. Audit log records the chain.
+
+### Journey B — Changes requested
+
+1. Reviewer sets status `changes_requested` with comments (item-level in MVP; field-level later).
+2. Editor revises (new revision) and resubmits.
+3. Reviewer approves/publishes. Prior revisions remain readable.
+
+### Journey C — Correction to published content
+
+1. Editor opens published item → “Create revision” (public version stays live).
+2. Editor edits and submits; Reviewer approves.
+3. On publish, new revision becomes the public snapshot; audit records replacement.
+
+### Journey D — Event lifecycle
+
+1. Editor creates event (intl/nat, dates, type, status upcoming/done, optional image).
+2. Review → publish updates `events.json`.
+3. **Proposed:** after end datetime, system can mark display status `done` via scheduled job or manual review reminder (exact automation = open).
+
+### Journey E — Publication metadata
+
+1. Editor adds title, type (collective/individual), department, description, cover image.
+2. Review → publish updates `publications.json` while keeping `covers.length === pubs.length`.
+3. Journals list remains out of scope (OJS).
+
+---
+
+## 5. Proposed solution
+
+### Product summary
+
+Build a **secure internal web application** (same institutional host as `crsic.dz`, data in Algeria) where authorized staff manage news, events, and publication metadata through RBAC + editorial workflow. On approval/publish, the app **exports snapshots** compatible with the existing public JSON contract so the current static SPA keeps working.
+
+```text
+[Editors/Reviewers]
+        │
+        ▼
+[Internal CMS App] ──DB (Algeria)──► versions, users, audit
+        │
+        │ publish job
+        ▼
+[Published JSON + media on crsic.dz]
+        │
+        ▼
+[Public SPA]  ← CONTENT_BASE_URL / local /data
+```
+
+### Why this shape
+
+| Option | Decision |
+|--------|----------|
+| A. Internal app publishes JSON snapshots | **Selected for MVP** — matches existing SPA and `data/CMS.md` |
+| B. Public API replacing JSON | Deferred — larger public rewrite |
+| C. External SaaS CMS | Rejected — roadmap forbids external CMS as product |
+| D. Scripts/docs only | Rejected — does not solve roles/workflow/audit |
+
+### Content status lifecycle (MVP)
+
+| Status | Meaning | Typical actor |
+|--------|---------|---------------|
+| `draft` | Work in progress | Editor |
+| `submitted` | Ready for review | Editor |
+| `changes_requested` | Must revise | Reviewer |
+| `approved` | Validated, not yet public | Reviewer |
+| `published` | In public snapshot | Reviewer (manual publish) |
+| `unpublished` | Removed from public snapshot; retained | Reviewer |
+| `rejected` | Not approved; retained | Reviewer |
+
+**Out of MVP / Phase 2+:** `scheduled` (auto-publish), `in_review`, `expired`, emergency bypass states.
+
+### Versioning (MVP)
+
+- Each submit/approve/publish path retains a revision with author, timestamp, optional change summary, status transitions.
+- Reviewers can view previous revision content (side-by-side **Proposed** for MVP if feasible; at least selectable prior revision).
+- Material edit to published content requires new revision + re-approval before replacing the public snapshot.
+- Restore prior revision: Super Admin / Reviewer (**Proposed**).
+
+### Permissions (MVP scopes)
+
+Dimensions in MVP:
+
+| Dimension | MVP |
+|-----------|-----|
+| Role | Super Admin / Editor / Reviewer |
+| Content type | news, event, publication |
+| Department / org unit | Research depts + centre-wide |
+| Language | Create/edit AR and/or EN fields per assignment (**Assumption:** most editors get both; can restrict later) |
+| Action | create, edit (own or scoped), submit, review, approve, publish, unpublish, manage users (admin), view audit (admin) |
+| Ownership | Editors: own drafts + returned items; Reviewers: all items in scope |
+
+**Not MVP:** geographic/regional scopes, separate Publisher role, self-serve permission granting by Reviewers.
+
+**Governance:** only Super Admin creates users and assigns roles/scopes (avoids permission creep from “reviewers grant roles”).
+
+---
+
+## 6. User stories
+
+### Authentication & accounts
+
+1. As a staff member, I can sign in with my individual account so actions are attributable.  
+2. As Super Admin, I can create/deactivate users and assign roles/scopes without deleting historical authorship.  
+3. As any user, after my account is created I can edit my display name and personal info (not my role or scopes).  
+4. As any user, my session expires after inactivity (**Proposed:** 30 minutes; confirm policy).
+
+### Editor
+
+5. As an Editor, I can create news/events/publications only in my allowed scopes.  
+6. As an Editor, I can save drafts and submit for review.  
+7. As an Editor, I can withdraw a submission that is not yet approved.  
+8. As an Editor, I can revise items in `changes_requested` and resubmit.  
+9. As an Editor, I can upload allowed images/PDFs with required metadata (alt text for images).  
+10. As an Editor, I can publish Arabic while leaving English pending.
+
+### Reviewer
+
+11. As a Reviewer, I can see a queue of submitted items in my scope (centre-wide + all research depts).  
+12. As a Reviewer, I can comment, request changes, approve, reject, publish, or unpublish (manual publish only).  
+13. As a Reviewer, I cannot approve/publish an item I authored.  
+14. As a Reviewer, I can compare or inspect prior revisions before approving a correction.
+
+### Publishing & public site
+
+15. As the system, when an item is published I update the corresponding public JSON snapshot and media paths without breaking the SPA contract.  
+16. As a Reviewer, when I unpublish an item it disappears from the public snapshot but remains in the CMS with history.
+
+### Audit
+
+17. As Super Admin, I can view an immutable-ish audit log of auth and content lifecycle events.
+
+---
+
+## 7. Functional requirements
+
+### Must have (MVP)
+
+1. Greenfield authentication (individual accounts, password policy, secure reset, HTTPS).  
+2. Roles: Super Admin, Editor, Reviewer + scoped assignments.  
+3. Content types: **News**, **Events**, **Publications** (metadata + cover).  
+4. Status workflow: draft → submitted → changes_requested → approved → published / rejected / unpublished (**no** scheduled auto-publish).  
+5. Revision history for content items on the publish path.  
+6. In-app notifications for submit, changes requested, approve/reject/publish (email optional Phase 2).  
+7. Media library: images + PDFs; allowlist MIME/extensions; max size; alt text for images.  
+8. Publish pipeline producing `news.json`, `events.json`, `publications.json` (+ stored media URLs/paths) compatible with [data/CMS.md](../../data/CMS.md).  
+9. AR/EN fields with independent readiness; AR may publish with EN pending.  
+10. Audit log for login (success/fail), user/permission changes, content lifecycle, uploads, publish jobs.  
+11. XSS-safe rich text policy: **Proposed** — plain text / limited formatting only in MVP to match public SPA (`textContent` / no raw HTML in JSON strings).  
+12. RTL-capable editing UI for Arabic.  
+13. Staging or preview of the item payload before publish (**Proposed:** preview panel showing public card fields).  
+14. Account deactivation + reassignment of open drafts/tasks.  
+15. User profile self-edit for name/personal info after account creation (roles/scopes remain Super Admin–only).
+
+### Should have (MVP if capacity; else early Phase 2)
+
+1. Editorial pre-submit checklist (non-blocking warnings OK).  
+2. Basic operational dashboard (counts + queues, not vanity analytics).  
+3. “Last updated” metadata stored for future public display.  
+4. Backup/restore procedure documented and tested once.
+
+### Nice to have / future
+
+1. Emergency bypass + post-publication review.  
+2. Field-level comments, @mentions, digests, escalation SLAs.  
+3. Virus/malware scanning integration.  
+4. Partners, static pages, alerts, galleries as types.  
+5. Homepage featured placement permissions.  
+6. Translator role and translation linkage rules.  
+7. Broken-link / accessibility scanners.  
+8. Delegation / out-of-office reviewer backup.  
+9. Legal hold & retention policy UI.
+
+---
+
+## 8. Acceptance criteria (MVP)
+
+### AC-Auth
+
+- Given valid credentials, user reaches a role-appropriate dashboard.  
+- Given deactivated account, login is denied and sessions are invalidated.  
+- Passwords are stored hashed; reset requires proof of control of registered email (**Assumption:** institutional email available per user).
+
+### AC-RBAC
+
+- Editor cannot publish or approve.  
+- Reviewer cannot manage global users/roles.  
+- Editor cannot see/edit out-of-scope departments/types.  
+- Author cannot approve own item (four-eyes).
+
+### AC-News
+
+- Required AR title (+ other mandatory fields defined in §9) enforced before submit.  
+- EN may be empty; item can still reach `published` with `en_status = pending`.  
+- Published news appears in public `news.json` with contract fields at minimum: `img`, `label`, `title` (extend schema only with explicit public-site change + README update).
+
+### AC-Events / Publications
+
+- Events respect intl/nat split and `status` values expected by SPA (`done` \| `upcoming`) unless public schema is versioned.  
+- Publications keep cover↔pub alignment invariant on publish.
+
+### AC-Workflow / versions
+
+- Status transitions are restricted to allowed edges.  
+- Publishing a correction does not silently overwrite without a new approved revision.  
+- Audit entries exist for submit, approve, publish, unpublish.
+
+### AC-Residency / hosting
+
+- Application, database, and media storage are deployed on infrastructure located in Algeria / same institutional host policy as `crsic.dz` (**verify with hoster**).  
+- No production content leaves Algeria except intentional public internet delivery of the public site itself.
+
+### AC-Success metric plumbing
+
+- System can demonstrate a complete draft → submit → approve → publish path for news, and list items published via CMS (for ops visibility). Numeric quota **N** is not a go/no-go gate.
+
+---
+
+## 9. Content / data impact
+
+### Public JSON contract (MVP publish targets)
+
+| File | CMS ownership | Notes |
+|------|---------------|-------|
+| `news.json` | Yes | Primary success path |
+| `events.json` | Yes | intl/nat |
+| `publications.json` | Yes | covers + pubs alignment |
+| `journals.json` | No (read-only link out / ignore) | OJS is source of truth |
+| `partners.json` | No in MVP | Future |
+| `locales/*.json` | No in MVP | UI chrome; not editorial articles |
+
+### Schema evolution
+
+Current public news items are shallow (`img`, `label`, `title`). CMS may store richer internal fields (body, summary, department, author, EN fields, timestamps).
+
+**Decision (2026-07-19): P1** — publish a **compatible subset** to existing SPA fields; keep richer fields internal until public UI is updated.
+
+**Follow-up (tracked in WORKLOG):** dedicated, more detailed public pages for **news** and **publications** (schema + UI enrichment) — not part of CMS MVP ship.
+
+### Multilingual rule (confirmed)
+
+- Arabic can publish with English pending.  
+- **Open questions:** Is Arabic always authoritative on conflict? Must EN eventually be required for certain types? Show “EN translation pending” on public EN UI?
+
+### Media
+
+- Store on same host (or residency-compliant storage); public URLs must be stable.  
+- Replacing a PDF/image should prefer stable URLs or controlled redirects so old links do not silently 404 (**Proposed**).
+
+---
+
+## 10. UX notes
+
+- Internal app is staff-facing; still support AR UI chrome (RTL) and EN UI chrome.  
+- Dashboards are **action queues**, not analytic walls: awaiting review, needs revision, recently published.  
+- Forms per content type (do not force events into a generic “article” shape).  
+- Preview should mirror public card constraints (plain text, image, labels).  
+- Accessibility: keyboard usable admin UI; require image alt text before submit when image present.  
+- Profile screen: user can update name/info; cannot self-elevate role/scopes.
+
+---
+
+## 11. Technical considerations
+
+### Constraints (confirmed / roadmap)
+
+- No external CMS product as the system of record.  
+- Public site today: zero-dependency static SPA; keep publish contract stable.  
+- Host: same as `crsic.dz`; data residency Algeria.  
+- Greenfield auth.
+
+### Suggested architecture (Node + local Postgres)
+
+| Concern | Guidance | Justification |
+|---------|----------|----------------|
+| Admin app | **Node** (API + staff UI) | Stakeholder preference; fits auth/upload workflows |
+| Data / auth / storage | **Local Postgres** on Algeria / `crsic.dz` infra (not hosted Supabase) | Satisfies Algeria residency; same-host policy |
+| Publish | Service writes atomic JSON snapshots + media onto `crsic.dz` publish path | Fits `CONTENT_BASE_URL` without rewriting public SPA |
+| Public site | Unchanged for MVP (P1) | Lowest risk; detail pages deferred |
+| File scanning | Host antivirus or upload quarantine if available | Public-sector upload risk |
+| Backups | Automated DB + media backups, tested restore | Institutional continuity |
+
+**Stack decision (2026-07-19):** Prefer **Node + local Postgres**. Hosted Supabase was considered and **rejected** for production CMS data because of Algeria residency. Self-hosted Supabase remains a possible future ops choice but is **not** required for MVP.
+
+**Framework within Node** (Express/Fastify/Next, etc.) remains an implementation detail — pick based on team skills once Phase 0 host check confirms Node + Postgres on the target host.
+
+### Integrations
+
+| System | MVP |
+|--------|-----|
+| Public SPA JSON/media | Required publish integration |
+| Local Postgres (same institutional host) | Required data store |
+| OJS | Out of scope (link only) |
+| OPAC / webmail | Out of scope |
+| Email gateway | Should-have for reset + optional notifications; must be institution-approved |
+| Ministry SSO | Not available (greenfield) |
+| Hosted Supabase | **Not used** for production CMS data |
+
+### Security concerns
+
+- Broken access control (IDOR on content IDs) — test mandatory.  
+- XSS via rich text — prefer plain/limited formatting matching public sanitization model.  
+- CSRF on state-changing routes.  
+- Malicious file upload (extension spoofing, polyglots).  
+- Privilege escalation via role assignment — Super Admin only.  
+- Audit log tampering — restrict write path; Super Admin read.  
+- Session fixation / brute force — rate limit logins.  
+- Staging vs production separation before go-live.
+
+### Edge cases
+
+- Publish job fails mid-write → public JSON must remain previous valid snapshot (atomic replace).  
+- Concurrent edit of same draft → last-write-wins with warning, or lock (**Proposed:** optimistic concurrency with version check).  
+- Reviewer absent → manual Super Admin reassignment in MVP; delegation automation Phase 2.  
+- Staff departure → deactivate + reassign; preserve audit names.  
+- EN pending forever → reporting flag; no auto-block of AR.  
+- Cover/pub length mismatch → publish blocked with validation error.  
+- Cache on public host serves stale JSON → document cache purge step in runbook.
+
+---
+
+## 12. Risks & dependencies
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| Scope creep into full ministry CMS | Delay | Enforce MVP type list; Phase 2 backlog |
+| Hosted Supabase (rejected for production CMS data) | Compliance risk if reintroduced | Stick to local Postgres in Algeria; no hosted Supabase for CMS |
+| Hosting limits (Node, Postgres, SSL, upload size) | Blocker | Validate `crsic.dz` host capabilities in Phase 0 |
+| Public schema too poor for real news bodies | Product gap | P1 now; WORKLOG pending for detail pages |
+| No malware scanning on host | Security | Quarantine uploads; manual review; Phase 2 scanner |
+| Small team still shares passwords | Governance | Policy + training; forbid shared accounts in AC |
+| Cache/CDN confusion despite “same host” | Stale content | Publish runbook + purge checklist |
+| Bilingual process unclear to staff | Inconsistent EN | UX status badges: AR ready / EN pending |
+
+### Dependencies
+
+- Access to `crsic.dz` hosting control panel / deploy path for Node app + Postgres + published JSON/media.  
+- Institutional email for password reset (**Assumption**).  
+- Provision first accounts: ≥1 Super Admin, ≥1 Reviewer (centre-wide + all depts), Editors with defined scopes.  
+- Legal/privacy baseline for publishing personal data in news/events (**Open**).
+
+---
+
+## 13. Success metrics
+
+| Metric | Target | Window |
+|--------|--------|--------|
+| End-to-end CMS publish works (draft → review → public JSON) | Pass (demo + production smoke) | Go-live |
+| News/events/pubs published via CMS require **zero** hand edits to production JSON for those items | 100% of CMS-published items | Ongoing |
+| Production incidents caused by invalid JSON from CMS publish | 0 | 90 days |
+| Four-eyes violations | 0 (system-enforced) | Ongoing |
+| Optional ops signal: count of CMS-published news | Track only (no minimum **N**) | 90 days |
+
+**Primary bar (stakeholder):** “what matters most is that it works” — functional reliability over volume quotas.  
+**Rejected as primary MVP metric:** raw public website traffic.
+
+---
+
+## 14. MVP scope vs phases
+
+### Phase 0 — Foundations (1–2 weeks equivalent)
+
+- Host capability check (Node + Postgres + SSL + storage on Algeria / `crsic.dz` infra).  
+- Auth, roles, audit skeleton.  
+- Seed org units (4 research depts + centre-wide).
+
+### Phase 1 — MVP (ship)
+
+- News + Events + Publications workflows (manual publish only).  
+- Media upload (image/PDF) with validation.  
+- Publish pipeline to public JSON contract (P1 subset).  
+- Editor/Reviewer dashboards + in-app notifications.  
+- Profile self-edit (name/info).  
+- Runbook: backup, restore, publish failure, user offboarding.
+
+### Phase 2 — Governance hardening
+
+- Emergency bypass + post-publication review.  
+- Scheduled publish (if later needed).  
+- Email digests / escalation.  
+- Malware scanning if available.  
+- Delegation for absent reviewers.  
+- Richer comments; optional Publisher role.
+
+### Phase 3 — Content surface expansion
+
+- **Detailed public news and publication pages** (schema + SPA UI) — see WORKLOG pending.  
+- Partners, static pages, alerts, homepage featured controls.  
+- Analytics for workflow performance.  
+- Retention / archive policy tooling.
+
+---
+
+## 15. Open questions
+
+1. ~~Exact **N**~~ → **Closed:** no numeric quota; success = path works.  
+2. ~~Public schema P1 vs P2~~ → **Closed: P1**; detail pages pending in WORKLOG.  
+3. ~~Scheduled publish~~ → **Closed:** manual publish only for MVP.  
+4. ~~Role/scope pattern~~ → **Closed:** Super Admin; Reviewer = centre-wide + all research depts; Editor = defined scopes and/or centre-wide; profile self-edit allowed.  
+5. ~~Stack preference~~ → **Closed:** **Node + local Postgres** (hosted Supabase rejected for residency).  
+6. Password-reset channel: institutional email addresses for all users?  
+7. Session timeout and password policy values required by internal IT/ministry rules?  
+8. May publication descriptions/news titles include limited formatting, or plain text only forever on the public card layer?  
+9. Exact named people for first accounts (optional for PRD; required before production provisioning).  
+10. Privacy: consent/retention rules when news includes personal names/photos?  
+11. After event end date, auto-flip to `done` or manual only?
+
+---
+
+## 16. Assumptions log
+
+| ID | Assumption | Impact if wrong |
+|----|------------|-----------------|
+| A1 | 3–5 users remain accurate for 6 months | May need simpler or richer admin UX |
+| A2 | Research departments + centre-wide are the right permission scopes | Rework assignments |
+| A3 | `crsic.dz` host can run Node + local Postgres | Architecture / hosting change |
+| A4 | P1 publish subset is acceptable until detail pages ship | Public still shows shallow cards |
+| A5 | Institutional email exists for resets | Alternate reset process |
+| A6 | Plain-text public card fields remain the SPA model for MVP | Rich text pipeline needed earlier |
+| A7 | Partners/locales/static pages can wait | Earlier CMS expansion |
+| A8 | Volume quota is unnecessary if reliability is proven | Stakeholders may later ask for KPIs |
+| A9 | Local Postgres on institutional host satisfies Algeria residency | Must confirm with hoster/legal |
+
+---
+
+## 17. Future improvements
+
+- Detailed public news / publication pages (WORKLOG pending).  
+- Scheduled publish.  
+- Emergency notices workflow.  
+- Configurable multi-step approvals by content type.  
+- Translator role and AR/EN linkage rules (simultaneous publish optional).  
+- Field-level review comments and resolved threads.  
+- Homepage / featured placement permissions.  
+- Document expiry and periodic review reminders.  
+- Deeper accessibility linting before submit.  
+- Read-only Auditor role and exportable compliance packs.  
+- Optional migration of selected static pages into CMS.
+
+---
+
+## 18. Decision log
+
+| Date | Decision |
+|------|----------|
+| 2026-07-19 | Proceed with internal app (not external CMS), JSON snapshot publish to existing public contract |
+| 2026-07-19 | MVP content types: news, events, publications only |
+| 2026-07-19 | Journals remain OJS-owned |
+| 2026-07-19 | AR may publish with EN pending |
+| 2026-07-19 | Hosting/data residency: Algeria / same host as crsic.dz |
+| 2026-07-19 | Auth: greenfield individual accounts |
+| 2026-07-19 | Emergency bypass deferred to Phase 2 |
+| 2026-07-19 | MVP roles: Super Admin, Editor, Reviewer; Super Admin owns user provisioning |
+| 2026-07-19 | Success = end-to-end path works; no minimum news volume **N** |
+| 2026-07-19 | Public schema **P1**; detailed news/publication pages deferred (WORKLOG) |
+| 2026-07-19 | Manual publish only; no scheduled auto-publish in MVP |
+| 2026-07-19 | Reviewer scope = centre-wide + all research depts; Editors get defined scopes and/or centre-wide |
+| 2026-07-19 | Users may edit name/personal info after account creation |
+| 2026-07-19 | Preferred stack: **Node + local Postgres** on Algeria / `crsic.dz` infra |
+| 2026-07-19 | Hosted Supabase **rejected** for production CMS data (residency); not required for MVP |
+
+---
+
+## 19. Mapping to template sections
+
+This PRD expands [TEMPLATE.md](./TEMPLATE.md) with discovery outputs (journeys, stories, ACs, risks, phases). Status is **Review**. When marked **Approved**, keep [docs/prds/README.md](./README.md) in sync and link implementation start from [docs/WORKLOG.md](../WORKLOG.md).

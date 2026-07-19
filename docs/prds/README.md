@@ -16,7 +16,7 @@ Future product specs for CRSIC live here. The public site has no active PRD yet;
 
 | PRD | Status | Notes |
 |-----|--------|-------|
-| _(none yet)_ | — | Use [TEMPLATE.md](./TEMPLATE.md) for the first entry |
+| [2026-07-19-internal-content-management.md](./2026-07-19-internal-content-management.md) | Review | Step 4 — internal CMS; P1 JSON publish; Node + local Postgres; OJS out of scope |
 
 ## Related
 
