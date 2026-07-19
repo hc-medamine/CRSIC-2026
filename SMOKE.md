@@ -64,7 +64,10 @@ Estimated time: **~5 minutes**.
 
 ---
 
-**Result:** ☐ Pass — safe to merge · ☐ Fail — fix before merge
+## G. Automated unit checks (optional)
 
-Logged in [WORKLOG.md](./WORKLOG.md) when a full pre-merge run is done for a release.  
-Related: [README.md §5.5](./README.md) (short review checklist).
+```bash
+node --test tests/*.test.mjs
+```
+
+Covers Escape dialog stack + `?lang=` parsing. Does **not** replace sections A–F.

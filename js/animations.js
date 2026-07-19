@@ -226,6 +226,10 @@ function initParallaxHero() {
         if (hero) {
           const max = Math.min(window.scrollY * 0.28, 120);
           hero.style.setProperty('--parallax-y', max.toFixed(1) + 'px');
+          hero.classList.toggle('is-parallaxing', max > 0.5);
+        } else {
+          document.querySelectorAll('.page-hero-inner.is-parallaxing')
+            .forEach((el) => el.classList.remove('is-parallaxing'));
         }
         ticking = false;
       });

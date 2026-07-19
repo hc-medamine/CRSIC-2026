@@ -7,7 +7,8 @@ Living single source of truth for the public site of **مركز البحث في 
 | [WORKLOG.md](./WORKLOG.md) | Changelog and status snapshot |
 | [AUDIT.md](./AUDIT.md) | Closed architecture audit (P0–P3) |
 | [SMOKE.md](./SMOKE.md) | Pre-merge smoke checklist (~5 minutes) |
-| [UIUX.md](./UIUX.md) | UI/UX audit log (step 3.5) |
+| [UIUX.md](./UIUX.md) | UI/UX audit log |
+| [PARITY.md](./PARITY.md) | AR/EN parity matrix (partial) |
 | [data/README.md](./data/README.md) | Content-editor guide for JSON / locales |
 | [data/CMS.md](./data/CMS.md) | Remote JSON publish contract (`CONTENT_BASE_URL`) |
 
@@ -231,7 +232,8 @@ Approximate inventory of shipped content:
 | Partners           | **11** — 3 international + 8 national                                                 |
 | Journals           | **4** — all link to `https://crsic.dz/ojsre/`                                         |
 | News               | **9** items (6 with `img/Holders/*.jpg`, 3 with `img: null`)                          |
-| Locale keys        | **~237** per language (incl. `ev_badge_upcoming`, `home_event_loc`)               |
+| Locale keys | **~262** per language (AR/EN key sets match) |
+| Locale preference | `localStorage` `crsic_lang` + URL `?lang=ar\|en` |
 | Admin accounts     | **None** — no auth                                                                    |
 | Sample credentials | **None**                                                                              |
 
@@ -599,7 +601,7 @@ No separate staging config files exist in-repo.
 
 ### Known issues / gaps
 
-1. **Content language** — dynamic JSON bodies are Arabic-only; English UI still shows Arabic titles/descriptions for pubs/events/news.
+1. **Editorial content language** — pubs/events/news/partners/journals bodies are intentionally Arabic-only in EN UI (notice + switch); full bilingual schema **blocked pending approval** — see [PARITY.md](./PARITY.md).
 2. **Contact depends on a local mail client** — no server-side mailer or form API.
 3. **Audit TODOs are closed**; no `TODO`/`FIXME` markers remain in app JS for open defects.
 
@@ -624,7 +626,7 @@ Track day-to-day progress in [WORKLOG.md](./WORKLOG.md).
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-07-19**                                                                                                                                                 |
+| Last updated     | **2026-07-19** |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes

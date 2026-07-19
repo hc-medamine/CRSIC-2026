@@ -9,7 +9,8 @@ Living record of architectural and feature work. **Append new changelog entries 
 | [data/CMS.md](./data/CMS.md) | `CONTENT_BASE_URL` publish contract |
 | [README.md](./README.md) | Living project source of truth (incl. Git workflow §5) |
 | [SMOKE.md](./SMOKE.md) | Pre-merge smoke checklist (~5 min) |
-| [UIUX.md](./UIUX.md) | UI/UX audit findings + step 3.5 fix log |
+| [PARITY.md](./PARITY.md) | AR/EN parity matrix (partial EN) |
+| [UIUX.md](./UIUX.md) | UI/UX audit findings + fix log |
 | **WORKLOG.md** | This file |
 
 ---
@@ -25,13 +26,31 @@ Living record of architectural and feature work. **Append new changelog entries 
 | Step 2 — home events from JSON | **Done** (branch `feature/home-events-json`) |
 | Step 3 — smoke checklist habit | **Done** — [SMOKE.md](./SMOKE.md) |
 | Step 3.5 — UI/UX audit / responsive / motion | **Done** — [UIUX.md](./UIUX.md) |
+| P2 a11y / i18n / org stack / will-change | **Done** on `feature/p2-a11y-i18n` — [PARITY.md](./PARITY.md) |
 | Step 4 — internal app + DB (no external CMS) | Pending (design next) |
 
 ---
 
 ## Changelog
 
-### 2026-07-19 — First GitHub push
+### 2026-07-19 — P2 a11y, responsive polish, partial EN parity
+
+**Done:**
+- Focus trap + restore for drawer and lightbox; Escape closes topmost dialog only (`js/a11y.js`)
+- Org chart stacked layout ≤700px
+- `will-change` no longer permanent on hero/cards/parallax
+- Contact + lightbox responsive stacking refinements
+- i18n: `?lang=`, `data-i18n-aria`, doc title/meta, strategy list wired, mailto labels localized
+- EN notice + “View Arabic version” for Arabic-only editorial JSON
+- Parity matrix [PARITY.md](./PARITY.md); tests `node --test tests/*.test.mjs`
+
+**Files:** `js/a11y.js`, `js/i18n.js`, `js/ui.js`, `js/animations.js`, `css/style.css`, `index.html`, `data/locales/*`, `tests/`, `PARITY.md`, `UIUX.md`, `WORKLOG.md`, `README.md`
+
+**Not claimed:** full English editorial parity (pubs/events/news/partners/journals bodies).
+
+**Next:** Merge/push feature branch; step 4 design when ready.
+
+---
 
 **Done:**
 - Authenticated GitHub CLI as `hc-medamine`

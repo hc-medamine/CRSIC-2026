@@ -21,11 +21,19 @@ import {
   replaceChildren,
   safeImageSrc
 } from './utils.js';
+import { trapFocus, handleEscapeStack } from './a11y.js';
 import { createPubCard } from './components/pubCard.js';
 import { createEventYearGroups, createHomeEventCard } from './components/eventCard.js';
 import { createPartnerCard } from './components/partnerCard.js';
 import { createJournalCard } from './components/journalCard.js';
 import { createNewsCard } from './components/newsCard.js';
+
+/** @type {null|(() => void)} */
+let releaseDrawerTrap = null;
+/** @type {null|(() => void)} */
+let releaseLightboxTrap = null;
+/** @type {HTMLElement|null} */
+let lightboxTrigger = null;
 
 /* ── SKELETON HELPERS ────────────────────────────────── */
 function skelNodes(className, n) {
@@ -161,6 +169,7 @@ export function renderAll() {
     if (evNat) replaceChildren(evNat, createEventYearGroups(getNatEvents()));
     if (natP) replaceChildren(natP, getNatPartners().map(createPartnerCard));
     if (intlP) replaceChildren(intlP, getIntlPartners().map(createPartnerCard));
+    updateContentLocaleNotices();
   });
 }
 
@@ -269,14 +278,98 @@ export function updateTabIndicator(bar) {
   bar.style.setProperty('--ind-sx', String(w / barW));
 }
 
+/* ── EN content notice (Arabic-only editorial JSON) ──── */
+function createContentLocaleNotice() {
+  return el('div', {
+    className: 'content-locale-notice',
+    attrs: { role: 'status' },
+    children: [
+      el('p', { className: 'content-locale-notice-text', text: t('content_ar_only_notice') }),
+      el('button', {
+        className: 'content-locale-notice-btn',
+        text: t('content_ar_only_switch'),
+        attrs: { type: 'button', 'data-switch-lang': 'ar' },
+      }),
+    ],
+  });
+}
+
+/**
+ * Show/hide English notices above sections fed by Arabic-only JSON.
+ * Content remains visible with lang="ar" on cards (intentional product decision).
+ */
+export function updateContentLocaleNotices() {
+  const hosts = [
+    'home-pub-grid',
+    'home-events-grid',
+    'home-news-grid',
+    'pub-grid',
+    'ev-intl-list',
+    'ev-nat-list',
+    'journals-grid',
+    'nat-partners',
+    'intl-partners',
+  ];
+  const show = getLang() === 'en';
+  hosts.forEach((id) => {
+    const grid = document.getElementById(id);
+    if (!grid || !grid.parentElement) return;
+    const parent = grid.parentElement;
+    let notice = parent.querySelector(`:scope > .content-locale-notice[data-for="${id}"]`);
+    if (show) {
+      if (!notice) {
+        notice = createContentLocaleNotice();
+        notice.dataset.for = id;
+        parent.insertBefore(notice, grid);
+      } else {
+        const text = notice.querySelector('.content-locale-notice-text');
+        const btn = notice.querySelector('.content-locale-notice-btn');
+        if (text) text.textContent = t('content_ar_only_notice');
+        if (btn) btn.textContent = t('content_ar_only_switch');
+      }
+      grid.setAttribute('lang', 'ar');
+    } else {
+      if (notice) notice.remove();
+      grid.removeAttribute('lang');
+    }
+  });
+}
+
 /* ── LIGHTBOX ────────────────────────────────────────── */
-export function openLightbox(i) {
+export function openLightbox(i, triggerEl) {
   const p = getPub(i);
   if (!p) return;
+  const overlay = document.getElementById('lightbox');
+  if (!overlay) return;
+
+  lightboxTrigger = triggerEl
+    || (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+
   document.getElementById('lb-title').textContent = p.t;
   document.getElementById('lb-dept').textContent = p.dept;
-  document.getElementById('lb-year').textContent = p.type === 'collective' ? 'مؤلف جماعي' : 'مؤلف فردي';
+  document.getElementById('lb-year').textContent =
+    p.type === 'collective' ? t('badge_collective') : t('badge_individual');
   document.getElementById('lb-desc').textContent = p.desc;
+
+  const body = overlay.querySelector('.lightbox-body');
+  const titleEl = document.getElementById('lb-title');
+  const descEl = document.getElementById('lb-desc');
+  const deptEl = document.getElementById('lb-dept');
+  [titleEl, descEl, deptEl].forEach((node) => {
+    if (!node) return;
+    if (getLang() === 'en') node.setAttribute('lang', 'ar');
+    else node.removeAttribute('lang');
+  });
+
+  let lbNotice = overlay.querySelector('.content-locale-notice');
+  if (getLang() === 'en') {
+    if (!lbNotice && body) {
+      lbNotice = createContentLocaleNotice();
+      body.insertBefore(lbNotice, body.firstChild);
+    }
+  } else if (lbNotice) {
+    lbNotice.remove();
+  }
 
   const coverHost = document.getElementById('lb-cover');
   const src = safeImageSrc(getCover(i));
@@ -292,18 +385,28 @@ export function openLightbox(i) {
   });
   replaceChildren(coverHost, [img]);
 
-  const overlay = document.getElementById('lightbox');
-  requestAnimationFrame(() => overlay.classList.add('open'));
-  setTimeout(() => {
+  overlay.setAttribute('aria-hidden', 'false');
+  requestAnimationFrame(() => {
+    overlay.classList.add('open');
+    if (releaseLightboxTrap) releaseLightboxTrap();
     const closeBtn = overlay.querySelector('.lightbox-close');
-    if (closeBtn) closeBtn.focus();
-  }, 320);
+    releaseLightboxTrap = trapFocus(overlay, {
+      initialFocus: closeBtn,
+      restoreFocus: lightboxTrigger,
+    });
+  });
 }
 
 export function closeLightbox() {
   const lb = document.getElementById('lightbox');
-  if (!lb) return;
+  if (!lb || !lb.classList.contains('open')) return;
   lb.classList.remove('open');
+  lb.setAttribute('aria-hidden', 'true');
+  if (releaseLightboxTrap) {
+    releaseLightboxTrap();
+    releaseLightboxTrap = null;
+  }
+  lightboxTrigger = null;
 }
 
 export function closeLightboxOutside(e) {
@@ -328,7 +431,7 @@ export function handleContactForm(e) {
   });
   if (hasError) return;
 
-  const body = `من: ${nameInput.value.trim()}\nالبريد: ${emailInput.value.trim()}\n\n${msgInput.value.trim()}`;
+  const body = `${t('mail_from')}: ${nameInput.value.trim()}\n${t('mail_email')}: ${emailInput.value.trim()}\n\n${msgInput.value.trim()}`;
   window.location.href =
     `mailto:contact@crsic.dz?subject=${encodeURIComponent(subjectInput.value.trim())}&body=${encodeURIComponent(body)}`;
   document.getElementById('form-success').style.display = 'block';
@@ -381,20 +484,37 @@ export function openDrawer() {
   const drawer = document.getElementById('navDrawer');
   const overlay = document.getElementById('navOverlay');
   const toggle = document.getElementById('navToggle');
-  if (drawer) drawer.classList.add('open');
+  if (!drawer) return;
+  drawer.classList.add('open');
+  drawer.setAttribute('aria-hidden', 'false');
   if (overlay) overlay.classList.add('open');
   if (toggle) toggle.setAttribute('aria-expanded', 'true');
   document.body.style.overflow = 'hidden';
+  if (releaseDrawerTrap) releaseDrawerTrap();
+  const closeBtn = document.getElementById('drawerClose');
+  releaseDrawerTrap = trapFocus(drawer, {
+    initialFocus: closeBtn,
+    restoreFocus: toggle instanceof HTMLElement ? toggle : null,
+  });
 }
 
 export function closeDrawer() {
   const drawer = document.getElementById('navDrawer');
   const overlay = document.getElementById('navOverlay');
   const toggle = document.getElementById('navToggle');
-  if (drawer) drawer.classList.remove('open');
+  if (!drawer || !drawer.classList.contains('open')) {
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    return;
+  }
+  drawer.classList.remove('open');
+  drawer.setAttribute('aria-hidden', 'true');
   if (overlay) overlay.classList.remove('open');
   if (toggle) toggle.setAttribute('aria-expanded', 'false');
   document.body.style.overflow = '';
+  if (releaseDrawerTrap) {
+    releaseDrawerTrap();
+    releaseDrawerTrap = null;
+  }
 }
 
 /* ── UI EVENT BINDINGS ───────────────────────────────── */
@@ -443,14 +563,14 @@ export function bindUIEvents() {
     const card = e.target.closest('[data-pub-index]');
     if (!card) return;
     const i = parseInt(card.dataset.pubIndex, 10);
-    if (!Number.isNaN(i)) openLightbox(i);
+    if (!Number.isNaN(i)) openLightbox(i, card);
   });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter') return;
     const card = e.target.closest('[data-pub-index]');
     if (!card) return;
     const i = parseInt(card.dataset.pubIndex, 10);
-    if (!Number.isNaN(i)) openLightbox(i);
+    if (!Number.isNaN(i)) openLightbox(i, card);
   });
 
   const form = document.getElementById('contactForm') || document.querySelector('#page-contact form');
@@ -466,7 +586,22 @@ export function bindUIEvents() {
   if (moreTabBtn) moreTabBtn.addEventListener('click', openDrawer);
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { closeLightbox(); closeDrawer(); }
+    handleEscapeStack(e, [
+      {
+        isOpen: () => {
+          const lb = document.getElementById('lightbox');
+          return !!(lb && lb.classList.contains('open'));
+        },
+        close: closeLightbox,
+      },
+      {
+        isOpen: () => {
+          const d = document.getElementById('navDrawer');
+          return !!(d && d.classList.contains('open'));
+        },
+        close: closeDrawer,
+      },
+    ]);
   });
 
   // Keyboard: Enter/Space activate dept cards (role="button")
