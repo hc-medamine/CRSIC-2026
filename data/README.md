@@ -7,6 +7,8 @@ Serve the site over **HTTP** (not `file://`) so modules and fetch work.
 
 Optional CMS/CDN: see [CMS.md](./CMS.md) and `CONTENT_BASE_URL` in `js/config.js`.
 
+Project docs index: [docs/README.md](../docs/README.md).
+
 ## Files
 
 | File | Contents |

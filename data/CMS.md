@@ -16,7 +16,7 @@ When `CONTENT_BASE_URL` is set (e.g. `https://cdn.example.com/crsic/`), the app 
 | `locales/ar.json` | flat key → string |
 | `locales/en.json` | flat key → string |
 
-Field schemas: [README.md](./README.md).
+Field schemas: [README.md](./README.md) (this folder). Full product docs: [docs/README.md](../docs/README.md).
 
 ## Enable remote published snapshots
 

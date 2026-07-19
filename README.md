@@ -4,11 +4,13 @@ Living single source of truth for the public site of **مركز البحث في 
 
 | Related docs | Role |
 |--------------|------|
-| [WORKLOG.md](./WORKLOG.md) | Changelog and status snapshot |
-| [AUDIT.md](./AUDIT.md) | Closed architecture audit (P0–P3) |
-| [SMOKE.md](./SMOKE.md) | Pre-merge smoke checklist (~5 minutes) |
-| [UIUX.md](./UIUX.md) | UI/UX audit log |
-| [PARITY.md](./PARITY.md) | AR/EN parity matrix (partial) |
+| [docs/README.md](./docs/README.md) | Documentation index |
+| [docs/WORKLOG.md](./docs/WORKLOG.md) | Changelog and status snapshot |
+| [docs/qa/SMOKE.md](./docs/qa/SMOKE.md) | Pre-merge smoke checklist (~5 minutes) |
+| [docs/audits/AUDIT.md](./docs/audits/AUDIT.md) | Closed architecture audit (P0–P3) |
+| [docs/audits/UIUX.md](./docs/audits/UIUX.md) | UI/UX audit log |
+| [docs/audits/PARITY.md](./docs/audits/PARITY.md) | AR/EN parity matrix (partial) |
+| [docs/prds/](./docs/prds/) | Product requirement documents (future) |
 | [data/README.md](./data/README.md) | Content-editor guide for JSON / locales |
 | [data/CMS.md](./data/CMS.md) | Remote JSON publish contract (`CONTENT_BASE_URL`) |
 
@@ -100,12 +102,24 @@ CRSIC 2026/
 ├── vercel.json                # Vercel 301s for legacy /about
 ├── _redirects                 # Netlify 301s
 ├── .htaccess                  # Apache 301s (NE preserves #)
-├── AUDIT.md                   # Closed audit
-├── WORKLOG.md                 # Living changelog
-├── README.md                  # This file
-├── SMOKE.md                   # Pre-merge smoke checklist
-├── UIUX.md                    # UI/UX audit + fix log
-├── PARITY.md                  # AR/EN parity matrix
+├── README.md                  # This file (product SSOT)
+├── WORKLOG.md                 # Stub → docs/WORKLOG.md
+├── SMOKE.md                   # Stub → docs/qa/SMOKE.md
+├── AUDIT.md                   # Stub → docs/audits/AUDIT.md
+├── UIUX.md                    # Stub → docs/audits/UIUX.md
+├── PARITY.md                  # Stub → docs/audits/PARITY.md
+├── docs/
+│   ├── README.md              # Documentation index
+│   ├── WORKLOG.md             # Living changelog
+│   ├── qa/
+│   │   └── SMOKE.md           # Pre-merge smoke checklist
+│   ├── audits/
+│   │   ├── AUDIT.md           # Closed audit
+│   │   ├── UIUX.md            # UI/UX audit + fix log
+│   │   └── PARITY.md          # AR/EN parity matrix
+│   └── prds/
+│       ├── README.md          # PRD folder guide
+│       └── TEMPLATE.md        # Concise PRD template
 ├── tests/                     # Node built-in tests (`node --test`)
 └── .vscode/
     └── settings.json          # Live Server port 5501
@@ -290,7 +304,7 @@ Remote publish contract (optional CDN / same JSON filenames): [data/CMS.md](./da
 | Remote | `origin` → `https://github.com/hc-medamine/CRSIC-2026.git` (`main` tracks `origin/main`) |
 | Ignore rules | [`.gitignore`](./.gitignore) — OS junk, `.claude/`, secrets, optional `node_modules/` |
 | Tracked IDE hint | `.vscode/settings.json` (Live Server port 5501) is tracked; other `.vscode/*` ignored |
-| Changelog | [WORKLOG.md](./WORKLOG.md) — append new entries **at the top** |
+| Changelog | [docs/WORKLOG.md](./docs/WORKLOG.md) — append new entries **at the top** |
 | Release process | Manual static deploy of project root; bump content by editing JSON or switching `CONTENT_BASE_URL` |
 | Coding standards | ES modules, named exports, JSDoc on public functions, no `innerHTML` assignment in `/js`, CSS variables for brand colours |
 | Lint / format | **None** yet |
@@ -338,7 +352,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/):
 | `content:` | `/data` JSON, locales, or media inventory |
 | `style:` | CSS / visual-only (no behaviour change) |
 | `refactor:` | Code restructure without behaviour change |
-| `docs:` | README, WORKLOG, AUDIT, data guides |
+| `docs:` | README, `docs/*`, data guides |
 | `chore:` | Gitignore, tooling, housekeeping |
 
 Examples:
@@ -355,10 +369,12 @@ style: smooth publication card hover on mobile
 | Done work | Update these files |
 |-----------|-------------------|
 | Architecture, routes, stack, setup, roadmap | [README.md](./README.md) |
-| Chronological “what shipped” + status snapshot | [WORKLOG.md](./WORKLOG.md) (newest entry at top) |
+| Chronological “what shipped” + status snapshot | [docs/WORKLOG.md](./docs/WORKLOG.md) (newest entry at top) |
 | Content schema / editor recipes | [data/README.md](./data/README.md) |
 | Remote JSON contract | [data/CMS.md](./data/CMS.md) |
-| Historical audit closure only | [AUDIT.md](./AUDIT.md) (do not reopen casually) |
+| Historical audit closure only | [docs/audits/AUDIT.md](./docs/audits/AUDIT.md) (do not reopen casually) |
+| New product slice / Step 4+ specs | [docs/prds/](./docs/prds/) from [TEMPLATE.md](./docs/prds/TEMPLATE.md) |
+| Docs map / moved files | [docs/README.md](./docs/README.md) |
 
 Minimum WORKLOG entry shape:
 
@@ -381,9 +397,9 @@ Short gate (always):
 - [ ] `covers.length === pubs.length` if publications changed
 - [ ] AR + EN locale keys still match if chrome strings changed
 - [ ] No raw HTML in JSON content string fields
-- [ ] README / WORKLOG updated when structure or process changed
+- [ ] README / `docs/WORKLOG.md` updated when structure or process changed
 
-**Full smoke run:** use **[SMOKE.md](./SMOKE.md)** (~5 minutes) before merging to `main`. Habit: no merge without at least sections A–D checked.
+**Full smoke run:** use **[docs/qa/SMOKE.md](./docs/qa/SMOKE.md)** (~5 minutes) before merging to `main`. Habit: no merge without at least sections A–D checked.
 
 ### 5.6 First-time identity (required once per machine)
 
@@ -451,7 +467,7 @@ Deep links may pass `data-tab` / `data-filter` on navigable elements.
 | API                  | `t(key)`, `setLang`, `applyTranslations` in `js/i18n.js`                                                                    |
 | HTML attrs           | `data-i18n`, `data-i18n-html`, `data-i18n-placeholder`, `data-i18n-aria` |
 | URL locale           | `?lang=ar\|en` (hash routes unchanged; no `/ar`/`/en` path prefix) |
-| Content bilingualism | **UI chrome** bilingual; editorial JSON bodies Arabic-only with EN notice — [PARITY.md](./PARITY.md) |
+| Content bilingualism | **UI chrome** bilingual; editorial JSON bodies Arabic-only with EN notice — [docs/audits/PARITY.md](./docs/audits/PARITY.md) |
 
 ### 6.5 Media assets
 
@@ -602,15 +618,16 @@ No separate staging config files exist in-repo.
 |------|------|--------|
 | 1 | Git workflow (init, ignore, branching/commits docs) | **Done** — see §5; remote [hc-medamine/CRSIC-2026](https://github.com/hc-medamine/CRSIC-2026) |
 | 2 | Home content fully from data (events teaser) | **Done** — `#home-events-grid` ← `getHomeEvents(3)` |
-| 3 | Smoke-check habit before merges | **Done** — [SMOKE.md](./SMOKE.md) + README §5.5 |
-| 3.5 | Full UI/UX audit → responsiveness → animation smoothness | **Done** — [UIUX.md](./UIUX.md) |
-| P2 | Focus traps, org stack, will-change, partial EN parity | **Done** on `feature/p2-a11y-i18n` — [PARITY.md](./PARITY.md) |
-| — | Home pubs mobile horizontal carousel | **Done** on `feature/home-pubs-carousel` (on `origin`) |
-| 4 | Internal web app + database (users, roles, publish news/books/etc.) — **no external CMS** | Pending (design next) |
+| 3 | Smoke-check habit before merges | **Done** — [docs/qa/SMOKE.md](./docs/qa/SMOKE.md) + README §5.5 |
+| 3.5 | Full UI/UX audit → responsiveness → animation smoothness | **Done** — [docs/audits/UIUX.md](./docs/audits/UIUX.md) |
+| P2 | Focus traps, org stack, will-change, partial EN parity | **Done** on `main` — [docs/audits/PARITY.md](./docs/audits/PARITY.md) |
+| — | Home pubs mobile horizontal carousel | **Done** on `main` |
+| — | Docs layout under `docs/` (+ PRD scaffold) | **Done** — [docs/README.md](./docs/README.md) |
+| 4 | Internal web app + database (users, roles, publish news/books/etc.) — **no external CMS** | Pending (design next — [docs/prds/](./docs/prds/)) |
 
 ### Known issues / gaps
 
-1. **Editorial content language** — pubs/events/news/partners/journals bodies are intentionally Arabic-only in EN UI (notice + switch); full bilingual schema **blocked pending approval** — see [PARITY.md](./PARITY.md).
+1. **Editorial content language** — pubs/events/news/partners/journals bodies are intentionally Arabic-only in EN UI (notice + switch); full bilingual schema **blocked pending approval** — see [docs/audits/PARITY.md](./docs/audits/PARITY.md).
 2. **Contact depends on a local mail client** — no server-side mailer or form API.
 3. **Audit TODOs are closed**; no `TODO`/`FIXME` markers remain in app JS for open defects.
 
@@ -618,7 +635,7 @@ No separate staging config files exist in-repo.
 
 | Priority | Item |
 |----------|------|
-| High | Step 4 — design internal web app + database |
+| High | Step 4 — design internal web app + database (start with a PRD in `docs/prds/`) |
 | Medium | Dual-field or locale-keyed content if EN parity is required |
 | Medium | Further image compression / WebP for covers and Holders |
 | Low | Introduce linting/formatting once the team grows |
@@ -627,7 +644,7 @@ No separate staging config files exist in-repo.
 
 Own **internal web app + database**: authenticated users with roles and publishing tasks (news, books, etc.). Public site remains the visitor face; no third-party/external CMS.
 
-Track day-to-day progress in [WORKLOG.md](./WORKLOG.md).
+Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Write product specs in [docs/prds/](./docs/prds/).
 
 ---
 
@@ -635,7 +652,7 @@ Track day-to-day progress in [WORKLOG.md](./WORKLOG.md).
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-07-19** (home pubs carousel + docs) |
+| Last updated     | **2026-07-19** (docs/ reorganisation + PRD scaffold) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes
@@ -646,10 +663,11 @@ Track day-to-day progress in [WORKLOG.md](./WORKLOG.md).
 - [ ] New page/hash/nav parent → update §6.2–6.3 and router notes
 - [ ] New config / env → update §7.2
 - [ ] New host or redirect → update §9
-- [ ] Roadmap / debt change → update §10 and WORKLOG
+- [ ] Roadmap / debt change → update §10 and `docs/WORKLOG.md`
+- [ ] Docs moved or new doc area → update this table, §3 tree, and [docs/README.md](./docs/README.md)
 - [ ] Bump **Last updated** date in this section
 
-Editors changing only publication/event copy do **not** need a full README rewrite if the schema is unchanged — update `data/*.json` and optionally note notable inventory shifts in WORKLOG.
+Editors changing only publication/event copy do **not** need a full README rewrite if the schema is unchanged — update `data/*.json` and optionally note notable inventory shifts in `docs/WORKLOG.md`.
 
 ---
 
