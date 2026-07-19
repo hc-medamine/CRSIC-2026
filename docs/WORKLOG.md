@@ -15,7 +15,7 @@ Living record of architectural and feature work. **Append new changelog entries 
 | [prds/](./prds/) | Future product requirement documents |
 | **WORKLOG.md** | This file |
 
-Root stubs (`WORKLOG.md`, `SMOKE.md`, `AUDIT.md`, `UIUX.md`, `PARITY.md`) redirect into `docs/` so old links keep working.
+Only root [README.md](../README.md) remains at the project root; other docs live under `docs/`.
 
 ---
 
@@ -32,12 +32,28 @@ Root stubs (`WORKLOG.md`, `SMOKE.md`, `AUDIT.md`, `UIUX.md`, `PARITY.md`) redire
 | Step 3.5 — UI/UX audit / responsive / motion | **Done** — [audits/UIUX.md](./audits/UIUX.md) |
 | P2 a11y / i18n / org stack / will-change | **Done** on `main` — [audits/PARITY.md](./audits/PARITY.md) |
 | Home pubs mobile carousel | **Done** on `main` |
-| Docs layout under `docs/` | **Done** (this entry) |
+| Docs layout under `docs/` | **Done** |
+| Root redirect stubs removed | **Done** (this entry) |
 | Step 4 — internal app + DB (no external CMS) | Pending (design next — start in [prds/](./prds/)) |
 
 ---
 
 ## Changelog
+
+### 2026-07-19 — Remove root Markdown stubs
+
+**Why:** Root “Moved” stubs were confusing; the real docs already live under `docs/`.
+
+**Done:**
+- Deleted root stubs: `WORKLOG.md`, `SMOKE.md`, `AUDIT.md`, `UIUX.md`, `PARITY.md`
+- Kept root `README.md` only
+- Updated README tree + docs index wording
+
+**Files:** deleted root stubs; `README.md`, `docs/README.md`, `docs/WORKLOG.md`
+
+**Next:** Step 4 design — first PRD under `docs/prds/`.
+
+---
 
 ### 2026-07-19 — Docs reorganisation under `docs/`
 

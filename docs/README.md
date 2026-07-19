@@ -31,4 +31,4 @@ docs/
     └── TEMPLATE.md    # Concise PRD template
 ```
 
-Root stubs (`WORKLOG.md`, `SMOKE.md`, `AUDIT.md`, `UIUX.md`, `PARITY.md`) redirect here so old links keep working.
+Only root `README.md` stays at the project root; all other project Markdown lives under `docs/`.

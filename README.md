@@ -103,11 +103,6 @@ CRSIC 2026/
 ├── _redirects                 # Netlify 301s
 ├── .htaccess                  # Apache 301s (NE preserves #)
 ├── README.md                  # This file (product SSOT)
-├── WORKLOG.md                 # Stub → docs/WORKLOG.md
-├── SMOKE.md                   # Stub → docs/qa/SMOKE.md
-├── AUDIT.md                   # Stub → docs/audits/AUDIT.md
-├── UIUX.md                    # Stub → docs/audits/UIUX.md
-├── PARITY.md                  # Stub → docs/audits/PARITY.md
 ├── docs/
 │   ├── README.md              # Documentation index
 │   ├── WORKLOG.md             # Living changelog
@@ -652,7 +647,7 @@ Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Write product
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-07-19** (docs/ reorganisation + PRD scaffold) |
+| Last updated     | **2026-07-19** (root Markdown stubs removed; docs under `docs/`) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes
