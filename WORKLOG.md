@@ -21,12 +21,13 @@ Living record of architectural and feature work. **Append new changelog entries 
 |------|--------|
 | Audit P0–P3 | **Closed** |
 | Public site JSON / locales / safe DOM | **Done** |
-| Git repository (`main`) | **On GitHub** — https://github.com/hc-medamine/CRSIC-2026 (`origin/main` @ `8981faf`) |
+| Git repository | **On GitHub** — https://github.com/hc-medamine/CRSIC-2026 |
 | Git workflow docs | **Done** — [README.md §5](./README.md) |
-| Step 2 — home events from JSON | **Done** (branch `feature/home-events-json`) |
+| Step 2 — home events from JSON | **Done** |
 | Step 3 — smoke checklist habit | **Done** — [SMOKE.md](./SMOKE.md) |
 | Step 3.5 — UI/UX audit / responsive / motion | **Done** — [UIUX.md](./UIUX.md) |
 | P2 a11y / i18n / org stack / will-change | **Done** on `feature/p2-a11y-i18n` — [PARITY.md](./PARITY.md) |
+| Home pubs mobile carousel | **Done** on `feature/home-pubs-carousel` (pushed to `origin`) |
 | Step 4 — internal app + DB (no external CMS) | Pending (design next) |
 
 ---
@@ -38,17 +39,20 @@ Living record of architectural and feature work. **Append new changelog entries 
 **Why:** On mobile, four tall book covers stacked vertically made the homepage feel repetitive and pushed events/news far below the fold.
 
 **Done:**
-- `#home-pub-grid` becomes a CSS scroll-snap horizontal carousel at ≤768px (one ~82% card + peek)
-- Tablet/desktop grid unchanged; publications page `#pub-grid` unchanged
-- RTL/LTR via `dir` + logical properties; titles clamped to 2 lines in the carousel
-- Decorative tilt disabled on coarse/touch pointers
-- Aria label `aria_home_pubs` for the home strip
+- `#home-pub-grid` becomes a CSS scroll-snap horizontal carousel at ≤768px (one ~82% card + peek of the next)
+- Tablet/desktop multi-column grid unchanged; publications page `#pub-grid` unchanged
+- RTL/LTR via `html[dir]` + logical properties; titles clamped to 2 lines in the carousel
+- Decorative tilt / hover-lift disabled on coarse/touch pointers
+- Aria label `aria_home_pubs` on the home strip
+- Branch pushed: `origin/feature/home-pubs-carousel`
 
-**Files:** `css/style.css`, `js/animations.js`, `index.html`, `data/locales/ar.json`, `data/locales/en.json`
+**Files:** `css/style.css`, `js/animations.js`, `index.html`, `data/locales/ar.json`, `data/locales/en.json`, `README.md`, `WORKLOG.md`
 
-**Next:** Manual check at 320–430px AR/EN; then merge when ready.
+**Next:** Merge into `main` when reviewed; then step 4 design (internal app).
 
 ---
+
+### 2026-07-19 — P2 a11y, responsive polish, partial EN parity
 
 **Done:**
 - Focus trap + restore for drawer and lightbox; Escape closes topmost dialog only (`js/a11y.js`)
@@ -67,6 +71,8 @@ Living record of architectural and feature work. **Append new changelog entries 
 
 ---
 
+### 2026-07-19 — First GitHub push
+
 **Done:**
 - Authenticated GitHub CLI as `hc-medamine`
 - Created public repo [hc-medamine/CRSIC-2026](https://github.com/hc-medamine/CRSIC-2026)
@@ -77,6 +83,8 @@ Living record of architectural and feature work. **Append new changelog entries 
 **Next:** Step 4 design — internal web app + database (users, roles, publishing).
 
 ---
+
+### 2026-07-16 — UI/UX polish (step 3.5)
 
 **Why:** Before designing the internal app, the public site needed LTR correctness, tablet navigation, smoother motion, and safer small-screen layout.
 
@@ -95,6 +103,8 @@ Living record of architectural and feature work. **Append new changelog entries 
 **Next:** Merge foundation branches → push to GitHub → then step 4 design (internal app).
 
 ---
+
+### 2026-07-16 — Smoke checklist habit (step 3)
 
 **Why:** No automated tests; merges need a repeatable human gate so data/routing/i18n regressions are caught early.
 
