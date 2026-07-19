@@ -279,8 +279,8 @@ Remote publish contract (optional CDN / same JSON filenames): [data/CMS.md](./da
 
 | Topic | Current state |
 |-------|----------------|
-| Repository | **Initialised** locally on branch `main` (2026-07-16) |
-| Remote | **None yet** — add with `git remote add origin <url>` when hosting is chosen |
+| Repository | **On GitHub** — [hc-medamine/CRSIC-2026](https://github.com/hc-medamine/CRSIC-2026) |
+| Remote | `origin` → `https://github.com/hc-medamine/CRSIC-2026.git` (`main` tracks `origin/main`) |
 | Ignore rules | [`.gitignore`](./.gitignore) — OS junk, `.claude/`, secrets, optional `node_modules/` |
 | Tracked IDE hint | `.vscode/settings.json` (Live Server port 5501) is tracked; other `.vscode/*` ignored |
 | Changelog | [WORKLOG.md](./WORKLOG.md) — append new entries **at the top** |
@@ -599,16 +599,15 @@ No separate staging config files exist in-repo.
 
 ### Known issues / gaps
 
-1. **No remote** — local `main` only until `origin` is added.
-2. **Content language** — dynamic JSON bodies are Arabic-only; English UI still shows Arabic titles/descriptions for pubs/events/news.
-3. **Contact depends on a local mail client** — no server-side mailer or form API.
-4. **Audit TODOs are closed**; no `TODO`/`FIXME` markers remain in app JS for open defects.
+1. **Content language** — dynamic JSON bodies are Arabic-only; English UI still shows Arabic titles/descriptions for pubs/events/news.
+2. **Contact depends on a local mail client** — no server-side mailer or form API.
+3. **Audit TODOs are closed**; no `TODO`/`FIXME` markers remain in app JS for open defects.
 
 ### Technical debt
 
 | Priority | Item |
 |----------|------|
-| High | Add remote + confirm first push when hosting is ready |
+| High | Step 4 — design internal web app + database |
 | Medium | Dual-field or locale-keyed content if EN parity is required |
 | Medium | Further image compression / WebP for covers and Holders |
 | Low | Introduce linting/formatting once the team grows |
@@ -625,7 +624,7 @@ Track day-to-day progress in [WORKLOG.md](./WORKLOG.md).
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-07-16**                                                                                                                                                 |
+| Last updated     | **2026-07-19**                                                                                                                                                 |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes

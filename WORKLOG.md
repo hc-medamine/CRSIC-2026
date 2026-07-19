@@ -20,7 +20,7 @@ Living record of architectural and feature work. **Append new changelog entries 
 |------|--------|
 | Audit P0–P3 | **Closed** |
 | Public site JSON / locales / safe DOM | **Done** |
-| Git repository (`main`) | **Initialised** — merging foundation work then first GitHub push |
+| Git repository (`main`) | **On GitHub** — https://github.com/hc-medamine/CRSIC-2026 (`origin/main` @ `8981faf`) |
 | Git workflow docs | **Done** — [README.md §5](./README.md) |
 | Step 2 — home events from JSON | **Done** (branch `feature/home-events-json`) |
 | Step 3 — smoke checklist habit | **Done** — [SMOKE.md](./SMOKE.md) |
@@ -31,7 +31,18 @@ Living record of architectural and feature work. **Append new changelog entries 
 
 ## Changelog
 
-### 2026-07-16 — UI/UX polish (step 3.5)
+### 2026-07-19 — First GitHub push
+
+**Done:**
+- Authenticated GitHub CLI as `hc-medamine`
+- Created public repo [hc-medamine/CRSIC-2026](https://github.com/hc-medamine/CRSIC-2026)
+- Pushed `main`, `feature/home-events-json`, `feature/ui-ux-polish` to `origin`
+
+**Files:** remote `origin` only (docs touch in this entry)
+
+**Next:** Step 4 design — internal web app + database (users, roles, publishing).
+
+---
 
 **Why:** Before designing the internal app, the public site needed LTR correctness, tablet navigation, smoother motion, and safer small-screen layout.
 
