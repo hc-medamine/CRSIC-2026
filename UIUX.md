@@ -21,3 +21,7 @@ Publications, events, news, partners, journals **body fields** remain Arabic unt
 ### Tests
 
 `node --test tests/*.test.mjs`
+
+## Home publications carousel (2026-07-19)
+
+On ≤768px, `#home-pub-grid` uses CSS scroll-snap (≈82% card + peek). Desktop/tablet grid unchanged. Documented in README §6.3 and WORKLOG.

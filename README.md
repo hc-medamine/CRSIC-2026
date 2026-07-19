@@ -103,6 +103,10 @@ CRSIC 2026/
 ├── AUDIT.md                   # Closed audit
 ├── WORKLOG.md                 # Living changelog
 ├── README.md                  # This file
+├── SMOKE.md                   # Pre-merge smoke checklist
+├── UIUX.md                    # UI/UX audit + fix log
+├── PARITY.md                  # AR/EN parity matrix
+├── tests/                     # Node built-in tests (`node --test`)
 └── .vscode/
     └── settings.json          # Live Server port 5501
 ```
@@ -114,9 +118,10 @@ CRSIC 2026/
 | JS modules         | camelCase filenames matching responsibility (`data.js`, `pubCard.js`)  |
 | Page sections      | `id="page-{id}"` matching hash (`#publications` → `page-publications`) |
 | Nav / deep links   | `data-page`, optional `data-tab`, `data-filter`                        |
-| i18n               | `data-i18n`, `data-i18n-html` (`<br>` only), `data-i18n-placeholder`   |
-| Publication covers | `cNN` collective, `iNN` individual; index-aligned with `pubs[]`        |
-| Content JSON       | UTF-8, no trailing commas, plain text in string fields (no HTML)       |
+| i18n               | `data-i18n`, `data-i18n-html`, `data-i18n-placeholder`, `data-i18n-aria` |
+| Home pub strip     | `#home-pub-grid` — grid ≥769px; scroll-snap carousel ≤768px             |
+| Publication covers | `cNN` collective, `iNN` individual; index-aligned with `pubs[]`          |
+| Content JSON       | UTF-8, no trailing commas, plain text in string fields (no HTML)         |
 
 ### Entry points & ignored / non-runtime folders
 
@@ -429,12 +434,13 @@ Deep links may pass `data-tab` / `data-filter` on navigable elements.
 - **Desktop:** sticky nav, mega-menus, language toggle, journals CTA
 - **Mobile:** drawer + bottom tab bar (home / publications / journals / events / more)
 - **Breadcrumb** bar (hidden on home)
-- **Publications / events / news (home):** JSON-filled grids (`#home-pub-grid`, `#home-events-grid`, `#home-news-grid`)
-- **Publications:** type filter + search; lightbox with cover and CTA to external library page
+- **Publications / events / news (home):** JSON-filled (`#home-pub-grid`, `#home-events-grid`, `#home-news-grid`)
+- **Home publications (mobile ≤768px):** `#home-pub-grid` is a horizontal CSS scroll-snap carousel (~82% card width + peek of the next card); tablet/desktop keep the multi-column `.pub-grid`. Full list via “View all publications” → `#publications`
+- **Publications page:** type filter + search; lightbox with cover and CTA to external library page; `#pub-grid` stays a responsive grid (not a carousel)
 - **Events / research:** tab switching; home shows 3 newest from `events.json`
-- **Language:** AR (RTL) ↔ EN (LTR); optional banner suggesting English when browser language is `en`/`fr` and no stored preference
+- **Language:** AR (RTL) ↔ EN (LTR); `?lang=` + `localStorage`; optional banner for `en*`/`fr*` browsers
 - **Contact:** client-side required-field shake; success message; opens mail client
-- **A11y:** skip link, ARIA on nav/drawer, `prefers-reduced-motion` respected in animations
+- **A11y:** skip link, ARIA on nav/drawer/lightbox (focus trap), `prefers-reduced-motion` respected; touch devices skip decorative card tilt
 
 ### 6.4 Internationalisation
 
@@ -443,8 +449,9 @@ Deep links may pass `data-tab` / `data-filter` on navigable elements.
 | Default              | Arabic, `lang="ar"` `dir="rtl"`                                                                                             |
 | Files                | `data/locales/ar.json`, `en.json`                                                                                           |
 | API                  | `t(key)`, `setLang`, `applyTranslations` in `js/i18n.js`                                                                    |
-| HTML attrs           | `data-i18n`, `data-i18n-html`, `data-i18n-placeholder`                                                                      |
-| Content bilingualism | **UI chrome** is bilingual; publication/event/news/partner **body fields are Arabic-only** in current JSON (not dual-field) |
+| HTML attrs           | `data-i18n`, `data-i18n-html`, `data-i18n-placeholder`, `data-i18n-aria` |
+| URL locale           | `?lang=ar\|en` (hash routes unchanged; no `/ar`/`/en` path prefix) |
+| Content bilingualism | **UI chrome** bilingual; editorial JSON bodies Arabic-only with EN notice — [PARITY.md](./PARITY.md) |
 
 ### 6.5 Media assets
 
@@ -593,10 +600,12 @@ No separate staging config files exist in-repo.
 
 | Step | Work | Status |
 |------|------|--------|
-| 1 | Git workflow (init, ignore, branching/commits docs) | **Done** — local `main` + initial commit; see §5 |
-| 2 | Home content fully from data (events teaser) | **Done** (2026-07-16) — `#home-events-grid` ← `getHomeEvents(3)` |
+| 1 | Git workflow (init, ignore, branching/commits docs) | **Done** — see §5; remote [hc-medamine/CRSIC-2026](https://github.com/hc-medamine/CRSIC-2026) |
+| 2 | Home content fully from data (events teaser) | **Done** — `#home-events-grid` ← `getHomeEvents(3)` |
 | 3 | Smoke-check habit before merges | **Done** — [SMOKE.md](./SMOKE.md) + README §5.5 |
 | 3.5 | Full UI/UX audit → responsiveness → animation smoothness | **Done** — [UIUX.md](./UIUX.md) |
+| P2 | Focus traps, org stack, will-change, partial EN parity | **Done** on `feature/p2-a11y-i18n` — [PARITY.md](./PARITY.md) |
+| — | Home pubs mobile horizontal carousel | **Done** on `feature/home-pubs-carousel` (on `origin`) |
 | 4 | Internal web app + database (users, roles, publish news/books/etc.) — **no external CMS** | Pending (design next) |
 
 ### Known issues / gaps
@@ -626,7 +635,7 @@ Track day-to-day progress in [WORKLOG.md](./WORKLOG.md).
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-07-19** |
+| Last updated     | **2026-07-19** (home pubs carousel + docs) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes
