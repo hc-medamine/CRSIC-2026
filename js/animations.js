@@ -260,6 +260,11 @@ function initStatShimmer() {
 /* ── [ANIM A3] 3D TILT via MutationObserver ──────────── */
 function watchForNewCards() {
   if (prefersReducedMotion()) return;
+  /* Touch / coarse pointers: skip decorative tilt (home carousel + general mobile) */
+  if (typeof window.matchMedia === 'function'
+      && window.matchMedia('(hover: none), (pointer: coarse)').matches) {
+    return;
+  }
   const TILT_MAX = 7;
   const tiltSelector = '.pub-card:not([data-tilt]), .journal-card:not([data-tilt])';
 

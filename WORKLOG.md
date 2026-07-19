@@ -33,7 +33,22 @@ Living record of architectural and feature work. **Append new changelog entries 
 
 ## Changelog
 
-### 2026-07-19 — P2 a11y, responsive polish, partial EN parity
+### 2026-07-19 — Home publications mobile carousel
+
+**Why:** On mobile, four tall book covers stacked vertically made the homepage feel repetitive and pushed events/news far below the fold.
+
+**Done:**
+- `#home-pub-grid` becomes a CSS scroll-snap horizontal carousel at ≤768px (one ~82% card + peek)
+- Tablet/desktop grid unchanged; publications page `#pub-grid` unchanged
+- RTL/LTR via `dir` + logical properties; titles clamped to 2 lines in the carousel
+- Decorative tilt disabled on coarse/touch pointers
+- Aria label `aria_home_pubs` for the home strip
+
+**Files:** `css/style.css`, `js/animations.js`, `index.html`, `data/locales/ar.json`, `data/locales/en.json`
+
+**Next:** Manual check at 320–430px AR/EN; then merge when ready.
+
+---
 
 **Done:**
 - Focus trap + restore for drawer and lightbox; Escape closes topmost dialog only (`js/a11y.js`)
