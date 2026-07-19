@@ -243,7 +243,7 @@ Approximate inventory of shipped content:
 
 | `localStorage` key       | Values | Purpose                             |
 | ------------------------ | ------ | ----------------------------------- | ------------------- |
-| `crsic_lang`             | `ar`   | `en`                                | Language preference |
+| `crsic_lang`             | `ar` \| `en` | Language preference (also mirrored as `?lang=`) |
 | `crsic_banner_dismissed` | `1`    | English-suggestion banner dismissed |
 
 ### 4.4 DRY data models & client ↔ “server” flow
