@@ -226,6 +226,10 @@ function initParallaxHero() {
         if (hero) {
           const max = Math.min(window.scrollY * 0.28, 120);
           hero.style.setProperty('--parallax-y', max.toFixed(1) + 'px');
+          hero.classList.toggle('is-parallaxing', max > 0.5);
+        } else {
+          document.querySelectorAll('.page-hero-inner.is-parallaxing')
+            .forEach((el) => el.classList.remove('is-parallaxing'));
         }
         ticking = false;
       });
@@ -256,6 +260,11 @@ function initStatShimmer() {
 /* ── [ANIM A3] 3D TILT via MutationObserver ──────────── */
 function watchForNewCards() {
   if (prefersReducedMotion()) return;
+  /* Touch / coarse pointers: skip decorative tilt (home carousel + general mobile) */
+  if (typeof window.matchMedia === 'function'
+      && window.matchMedia('(hover: none), (pointer: coarse)').matches) {
+    return;
+  }
   const TILT_MAX = 7;
   const tiltSelector = '.pub-card:not([data-tilt]), .journal-card:not([data-tilt])';
 

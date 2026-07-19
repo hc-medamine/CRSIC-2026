@@ -1,33 +1,23 @@
-# UI/UX audit — step 3.5 (2026-07-16)
+# UI/UX audit — living notes
 
-Living notes from the responsiveness / motion polish pass on `feature/ui-ux-polish`.
+## Step 3.5 (2026-07-16) — Done
 
-## Fixed in this pass (P0–P1)
+See commit history / WORKLOG. P0–P1 responsive/motion items closed.
+
+## P2 pass (2026-07-19) — Done on `feature/p2-a11y-i18n`
 
 | ID | Issue | Fix |
 |----|--------|-----|
-| P0.1 | `body { direction: rtl }` overrode EN `html[dir=ltr]` | `direction: inherit` on body + forms |
-| P0.2 | Tablet 769–1024: desktop nav, hover-only megas | Drawer + bottom tabs from `max-width: 1024px` |
-| P0.3 | Drawer always from physical `right` | Logical `inset-inline-start` + dir-aware `translateX` |
-| P1.4 | Pubs 2-col until 480 while events 1-col at 768 | Pubs → 1-col at ≤768 |
-| P1.5 | Events 3→1 with no tablet step | Events → 2-col at ≤1024, 1-col at ≤768 |
-| P1.6 | Tab indicator / title / nav underline animated `left`/`width` | `transform: translateX/scaleX` |
-| P1.7 | Reduced-motion gaps (scroll, ripple, shimmer) | Gates in CSS + `animations.js` |
-| P1.8 | Horizontal overflow risk | `overflow-x: clip` on html/body; section-header stacks ≤768 |
-| P1.9 | Touch targets &lt; 44px | Tabs, dept chips, lang buttons ≥44px |
-| P1.10 | Safe-area / back-to-top | `#app` padding + FAB `inset-inline-start` + safe-area bottom |
-| P1.11 | Sticky offsets | `--nav-h` CSS variable |
-| Extra | Home hero double entrance | Exclude `#page-home` from `pageStagger` |
-| Extra | Parallax unbounded | Clamp to 120px |
+| P2.1 | Focus trap drawer/lightbox | `js/a11y.js` + wired in `ui.js`; Escape topmost-only; focus restore |
+| P2.2 | Org chart mobile | Stacked vertical layout ≤700px |
+| P2.3 | Permanent `will-change` | Removed from hero geos; hover-only cards; parallax class |
+| P2.4 | Contact / lightbox stack | Lightbox column ≤560; contact form full-width submit ≤768 |
+| P2.5 | EN parity (partial) | Chrome/aria/meta/strategy wired; editorial JSON Arabic-only + notice — see [PARITY.md](./PARITY.md) |
 
-## Deferred (P2 — later polish)
+### Intentionally not “full EN parity”
 
-- Focus trap for drawer/lightbox
-- Org chart stacked mobile layout
-- Permanent `will-change` cleanup
-- Contact/lightbox micro-stack tweaks beyond g2@768
-- Full EN content parity (product decision)
+Publications, events, news, partners, journals **body fields** remain Arabic until a bilingual content schema is approved. English UI shows a notice + switch-to-Arabic control.
 
-## Smoke after this pass
+### Tests
 
-Run [SMOKE.md](./SMOKE.md) sections A–D + F1–F2, especially EN toggle (LTR) and tablet width (~900px) drawer.
+`node --test tests/*.test.mjs`
