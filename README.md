@@ -49,7 +49,8 @@ The product is a **zero-dependency static SPA**: Arabic-first (RTL) with English
 | CI/CD                        | **None**                                                         | No GitHub Actions or similar                            |
 | Auth / payments / email SaaS | **None**                                                         | Form opens the user’s mail client to `contact@crsic.dz` |
 | Monitoring                   | **None**                                                         | —                                                       |
-| Linters / formatters / tests | **None**                                                         | No ESLint, Prettier, EditorConfig, or test runner       |
+| Linters / formatters         | **None**                                                         | No ESLint, Prettier, or EditorConfig                    |
+| Unit tests                   | Node built-in (`node --test`)                                    | `tests/*.test.mjs` (a11y Escape stack + `?lang=`); no CI |
 | Bundler                      | **None**                                                         | Browser loads ES modules directly                       |
 | IDE helper                   | VS Code Live Server                                              | Port **5501** (`.vscode/settings.json`)                 |
 
@@ -74,6 +75,7 @@ CRSIC 2026/
 │   ├── i18n.js                # locales, RTL/LTR, localStorage, banner
 │   ├── router.js              # hash navigation, PAGE_PARENT, deep links
 │   ├── ui.js                  # render, filters, lightbox, contact form, drawer
+│   ├── a11y.js                # focus trap, Escape topmost dialog
 │   ├── animations.js          # scroll/tilt/counters; respects prefers-reduced-motion
 │   ├── utils.js               # DOM helpers, sanitizers, throttle/debounce
 │   └── components/            # Safe DOM card builders (no string innerHTML)
@@ -618,6 +620,7 @@ No separate staging config files exist in-repo.
 | P2 | Focus traps, org stack, will-change, partial EN parity | **Done** on `main` — [docs/audits/PARITY.md](./docs/audits/PARITY.md) |
 | — | Home pubs mobile horizontal carousel | **Done** on `main` |
 | — | Docs layout under `docs/` (+ PRD scaffold) | **Done** — [docs/README.md](./docs/README.md) |
+| — | Root Markdown stubs removed (README only at root) | **Done** |
 | 4 | Internal web app + database (users, roles, publish news/books/etc.) — **no external CMS** | Pending (design next — [docs/prds/](./docs/prds/)) |
 
 ### Known issues / gaps
@@ -647,7 +650,7 @@ Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Write product
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-07-19** (root Markdown stubs removed; docs under `docs/`) |
+| Last updated     | **2026-07-19** (docs sync: tests + `a11y.js` in stack/tree; stubs removed) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes

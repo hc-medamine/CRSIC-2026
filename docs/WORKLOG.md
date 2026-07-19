@@ -33,12 +33,29 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | P2 a11y / i18n / org stack / will-change | **Done** on `main` — [audits/PARITY.md](./audits/PARITY.md) |
 | Home pubs mobile carousel | **Done** on `main` |
 | Docs layout under `docs/` | **Done** |
-| Root redirect stubs removed | **Done** (this entry) |
+| Root redirect stubs removed | **Done** |
+| Docs sync (README tests / tree) | **Done** (this entry) |
 | Step 4 — internal app + DB (no external CMS) | Pending (design next — start in [prds/](./prds/)) |
 
 ---
 
 ## Changelog
+
+### 2026-07-19 — Docs sync with project status
+
+**Why:** README still claimed “no tests” while `tests/` and `js/a11y.js` shipped; roadmap omitted the stub-removal step.
+
+**Done:**
+- README §2: Node `node --test` documented; lint/format still none
+- README §3 tree: added `js/a11y.js`
+- README §10: root stubs removal marked **Done**
+- Status snapshot + this entry kept current
+
+**Files:** `README.md`, `docs/WORKLOG.md`
+
+**Next:** Step 4 design — first PRD under `docs/prds/`.
+
+---
 
 ### 2026-07-19 — Remove root Markdown stubs
 
@@ -66,12 +83,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 - Moved `AUDIT.md`, `UIUX.md`, `PARITY.md` → `docs/audits/`
 - Added `docs/README.md` (documentation index)
 - Added `docs/prds/README.md` + `docs/prds/TEMPLATE.md` for future PRDs
-- Left thin redirect stubs at previous root paths
+- Briefly left root redirect stubs (removed later same day — see entry above)
 - Kept `data/README.md` and `data/CMS.md` beside content (editor-facing)
 - Updated root `README.md` navigation, tree, and cross-links
 - Branch: `docs/reorganize-structure`
 
-**Files:** `docs/**`, root stubs (`WORKLOG.md`, `SMOKE.md`, `AUDIT.md`, `UIUX.md`, `PARITY.md`), `README.md`
+**Files:** `docs/**`, (temporary) root stubs, `README.md`
 
 **Validation commands & results:**
 
@@ -79,7 +96,7 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 |---------|--------|
 | `node --test tests/*.test.mjs` | **Pass** — 5/5 (a11y Escape stack + `?lang=` parse) |
 | JSON parse of `data/*.json` + locales | **Pass** — all files valid; `covers.length === pubs.length` (36); locale key parity (263 keys) |
-| Root stub + `docs/` path presence check | **Pass** — stubs and new paths present |
+| Path presence check for new `docs/` layout | **Pass** |
 | Manual browser smoke A–F ([qa/SMOKE.md](./qa/SMOKE.md)) | **Skipped** — docs-only change; no app behaviour modified |
 
 **Next:** Step 4 design — first PRD under `docs/prds/` using the template.
