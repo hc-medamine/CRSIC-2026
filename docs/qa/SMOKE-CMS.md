@@ -60,6 +60,14 @@ Estimated time: **~10 minutes**.
 | F2 | Replace keeps same public path | ☐ |
 | F3 | Audit `media.upload` / `media.replace` | ☐ |
 
+## H. Revisions & ops
+
+| # | Check | Pass? |
+|---|--------|-------|
+| H1 | Open a submitted/edited item → **Revision history** lists versions | ☐ |
+| H2 | Select two revisions → changed fields highlighted | ☐ |
+| H3 | Ops runbook exists: [CMS-OPS.md](../runbooks/CMS-OPS.md) | ☐ |
+
 ## G. Gate
 
 | # | Check | Pass? |

@@ -35,12 +35,27 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **News + Events + Publications + Media + Audit** on `feature/step4-internal-cms`; smoke: [qa/SMOKE-CMS.md](./qa/SMOKE-CMS.md) — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
+| Step 4 — internal app + DB (no external CMS) | **MVP local complete** on `feature/step4-internal-cms` (incl. audit, media, runbook, revisions); merge when SMOKE-CMS green — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
 | Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — CMS runbook + revision history UI
+
+**Why:** Phase 1 remaining gaps before merge gate.
+
+**Done:**
+- Ops runbook: backup/restore DB+media+JSON, Super Admin password reset, offboarding — [runbooks/CMS-OPS.md](./runbooks/CMS-OPS.md)
+- Revision history on news/events/publications detail pages (list + optional side-by-side compare)
+- `GET /api/content/[id]/revisions`
+
+**Files:** `docs/runbooks/CMS-OPS.md`, `cms/src/lib/content/revisions.ts`, `cms/src/app/api/content/[id]/revisions/`, `cms/src/app/dashboard/revision-history.tsx`, detail pages, docs
+
+**Next:** Confirm SMOKE-CMS H1–H3; merge when zero friction.
+
+---
 
 ### 2026-07-20 — Audit log + CMS smoke checklist
 

@@ -6,6 +6,7 @@ import { canAccessContentType, canReview, getUserOrgIds } from "@/lib/content/pe
 import { getMediaByPublicPath } from "@/lib/media/store";
 import { listOrgUnits } from "@/lib/users";
 import { EventEditorForm } from "../event-form";
+import { RevisionHistory } from "@/app/dashboard/revision-history";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -75,6 +76,8 @@ export default async function EventDetailPage({ params }: Props) {
           reviewNote: item.review_note,
         }}
       />
+
+      <RevisionHistory contentItemId={item.id} />
     </main>
   );
 }

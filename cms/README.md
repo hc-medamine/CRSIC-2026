@@ -56,6 +56,8 @@ Editors need the matching content-type scope (`news` / `event` / `publication`).
 - Migrations auto-run on `npm run dev` / `npm run build`
 - Audit log (Super Admin): `/dashboard/audit`
 - Automated smoke: `npm run db:smoke` — see [docs/qa/SMOKE-CMS.md](../docs/qa/SMOKE-CMS.md)
+- Ops runbook: [docs/runbooks/CMS-OPS.md](../docs/runbooks/CMS-OPS.md) (backup/restore, password reset, offboarding)
+- Revision history on each news/event/publication detail page (select + compare)
 
 ## Secrets
 
