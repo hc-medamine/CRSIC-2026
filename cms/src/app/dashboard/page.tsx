@@ -46,6 +46,11 @@ export default async function DashboardPage() {
             </Link>
           </li>
           <li>
+            <Link className="font-medium underline" href="/dashboard/publications">
+              Publications →
+            </Link>
+          </li>
+          <li>
             <Link className="font-medium underline" href="/dashboard/notifications">
               Notifications{unread > 0 ? ` (${unread})` : ""} →
             </Link>

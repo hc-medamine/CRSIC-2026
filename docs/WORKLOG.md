@@ -35,12 +35,30 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **News + Events workflows** on `feature/step4-internal-cms`; next: publications — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
+| Step 4 — internal app + DB (no external CMS) | **News + Events + Publications** on `feature/step4-internal-cms`; next: media upload / polish — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
 | Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — Step 6: publications workflow (draft → publish)
+
+**Why:** Third MVP content type; must keep public `covers.length === pubs.length`.
+
+**Done:**
+- `pub_kind` (collective/individual) on `content_items`; dept via `label_ar`, desc via `summary_ar`, cover via `image_path`
+- Same editorial workflow + four-eyes + notifications as news/events
+- Publish rebuilds `data/publications.json` (with `.bak`); validates cover/pubs alignment
+- UI: `/dashboard/publications`, `/new`, `/[id]`
+
+**Note:** First CMS publish replaces `publications.json` with CMS-published items only (backup at `.bak`).
+
+**Files:** `cms/sql/007_publication_fields.sql`, `cms/src/lib/content/publications.ts`, `cms/src/lib/publish/publicationsJson.ts`, `cms/src/app/api/publications/`, `cms/src/app/dashboard/publications/`, docs
+
+**Next:** Media upload for covers/images, or smoke-test + merge gate when zero friction.
+
+---
 
 ### 2026-07-20 — Step 5: events workflow (draft → publish)
 
@@ -54,7 +72,7 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 **Files:** `cms/sql/006_event_fields.sql`, `cms/src/lib/content/events.ts`, `cms/src/lib/publish/eventsJson.ts`, `cms/src/app/api/events/`, `cms/src/app/dashboard/events/`, docs
 
-**Next:** Step 6 — Publications workflow.
+**Next:** Step 6 — Publications workflow (done — see entry above).
 
 ---
 

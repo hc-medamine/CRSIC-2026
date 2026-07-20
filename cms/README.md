@@ -42,7 +42,7 @@ npm run dev
 |------|--------|-----------------|
 | News | Done | `data/news.json` |
 | Events | Done | `data/events.json` |
-| Publications | Next | `data/publications.json` (`covers.length === pubs.length`) |
+| Publications | Done | `data/publications.json` (`covers.length === pubs.length`) |
 
 Editors need the matching content-type scope (`news` / `event` / `publication`). Four-eyes: authors cannot approve their own items. First CMS publish replaces that JSON from CMS-published items only (writes `.bak` first).
 
