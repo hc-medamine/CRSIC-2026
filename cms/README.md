@@ -36,6 +36,16 @@ npm run dev
 - Password reset: Super Admin in-app only; no email recovery
 - Notifications: in-app only (`/dashboard/notifications`)
 
+## Content workflows (in progress)
+
+| Type | Status | Public snapshot |
+|------|--------|-----------------|
+| News | Done | `data/news.json` |
+| Events | Done | `data/events.json` |
+| Publications | Next | `data/publications.json` (`covers.length === pubs.length`) |
+
+Editors need the matching content-type scope (`news` / `event` / `publication`). Four-eyes: authors cannot approve their own items. First CMS publish replaces that JSON from CMS-published items only (writes `.bak` first).
+
 ## Secrets
 
 - Never commit `.env.local` or real passwords.

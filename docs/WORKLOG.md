@@ -35,12 +35,28 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **News workflow live** on `feature/step4-internal-cms` (steps 0–4); next: events — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
+| Step 4 — internal app + DB (no external CMS) | **News + Events workflows** on `feature/step4-internal-cms`; next: publications — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
 | Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — Step 5: events workflow (draft → publish)
+
+**Why:** Second content type per PRD; same review path as news.
+
+**Done:**
+- Event fields on `content_items` (scope intl/nat, day/month/year, type, display upcoming/done)
+- Editor/reviewer workflow + four-eyes + notifications
+- Publish rebuilds `data/events.json` (with `.bak`); P1 Arabic public fields
+- UI: `/dashboard/events`, `/new`, `/[id]`
+
+**Files:** `cms/sql/006_event_fields.sql`, `cms/src/lib/content/events.ts`, `cms/src/lib/publish/eventsJson.ts`, `cms/src/app/api/events/`, `cms/src/app/dashboard/events/`, docs
+
+**Next:** Step 6 — Publications workflow.
+
+---
 
 ### 2026-07-20 — Step 4: news workflow (draft → publish)
 
