@@ -390,6 +390,8 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 - During local development, store media under the CMS app upload directory; publish into public `img/` (or equivalent) for SPA consumption.  
 - Prefer stable URLs on replace so old links do not silently 404.  
 - At go-live, media and DB follow Algeria / `crsic.dz` policy.
+- **Locked (2026-07-20):** max **5 MB**; allow **JPEG / PNG / WebP + PDF**; public tree **`img/cms/{news|events|covers}/`**; **replace keeps the same public path**.
+
 ---
 
 ## 10. UX notes
@@ -633,6 +635,7 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 | 2026-07-20 | Personal data MVP: editorial checklist + Super Admin unpublish; no legal module |
 | 2026-07-20 | App directory: **`cms/`** at repo root |
 | 2026-07-20 | First Super Admin: **F. Chettih** / `f.chettih@crsic.dz` (login = email; no SMTP) |
+| 2026-07-20 | Media: **5 MB** max; **images + PDF**; public path **`img/cms/{news|events|covers}/`**; **stable path on replace** |
 | TBD | Exact named people for Editor/Reviewer seed accounts |
 ---
 

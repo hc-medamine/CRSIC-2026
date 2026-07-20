@@ -3,6 +3,7 @@ import { redirect, notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { getEventById } from "@/lib/content/events";
 import { canAccessContentType, canReview, getUserOrgIds } from "@/lib/content/permissions";
+import { getMediaByPublicPath } from "@/lib/media/store";
 import { listOrgUnits } from "@/lib/users";
 import { EventEditorForm } from "../event-form";
 
@@ -23,6 +24,7 @@ export default async function EventDetailPage({ params }: Props) {
   const orgs = allOrgs.filter((o) => orgIds.includes(o.id));
   const isAuthor = item.created_by === user.id || user.role === "super_admin";
   const reviewer = canReview(user) && item.created_by !== user.id;
+  const media = item.image_path ? await getMediaByPublicPath(item.image_path) : null;
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 px-6 py-12 font-sans">
@@ -58,6 +60,7 @@ export default async function EventDetailPage({ params }: Props) {
           bodyAr: item.body_ar ?? "",
           bodyEn: item.body_en ?? "",
           imagePath: item.image_path ?? "",
+          imageMediaId: media?.id ?? null,
           imageAltAr: item.image_alt_ar ?? "",
           imageAltEn: item.image_alt_en ?? "",
           enStatus: item.en_status,

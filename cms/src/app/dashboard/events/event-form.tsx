@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { MediaUploadField } from "@/app/dashboard/media-upload-field";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
 
@@ -15,6 +16,7 @@ type Initial = {
   bodyAr: string;
   bodyEn: string;
   imagePath: string;
+  imageMediaId?: string | null;
   imageAltAr: string;
   imageAltEn: string;
   enStatus: "pending" | "ready";
@@ -48,6 +50,7 @@ export function EventEditorForm({ mode, orgUnits, initial, canSubmit, canReview,
   const [bodyAr, setBodyAr] = useState(initial?.bodyAr ?? "");
   const [bodyEn, setBodyEn] = useState(initial?.bodyEn ?? "");
   const [imagePath, setImagePath] = useState(initial?.imagePath ?? "");
+  const [imageMediaId, setImageMediaId] = useState(initial?.imageMediaId ?? null);
   const [imageAltAr, setImageAltAr] = useState(initial?.imageAltAr ?? "");
   const [imageAltEn, setImageAltEn] = useState(initial?.imageAltEn ?? "");
   const [enStatus, setEnStatus] = useState<"pending" | "ready">(initial?.enStatus ?? "pending");
@@ -223,10 +226,18 @@ export function EventEditorForm({ mode, orgUnits, initial, canSubmit, canReview,
           <span className="font-medium">Type (EN)</span>
           <input disabled={!editable} value={eventTypeEn} onChange={(e) => setEventTypeEn(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
         </label>
-        <label className="text-sm">
-          <span className="font-medium">Image path (optional)</span>
-          <input disabled={!editable} value={imagePath} onChange={(e) => setImagePath(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
-        </label>
+        <MediaUploadField
+          bucket="events"
+          publicPath={imagePath}
+          mediaId={imageMediaId}
+          disabled={!editable}
+          imagesOnly
+          label="Event image (optional)"
+          onUploaded={({ publicPath, mediaId }) => {
+            setImagePath(publicPath);
+            setImageMediaId(mediaId);
+          }}
+        />
         <label className="text-sm">
           <span className="font-medium">Image alt (AR)</span>
           <input dir="rtl" disabled={!editable} value={imageAltAr} onChange={(e) => setImageAltAr(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />

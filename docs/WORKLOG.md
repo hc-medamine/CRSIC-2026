@@ -35,12 +35,30 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **News + Events + Publications** on `feature/step4-internal-cms`; next: media upload / polish — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
+| Step 4 — internal app + DB (no external CMS) | **News + Events + Publications + Media** on `feature/step4-internal-cms`; next: smoke / audit / merge gate — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
 | Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — Media upload (5 MB, images+PDF, stable paths)
+
+**Why:** Phase 1 media library; editors need upload instead of hand-typed paths.
+
+**Locked:** 5 MB; JPEG/PNG/WebP + PDF; `img/cms/{news|events|covers}/`; replace keeps same public path.
+
+**Done:**
+- `media_assets` table + magic-byte allowlist validation
+- `POST /api/media`, `POST /api/media/[id]` (replace)
+- Upload UI on news/events/publications forms + `/dashboard/media`
+- Staging `cms/uploads/` + public write under `img/cms/` (gitignored binaries)
+
+**Files:** `cms/sql/008_media.sql`, `cms/src/lib/media/`, `cms/src/app/api/media/`, dashboard media + form wiring, docs
+
+**Next:** Smoke-test draft → review → publish for all three types; audit log if still open; merge when zero friction.
+
+---
 
 ### 2026-07-20 — Auto-apply DB migrations on dev/build
 
@@ -53,7 +71,7 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 **Files:** `cms/scripts/migrate.ts`, `cms/scripts/check-migrations.ts`, `cms/package.json`, docs
 
-**Next:** Media upload / smoke-test three content workflows.
+**Next:** Done — see Media upload entry above.
 
 ---
 

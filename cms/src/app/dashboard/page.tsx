@@ -51,6 +51,11 @@ export default async function DashboardPage() {
             </Link>
           </li>
           <li>
+            <Link className="font-medium underline" href="/dashboard/media">
+              Media uploads →
+            </Link>
+          </li>
+          <li>
             <Link className="font-medium underline" href="/dashboard/notifications">
               Notifications{unread > 0 ? ` (${unread})` : ""} →
             </Link>

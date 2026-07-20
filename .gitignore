@@ -22,6 +22,13 @@ ehthumbs.db
 # CMS publish backups of public JSON
 data/*.json.bak
 
+# CMS local uploads + published CMS media (binary; regenerated via upload)
+cms/uploads/**
+!cms/uploads/.gitkeep
+img/cms/**
+!img/cms/**/
+!img/cms/**/.gitkeep
+
 # Logs & caches
 *.log
 .cache/

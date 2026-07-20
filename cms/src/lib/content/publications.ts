@@ -88,11 +88,13 @@ async function addRevision(
   );
 }
 
-function validatePublicationFields(input: PublicationInput) {
+function validatePublicationFields(input: PublicationInput, opts?: { requireCover?: boolean }) {
   if (!input.titleAr.trim()) throw new Error("Arabic title is required");
   if (!input.deptAr.trim()) throw new Error("Department (AR) is required");
   if (!input.descAr.trim()) throw new Error("Description (AR) is required");
-  if (!input.coverPath.trim()) throw new Error("Cover path is required");
+  if (opts?.requireCover !== false && !input.coverPath.trim()) {
+    throw new Error("Cover path is required");
+  }
   if (!["collective", "individual"].includes(input.pubKind)) {
     throw new Error("Invalid publication type");
   }
@@ -135,7 +137,7 @@ export async function createPublication(
   if (!(await canAccessOrg(user, input.orgUnitId))) {
     throw new Error("No permission for this organisation unit");
   }
-  validatePublicationFields(input);
+  validatePublicationFields(input, { requireCover: false });
   const enStatus = input.enStatus ?? (input.titleEn?.trim() ? "ready" : "pending");
 
   const result = await query<PublicationItem>(
@@ -158,7 +160,7 @@ export async function createPublication(
       input.deptEn?.trim() || null,
       input.descAr.trim(),
       input.descEn?.trim() || null,
-      input.coverPath.trim(),
+      input.coverPath.trim() || null,
       input.imageAltAr?.trim() || null,
       input.imageAltEn?.trim() || null,
       input.pubKind,
@@ -185,7 +187,7 @@ export async function updatePublicationDraft(
   if (!(await canAccessOrg(user, input.orgUnitId))) {
     throw new Error("No permission for this organisation unit");
   }
-  validatePublicationFields(input);
+  validatePublicationFields(input, { requireCover: false });
   const enStatus = input.enStatus ?? (input.titleEn?.trim() ? "ready" : "pending");
 
   const result = await query<PublicationItem>(
@@ -208,7 +210,7 @@ export async function updatePublicationDraft(
       input.deptEn?.trim() || null,
       input.descAr.trim(),
       input.descEn?.trim() || null,
-      input.coverPath.trim(),
+      input.coverPath.trim() || null,
       input.imageAltAr?.trim() || null,
       input.imageAltEn?.trim() || null,
       input.pubKind,

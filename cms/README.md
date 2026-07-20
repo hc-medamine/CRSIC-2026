@@ -47,6 +47,14 @@ Migrations apply **automatically** on `npm run dev` and `npm run build` (`predev
 
 Editors need the matching content-type scope (`news` / `event` / `publication`). Four-eyes: authors cannot approve their own items. First CMS publish replaces that JSON from CMS-published items only (writes `.bak` first).
 
+## Media
+
+- Max **5 MB**; JPEG / PNG / WebP / PDF (magic-byte checked)
+- Public paths: `img/cms/news/`, `img/cms/events/`, `img/cms/covers/`
+- Replace overwrites the **same** public path
+- Staging: `cms/uploads/` (gitignored); UI: `/dashboard/media` and content forms
+- Migrations auto-run on `npm run dev` / `npm run build`
+
 ## Secrets
 
 - Never commit `.env.local` or real passwords.

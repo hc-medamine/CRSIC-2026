@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { MediaUploadField } from "@/app/dashboard/media-upload-field";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
 
@@ -15,6 +16,7 @@ type Initial = {
   descAr: string;
   descEn: string;
   coverPath: string;
+  coverMediaId?: string | null;
   imageAltAr: string;
   imageAltEn: string;
   enStatus: "pending" | "ready";
@@ -49,6 +51,7 @@ export function PublicationEditorForm({
   const [descAr, setDescAr] = useState(initial?.descAr ?? "");
   const [descEn, setDescEn] = useState(initial?.descEn ?? "");
   const [coverPath, setCoverPath] = useState(initial?.coverPath ?? "");
+  const [coverMediaId, setCoverMediaId] = useState(initial?.coverMediaId ?? null);
   const [imageAltAr, setImageAltAr] = useState(initial?.imageAltAr ?? "");
   const [imageAltEn, setImageAltEn] = useState(initial?.imageAltEn ?? "");
   const [enStatus, setEnStatus] = useState<"pending" | "ready">(initial?.enStatus ?? "pending");
@@ -203,17 +206,18 @@ export function PublicationEditorForm({
             rows={3}
           />
         </label>
-        <label className="text-sm">
-          <span className="font-medium">Cover path *</span>
-          <input
-            required
-            disabled={!editable}
-            value={coverPath}
-            onChange={(e) => setCoverPath(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
-            placeholder="img/covers/c00.png"
-          />
-        </label>
+        <MediaUploadField
+          bucket="covers"
+          publicPath={coverPath}
+          mediaId={coverMediaId}
+          disabled={!editable}
+          imagesOnly
+          label="Cover image *"
+          onUploaded={({ publicPath, mediaId }) => {
+            setCoverPath(publicPath);
+            setCoverMediaId(mediaId);
+          }}
+        />
         <label className="text-sm">
           <span className="font-medium">Cover alt (AR) *</span>
           <input
