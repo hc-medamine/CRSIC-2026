@@ -421,7 +421,7 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 | Machine | Local Windows developer workstation |
 | IDE | Cursor Pro |
 | Database | **PostgreSQL 18.4-2** (Windows x64) |
-| App runtime | Node (exact framework — **open; prompt before choosing**) |
+| App runtime | **Next.js** (App Router) — stakeholder decision 2026-07-20 |
 | Git branch | `feature/step4-internal-cms` until zero-friction merge |
 | Merge / go-live gate | Fully functional, zero known bugs, smoke path green |
 
@@ -560,7 +560,7 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 11. Arabic vs EN conflict rule — **Open; prompt stakeholder** (AR authoritative was previously proposed only).  
 12. Exact named people for first accounts — prompt at first seed.  
 13. Privacy SOP for names/photos in news — **Open; prompt stakeholder**.  
-14. Exact Node framework (Express / Fastify / Next / other) — **Open; prompt stakeholder before scaffolding**.
+14. ~~Exact Node framework~~ → **Closed: Next.js (App Router)** (2026-07-20).
 
 **Process:** any new ambiguity discovered during implementation → prompt → Decision log → then code.
 ---
@@ -622,6 +622,7 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 | 2026-07-20 | Dev stack: local Windows + **Cursor Pro** + **PostgreSQL 18.4-2** + Node |
 | 2026-07-20 | Implementation branch: `feature/step4-internal-cms`; merge/`main`/go-live only when zero friction |
 | 2026-07-20 | **Ambiguity policy:** always prompt stakeholder; never assume; never silent default |
+| 2026-07-20 | Node framework: **Next.js (App Router)** |
 | TBD | Session timeout minutes |
 | TBD | AR vs EN conflict / public card formatting / event auto-`done` |
 | TBD | Exact Node framework |

@@ -42,6 +42,20 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ## Changelog
 
+### 2026-07-20 — Node framework locked: Next.js
+
+**Why:** Stakeholder chose framework for Step 4 CMS.
+
+**Done:**
+- PRD Decision log + §11: **Next.js (App Router)**
+- Open question §15.14 closed
+
+**Files:** `docs/prds/2026-07-19-internal-content-management.md`, `docs/WORKLOG.md`
+
+**Next:** Prompt remaining Phase 0 questions (DB name/user, session, AR/EN, formatting, events, privacy) → then scaffold.
+
+---
+
 ### 2026-07-20 — Ambiguity policy corrected (prompt-only)
 
 **Why:** Stakeholder requires strict prompting for every undecided point — never assume, never silent default.
