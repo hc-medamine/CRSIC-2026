@@ -2,7 +2,7 @@ import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
-import { rebuildPublicNewsJson } from "@/lib/publish/newsJson";
+import { buildNewsPayload, rebuildPublicNewsJson } from "@/lib/publish/newsJson";
 import {
   canAccessContentType,
   canAccessOrg,
@@ -429,15 +429,18 @@ export async function publishNews(user: SessionUser, id: string) {
   }
 
   const slug = existing.public_slug ?? `news-${existing.id.slice(0, 8)}`;
+  const payload = buildNewsPayload(existing);
   const result = await query<NewsItem>(
     `UPDATE content_items SET
       status = 'published',
       public_slug = $2,
       published_at = COALESCE(published_at, NOW()),
+      live_payload = $4::jsonb,
+      live_at = NOW(),
       updated_by = $3,
       updated_at = NOW()
      WHERE id = $1 RETURNING *`,
-    [id, slug, user.id],
+    [id, slug, user.id, JSON.stringify(payload)],
   );
   const item = result.rows[0];
   await addRevision(item.id, "published", snapshotOf(item), user.id, "Published");
@@ -462,6 +465,8 @@ export async function unpublishNews(user: SessionUser, id: string) {
   const result = await query<NewsItem>(
     `UPDATE content_items SET
       status = 'unpublished',
+      live_payload = NULL,
+      live_at = NULL,
       updated_by = $2,
       updated_at = NOW()
      WHERE id = $1 RETURNING *`,

@@ -9,44 +9,66 @@ export type PublicPubItem = {
   desc: string;
 };
 
-type PublishedRow = {
+/** Public item plus its cover (kept alongside so covers.length === pubs.length on rebuild). */
+export type StoredPubPayload = PublicPubItem & { cover: string };
+
+type PayloadSource = {
   title_ar: string;
   pub_kind: "collective" | "individual" | null;
   label_ar: string | null;
   summary_ar: string | null;
   image_path: string | null;
-  published_at: Date | null;
 };
+
+/** P1 public object for a publication row (persisted to content_items.live_payload). */
+export function buildPublicationPayload(row: PayloadSource): StoredPubPayload {
+  const cover = row.image_path?.trim();
+  if (!cover) {
+    throw new Error(`Publication "${row.title_ar}" is missing a cover path`);
+  }
+  return {
+    t: row.title_ar.trim(),
+    type: row.pub_kind === "individual" ? "individual" : "collective",
+    dept: row.label_ar?.trim() || "",
+    desc: row.summary_ar?.trim() || "",
+    cover,
+  };
+}
 
 function publicPublicationsPath(): string {
   return join(process.cwd(), "..", "data", "publications.json");
 }
 
-/** P1: Arabic plain-text pubs + covers; covers.length === pubs.length */
+/**
+ * P1: Arabic plain-text pubs + covers; covers.length === pubs.length.
+ * Emits every row whose live_payload is set (published, or under revision with the public
+ * copy still live), NOT just status = 'published'.
+ */
 export async function rebuildPublicPublicationsJson(): Promise<{
   count: number;
   path: string;
 }> {
-  const result = await query<PublishedRow>(
-    `SELECT title_ar, pub_kind, label_ar, summary_ar, image_path, published_at
+  const result = await query<{ live_payload: StoredPubPayload }>(
+    `SELECT live_payload
      FROM content_items
-     WHERE content_type = 'publication' AND status = 'published'
-     ORDER BY published_at DESC NULLS LAST, updated_at DESC`,
+     WHERE content_type = 'publication' AND live_payload IS NOT NULL
+     ORDER BY live_at DESC NULLS LAST, updated_at DESC`,
   );
 
   const pubs: PublicPubItem[] = [];
   const covers: string[] = [];
 
   for (const row of result.rows) {
-    const cover = row.image_path?.trim();
+    const p = row.live_payload;
+    const cover = p.cover?.trim();
     if (!cover) {
-      throw new Error(`Published publication "${row.title_ar}" is missing cover path`);
+      throw new Error(`Live publication "${p.t}" is missing cover path`);
     }
     pubs.push({
-      t: row.title_ar.trim(),
-      type: row.pub_kind === "individual" ? "individual" : "collective",
-      dept: row.label_ar?.trim() || "",
-      desc: row.summary_ar?.trim() || "",
+      t: (p.t ?? "").trim(),
+      type: p.type === "individual" ? "individual" : "collective",
+      dept: p.dept?.trim() || "",
+      desc: p.desc?.trim() || "",
     });
     covers.push(cover);
   }

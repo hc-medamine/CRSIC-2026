@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type Revision = {
   id: string;
@@ -13,9 +14,19 @@ type Revision = {
   authorDisplayName: string | null;
 };
 
+type ContentType = "news" | "event" | "publication";
+
 type Props = {
   contentItemId: string;
+  contentType: ContentType;
+  canRestore?: boolean;
 };
+
+function apiSegment(type: ContentType): string {
+  if (type === "news") return "news";
+  if (type === "event") return "events";
+  return "publications";
+}
 
 const HIGHLIGHT_KEYS = [
   "title_ar",
@@ -34,39 +45,61 @@ const HIGHLIGHT_KEYS = [
   "pub_kind",
 ];
 
-export function RevisionHistory({ contentItemId }: Props) {
+export function RevisionHistory({ contentItemId, contentType, canRestore }: Props) {
+  const router = useRouter();
   const [revisions, setRevisions] = useState<Revision[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [compareId, setCompareId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [restoring, setRestoring] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/content/${contentItemId}/revisions`);
+      const data = (await res.json()) as { ok: boolean; error?: string; revisions?: Revision[] };
+      if (!res.ok || !data.ok || !data.revisions) {
+        setError(data.error ?? "Failed to load revisions");
+        return;
+      }
+      setRevisions(data.revisions);
+      setSelectedId((prev) => prev ?? data.revisions?.[0]?.id ?? null);
+      setCompareId((prev) => prev ?? data.revisions?.[1]?.id ?? null);
+    } finally {
+      setLoading(false);
+    }
+  }, [contentItemId]);
 
   useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(`/api/content/${contentItemId}/revisions`);
-        const data = (await res.json()) as { ok: boolean; error?: string; revisions?: Revision[] };
-        if (!res.ok || !data.ok || !data.revisions) {
-          if (!cancelled) setError(data.error ?? "Failed to load revisions");
-          return;
-        }
-        if (!cancelled) {
-          setRevisions(data.revisions);
-          setSelectedId(data.revisions[0]?.id ?? null);
-          setCompareId(data.revisions[1]?.id ?? null);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
     void load();
-    return () => {
-      cancelled = true;
-    };
-  }, [contentItemId]);
+  }, [load]);
+
+  async function restore() {
+    if (!selectedId) return;
+    setRestoring(true);
+    setError(null);
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/${apiSegment(contentType)}/${contentItemId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "restore_revision", revisionId: selectedId }),
+      });
+      const data = (await res.json()) as { ok: boolean; error?: string };
+      if (!res.ok || !data.ok) {
+        setError(data.error ?? "Restore failed");
+        return;
+      }
+      setMessage("Revision restored onto the editable draft.");
+      await load();
+      router.refresh();
+    } finally {
+      setRestoring(false);
+    }
+  }
 
   const selected = revisions.find((r) => r.id === selectedId) ?? null;
   const compare = revisions.find((r) => r.id === compareId) ?? null;
@@ -96,6 +129,7 @@ export function RevisionHistory({ contentItemId }: Props) {
 
       {loading ? <p className="text-sm text-zinc-500">Loading…</p> : null}
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {message ? <p className="text-sm text-green-700">{message}</p> : null}
 
       {!loading && revisions.length === 0 ? (
         <p className="text-sm text-zinc-500">No revisions recorded yet.</p>
@@ -138,12 +172,24 @@ export function RevisionHistory({ contentItemId }: Props) {
 
       {selected ? (
         <div className="rounded border border-zinc-100 bg-zinc-50 p-3 text-sm">
-          <p className="text-xs text-zinc-500">
-            #{selected.revisionNumber} · {selected.status} ·{" "}
-            {selected.authorDisplayName ?? selected.authorEmail ?? "unknown"} ·{" "}
-            {new Date(selected.createdAt).toLocaleString()}
-            {selected.changeSummary ? ` · ${selected.changeSummary}` : ""}
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs text-zinc-500">
+              #{selected.revisionNumber} · {selected.status} ·{" "}
+              {selected.authorDisplayName ?? selected.authorEmail ?? "unknown"} ·{" "}
+              {new Date(selected.createdAt).toLocaleString()}
+              {selected.changeSummary ? ` · ${selected.changeSummary}` : ""}
+            </p>
+            {canRestore ? (
+              <button
+                type="button"
+                disabled={restoring}
+                onClick={() => void restore()}
+                className="rounded border border-emerald-300 px-2 py-1 text-xs text-emerald-800 hover:bg-emerald-50 disabled:opacity-60"
+              >
+                {restoring ? "Restoring…" : "Restore this revision (→ draft)"}
+              </button>
+            ) : null}
+          </div>
 
           <div className="mt-3 overflow-x-auto">
             <table className="w-full min-w-[28rem] border-collapse text-left text-xs">

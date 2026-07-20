@@ -12,7 +12,10 @@ export type PublicEventItem = {
   img?: string;
 };
 
-type PublishedRow = {
+/** Public item plus the scope used to bucket it into intl/nat on rebuild. */
+export type StoredEventPayload = PublicEventItem & { scope: "intl" | "nat" };
+
+type PayloadSource = {
   title_ar: string;
   event_day: string | null;
   event_month: string | null;
@@ -21,37 +24,55 @@ type PublishedRow = {
   event_display_status: "upcoming" | "done" | null;
   event_scope: "intl" | "nat" | null;
   image_path: string | null;
-  published_at: Date | null;
 };
+
+/** P1 public object for an event row (persisted to content_items.live_payload). */
+export function buildEventPayload(row: PayloadSource): StoredEventPayload {
+  const item: StoredEventPayload = {
+    day: row.event_day?.trim() || "01",
+    month: row.event_month?.trim() || "",
+    year: row.event_year?.trim() || "",
+    title: row.title_ar.trim(),
+    type: row.event_type_ar?.trim() || "فعالية",
+    status: row.event_display_status === "done" ? "done" : "upcoming",
+    scope: row.event_scope === "nat" ? "nat" : "intl",
+  };
+  if (row.image_path) item.img = row.image_path;
+  return item;
+}
 
 function publicEventsPath(): string {
   return join(process.cwd(), "..", "data", "events.json");
 }
 
+/**
+ * Emits every event row whose live_payload is set (published, or under revision with the
+ * public copy still live), split into intl/nat by the scope captured at publish time.
+ */
 export async function rebuildPublicEventsJson(): Promise<{ intl: number; nat: number; path: string }> {
-  const result = await query<PublishedRow>(
-    `SELECT title_ar, event_day, event_month, event_year, event_type_ar,
-            event_display_status, event_scope, image_path, published_at
+  const result = await query<{ live_payload: StoredEventPayload }>(
+    `SELECT live_payload
      FROM content_items
-     WHERE content_type = 'event' AND status = 'published'
-     ORDER BY event_year DESC NULLS LAST, event_month DESC NULLS LAST, event_day DESC NULLS LAST, published_at DESC`,
+     WHERE content_type = 'event' AND live_payload IS NOT NULL
+     ORDER BY live_at DESC NULLS LAST, updated_at DESC`,
   );
 
   const intl: PublicEventItem[] = [];
   const nat: PublicEventItem[] = [];
 
   for (const row of result.rows) {
-    const item: PublicEventItem = {
-      day: row.event_day?.trim() || "01",
-      month: row.event_month?.trim() || "",
-      year: row.event_year?.trim() || "",
-      title: row.title_ar.trim(),
-      type: row.event_type_ar?.trim() || "فعالية",
-      status: row.event_display_status === "done" ? "done" : "upcoming",
+    const { scope, ...item } = row.live_payload;
+    const publicItem: PublicEventItem = {
+      day: item.day?.trim() || "01",
+      month: item.month?.trim() || "",
+      year: item.year?.trim() || "",
+      title: (item.title ?? "").trim(),
+      type: item.type?.trim() || "فعالية",
+      status: item.status === "done" ? "done" : "upcoming",
     };
-    if (row.image_path) item.img = row.image_path;
-    if (row.event_scope === "nat") nat.push(item);
-    else intl.push(item);
+    if (item.img) publicItem.img = item.img;
+    if (scope === "nat") nat.push(publicItem);
+    else intl.push(publicItem);
   }
 
   const path = publicEventsPath();

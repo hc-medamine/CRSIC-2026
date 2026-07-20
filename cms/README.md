@@ -37,6 +37,21 @@ Migrations apply **automatically** on `npm run dev` and `npm run build` (`predev
 - Password reset: Super Admin in-app only; no email recovery
 - Notifications: in-app only (`/dashboard/notifications`)
 
+## Staff accounts (real people)
+
+Login id is the **email** (no SMTP). Passwords are set in-app by the Super Admin and are **never**
+committed. Names are stored AR (authoritative) + EN.
+
+| Role | Display | Name (AR) | Name (EN) | Email |
+|------|---------|-----------|-----------|-------|
+| Super Admin | F. Chettih | فاطمة الزهرة شتيح | Fatima El Zahra Chettih | `f.chettih@crsic.dz` |
+| Reviewer | F. Boufatah | فريحة بوفاتح | Fariha Boufatah | `f.boufatah@crsic.dz` |
+| Editor | i.megoussi | ايمان مقوسي | Megoussi Imen | `i.megoussi@crsic.dz` |
+| Editor | t.medjelled | طارق مجلد | Tarek Medjelled | `t.medjelled@crsic.dz` |
+
+**Smoke accounts are test-only** (automation for `npm run db:smoke`), not real staff — keep but do
+not treat as people: `smoke.editor@crsic.dz`, `smoke.reviewer@crsic.dz`.
+
 ## Content workflows (in progress)
 
 | Type | Status | Public snapshot |
@@ -45,7 +60,27 @@ Migrations apply **automatically** on `npm run dev` and `npm run build` (`predev
 | Events | Done | `data/events.json` |
 | Publications | Done | `data/publications.json` (`covers.length === pubs.length`) |
 
-Editors need the matching content-type scope (`news` / `event` / `publication`). Four-eyes: authors cannot approve their own items. First CMS publish replaces that JSON from CMS-published items only (writes `.bak` first).
+Editors need the matching content-type scope (`news` / `event` / `publication`). Four-eyes: authors cannot approve their own items.
+
+Public JSON is rebuilt from rows **where `live_payload IS NOT NULL`** (migration `010`), so:
+
+- **Publish** sets `live_payload` (P1 public object) + `status = published`.
+- **Unpublish** clears `live_payload` + `status = unpublished`.
+- **Create revision (public stays live)** sends a published item back to `draft` but **keeps**
+  `live_payload`, so the public site keeps serving the last published copy until the next publish.
+
+Before the first production publish, import the existing static cards so nothing is lost — see
+[CMS-CUTOVER.md](../docs/runbooks/CMS-CUTOVER.md) and `npm run db:import-legacy`.
+
+### Operational features
+
+- **Action queues** on `/dashboard`: Awaiting review, Needs revision, My drafts, Recently published.
+- **Publish preview** (P1 public card) on each detail form, near the Publish button.
+- **RTL/LTR admin chrome**: language/direction toggle (AR RTL / EN LTR), persisted in the
+  `cms_lang` cookie; nav labels localised.
+- **Restore a prior revision** (Reviewer / Super Admin) from the revision history panel.
+- **Reassign author** (Super Admin / Reviewer) for draft / changes-requested / submitted items —
+  audited as `content.reassign`.
 
 ## Media
 

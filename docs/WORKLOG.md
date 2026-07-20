@@ -35,12 +35,65 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **SMOKE-CMS confirmed** on `feature/step4-internal-cms` — ready to merge when you say so — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
+| Step 4 — internal app + DB (no external CMS) | **Phase‑1 completion gaps closed** (queues, preview, RTL, restore/start‑revision, reassign, legacy cutover); on `feature/step4-internal-cms`, **not merged** — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
 | Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — Phase‑1 completion gaps closed (queues, preview, RTL, revisions, cutover)
+
+**Why:** Merge gate requires the CMS to be fully complete, not only smoke‑green. Closed all nine
+remaining completion items on `feature/step4-internal-cms` (no merge to `main`).
+
+**Done:**
+- **Action‑queue dashboard** (`/dashboard`): Awaiting review, Needs revision, My drafts, Recently
+  published — role/permission scoped; rows link to the right detail page. New helper
+  `cms/src/lib/content/queues.ts`.
+- **Publish preview** (`PublishPreview`) of the P1 public card on all three detail forms.
+- **Full RTL admin chrome**: `CmsChrome` shell with AR RTL / EN LTR toggle persisted in `cms_lang`
+  cookie; localised nav labels (`cms/src/lib/i18n/labels.ts`); nav + logout moved into the shell.
+- **Restore prior revision** (Reviewer/Super Admin): API action `restore_revision` + button in
+  `RevisionHistory`; applies snapshot fields and sets status `draft`.
+- **Published → create revision (public stays live)**: migration `010_live_payload.sql`
+  (`live_payload JSONB`, `live_at`); rebuilders now emit from rows where `live_payload IS NOT NULL`;
+  publish sets it, unpublish clears it, new `start_revision` keeps it while status → `draft`.
+- **Draft reassignment** (Super Admin/Reviewer): API action `reassign` + `ReassignAuthor` UI +
+  `/api/content/assignable-users`; audited as `content.reassign`; new author notified.
+- **Legacy cutover**: `npm run db:import-legacy` imports current `data/*.json` as live published
+  items (idempotent, keeps `covers.length === pubs.length`, does not rewrite JSON) —
+  [runbooks/CMS-CUTOVER.md](./runbooks/CMS-CUTOVER.md).
+- **Backup/restore drill** logged in [runbooks/CMS-OPS.md](./runbooks/CMS-OPS.md) §8: `pg_dump`
+  unavailable on this dev machine → documented SQL fallback (no dump files committed).
+- **Docs**: real staff accounts recorded (`cms/README.md` + PRD decision log, closing the named‑people
+  TBD; `smoke.*` labelled automation‑only); SMOKE‑CMS section I added.
+
+**Verify:** `npm run db:migrate` (010 applied), `npm run build` (green), `npm run db:smoke`
+(SMOKE PASS; `data/news.json` restored from snapshot — no wipe).
+
+**Files:** `cms/sql/010_live_payload.sql`, `cms/src/lib/content/{queues,lifecycle}.ts`,
+`cms/src/lib/i18n/labels.ts`, `cms/src/lib/publish/*Json.ts`, `cms/src/lib/content/{news,events,publications}.ts`,
+`cms/src/app/dashboard/{cms-chrome,publish-preview,reassign-author,revision-history,page,layout}.tsx`,
+`cms/src/app/dashboard/**/[id]/page.tsx`, `cms/src/app/dashboard/**/*-form.tsx`,
+`cms/src/app/api/{news,events,publications}/[id]/route.ts`, `cms/src/app/api/content/assignable-users/`,
+`cms/scripts/import-legacy.ts`, `cms/package.json`, `docs/runbooks/CMS-{OPS,CUTOVER}.md`,
+`docs/qa/SMOKE-CMS.md`, `cms/README.md`, PRD, this file.
+
+**Next:** Manual UI pass of SMOKE‑CMS §A–I; merge `feature/step4-internal-cms` → `main` only when
+explicitly requested.
+
+---
+
+### 2026-07-20 — Merge blocked until CMS fully complete
+
+**Why:** Stakeholder: do not merge until CMS is fully complete (not only smoke-green).
+
+**Gate:** No PR/merge `feature/step4-internal-cms` → `main` until remaining Phase‑1 completion items are done (see list in chat / next entries). Phase 2/3 and public detail pages stay out of this gate unless explicitly added.
+
+**Next:** Close completion gaps (queues, preview, RTL chrome, restore revision, published→revision flow, draft reassignment, backup drill, real staff seeds, legacy JSON policy).
+
+---
 
 ### 2026-07-20 — SMOKE-CMS confirmed (manual + automated)
 

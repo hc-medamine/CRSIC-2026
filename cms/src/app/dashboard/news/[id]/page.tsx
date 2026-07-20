@@ -7,6 +7,7 @@ import { getMediaByPublicPath } from "@/lib/media/store";
 import { listOrgUnits } from "@/lib/users";
 import { NewsEditorForm } from "../news-form";
 import { RevisionHistory } from "@/app/dashboard/revision-history";
+import { ReassignAuthor } from "@/app/dashboard/reassign-author";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -27,6 +28,8 @@ export default async function NewsDetailPage({ params }: Props) {
 
   const isAuthor = item.created_by === user.id || user.role === "super_admin";
   const reviewer = canReview(user) && item.created_by !== user.id;
+  const canManage = user.role === "super_admin" || user.role === "reviewer";
+  const canReassign = canManage && ["draft", "changes_requested", "submitted"].includes(item.status);
   const media = item.image_path ? await getMediaByPublicPath(item.image_path) : null;
 
   return (
@@ -75,7 +78,15 @@ export default async function NewsDetailPage({ params }: Props) {
         }}
       />
 
-      <RevisionHistory contentItemId={item.id} />
+      {canReassign ? (
+        <ReassignAuthor
+          contentItemId={item.id}
+          contentType="news"
+          currentAuthorId={item.created_by}
+        />
+      ) : null}
+
+      <RevisionHistory contentItemId={item.id} contentType="news" canRestore={canManage} />
     </main>
   );
 }

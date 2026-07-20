@@ -638,7 +638,10 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 | 2026-07-20 | App directory: **`cms/`** at repo root |
 | 2026-07-20 | First Super Admin: **F. Chettih** / `f.chettih@crsic.dz` (login = email; no SMTP) |
 | 2026-07-20 | Media: **5 MB** max; **images + PDF**; public path **`img/cms/{news|events|covers}/`**; **stable path on replace** |
-| TBD | Exact named people for Editor/Reviewer seed accounts |
+| 2026-07-20 | **No merge to `main` until CMS is fully complete** (smoke alone is not enough); Phase 2/3 stay deferred unless added |
+| 2026-07-20 | Named staff accounts (closes prior TBD): Super Admin **F. Chettih** `f.chettih@crsic.dz`; Reviewer **F. Boufatah** `f.boufatah@crsic.dz`; Editors **i.megoussi** `i.megoussi@crsic.dz` (Megoussi Imen / ايمان مقوسي), **t.medjelled** `t.medjelled@crsic.dz` (Tarek Medjelled / طارق مجلد). `smoke.*` accounts are automation-only, not staff. |
+| 2026-07-20 | Public JSON rebuilt from rows where **`live_payload IS NOT NULL`** (not only `status='published'`); "create revision" keeps the public copy live until next publish (migration `010_live_payload.sql`) |
+| 2026-07-20 | Legacy cutover: import current `data/*.json` into CMS as live items via `npm run db:import-legacy` before first production publish, OR accept loss of non-imported cards ([CMS-CUTOVER.md](../runbooks/CMS-CUTOVER.md)) |
 ---
 
 ## 19. Mapping to template sections

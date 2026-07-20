@@ -8,33 +8,43 @@ export type PublicNewsItem = {
   title: string;
 };
 
-type PublishedRow = {
-  id: string;
+type PayloadSource = {
   title_ar: string;
   label_ar: string | null;
   image_path: string | null;
-  public_slug: string | null;
-  published_at: Date | null;
 };
+
+/** P1 public object for a news row (persisted to content_items.live_payload). */
+export function buildNewsPayload(row: PayloadSource): PublicNewsItem {
+  return {
+    img: row.image_path,
+    label: row.label_ar?.trim() || "خبر",
+    title: row.title_ar.trim(),
+  };
+}
 
 function publicNewsPath(): string {
   // cms/ -> repo root data/news.json
   return join(process.cwd(), "..", "data", "news.json");
 }
 
-/** P1: Arabic plain-text subset for existing SPA contract */
+/**
+ * P1: Arabic plain-text subset for existing SPA contract.
+ * Emits every row whose live_payload is set (published, or under revision with the public
+ * copy still live), NOT just status = 'published'.
+ */
 export async function rebuildPublicNewsJson(): Promise<{ count: number; path: string }> {
-  const result = await query<PublishedRow>(
-    `SELECT id, title_ar, label_ar, image_path, public_slug, published_at
+  const result = await query<{ live_payload: PublicNewsItem }>(
+    `SELECT live_payload
      FROM content_items
-     WHERE content_type = 'news' AND status = 'published'
-     ORDER BY published_at DESC NULLS LAST, updated_at DESC`,
+     WHERE content_type = 'news' AND live_payload IS NOT NULL
+     ORDER BY live_at DESC NULLS LAST, updated_at DESC`,
   );
 
   const news: PublicNewsItem[] = result.rows.map((row) => ({
-    img: row.image_path,
-    label: row.label_ar?.trim() || "خبر",
-    title: row.title_ar.trim(),
+    img: row.live_payload.img ?? null,
+    label: row.live_payload.label?.trim() || "خبر",
+    title: (row.live_payload.title ?? "").trim(),
   }));
 
   const path = publicNewsPath();

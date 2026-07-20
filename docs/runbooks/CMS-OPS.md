@@ -128,3 +128,50 @@ First CMS publish for a content type **replaces** that public JSON with **CMS-pu
 | Automated smoke | `cd cms && npm run db:smoke` |
 | Manual smoke | [SMOKE-CMS.md](../qa/SMOKE-CMS.md) |
 | Audit | `/dashboard/audit` (Super Admin) |
+
+---
+
+## 7. Legacy JSON cutover
+
+See [CMS-CUTOVER.md](./CMS-CUTOVER.md) for the full policy and the `npm run db:import-legacy`
+step that imports the current `data/*.json` into the CMS as live items **before** the first
+production publish (so no legacy cards are lost).
+
+---
+
+## 8. Backup / restore drill
+
+### Drill log
+
+| Date | Action | Result |
+|------|--------|--------|
+| 2026-07-20 | Attempted DB backup with `pg_dump` on the dev Windows machine | **pg_dump NOT available** — not on `PATH` and no `C:\Program Files\PostgreSQL\*\bin\pg_dump.exe` found. Documented SQL fallback below. |
+| 2026-07-20 | Public JSON safety verified | `npm run db:smoke` snapshots `data/news.json`, publishes, unpublishes, and **restores** it — confirmed no wipe. |
+
+> The PostgreSQL **client tools** (`pg_dump`, `pg_restore`, `psql`) are not installed on this
+> dev machine even though the server (`crsic_db`) is reachable via `DATABASE_URL`. Install the
+> matching PostgreSQL client tools (or run the dump from the DB host / a machine that has them)
+> before relying on the `pg_dump` path in §1.
+
+### Exact commands (run once client tools are available)
+
+```powershell
+$stamp = Get-Date -Format "yyyyMMdd-HHmmss"
+pg_dump -h localhost -U crsic_cms_app -d crsic_db -Fc -f "C:\backups\crsic_db-$stamp.dump"
+```
+
+### SQL fallback export (no pg_dump)
+
+If `pg_dump` is unavailable, take a logical export per table via `psql \copy` (client-side, no
+server file permissions needed):
+
+```powershell
+# One CSV per table (adjust the table list as the schema grows)
+foreach ($t in "users","org_units","user_org_scopes","user_content_scopes","content_items","content_revisions","notifications","media_assets","audit_log","schema_migrations") {
+  psql "$env:DATABASE_URL" -c "\copy (SELECT * FROM $t) TO 'C:\backups\crsic-$t.csv' WITH (FORMAT csv, HEADER)"
+}
+```
+
+If even `psql` is missing, a Node fallback can stream each table to CSV using the app's `pg`
+pool (write an ad-hoc script under `cms/scripts/`, run with `--env-file=.env.local`, and store
+output **outside** the repo). **Never commit dump/CSV files** — `C:\backups\` is off-repo by design.

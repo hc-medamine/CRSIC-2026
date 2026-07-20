@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MediaUploadField } from "@/app/dashboard/media-upload-field";
+import { PublishPreview } from "@/app/dashboard/publish-preview";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
 
@@ -366,6 +367,17 @@ export function PublicationEditorForm({
         </div>
       ) : null}
 
+      {mode === "edit" ? (
+        <PublishPreview
+          kind="publication"
+          cover={coverPath.trim()}
+          title={titleAr}
+          type={pubKind}
+          dept={deptAr}
+          desc={descAr}
+        />
+      ) : null}
+
       {mode === "edit" &&
       canReview &&
       (initial?.status === "approved" || initial?.status === "unpublished") ? (
@@ -379,15 +391,27 @@ export function PublicationEditorForm({
         </button>
       ) : null}
 
-      {mode === "edit" && canReview && initial?.status === "published" ? (
-        <button
-          type="button"
-          disabled={pending}
-          className="w-fit rounded border px-4 py-2 text-sm"
-          onClick={() => void run("unpublish")}
-        >
-          Unpublish
-        </button>
+      {mode === "edit" && (isAuthor || canReview) && initial?.status === "published" ? (
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={pending}
+            className="w-fit rounded border border-emerald-300 px-4 py-2 text-sm text-emerald-800"
+            onClick={() => void run("start_revision")}
+          >
+            Create revision (public stays live)
+          </button>
+          {canReview ? (
+            <button
+              type="button"
+              disabled={pending}
+              className="w-fit rounded border px-4 py-2 text-sm"
+              onClick={() => void run("unpublish")}
+            >
+              Unpublish
+            </button>
+          ) : null}
+        </div>
       ) : null}
     </div>
   );

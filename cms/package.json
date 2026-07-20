@@ -13,7 +13,8 @@
     "db:status": "node --env-file=.env.local --import tsx scripts/check-migrations.ts",
     "db:smoke": "node --env-file=.env.local --import tsx scripts/smoke-cms.ts",
     "db:seed:super-admin": "node --env-file=.env.local --import tsx scripts/seed-super-admin.ts",
-    "db:seed:welcome-notifications": "node --env-file=.env.local --import tsx scripts/seed-welcome-notifications.ts"
+    "db:seed:welcome-notifications": "node --env-file=.env.local --import tsx scripts/seed-welcome-notifications.ts",
+    "db:import-legacy": "node --env-file=.env.local --import tsx scripts/import-legacy.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
