@@ -42,6 +42,21 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ## Changelog
 
+### 2026-07-20 — Ambiguity policy corrected (prompt-only)
+
+**Why:** Stakeholder requires strict prompting for every undecided point — never assume, never silent default.
+
+**Done:**
+- PRD document rule + A10 rewritten to prompt-only policy
+- Re-opened: session timeout, AR/EN conflict, public card formatting, event auto-`done`, Node framework, privacy SOP
+- Removed invented “defaults locked” language from prior same-day entry
+
+**Files:** `docs/prds/2026-07-19-internal-content-management.md`, `docs/WORKLOG.md`
+
+**Next:** Prompt on open questions listed in PRD §15 (items 8–14).
+
+---
+
 ### 2026-07-20 — Step 4 implementation branch + PRD amendments
 
 **Why:** Lock no-email policy, local-only development stack, and Git workflow before building.
@@ -51,12 +66,13 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 - PRD amendments: no email/SMTP features; Super Admin in-app password reset; in-app notifications only
 - Dev environment locked: this Windows machine, Cursor Pro, PostgreSQL **18.4-2**, Node
 - Go-live only after zero-friction local completion
-- Defaults locked in PRD (session 30m, AR authoritative, plain-text public cards, manual event `done`)
+- Ambiguity policy corrected: **always prompt stakeholder; never assume; never silent default**
+- Re-opened for prompt: session timeout, AR/EN conflict, card formatting, event auto-`done`, Node framework, privacy SOP
 - README §10 Step 4 status updated to implementation branch
 
 **Files:** `docs/prds/2026-07-19-internal-content-management.md`, `docs/prds/README.md`, `docs/WORKLOG.md`, `README.md`
 
-**Next:** Phase 0 local scaffold (Postgres + Node app + auth) on `feature/step4-internal-cms`.
+**Next:** Prompt stakeholder on open PRD questions → then Phase 0 local scaffold on `feature/step4-internal-cms`.
 
 ---
 

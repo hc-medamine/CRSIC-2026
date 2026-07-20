@@ -12,6 +12,7 @@
 
 **Document rule:** Facts confirmed in discovery are unmarked. Items that are not yet verified are labeled **Assumption**, **Open question**, or **Proposed**.
 
+**Ambiguity policy (stakeholder-locked 2026-07-20):** When anything is unclear or undecided, **stop and prompt the stakeholder for an explicit decision**. **Never assume. Never apply a default or “labeled default” without that prompt.** Do not proceed on silent judgment calls.
 ---
 
 ## 1. Problem
@@ -242,7 +243,7 @@ Dimensions in MVP:
 2. As Super Admin, I can create/deactivate users and assign roles/scopes without deleting historical authorship.  
 3. As any user, after my account is created I can edit my display name and personal info (not my role or scopes).  
 4. As Super Admin, I can set or reset another user’s password in the admin UI (no email).  
-5. As any user, my session expires after inactivity (**default: 30 minutes**).
+5. As any user, my session expires after inactivity (**Open — prompt for timeout value; do not invent a default**).
 
 ### Editor
 
@@ -285,7 +286,7 @@ Dimensions in MVP:
 8. Publish pipeline producing `news.json`, `events.json`, `publications.json` (+ stored media URLs/paths) compatible with [data/CMS.md](../../data/CMS.md).  
 9. AR/EN fields with independent readiness; AR may publish with EN pending.  
 10. Audit log for login (success/fail), user/permission changes, content lifecycle, uploads, publish jobs.  
-11. XSS-safe content policy: **plain text** for public JSON string fields (matches SPA `textContent` / no raw HTML).  
+11. XSS-safe content policy for public JSON string fields — **Open; prompt** (SPA today uses plain `textContent` / no raw HTML; confirm whether to keep that).  
 12. RTL-capable editing UI for Arabic.  
 13. Preview of the item payload before publish (public card fields).  
 14. Account deactivation + reassignment of open drafts/tasks.  
@@ -383,8 +384,7 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 ### Multilingual rule (confirmed)
 
 - Arabic can publish with English pending.  
-- **Locked defaults:** Arabic is authoritative on conflict; EN is optional until filled; public EN UI keeps existing “content in Arabic” behaviour until detail-page work lands (WORKLOG pending).
-
+- **Open — prompt before locking:** Is Arabic authoritative on conflict? Must EN eventually be required for some types? How should public EN UI behave when EN is pending?
 ### Media
 
 - During local development, store media under the CMS app upload directory; publish into public `img/` (or equivalent) for SPA consumption.  
@@ -421,7 +421,7 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 | Machine | Local Windows developer workstation |
 | IDE | Cursor Pro |
 | Database | **PostgreSQL 18.4-2** (Windows x64) |
-| App runtime | Node (exact framework chosen in Phase 0 and logged) |
+| App runtime | Node (exact framework — **open; prompt before choosing**) |
 | Git branch | `feature/step4-internal-cms` until zero-friction merge |
 | Merge / go-live gate | Fully functional, zero known bugs, smoke path green |
 
@@ -518,7 +518,7 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 - Scaffold Node app + schema (users, roles, content, audit, notifications).  
 - Auth (login, session, Super Admin password set/reset).  
 - Seed org units (4 research depts + centre-wide).  
-- Record chosen Node framework in Decision log.
+- Record chosen Node framework in Decision log **only after stakeholder prompt/decision**.
 
 ### Phase 1 — MVP (local complete → then merge)
 
@@ -554,14 +554,15 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 5. ~~Stack~~ → **Closed:** Node + PostgreSQL 18.4-2 local; Cursor Pro; feature branch workflow.  
 6. ~~Email~~ → **Closed:** no email features.  
 7. ~~Password reset~~ → **Closed:** Super Admin in-app reset.  
-8. ~~Session timeout~~ → **Closed default:** 30 minutes.  
-9. ~~Public card formatting~~ → **Closed:** plain text.  
-10. ~~Event end → `done`~~ → **Closed for MVP:** manual status only.  
-11. ~~Arabic vs EN conflict~~ → **Closed:** Arabic authoritative.  
-12. Exact named people for first accounts — fill at first seed (implementation task).  
-13. Privacy SOP for names/photos — editorial checklist for MVP (**Assumption**).  
-14. Exact Node framework — decide in Phase 0; log decision (no further prompt required if one fits).
+8. Session timeout value — **Open; prompt stakeholder** (do not invent minutes).  
+9. Public card formatting (plain text vs limited formatting) — **Open if not already confirmed; prompt before build**.  
+10. Event end → `done` (auto vs manual) — **Open; prompt stakeholder**.  
+11. Arabic vs EN conflict rule — **Open; prompt stakeholder** (AR authoritative was previously proposed only).  
+12. Exact named people for first accounts — prompt at first seed.  
+13. Privacy SOP for names/photos in news — **Open; prompt stakeholder**.  
+14. Exact Node framework (Express / Fastify / Next / other) — **Open; prompt stakeholder before scaffolding**.
 
+**Process:** any new ambiguity discovered during implementation → prompt → Decision log → then code.
 ---
 
 ## 16. Assumptions log
@@ -572,12 +573,12 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 | A2 | Research depts + centre-wide are right scopes | Rework assignments |
 | A3 | Local Postgres 18.x maps cleanly to prod host later | Deploy friction |
 | A4 | P1 subset acceptable until detail pages | Shallow public cards |
-| A5 | Super Admin password reset is acceptable without email | Locked-out UX |
-| A6 | Plain-text public cards remain SPA model for MVP | Rich text earlier |
+| A5 | Super Admin password reset without email is acceptable | Locked-out UX if rejected |
+| A6 | _(removed)_ Plain-text / session / AR-authority defaults must not be invented — **prompt** | — |
 | A7 | Partners/locales/static pages can wait | Earlier expansion |
 | A8 | Volume quota unnecessary | Later KPI ask |
 | A9 | Merge only from `feature/step4-internal-cms` when smoke is clean | Process drift |
-| A10 | Ambiguities may be resolved by labeled defaults without blocking | Stakeholder override later |
+| A10 | **Ambiguities are resolved only by prompting the stakeholder — never assume, never silent default** | Wrong builds if ignored |
 
 ---
 
@@ -620,9 +621,11 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 | 2026-07-20 | **No email features** — Super Admin password reset in-app; in-app notifications only |
 | 2026-07-20 | Dev stack: local Windows + **Cursor Pro** + **PostgreSQL 18.4-2** + Node |
 | 2026-07-20 | Implementation branch: `feature/step4-internal-cms`; merge/`main`/go-live only when zero friction |
-| 2026-07-20 | Defaults locked: session 30m; AR authoritative; plain-text public fields; manual event `done` |
-| TBD | Exact Node framework within Node ecosystem |
-
+| 2026-07-20 | **Ambiguity policy:** always prompt stakeholder; never assume; never silent default |
+| TBD | Session timeout minutes |
+| TBD | AR vs EN conflict / public card formatting / event auto-`done` |
+| TBD | Exact Node framework |
+| TBD | Privacy SOP for personal data in news |
 ---
 
 ## 19. Mapping to template sections
