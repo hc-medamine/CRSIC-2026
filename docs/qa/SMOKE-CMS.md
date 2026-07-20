@@ -72,7 +72,7 @@ Estimated time: **~10 minutes**.
 
 | # | Check | Pass? |
 |---|--------|-------|
-| I1 | `/dashboard` shows queues: Awaiting review, Needs revision, My drafts, Recently published; rows link to the right detail page | ☐ |
+| I1 | `/dashboard` shows queues: Awaiting review, Needs revision, My drafts, Rejected, **Unpublished**, Recently published; rows link to the right detail page | ☐ |
 | I2 | Each detail form shows the **Public card preview (P1)** near Publish (news img/label/title; event date/title/type/status; pub cover/title/type/dept/desc) | ☐ |
 | I3 | Chrome **language toggle** flips AR RTL ↔ EN LTR, nav labels localise, and the choice survives a reload (`cms_lang` cookie) | ☐ |
 | I4 | On a **published** item: “Create revision (public stays live)” → status `draft`, but public JSON still contains the item (unchanged) | ☐ |
@@ -80,6 +80,7 @@ Estimated time: **~10 minutes**.
 | I6 | Reviewer/Super Admin: **Restore this revision** in revision history sets fields back + status `draft`; audit `*.restore_revision` | ☐ |
 | I7 | Super Admin/Reviewer: **Reassign author** on a draft/changes_requested/submitted item; audit `content.reassign`; new author notified | ☐ |
 | I8 | Cutover: `npm run db:import-legacy` imports current JSON as live items (idempotent; publications keep `covers.length === pubs.length`); does **not** rewrite `data/*.json` | ☐ |
+| I9 | After unpublish (or reject): item appears in **Unpublished** / **Rejected** on dashboard for author + Reviewer/SA (Editors: own or scoped). Super Admin only: **Delete permanently** on unpublished/rejected; audit `*.delete` | ☐ |
 
 ## G. Gate
 

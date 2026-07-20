@@ -39,9 +39,18 @@ type Props = {
   canSubmit?: boolean;
   canReview?: boolean;
   isAuthor?: boolean;
+  canDelete?: boolean;
 };
 
-export function EventEditorForm({ mode, orgUnits, initial, canSubmit, canReview, isAuthor }: Props) {
+export function EventEditorForm({
+  mode,
+  orgUnits,
+  initial,
+  canSubmit,
+  canReview,
+  isAuthor,
+  canDelete,
+}: Props) {
   const router = useRouter();
   const [orgUnitId, setOrgUnitId] = useState(initial?.orgUnitId ?? orgUnits[0]?.id ?? "");
   const [titleAr, setTitleAr] = useState(initial?.titleAr ?? "");
@@ -119,6 +128,12 @@ export function EventEditorForm({ mode, orgUnits, initial, canSubmit, canReview,
 
   async function run(action: string, extra?: Record<string, unknown>) {
     if (!initial?.id) return;
+    if (action === "delete") {
+      const ok = window.confirm(
+        "Permanently delete this item? This cannot be undone.",
+      );
+      if (!ok) return;
+    }
     setPending(true);
     setError(null);
     setMessage(null);
@@ -128,9 +143,14 @@ export function EventEditorForm({ mode, orgUnits, initial, canSubmit, canReview,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action, ...extra }),
       });
-      const data = (await res.json()) as { ok: boolean; error?: string };
+      const data = (await res.json()) as { ok: boolean; error?: string; deleted?: boolean };
       if (!res.ok || !data.ok) {
         setError(data.error ?? "Action failed");
+        return;
+      }
+      if (data.deleted) {
+        router.push("/dashboard/events");
+        router.refresh();
         return;
       }
       setMessage("Saved.");
@@ -333,6 +353,19 @@ export function EventEditorForm({ mode, orgUnits, initial, canSubmit, canReview,
       {mode === "edit" && isAuthor && initial?.status === "rejected" ? (
         <button type="button" disabled={pending} className="w-fit rounded border border-amber-300 px-4 py-2 text-sm text-amber-900" onClick={() => void run("reopen_rejected")}>
           Reopen as draft
+        </button>
+      ) : null}
+
+      {mode === "edit" &&
+      canDelete &&
+      (initial?.status === "unpublished" || initial?.status === "rejected") ? (
+        <button
+          type="button"
+          disabled={pending}
+          className="w-fit rounded border border-red-300 px-4 py-2 text-sm text-red-800"
+          onClick={() => void run("delete")}
+        >
+          Delete permanently
         </button>
       ) : null}
     </div>

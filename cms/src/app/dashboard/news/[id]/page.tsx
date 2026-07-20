@@ -60,6 +60,7 @@ export default async function NewsDetailPage({ params }: Props) {
         isAuthor={isAuthor}
         canSubmit={isAuthor && ["draft", "changes_requested"].includes(item.status)}
         canReview={reviewer}
+        canDelete={user.role === "super_admin"}
         initial={{
           id: item.id,
           orgUnitId: item.org_unit_id,

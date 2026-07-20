@@ -199,6 +199,32 @@ export async function reopenRejected(user: SessionUser, id: string): Promise<Con
   return item.content_type;
 }
 
+/**
+ * Super Admin only: permanently delete unpublished or rejected items (and their revisions).
+ */
+export async function deleteContentItem(user: SessionUser, id: string): Promise<ContentType> {
+  if (user.role !== "super_admin") {
+    throw new Error("Super Admin role required to delete content");
+  }
+  const item = await getItemRow(id);
+  if (!item) throw new Error("Not found");
+  if (!["unpublished", "rejected"].includes(item.status)) {
+    throw new Error("Only unpublished or rejected items can be deleted");
+  }
+
+  await writeAudit({
+    actor: user,
+    action: `${item.content_type}.delete`,
+    entityType: item.content_type,
+    entityId: id,
+    summary: `Deleted ${item.status} item — ${item.title_ar}`,
+    metadata: { title: item.title_ar, status: item.status },
+  });
+
+  await query(`DELETE FROM content_items WHERE id = $1`, [id]);
+  return item.content_type;
+}
+
 export type AssignableUser = {
   id: string;
   display_name: string;

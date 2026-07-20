@@ -12,7 +12,13 @@ import {
   withdrawNews,
   type NewsInput,
 } from "@/lib/content/news";
-import { reassignAuthor, reopenRejected, restoreRevision, startRevision } from "@/lib/content/lifecycle";
+import {
+  deleteContentItem,
+  reassignAuthor,
+  reopenRejected,
+  restoreRevision,
+  startRevision,
+} from "@/lib/content/lifecycle";
 import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 
 export const runtime = "nodejs";
@@ -98,6 +104,9 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         await reopenRejected(user, id);
         item = await getNewsById(id);
         break;
+      case "delete":
+        await deleteContentItem(user, id);
+        return NextResponse.json({ ok: true, deleted: true });
       case "restore_revision":
         if (!body.revisionId) throw new Error("revisionId required");
         await restoreRevision(user, id, body.revisionId);
@@ -116,7 +125,12 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     return NextResponse.json({ ok: true, item: serialize(item) });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Update failed";
-    const status = message.includes("Four-eyes") || message.includes("permission") ? 403 : 400;
+    const status =
+      message.includes("Four-eyes") ||
+      message.includes("permission") ||
+      message.includes("Super Admin role required")
+        ? 403
+        : 400;
     return NextResponse.json({ ok: false, error: message }, { status });
   }
 }

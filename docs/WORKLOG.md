@@ -35,12 +35,24 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **Bugbot fixes applied**; awaiting stakeholder merge-complete confirm — `feature/step4-internal-cms` **not merged** — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
+| Step 4 — internal app + DB (no external CMS) | **In progress** — Super Admin delete + unpublished queue; awaiting merge-complete — `feature/step4-internal-cms` **not merged** — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
 | Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — Super Admin delete + unpublished dashboard queue
+
+**Done:**
+- Super Admin can permanently delete **unpublished** or **rejected** items (`deleteContentItem`; audit `*.delete`; revisions cascade).
+- Dashboard **Unpublished** queue for concerned parties: Reviewer/SA see all; Editors see own + scoped org/type items.
+- Rejected queue also visible to Reviewer/SA (not only author).
+- SMOKE-CMS I1/I9 updated.
+
+**Next:** Confirm UI (unpublish → dashboard queue; SA delete); then merge when stakeholder says merge-complete.
+
+---
 
 ### 2026-07-20 — Bugbot fixes before merge-complete
 

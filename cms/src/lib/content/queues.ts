@@ -21,6 +21,7 @@ export type Queues = {
   needsRevision: QueueItem[];
   myDrafts: QueueItem[];
   rejected: QueueItem[];
+  unpublished: QueueItem[];
   recentlyPublished: QueueItem[];
 };
 
@@ -70,6 +71,8 @@ async function runQueue(where: string, params: unknown[], limit: number): Promis
  * - awaitingReview: submitted items (Reviewer / Super Admin only)
  * - needsRevision: changes_requested items (author, or Reviewer/Super Admin)
  * - myDrafts: the current user's drafts
+ * - rejected: author's rejected items (Reviewer/SA see all)
+ * - unpublished: unpublished items for concerned parties (author, Reviewer/SA, or scoped Editor)
  * - recentlyPublished: recently published (live) items in the user's scope
  */
 export async function getQueues(user: SessionUser): Promise<Queues> {
@@ -106,11 +109,19 @@ export async function getQueues(user: SessionUser): Promise<Queues> {
     50,
   );
 
-  const rejected = await runQueue(
-    `c.status = 'rejected' AND c.created_by = $1`,
-    [user.id],
-    50,
-  );
+  const rejected = reviewer
+    ? await runQueue(`c.status = 'rejected'`, [], 50)
+    : await runQueue(`c.status = 'rejected' AND c.created_by = $1`, [user.id], 50);
+
+  const unpublished = reviewer
+    ? await runQueue(`c.status = 'unpublished'`, [], 50)
+    : scopeWhere === "FALSE"
+      ? await runQueue(`c.status = 'unpublished' AND c.created_by = $1`, [user.id], 50)
+      : await runQueue(
+          `c.status = 'unpublished' AND (c.created_by = $${scopeParams.length + 1} OR (${scopeWhere}))`,
+          [...scopeParams, user.id],
+          50,
+        );
 
   const recentlyPublished = reviewer
     ? await runQueue(`c.status = 'published'`, [], 10)
@@ -118,5 +129,12 @@ export async function getQueues(user: SessionUser): Promise<Queues> {
       ? []
       : await runQueue(`c.status = 'published' AND ${scopeWhere}`, scopeParams, 10);
 
-  return { awaitingReview, needsRevision, myDrafts, rejected, recentlyPublished };
+  return {
+    awaitingReview,
+    needsRevision,
+    myDrafts,
+    rejected,
+    unpublished,
+    recentlyPublished,
+  };
 }
