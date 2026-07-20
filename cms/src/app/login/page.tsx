@@ -1,10 +1,8 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -25,8 +23,8 @@ export default function LoginPage() {
         setError(data.error ?? "Login failed");
         return;
       }
-      router.replace("/dashboard");
-      router.refresh();
+      // Full navigation so the new session cookie is always sent
+      window.location.assign("/dashboard");
     } catch {
       setError("Network error");
     } finally {

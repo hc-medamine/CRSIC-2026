@@ -1,5 +1,7 @@
-import { getIronSession, type SessionOptions } from "iron-session";
+import { getIronSession, type SessionOptions, type IronSession } from "iron-session";
 import { cookies } from "next/headers";
+import type { NextRequest } from "next/server";
+import type { NextResponse } from "next/server";
 
 export type SessionUser = {
   id: string;
@@ -41,8 +43,20 @@ export function getSessionOptions(): SessionOptions {
   };
 }
 
+/** Server Components / pages — read/write via Next cookie store */
 export async function getSession() {
   return getIronSession<SessionData>(await cookies(), getSessionOptions());
+}
+
+/**
+ * Route Handlers must pass the Response so Set-Cookie is attached.
+ * Using cookies()-only save in Route Handlers often drops the session cookie.
+ */
+export async function getSessionForRoute(
+  request: NextRequest,
+  response: NextResponse,
+): Promise<IronSession<SessionData>> {
+  return getIronSession<SessionData>(request, response, getSessionOptions());
 }
 
 export async function requireUser(): Promise<SessionUser> {

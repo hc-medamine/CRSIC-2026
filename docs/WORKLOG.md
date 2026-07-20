@@ -42,6 +42,20 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ## Changelog
 
+### 2026-07-20 — Fix login session cookie (dashboard bounce)
+
+**Why:** Login API returned 200 but session cookie was not set on the response, so `/dashboard` redirected back to `/login`.
+
+**Done:**
+- Login/logout use `getIronSession(req, res)` so `Set-Cookie` is attached
+- After login, hard navigate to `/dashboard`
+
+**Files:** `cms/src/lib/auth/session.ts`, `cms/src/app/api/auth/login/route.ts`, `cms/src/app/api/auth/logout/route.ts`, `cms/src/app/login/page.tsx`
+
+**Next:** Confirm login → dashboard works; then Step 2 profile self-edit.
+
+---
+
 ### 2026-07-20 — Step 1: org units + Super Admin user management
 
 **Why:** Complete Phase 0 access control before content workflows.

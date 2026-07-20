@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { getSession } from "@/lib/auth/session";
+import { NextRequest, NextResponse } from "next/server";
+import { getSession, sessionTimeoutMs } from "@/lib/auth/session";
 import { hashPassword } from "@/lib/auth/password";
 import { query } from "@/lib/db";
 import {
@@ -16,10 +16,10 @@ const CONTENT_TYPES: ContentType[] = ["news", "event", "publication"];
 
 async function requireSuperAdminApi() {
   const session = await getSession();
-  if (!session.user || session.user.role !== "super_admin") return null;
-  session.lastActivityAt = Date.now();
-  await session.save();
-  return session.user;
+  const user = session.user;
+  if (!user || user.role !== "super_admin" || !session.lastActivityAt) return null;
+  if (Date.now() - session.lastActivityAt > sessionTimeoutMs()) return null;
+  return user;
 }
 
 export async function GET() {
@@ -31,7 +31,7 @@ export async function GET() {
   return NextResponse.json({ ok: true, users });
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const admin = await requireSuperAdminApi();
   if (!admin) {
     return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });

@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth/password";
-import { getSession } from "@/lib/auth/session";
+import { getSessionForRoute } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
 
@@ -14,7 +14,7 @@ type UserRow = {
   is_active: boolean;
 };
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as { email?: string; password?: string };
     const email = body.email?.trim().toLowerCase() ?? "";
@@ -40,7 +40,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: "Invalid email or password." }, { status: 401 });
     }
 
-    const session = await getSession();
+    const response = NextResponse.json({
+      ok: true,
+      user: {
+        email: user.email,
+        displayName: user.display_name,
+        role: user.role,
+      },
+    });
+
+    const session = await getSessionForRoute(request, response);
     session.user = {
       id: user.id,
       email: user.email,
@@ -50,14 +59,7 @@ export async function POST(request: Request) {
     session.lastActivityAt = Date.now();
     await session.save();
 
-    return NextResponse.json({
-      ok: true,
-      user: {
-        email: user.email,
-        displayName: user.display_name,
-        role: user.role,
-      },
-    });
+    return response;
   } catch (err) {
     const message = err instanceof Error ? err.message : "Login failed";
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
