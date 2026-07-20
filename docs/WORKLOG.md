@@ -42,6 +42,21 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ## Changelog
 
+### 2026-07-20 — Auto-apply DB migrations on dev/build
+
+**Why:** Avoid forgetting `db:migrate` after pulling new SQL files.
+
+**Done:**
+- `schema_migrations` tracking — each `sql/*.sql` applied once
+- `predev` / `prebuild` run `db:migrate` automatically
+- `npm run db:status` reports tables + event/pub columns
+
+**Files:** `cms/scripts/migrate.ts`, `cms/scripts/check-migrations.ts`, `cms/package.json`, docs
+
+**Next:** Media upload / smoke-test three content workflows.
+
+---
+
 ### 2026-07-20 — Step 6: publications workflow (draft → publish)
 
 **Why:** Third MVP content type; must keep public `covers.length === pubs.length`.

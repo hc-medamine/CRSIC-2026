@@ -20,10 +20,11 @@ Next.js (App Router) admin app for Step 4 — see [docs/prds/2026-07-19-internal
 ```bash
 cd cms
 npm install
-npm run db:migrate
 npm run db:seed:super-admin
 npm run dev
 ```
+
+Migrations apply **automatically** on `npm run dev` and `npm run build` (`predev` / `prebuild`). Manual: `npm run db:migrate`. Check: `npm run db:status`.
 
 4. Open [http://localhost:3000/login](http://localhost:3000/login). Sign in with the Super Admin **email** (no SMTP — email is the login id only).
 5. Super Admin: [http://localhost:3000/dashboard/users](http://localhost:3000/dashboard/users) to manage users.
