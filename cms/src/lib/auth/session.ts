@@ -12,7 +12,7 @@ export type SessionUser = {
 
 export type SessionData = {
   user?: SessionUser;
-  /** Unix ms — updated on each authenticated request */
+  /** Unix ms — updated on login and via /api/auth/touch */
   lastActivityAt?: number;
 };
 
@@ -43,14 +43,13 @@ export function getSessionOptions(): SessionOptions {
   };
 }
 
-/** Server Components / pages — read/write via Next cookie store */
+/** Server Components — read only (cannot modify cookies here in Next.js) */
 export async function getSession() {
   return getIronSession<SessionData>(await cookies(), getSessionOptions());
 }
 
 /**
- * Route Handlers must pass the Response so Set-Cookie is attached.
- * Using cookies()-only save in Route Handlers often drops the session cookie.
+ * Route Handlers / Server Actions — pass Response so Set-Cookie is attached.
  */
 export async function getSessionForRoute(
   request: NextRequest,
@@ -59,22 +58,21 @@ export async function getSessionForRoute(
   return getIronSession<SessionData>(request, response, getSessionOptions());
 }
 
+function isSessionActive(session: SessionData): session is SessionData & {
+  user: SessionUser;
+  lastActivityAt: number;
+} {
+  if (!session.user || !session.lastActivityAt) return false;
+  return Date.now() - session.lastActivityAt <= sessionTimeoutMs();
+}
+
+/**
+ * For Server Components / layouts — read-only. Do not save() or destroy() here.
+ */
 export async function requireUser(): Promise<SessionUser> {
   const session = await getSession();
-  const now = Date.now();
-  const timeout = sessionTimeoutMs();
-
-  if (!session.user || !session.lastActivityAt) {
-    session.destroy();
+  if (!isSessionActive(session)) {
     throw new Error("UNAUTHENTICATED");
   }
-
-  if (now - session.lastActivityAt > timeout) {
-    session.destroy();
-    throw new Error("SESSION_EXPIRED");
-  }
-
-  session.lastActivityAt = now;
-  await session.save();
   return session.user;
 }

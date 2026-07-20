@@ -42,7 +42,17 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ## Changelog
 
-### 2026-07-20 — Fix login session cookie (dashboard bounce)
+### 2026-07-20 — Fix session save in Server Components
+
+**Why:** Next.js forbids modifying cookies from Server Components; `requireUser()` called `session.save()` on `/dashboard` and bounced to login.
+
+**Done:**
+- `requireUser()` is read-only
+- Idle refresh via `POST /api/auth/touch` + `SessionTouch` client component
+
+**Files:** `cms/src/lib/auth/session.ts`, `cms/src/app/api/auth/touch/route.ts`, `cms/src/app/dashboard/session-touch.tsx`, `cms/src/app/dashboard/layout.tsx`
+
+---
 
 **Why:** Login API returned 200 but session cookie was not set on the response, so `/dashboard` redirected back to `/login`.
 
