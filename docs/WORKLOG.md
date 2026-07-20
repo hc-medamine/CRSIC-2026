@@ -35,12 +35,31 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **Done** — on `main` (merge-complete 2026-07-20) |
-| Public detailed news + publication pages | **Done** on `main` (PR #3) — enrich sample bodies for study-case items |
+| Step 4 — internal app + DB (no external CMS) | **Done** on `main` — PR [#2](https://github.com/hc-medamine/CRSIC-2026/pull/2) (2026-07-20) |
+| Public detail pages (news / events / pubs) | **Done** on `main` — PR [#3](https://github.com/hc-medamine/CRSIC-2026/pull/3); study-case sample bodies only |
+| Fill remaining public detail copy | **Paused** — stakeholder resumes next session when source text is available |
+| CMS Phase 2 (emergency bypass, auditor, …) | **Deferred** |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — Session wrap-up (pause)
+
+**Shipped to `main` this session:**
+1. **CMS Phase 1 merge-complete** — PR [#2](https://github.com/hc-medamine/CRSIC-2026/pull/2) (`feature/step4-internal-cms`): auth, users, news/events/publications workflows, media, audit, queues, revisions, Super Admin delete for unpublished/rejected, unpublished dashboard queue.
+2. **Public detail pages** — PR [#3](https://github.com/hc-medamine/CRSIC-2026/pull/3): public JSON + CMS publish fields (`id`, `slug`, `summary`, `body`, `media[]`); hash routes `#news|event|publication/{slug}`; shared lightbox for news/events/pubs → full detail; images/PDFs fully visible (`object-fit: contain` + PDF embed).
+3. **Study-case sample copy** (`d097d58`) for three items only (news الجنوب / pub علم نفس الصحة / event سماع الشيوخ). Remaining editorial fill **paused** — no source data this session.
+
+**Smoke:** lightbox → تفاصيل; deep link; contain images — PASS before merge of PR #3.
+
+**Resume next session:**
+- Fill remaining `summary` / `body` / multi-media from stakeholder source (CMS or `data/*.json`).
+- Optional: CMS Phase 2 backlog (emergency bypass, auditor role, …).
+
+Branch at pause: **`main`** @ `d097d58` (plus this log commit).
+
+---
 
 ### 2026-07-20 — Detail pages merged; sample bodies for study cases
 
