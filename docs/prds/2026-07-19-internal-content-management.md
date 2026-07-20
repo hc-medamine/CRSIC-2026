@@ -385,7 +385,9 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 ### Multilingual rule (confirmed)
 
 - Arabic can publish with English pending.  
-- **Locked (2026-07-20):** Arabic is authoritative when both exist and conflict. EN is not required for MVP publish. While EN is pending, public site keeps current behaviour (Arabic content + notice / language switch) until detail pages ship.### Media
+- **Locked (2026-07-20):** Arabic is authoritative when both exist and conflict. EN is not required for MVP publish. While EN is pending, public site keeps current behaviour (Arabic content + notice / language switch) until detail pages ship.
+
+### Media
 
 - During local development, store media under the CMS app upload directory; publish into public `img/` (or equivalent) for SPA consumption.  
 - Prefer stable URLs on replace so old links do not silently 404.  
