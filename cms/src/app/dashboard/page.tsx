@@ -31,14 +31,14 @@ export default async function DashboardPage() {
             <dd className="inline">{user.role}</dd>
           </div>
         </dl>
-        <p className="mt-4 text-sm text-zinc-500">
-          Session idle timeout is 30 minutes (PRD). Editorial workflows come next.
-        </p>
-        <p className="mt-2 text-sm">
-          <Link className="underline" href="/api/auth/me">
-            /api/auth/me
-          </Link>
-        </p>
+        <p className="mt-4 text-sm text-zinc-500">Session idle timeout is 30 minutes (PRD).</p>
+        {user.role === "super_admin" ? (
+          <p className="mt-4">
+            <Link className="font-medium underline" href="/dashboard/users">
+              User management →
+            </Link>
+          </p>
+        ) : null}
       </section>
     </main>
   );

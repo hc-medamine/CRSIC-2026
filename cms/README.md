@@ -26,7 +26,8 @@ npm run dev
 ```
 
 4. Open [http://localhost:3000/login](http://localhost:3000/login). Sign in with the Super Admin **email** (no SMTP — email is the login id only).
-5. Check DB: [http://localhost:3000/api/health/db](http://localhost:3000/api/health/db).
+5. Super Admin: [http://localhost:3000/dashboard/users](http://localhost:3000/dashboard/users) to manage users.
+6. Check DB: [http://localhost:3000/api/health/db](http://localhost:3000/api/health/db).
 
 ## Auth (Phase 0)
 

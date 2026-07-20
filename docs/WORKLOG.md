@@ -42,6 +42,23 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ## Changelog
 
+### 2026-07-20 — Step 1: org units + Super Admin user management
+
+**Why:** Complete Phase 0 access control before content workflows.
+
+**Done:**
+- Seeded org units: centre-wide + 4 research departments
+- Tables `user_org_scopes`, `user_content_scopes`
+- Super Admin UI `/dashboard/users`: create users, activate/deactivate, reset password (in-app, no email)
+- Reviewer/Super Admin auto-scoped to all orgs + all content types; Editors require explicit scopes
+- Link from dashboard for Super Admin
+
+**Files:** `cms/sql/002_*.sql`, `cms/sql/003_*.sql`, `cms/src/lib/users.ts`, `cms/src/app/dashboard/users/`, `cms/src/app/api/users/`, docs
+
+**Next:** Step 2 — profile self-edit (name/info) for signed-in users.
+
+---
+
 ### 2026-07-20 — Auth skeleton + Super Admin seed
 
 **Why:** Phase 0 login path for Step 4 CMS.
