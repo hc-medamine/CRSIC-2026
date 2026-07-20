@@ -5,7 +5,14 @@
  * reviewer sees exactly what will be written to the public JSON.
  */
 
-type NewsPreview = { kind: "news"; img: string; label: string; title: string };
+type NewsPreview = {
+  kind: "news";
+  img: string;
+  label: string;
+  title: string;
+  slug?: string;
+  mediaCount?: number;
+};
 type EventPreview = {
   kind: "event";
   day: string;
@@ -15,6 +22,8 @@ type EventPreview = {
   type: string;
   status: string;
   img?: string;
+  slug?: string;
+  mediaCount?: number;
 };
 type PublicationPreview = {
   kind: "publication";
@@ -23,6 +32,8 @@ type PublicationPreview = {
   type: string;
   dept: string;
   desc: string;
+  slug?: string;
+  mediaCount?: number;
 };
 
 type Props = NewsPreview | EventPreview | PublicationPreview;
@@ -67,7 +78,11 @@ function Field({ label, value }: { label: string; value: string }) {
 export function PublishPreview(props: Props) {
   return (
     <section className="grid gap-3 rounded-lg border border-emerald-200 bg-emerald-50/60 p-4">
-      <p className="text-sm font-medium text-emerald-900">Public card preview (P1)</p>
+      <p className="text-sm font-medium text-emerald-900">Public card + detail preview</p>
+      {props.slug ? <Field label="slug" value={props.slug} /> : null}
+      {typeof props.mediaCount === "number" ? (
+        <Field label="media" value={String(props.mediaCount)} />
+      ) : null}
 
       {props.kind === "news" ? (
         <div className="flex gap-3">

@@ -35,12 +35,23 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **Done** — merged to `main` (merge-complete 2026-07-20) — PRD [Review](./prds/2026-07-19-internal-content-management.md) → update status after merge |
-| Public detailed news + publication pages | **Next** (enrich SPA beyond card fields) |
+| Step 4 — internal app + DB (no external CMS) | **Done** — on `main` (merge-complete 2026-07-20) |
+| Public detailed news + publication pages | **In progress** — `feature/public-detail-pages` (events too; slug deep links + multi-media) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — Public detail pages (news, events, publications)
+
+**Done on `feature/public-detail-pages`:**
+- Public JSON + CMS publish emit `id`, `slug`, `summary`, `body`, `media[]`; attachments column + multi-upload UI.
+- SPA hash routes `#news/{slug}`, `#event/{slug}`, `#publication/{slug}` with detail shell; **shared lightbox teaser** for news, events, and publications + “View full details”.
+- Legacy JSON backfilled (`scripts/backfill-public-detail-fields.mjs`).
+
+**Next:** Smoke deep links + PR merge when ready.
+
+---
 
 ### 2026-07-20 — CMS merge-complete
 

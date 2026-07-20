@@ -3,7 +3,9 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MediaUploadField } from "@/app/dashboard/media-upload-field";
+import { MediaAttachmentsField } from "@/app/dashboard/media-attachments-field";
 import { PublishPreview } from "@/app/dashboard/publish-preview";
+import type { PublicMediaItem } from "@/lib/publish/media";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
 
@@ -22,6 +24,10 @@ type Initial = {
   imageAltEn: string;
   enStatus: "pending" | "ready";
   pubKind: "collective" | "individual";
+  bodyAr?: string;
+  bodyEn?: string;
+  attachments?: PublicMediaItem[];
+  publicSlug?: string | null;
   status?: string;
   reviewNote?: string | null;
 };
@@ -61,6 +67,14 @@ export function PublicationEditorForm({
   const [pubKind, setPubKind] = useState<"collective" | "individual">(
     initial?.pubKind ?? "collective",
   );
+  const [bodyAr, setBodyAr] = useState(initial?.bodyAr ?? "");
+  const [bodyEn, setBodyEn] = useState(initial?.bodyEn ?? "");
+  const [attachments, setAttachments] = useState<PublicMediaItem[]>(() => {
+    if (initial?.attachments?.length) return initial.attachments;
+    if (initial?.coverPath) return [{ kind: "image", src: initial.coverPath }];
+    return [];
+  });
+  const [publicSlug, setPublicSlug] = useState(initial?.publicSlug ?? "");
   const [checklist, setChecklist] = useState(false);
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -71,6 +85,13 @@ export function PublicationEditorForm({
     mode === "create" || initial?.status === "draft" || initial?.status === "changes_requested";
 
   function fields() {
+    const media =
+      attachments.length > 0
+        ? attachments
+        : coverPath.trim()
+          ? [{ kind: "image" as const, src: coverPath.trim() }]
+          : [];
+    const primary = (media.find((m) => m.kind === "image")?.src ?? coverPath.trim()) || "";
     return {
       orgUnitId,
       titleAr,
@@ -79,9 +100,13 @@ export function PublicationEditorForm({
       deptEn,
       descAr,
       descEn,
-      coverPath: coverPath.trim(),
+      bodyAr,
+      bodyEn,
+      coverPath: primary,
       imageAltAr,
       imageAltEn,
+      attachments: media,
+      publicSlug: publicSlug.trim() || null,
       enStatus,
       pubKind,
     };
@@ -230,8 +255,43 @@ export function PublicationEditorForm({
           onUploaded={({ publicPath, mediaId }) => {
             setCoverPath(publicPath);
             setCoverMediaId(mediaId);
+            setAttachments((prev) => [
+              { kind: "image", src: publicPath },
+              ...prev.filter((a) => a.src !== coverPath),
+            ]);
           }}
         />
+        <MediaAttachmentsField
+          bucket="covers"
+          items={attachments}
+          disabled={!editable}
+          onChange={(next) => {
+            setAttachments(next);
+            const firstImg = next.find((a) => a.kind === "image");
+            if (firstImg) setCoverPath(firstImg.src);
+          }}
+        />
+        <label className="text-sm">
+          <span className="font-medium">Body (AR)</span>
+          <textarea
+            dir="rtl"
+            disabled={!editable}
+            value={bodyAr}
+            onChange={(e) => setBodyAr(e.target.value)}
+            className="mt-1 w-full rounded border px-3 py-2"
+            rows={4}
+          />
+        </label>
+        <label className="text-sm">
+          <span className="font-medium">Public slug (optional)</span>
+          <input
+            dir="auto"
+            disabled={!editable}
+            value={publicSlug}
+            onChange={(e) => setPublicSlug(e.target.value)}
+            className="mt-1 w-full rounded border px-3 py-2 font-mono text-xs"
+          />
+        </label>
         <label className="text-sm">
           <span className="font-medium">Cover alt (AR) *</span>
           <input
@@ -388,6 +448,8 @@ export function PublicationEditorForm({
           type={pubKind}
           dept={deptAr}
           desc={descAr}
+          slug={publicSlug.trim() || undefined}
+          mediaCount={attachments.length}
         />
       ) : null}
 

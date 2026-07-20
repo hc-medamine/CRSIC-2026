@@ -79,6 +79,8 @@ export default async function EventDetailPage({ params }: Props) {
           eventTypeAr: item.event_type_ar ?? "",
           eventTypeEn: item.event_type_en ?? "",
           eventDisplayStatus: item.event_display_status ?? "upcoming",
+          attachments: Array.isArray(item.attachments) ? item.attachments : [],
+          publicSlug: item.public_slug,
           status: item.status,
           reviewNote: item.review_note,
         }}

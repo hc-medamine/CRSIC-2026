@@ -64,8 +64,17 @@ export function createNewsCard(n, i) {
     });
   }
 
+  const slug = n.slug || n.id || '';
   return el('article', {
-    className: 'news-card',
+    className: 'news-card news-card--link',
+    attrs: slug
+      ? {
+          role: 'button',
+          tabindex: 0,
+          'data-lightbox-type': 'news',
+          'data-lightbox-slug': slug,
+        }
+      : {},
     children: [
       thumb,
       el('div', {

@@ -71,7 +71,15 @@ export function createHomeEventCard(e, i = 0) {
   );
 
   return el('article', {
-    className: 'event-card',
+    className: 'event-card event-card--link',
+    attrs: (e && (e.slug || e.id))
+      ? {
+          role: 'button',
+          tabindex: 0,
+          'data-lightbox-type': 'event',
+          'data-lightbox-slug': e.slug || e.id,
+        }
+      : {},
     children: [
       el('div', {
         className: `event-thumb ${THUMB_BG[i % THUMB_BG.length]}`,
@@ -86,9 +94,8 @@ export function createHomeEventCard(e, i = 0) {
             className: 'event-footer-row',
             children: [
               el('span', { className: 'event-date', text: formatHomeEventDate(e) }),
-              el('a', {
+              el('span', {
                 className: 'event-album-link',
-                attrs: { href: '#', 'data-page': 'events' },
                 children: [
                   el('span', { className: 'event-album-dot' }),
                   el('span', { text: t('ev_details') }),
@@ -112,8 +119,17 @@ export function createEvCard(e) {
     text: e.status === 'done' ? t('ev_done_pill') : t('ev_upcoming_pill'),
   });
 
+  const slug = e.slug || e.id || '';
   return el('div', {
-    className: 'ev-card',
+    className: 'ev-card ev-card--link',
+    attrs: slug
+      ? {
+          role: 'button',
+          tabindex: 0,
+          'data-lightbox-type': 'event',
+          'data-lightbox-slug': slug,
+        }
+      : {},
     children: [
       el('div', {
         className: 'ev-date',

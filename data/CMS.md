@@ -8,13 +8,15 @@ When `CONTENT_BASE_URL` is set (e.g. `https://cdn.example.com/crsic/`), the app 
 
 | Path | Shape |
 |------|--------|
-| `publications.json` | `{ "covers": string[], "pubs": object[] }` |
-| `events.json` | `{ "intl": object[], "nat": object[] }` |
+| `publications.json` | `{ "covers": string[], "pubs": object[] }` — pubs may include `id`, `slug`, `summary`, `body`, `media[]` |
+| `events.json` | `{ "intl": object[], "nat": object[] }` — items may include detail fields |
 | `partners.json` | `{ "nat": object[], "intl": object[] }` |
 | `journals.json` | `{ "journals": object[] }` |
-| `news.json` | `{ "news": object[] }` |
+| `news.json` | `{ "news": object[] }` — items may include detail fields |
 | `locales/ar.json` | flat key → string |
 | `locales/en.json` | flat key → string |
+
+SPA deep links (hash): `#news/{slug}`, `#event/{slug}`, `#publication/{slug}`.
 
 Field schemas: [README.md](./README.md) (this folder). Full product docs: [docs/README.md](../docs/README.md).
 

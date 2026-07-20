@@ -77,6 +77,8 @@ export default async function NewsDetailPage({ params }: Props) {
           imageAltAr: item.image_alt_ar ?? "",
           imageAltEn: item.image_alt_en ?? "",
           enStatus: item.en_status,
+          attachments: Array.isArray(item.attachments) ? item.attachments : [],
+          publicSlug: item.public_slug,
           status: item.status,
           reviewNote: item.review_note,
         }}

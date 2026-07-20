@@ -3,6 +3,8 @@ import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { buildNewsPayload, rebuildPublicNewsJson } from "@/lib/publish/newsJson";
+import { normalizeAttachments, type PublicMediaItem } from "@/lib/publish/media";
+import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
 import { mutateThenRebuildPublic } from "@/lib/publish/safeRebuild";
 import {
   canAccessContentType,
@@ -54,6 +56,7 @@ export type NewsItem = {
   image_path: string | null;
   image_alt_ar: string | null;
   image_alt_en: string | null;
+  attachments: PublicMediaItem[] | unknown;
   checklist_confirmed: boolean;
   review_note: string | null;
   public_slug: string | null;
@@ -75,6 +78,8 @@ export type NewsInput = {
   imagePath?: string | null;
   imageAltAr?: string;
   imageAltEn?: string;
+  attachments?: PublicMediaItem[];
+  publicSlug?: string | null;
   enStatus?: "pending" | "ready";
 };
 
@@ -94,6 +99,8 @@ function snapshotOf(row: NewsItem) {
     image_path: row.image_path,
     image_alt_ar: row.image_alt_ar,
     image_alt_en: row.image_alt_en,
+    attachments: normalizeAttachments(row.attachments),
+    public_slug: row.public_slug,
   };
 }
 
@@ -161,15 +168,19 @@ export async function createNews(user: SessionUser, input: NewsInput): Promise<N
     input.enStatus ??
     (input.titleEn?.trim() ? "ready" : "pending");
 
+  const attachments = normalizeAttachments(input.attachments);
+  const primaryImage =
+    attachments.find((a) => a.kind === "image")?.src ?? input.imagePath ?? null;
+
   const result = await query<NewsItem>(
     `INSERT INTO content_items (
       content_type, status, org_unit_id, created_by, updated_by, en_status,
       title_ar, title_en, label_ar, label_en, summary_ar, summary_en,
-      body_ar, body_en, image_path, image_alt_ar, image_alt_en
+      body_ar, body_en, image_path, image_alt_ar, image_alt_en, attachments
     ) VALUES (
       'news', 'draft', $1, $2, $2, $3,
       $4, $5, $6, $7, $8, $9,
-      $10, $11, $12, $13, $14
+      $10, $11, $12, $13, $14, $15::jsonb
     ) RETURNING *`,
     [
       input.orgUnitId,
@@ -183,9 +194,10 @@ export async function createNews(user: SessionUser, input: NewsInput): Promise<N
       input.summaryEn?.trim() || null,
       input.bodyAr?.trim() || null,
       input.bodyEn?.trim() || null,
-      input.imagePath ?? null,
+      primaryImage,
       input.imageAltAr?.trim() || null,
       input.imageAltEn?.trim() || null,
+      JSON.stringify(attachments),
     ],
   );
   const item = result.rows[0];
@@ -217,6 +229,14 @@ export async function updateNewsDraft(
     input.enStatus ??
     (input.titleEn?.trim() ? "ready" : "pending");
 
+  const attachments = normalizeAttachments(input.attachments);
+  const primaryImage =
+    attachments.find((a) => a.kind === "image")?.src ?? input.imagePath ?? null;
+  const slugOverride =
+    user.role === "super_admin" && input.publicSlug !== undefined
+      ? input.publicSlug
+      : undefined;
+
   const result = await query<NewsItem>(
     `UPDATE content_items SET
       org_unit_id = $2,
@@ -233,6 +253,8 @@ export async function updateNewsDraft(
       image_path = $13,
       image_alt_ar = $14,
       image_alt_en = $15,
+      attachments = $16::jsonb,
+      public_slug = COALESCE($17, public_slug),
       updated_at = NOW()
      WHERE id = $1 AND content_type = 'news'
      RETURNING *`,
@@ -249,9 +271,11 @@ export async function updateNewsDraft(
       input.summaryEn?.trim() || null,
       input.bodyAr?.trim() || null,
       input.bodyEn?.trim() || null,
-      input.imagePath ?? null,
+      primaryImage,
       input.imageAltAr?.trim() || null,
       input.imageAltEn?.trim() || null,
+      JSON.stringify(attachments),
+      slugOverride?.trim() || null,
     ],
   );
   const item = result.rows[0];
@@ -429,8 +453,12 @@ export async function publishNews(user: SessionUser, id: string) {
     throw new Error("Only approved or unpublished items can be published");
   }
 
-  const slug = existing.public_slug ?? `news-${existing.id.slice(0, 8)}`;
-  const payload = buildNewsPayload(existing);
+  const slug = await resolvePublicSlug({
+    itemId: existing.id,
+    titleAr: existing.title_ar,
+    existingSlug: existing.public_slug,
+  });
+  const payload = buildNewsPayload({ ...existing, public_slug: slug });
   const item = await mutateThenRebuildPublic({
     itemId: id,
     mutate: async () => {

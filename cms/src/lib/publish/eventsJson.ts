@@ -1,8 +1,16 @@
 import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
+import {
+  buildMediaList,
+  primaryImageSrc,
+  type PublicMediaItem,
+} from "@/lib/publish/media";
+import { slugifyTitle, uniqueSlug } from "@/lib/publish/slug";
 
 export type PublicEventItem = {
+  id: string;
+  slug: string;
   day: string;
   month: string;
   year: string;
@@ -10,13 +18,19 @@ export type PublicEventItem = {
   type: string;
   status: "done" | "upcoming";
   img?: string;
+  summary: string;
+  body: string;
+  media: PublicMediaItem[];
 };
 
 /** Public item plus the scope used to bucket it into intl/nat on rebuild. */
 export type StoredEventPayload = PublicEventItem & { scope: "intl" | "nat" };
 
 type PayloadSource = {
+  id: string;
   title_ar: string;
+  summary_ar: string | null;
+  body_ar: string | null;
   event_day: string | null;
   event_month: string | null;
   event_year: string | null;
@@ -24,11 +38,24 @@ type PayloadSource = {
   event_display_status: "upcoming" | "done" | null;
   event_scope: "intl" | "nat" | null;
   image_path: string | null;
+  image_alt_ar: string | null;
+  public_slug: string | null;
+  attachments?: unknown;
 };
 
-/** P1 public object for an event row (persisted to content_items.live_payload). */
-export function buildEventPayload(row: PayloadSource): StoredEventPayload {
+/** Public object for an event row (persisted to content_items.live_payload). */
+export function buildEventPayload(
+  row: PayloadSource,
+  usedSlugs?: Set<string>,
+): StoredEventPayload {
+  const media = buildMediaList(row.attachments, row.image_path, row.image_alt_ar);
+  const base = row.public_slug?.trim() || slugifyTitle(row.title_ar);
+  const slug = usedSlugs ? uniqueSlug(base, usedSlugs) : base;
+  if (usedSlugs) usedSlugs.add(slug);
+  const primary = primaryImageSrc(media) ?? row.image_path ?? undefined;
   const item: StoredEventPayload = {
+    id: row.id,
+    slug,
     day: row.event_day?.trim() || "01",
     month: row.event_month?.trim() || "",
     year: row.event_year?.trim() || "",
@@ -36,8 +63,11 @@ export function buildEventPayload(row: PayloadSource): StoredEventPayload {
     type: row.event_type_ar?.trim() || "فعالية",
     status: row.event_display_status === "done" ? "done" : "upcoming",
     scope: row.event_scope === "nat" ? "nat" : "intl",
+    summary: row.summary_ar?.trim() || "",
+    body: row.body_ar?.trim() || "",
+    media,
   };
-  if (row.image_path) item.img = row.image_path;
+  if (primary) item.img = primary;
   return item;
 }
 
@@ -45,11 +75,11 @@ function publicEventsPath(): string {
   return join(process.cwd(), "..", "data", "events.json");
 }
 
-/**
- * Emits every event row whose live_payload is set (published, or under revision with the
- * public copy still live), split into intl/nat by the scope captured at publish time.
- */
-export async function rebuildPublicEventsJson(): Promise<{ intl: number; nat: number; path: string }> {
+export async function rebuildPublicEventsJson(): Promise<{
+  intl: number;
+  nat: number;
+  path: string;
+}> {
   const result = await query<{ live_payload: StoredEventPayload }>(
     `SELECT live_payload
      FROM content_items
@@ -62,15 +92,22 @@ export async function rebuildPublicEventsJson(): Promise<{ intl: number; nat: nu
 
   for (const row of result.rows) {
     const { scope, ...item } = row.live_payload;
+    const media = buildMediaList(item.media, item.img, undefined);
     const publicItem: PublicEventItem = {
+      id: item.id || `legacy-event-${item.slug || slugifyTitle(item.title || "item")}`,
+      slug: item.slug || slugifyTitle(item.title || "item"),
       day: item.day?.trim() || "01",
       month: item.month?.trim() || "",
       year: item.year?.trim() || "",
       title: (item.title ?? "").trim(),
       type: item.type?.trim() || "فعالية",
       status: item.status === "done" ? "done" : "upcoming",
+      summary: item.summary?.trim() || "",
+      body: item.body?.trim() || "",
+      media,
     };
-    if (item.img) publicItem.img = item.img;
+    const primary = primaryImageSrc(media) ?? item.img;
+    if (primary) publicItem.img = primary;
     if (scope === "nat") nat.push(publicItem);
     else intl.push(publicItem);
   }

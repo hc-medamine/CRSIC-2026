@@ -12,7 +12,11 @@ import {
   getNatEvents,
   getHomeEvents,
   getNatPartners,
-  getIntlPartners
+  getIntlPartners,
+  findNewsByKey,
+  findEventByKey,
+  findPublicationByKey,
+  getCoverForPub,
 } from './data.js';
 import { t, getLang } from './i18n.js';
 import {
@@ -63,6 +67,7 @@ const BC_MAP = {
   events: [{ key: 'bc_events', page: 'events' }, { key: 'bc_events_label', page: 'events' }],
   cooperation: [{ key: 'bc_events', page: 'events' }, { key: 'bc_cooperation', page: 'cooperation' }],
   contact: [{ key: 'bc_contact', page: 'contact' }],
+  detail: [{ key: 'bc_detail', page: 'home' }],
 };
 
 const BOTTOM_TAB_PAGES = ['home', 'publications', 'journals', 'events'];
@@ -335,21 +340,142 @@ export function updateContentLocaleNotices() {
   });
 }
 
-/* ── LIGHTBOX ────────────────────────────────────────── */
-export function openLightbox(i, triggerEl) {
-  const p = getPub(i);
-  if (!p) return;
+/* ── LIGHTBOX (news / event / publication teaser) ───── */
+/** @type {{ type: string, slug: string }|null} */
+let lightboxTarget = null;
+
+const LB_HOLDER_FALLBACK = [
+  'img/Holders/0.jpg',
+  'img/Holders/1.jpg',
+  'img/Holders/2.jpg',
+  'img/Holders/3.jpg',
+  'img/Holders/4.jpg',
+  'img/Holders/5.jpg',
+];
+
+/**
+ * @param {'publication'|'news'|'event'} type
+ * @param {string} [slug]
+ * @param {number} [index]
+ */
+function resolveLightboxContent(type, slug, index) {
+  if (type === 'publication') {
+    let pub = null;
+    let idx = typeof index === 'number' && !Number.isNaN(index) ? index : -1;
+    if (slug) {
+      const found = findPublicationByKey(slug);
+      if (found) {
+        pub = found.pub;
+        idx = found.index;
+      }
+    } else if (idx >= 0) {
+      pub = getPub(idx);
+    }
+    if (!pub) return null;
+    return {
+      type: 'publication',
+      slug: pub.slug || pub.id || '',
+      title: pub.t || '',
+      badge: pub.dept || '',
+      meta: pub.type === 'collective' ? t('badge_collective') : t('badge_individual'),
+      summary: pub.summary || pub.desc || '',
+      cover: getCoverForPub(idx) || (pub.media && pub.media[0] && pub.media[0].src) || '',
+    };
+  }
+
+  if (type === 'news') {
+    const item = slug ? findNewsByKey(slug) : null;
+    if (!item) return null;
+    const mediaImg =
+      (item.media || []).find((m) => m && m.kind === 'image' && m.src)?.src || item.img || '';
+    return {
+      type: 'news',
+      slug: item.slug || item.id || '',
+      title: item.title || '',
+      badge: item.label || '',
+      meta: '',
+      summary: item.summary || '',
+      cover: mediaImg || '',
+    };
+  }
+
+  if (type === 'event') {
+    const item = slug ? findEventByKey(slug) : null;
+    if (!item) return null;
+    const dateLine = [item.day, item.month, item.year].filter(Boolean).join(' ');
+    const statusLabel =
+      item.status === 'upcoming' ? t('ev_badge_upcoming') : t('ev_badge_done');
+    const mediaImg =
+      (item.media || []).find((m) => m && m.kind === 'image' && m.src)?.src || item.img || '';
+    return {
+      type: 'event',
+      slug: item.slug || item.id || '',
+      title: item.title || '',
+      badge: item.type || '',
+      meta: [dateLine, statusLabel].filter(Boolean).join(' · '),
+      summary: item.summary || '',
+      cover: mediaImg || LB_HOLDER_FALLBACK[0],
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Open content lightbox. Prefer `{ type, slug }`.
+ * Legacy: `openLightbox(pubIndex, triggerEl)` still works.
+ * @param {number|{ type: string, slug?: string, index?: number, triggerEl?: HTMLElement }} optsOrIndex
+ * @param {HTMLElement} [triggerEl]
+ */
+export function openLightbox(optsOrIndex, triggerEl) {
+  let type = 'publication';
+  let slug;
+  let index;
+
+  if (typeof optsOrIndex === 'number') {
+    index = optsOrIndex;
+  } else if (optsOrIndex && typeof optsOrIndex === 'object') {
+    type = optsOrIndex.type || 'publication';
+    slug = optsOrIndex.slug;
+    index = optsOrIndex.index;
+    triggerEl = optsOrIndex.triggerEl || triggerEl;
+  } else {
+    return;
+  }
+
+  const content = resolveLightboxContent(type, slug, index);
+  if (!content) return;
+
   const overlay = document.getElementById('lightbox');
   if (!overlay) return;
 
-  lightboxTrigger = triggerEl
-    || (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+  lightboxTarget = content.slug ? { type: content.type, slug: content.slug } : null;
+  lightboxTrigger =
+    triggerEl ||
+    (document.activeElement instanceof HTMLElement ? document.activeElement : null);
 
-  document.getElementById('lb-title').textContent = p.t;
-  document.getElementById('lb-dept').textContent = p.dept;
-  document.getElementById('lb-year').textContent =
-    p.type === 'collective' ? t('badge_collective') : t('badge_individual');
-  document.getElementById('lb-desc').textContent = p.desc;
+  document.getElementById('lb-title').textContent = content.title;
+  document.getElementById('lb-dept').textContent = content.badge;
+  document.getElementById('lb-year').textContent = content.meta;
+  document.getElementById('lb-desc').textContent = content.summary;
+
+  const detailBtn = document.getElementById('lb-detail-btn');
+  if (detailBtn) {
+    if (lightboxTarget) {
+      detailBtn.hidden = false;
+      detailBtn.dataset.detailType = lightboxTarget.type;
+      detailBtn.dataset.detailSlug = lightboxTarget.slug;
+    } else {
+      detailBtn.hidden = true;
+      delete detailBtn.dataset.detailType;
+      delete detailBtn.dataset.detailSlug;
+    }
+  }
+
+  const platformBtn = document.getElementById('lb-platform-btn');
+  if (platformBtn) {
+    platformBtn.hidden = content.type !== 'publication';
+  }
 
   const body = overlay.querySelector('.lightbox-body');
   const titleEl = document.getElementById('lb-title');
@@ -372,18 +498,28 @@ export function openLightbox(i, triggerEl) {
   }
 
   const coverHost = document.getElementById('lb-cover');
-  const src = safeImageSrc(getCover(i));
-  const img = el('img', {
-    attrs: { src, alt: p.t || '' },
-    style: {
-      width: '100%',
-      height: '100%',
-      'object-fit': 'cover',
-      display: 'block',
-      'border-radius': '6px',
-    },
-  });
-  replaceChildren(coverHost, [img]);
+  const src = safeImageSrc(content.cover);
+  if (src) {
+    replaceChildren(coverHost, [
+      el('img', {
+        attrs: { src, alt: content.title || '' },
+        style: {
+          width: '100%',
+          height: '100%',
+          'object-fit': 'cover',
+          display: 'block',
+          'border-radius': '6px',
+        },
+      }),
+    ]);
+  } else {
+    replaceChildren(coverHost, [
+      el('div', {
+        className: 'lightbox-cover-placeholder',
+        text: content.badge || content.type,
+      }),
+    ]);
+  }
 
   overlay.setAttribute('aria-hidden', 'false');
   requestAnimationFrame(() => {
@@ -402,6 +538,7 @@ export function closeLightbox() {
   if (!lb || !lb.classList.contains('open')) return;
   lb.classList.remove('open');
   lb.setAttribute('aria-hidden', 'true');
+  lightboxTarget = null;
   if (releaseLightboxTrap) {
     releaseLightboxTrap();
     releaseLightboxTrap = null;
@@ -554,18 +691,46 @@ export function bindUIEvents() {
   const lightbox = document.getElementById('lightbox');
   if (lightbox) {
     lightbox.addEventListener('click', closeLightboxOutside);
-    lightbox.querySelectorAll('.lightbox-close, .lb-btn-ghost').forEach(btn => {
+    lightbox.querySelectorAll('.lightbox-close, .lb-btn-ghost').forEach((btn) => {
+      if (btn.id === 'lb-detail-btn') return;
       btn.addEventListener('click', closeLightbox);
     });
   }
 
   document.addEventListener('click', (e) => {
+    const lbCard = e.target.closest('[data-lightbox-type][data-lightbox-slug]');
+    if (lbCard) {
+      e.preventDefault();
+      openLightbox(
+        {
+          type: lbCard.dataset.lightboxType,
+          slug: lbCard.dataset.lightboxSlug,
+          index: lbCard.dataset.pubIndex != null ? parseInt(lbCard.dataset.pubIndex, 10) : undefined,
+        },
+        lbCard,
+      );
+      return;
+    }
     const card = e.target.closest('[data-pub-index]');
     if (!card) return;
     const i = parseInt(card.dataset.pubIndex, 10);
     if (!Number.isNaN(i)) openLightbox(i, card);
   });
   document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const lbCard = e.target.closest('[data-lightbox-type][data-lightbox-slug]');
+    if (lbCard && e.target === lbCard) {
+      e.preventDefault();
+      openLightbox(
+        {
+          type: lbCard.dataset.lightboxType,
+          slug: lbCard.dataset.lightboxSlug,
+          index: lbCard.dataset.pubIndex != null ? parseInt(lbCard.dataset.pubIndex, 10) : undefined,
+        },
+        lbCard,
+      );
+      return;
+    }
     if (e.key !== 'Enter') return;
     const card = e.target.closest('[data-pub-index]');
     if (!card) return;
