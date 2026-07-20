@@ -35,12 +35,26 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **Phase‑1 completion gaps closed** (queues, preview, RTL, restore/start‑revision, reassign, legacy cutover); on `feature/step4-internal-cms`, **not merged** — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
+| Step 4 — internal app + DB (no external CMS) | **Bugbot fixes applied**; awaiting stakeholder merge-complete confirm — `feature/step4-internal-cms` **not merged** — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
 | Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — Bugbot fixes before merge-complete
+
+**Why:** Stakeholder requires Bugbot findings fixed before CMS merge-complete.
+
+**Fixed:**
+- Content GET + detail pages enforce `canViewContentItem` (org/content scope)
+- Publish/unpublish rolls back DB live columns if public JSON rebuild fails
+- Rebuild order: `live_at DESC, created_at ASC`; legacy import staggers `live_at` and keys events by title+scope
+- Rejected items moved to their own queue; author can **Reopen as draft**
+
+**Next:** Stakeholder re-smoke / confirm merge-complete.
+
+---
 
 ### 2026-07-20 — Phase‑1 completion gaps closed (queues, preview, RTL, revisions, cutover)
 

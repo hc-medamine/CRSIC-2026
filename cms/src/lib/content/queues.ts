@@ -20,6 +20,7 @@ export type Queues = {
   awaitingReview: QueueItem[];
   needsRevision: QueueItem[];
   myDrafts: QueueItem[];
+  rejected: QueueItem[];
   recentlyPublished: QueueItem[];
 };
 
@@ -100,7 +101,13 @@ export async function getQueues(user: SessionUser): Promise<Queues> {
     : await runQueue(`c.status = 'changes_requested' AND c.created_by = $1`, [user.id], 50);
 
   const myDrafts = await runQueue(
-    `c.status IN ('draft', 'rejected') AND c.created_by = $1`,
+    `c.status = 'draft' AND c.created_by = $1`,
+    [user.id],
+    50,
+  );
+
+  const rejected = await runQueue(
+    `c.status = 'rejected' AND c.created_by = $1`,
     [user.id],
     50,
   );
@@ -111,5 +118,5 @@ export async function getQueues(user: SessionUser): Promise<Queues> {
       ? []
       : await runQueue(`c.status = 'published' AND ${scopeWhere}`, scopeParams, 10);
 
-  return { awaitingReview, needsRevision, myDrafts, recentlyPublished };
+  return { awaitingReview, needsRevision, myDrafts, rejected, recentlyPublished };
 }

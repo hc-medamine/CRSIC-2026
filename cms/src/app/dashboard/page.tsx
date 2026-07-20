@@ -102,6 +102,12 @@ export default async function DashboardPage() {
           emptyLabel={t("noItems", lang)}
         />
         <QueueList
+          title={t("rejected", lang)}
+          items={queues.rejected}
+          emptyLabel={t("noItems", lang)}
+          showNote
+        />
+        <QueueList
           title={t("recentlyPublished", lang)}
           items={queues.recentlyPublished}
           emptyLabel={t("noItems", lang)}

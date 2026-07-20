@@ -3,8 +3,9 @@
  * into content_items as PUBLISHED rows with live_payload set (Step 4, gap #9 — legacy cutover).
  *
  * - Does NOT rewrite the public JSON files (payloads already match the source).
- * - Idempotent-ish: skips a row if a published item with the same title_ar + content_type exists.
- * - org_unit = centre-wide (looked up from org_units); created_by = super admin f.chettih@crsic.dz.
+ * - Idempotent-ish: skips when the same card already exists (events keyed by title+scope).
+ * - Preserves source array order via staggered live_at (index 0 = newest).
+ * - org_unit = centre-wide; created_by = super admin f.chettih@crsic.dz.
  * - Keeps publications covers.length === pubs.length (imports pubs[i] with covers[i]).
  *
  * Usage: npm run db:import-legacy
@@ -21,6 +22,11 @@ function dataPath(name: string): string {
 
 function readJson<T>(name: string): T {
   return JSON.parse(readFileSync(dataPath(name), "utf8")) as T;
+}
+
+/** Index 0 is newest (matches homepage slice / typical legacy JSON order). */
+function liveAtForIndex(index: number): Date {
+  return new Date(Date.now() - index * 1000);
 }
 
 async function getCentreWideOrgId(): Promise<string> {
@@ -47,11 +53,25 @@ async function getSuperAdminId(): Promise<string> {
   return res.rows[0].id;
 }
 
-async function alreadyPublished(contentType: string, titleAr: string): Promise<boolean> {
+async function alreadyPublishedNewsOrPub(contentType: string, titleAr: string): Promise<boolean> {
   const res = await query(
     `SELECT 1 FROM content_items
-     WHERE content_type = $1 AND title_ar = $2 AND status = 'published' LIMIT 1`,
+     WHERE content_type = $1 AND title_ar = $2 AND live_payload IS NOT NULL LIMIT 1`,
     [contentType, titleAr],
+  );
+  return (res.rowCount ?? 0) > 0;
+}
+
+async function alreadyPublishedEvent(
+  titleAr: string,
+  eventScope: "intl" | "nat",
+): Promise<boolean> {
+  const res = await query(
+    `SELECT 1 FROM content_items
+     WHERE content_type = 'event' AND title_ar = $1 AND event_scope = $2
+       AND live_payload IS NOT NULL
+     LIMIT 1`,
+    [titleAr, eventScope],
   );
   return (res.rowCount ?? 0) > 0;
 }
@@ -72,6 +92,7 @@ async function insertPublished(row: {
   eventTypeAr?: string | null;
   eventDisplayStatus?: "upcoming" | "done" | null;
   payload: unknown;
+  liveAt: Date;
 }) {
   await query(
     `INSERT INTO content_items (
@@ -83,7 +104,7 @@ async function insertPublished(row: {
        $1, 'published', $2, $3, $3, 'pending',
        $4, $5, $6, $7, $8,
        $9, $10, $11, $12, $13, $14,
-       TRUE, NOW(), $15::jsonb, NOW()
+       TRUE, $16, $15::jsonb, $16
      )`,
     [
       row.contentType,
@@ -101,6 +122,7 @@ async function insertPublished(row: {
       row.eventTypeAr ?? null,
       row.eventDisplayStatus ?? null,
       JSON.stringify(row.payload),
+      row.liveAt,
     ],
   );
 }
@@ -125,10 +147,11 @@ async function importNews(orgUnitId: string, createdBy: string) {
   const { news } = readJson<LegacyNews>("news.json");
   let inserted = 0;
   let skipped = 0;
-  for (const n of news) {
+  for (let i = 0; i < news.length; i += 1) {
+    const n = news[i];
     const title = n.title.trim();
     if (!title) continue;
-    if (await alreadyPublished("news", title)) {
+    if (await alreadyPublishedNewsOrPub("news", title)) {
       skipped += 1;
       continue;
     }
@@ -140,6 +163,7 @@ async function importNews(orgUnitId: string, createdBy: string) {
       labelAr: n.label?.trim() || null,
       imagePath: n.img ?? null,
       payload: { img: n.img ?? null, label: n.label?.trim() || "خبر", title },
+      liveAt: liveAtForIndex(i),
     });
     inserted += 1;
   }
@@ -150,12 +174,14 @@ async function importEvents(orgUnitId: string, createdBy: string) {
   const events = readJson<LegacyEvents>("events.json");
   let inserted = 0;
   let skipped = 0;
+  let globalIndex = 0;
   for (const scope of ["intl", "nat"] as const) {
     for (const e of events[scope] ?? []) {
       const title = e.title.trim();
       if (!title) continue;
-      if (await alreadyPublished("event", title)) {
+      if (await alreadyPublishedEvent(title, scope)) {
         skipped += 1;
+        globalIndex += 1;
         continue;
       }
       const payload: Record<string, unknown> = {
@@ -181,8 +207,10 @@ async function importEvents(orgUnitId: string, createdBy: string) {
         eventTypeAr: e.type,
         eventDisplayStatus: e.status === "done" ? "done" : "upcoming",
         payload,
+        liveAt: liveAtForIndex(globalIndex),
       });
       inserted += 1;
+      globalIndex += 1;
     }
   }
   console.log(`events: inserted ${inserted}, skipped ${skipped} (already published)`);
@@ -202,7 +230,7 @@ async function importPublications(orgUnitId: string, createdBy: string) {
     const cover = covers[i];
     const title = p.t.trim();
     if (!title) continue;
-    if (await alreadyPublished("publication", title)) {
+    if (await alreadyPublishedNewsOrPub("publication", title)) {
       skipped += 1;
       continue;
     }
@@ -222,6 +250,7 @@ async function importPublications(orgUnitId: string, createdBy: string) {
         desc: p.desc?.trim() || "",
         cover,
       },
+      liveAt: liveAtForIndex(i),
     });
     inserted += 1;
   }

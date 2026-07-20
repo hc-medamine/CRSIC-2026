@@ -171,6 +171,34 @@ export async function restoreRevision(
   return item.content_type;
 }
 
+/**
+ * Author (or Super Admin) reopens a rejected item as draft so it can be edited and resubmitted.
+ */
+export async function reopenRejected(user: SessionUser, id: string): Promise<ContentType> {
+  const item = await getItemRow(id);
+  if (!item) throw new Error("Not found");
+  const isAuthor = item.created_by === user.id || user.role === "super_admin";
+  if (!isAuthor) throw new Error("Only the author (or Super Admin) can reopen a rejected item");
+  if (item.status !== "rejected") throw new Error("Only rejected items can be reopened");
+
+  await query(
+    `UPDATE content_items SET status = 'draft', review_note = NULL, updated_by = $2, updated_at = NOW()
+     WHERE id = $1`,
+    [id, user.id],
+  );
+  const snapshot = await captureSnapshot(id);
+  await addRevision(id, "draft", snapshot, user.id, "Reopened rejected item as draft");
+  await writeAudit({
+    actor: user,
+    action: `${item.content_type}.reopen_rejected`,
+    entityType: item.content_type,
+    entityId: id,
+    summary: `Reopened rejected item as draft — ${item.title_ar}`,
+    metadata: { title: item.title_ar },
+  });
+  return item.content_type;
+}
+
 export type AssignableUser = {
   id: string;
   display_name: string;

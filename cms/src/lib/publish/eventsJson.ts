@@ -54,7 +54,7 @@ export async function rebuildPublicEventsJson(): Promise<{ intl: number; nat: nu
     `SELECT live_payload
      FROM content_items
      WHERE content_type = 'event' AND live_payload IS NOT NULL
-     ORDER BY live_at DESC NULLS LAST, updated_at DESC`,
+     ORDER BY live_at DESC NULLS LAST, created_at ASC`,
   );
 
   const intl: PublicEventItem[] = [];

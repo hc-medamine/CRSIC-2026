@@ -3,6 +3,7 @@ import { redirect, notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { getEventById } from "@/lib/content/events";
 import { canAccessContentType, canReview, getUserOrgIds } from "@/lib/content/permissions";
+import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 import { getMediaByPublicPath } from "@/lib/media/store";
 import { listOrgUnits } from "@/lib/users";
 import { EventEditorForm } from "../event-form";
@@ -17,6 +18,8 @@ export default async function EventDetailPage({ params }: Props) {
   const { id } = await params;
   const item = await getEventById(id);
   if (!item) notFound();
+  const meta = await getContentMeta(id);
+  if (!meta || !(await canViewContentItem(user, meta))) redirect("/dashboard");
 
   const allOrgs = await listOrgUnits();
   const orgIds =

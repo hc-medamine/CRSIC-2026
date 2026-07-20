@@ -3,6 +3,7 @@ import { redirect, notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { getNewsById } from "@/lib/content/news";
 import { canAccessContentType, canReview, getUserOrgIds } from "@/lib/content/permissions";
+import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 import { getMediaByPublicPath } from "@/lib/media/store";
 import { listOrgUnits } from "@/lib/users";
 import { NewsEditorForm } from "../news-form";
@@ -18,6 +19,8 @@ export default async function NewsDetailPage({ params }: Props) {
   const { id } = await params;
   const item = await getNewsById(id);
   if (!item) notFound();
+  const meta = await getContentMeta(id);
+  if (!meta || !(await canViewContentItem(user, meta))) redirect("/dashboard");
 
   const allOrgs = await listOrgUnits();
   const orgIds =

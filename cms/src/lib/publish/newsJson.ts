@@ -38,7 +38,7 @@ export async function rebuildPublicNewsJson(): Promise<{ count: number; path: st
     `SELECT live_payload
      FROM content_items
      WHERE content_type = 'news' AND live_payload IS NOT NULL
-     ORDER BY live_at DESC NULLS LAST, updated_at DESC`,
+     ORDER BY live_at DESC NULLS LAST, created_at ASC`,
   );
 
   const news: PublicNewsItem[] = result.rows.map((row) => ({

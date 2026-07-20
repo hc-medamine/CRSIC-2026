@@ -12,7 +12,8 @@ import {
   withdrawNews,
   type NewsInput,
 } from "@/lib/content/news";
-import { reassignAuthor, restoreRevision, startRevision } from "@/lib/content/lifecycle";
+import { reassignAuthor, reopenRejected, restoreRevision, startRevision } from "@/lib/content/lifecycle";
+import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 
 export const runtime = "nodejs";
 
@@ -40,6 +41,10 @@ export async function GET(_request: NextRequest, { params }: Params) {
   const { id } = await params;
   const item = await getNewsById(id);
   if (!item) return NextResponse.json({ ok: false, error: "Not found" }, { status: 404 });
+  const meta = await getContentMeta(id);
+  if (!meta || !(await canViewContentItem(user, meta))) {
+    return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
+  }
   return NextResponse.json({ ok: true, item: serialize(item) });
 }
 
@@ -87,6 +92,10 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         break;
       case "start_revision":
         await startRevision(user, id);
+        item = await getNewsById(id);
+        break;
+      case "reopen_rejected":
+        await reopenRejected(user, id);
         item = await getNewsById(id);
         break;
       case "restore_revision":

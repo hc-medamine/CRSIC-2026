@@ -329,6 +329,12 @@ export function EventEditorForm({ mode, orgUnits, initial, canSubmit, canReview,
           ) : null}
         </div>
       ) : null}
+
+      {mode === "edit" && isAuthor && initial?.status === "rejected" ? (
+        <button type="button" disabled={pending} className="w-fit rounded border border-amber-300 px-4 py-2 text-sm text-amber-900" onClick={() => void run("reopen_rejected")}>
+          Reopen as draft
+        </button>
+      ) : null}
     </div>
   );
 }

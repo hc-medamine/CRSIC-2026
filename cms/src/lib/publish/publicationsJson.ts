@@ -52,7 +52,7 @@ export async function rebuildPublicPublicationsJson(): Promise<{
     `SELECT live_payload
      FROM content_items
      WHERE content_type = 'publication' AND live_payload IS NOT NULL
-     ORDER BY live_at DESC NULLS LAST, updated_at DESC`,
+     ORDER BY live_at DESC NULLS LAST, created_at ASC`,
   );
 
   const pubs: PublicPubItem[] = [];

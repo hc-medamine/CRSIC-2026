@@ -25,6 +25,7 @@ export const LABELS: LabelMap = {
   awaitingReview: { en: "Awaiting review", ar: "في انتظار المراجعة" },
   needsRevision: { en: "Needs revision", ar: "بحاجة إلى تعديل" },
   myDrafts: { en: "My drafts", ar: "مسوداتي" },
+  rejected: { en: "Rejected", ar: "مرفوض" },
   recentlyPublished: { en: "Recently published", ar: "المنشور حديثًا" },
   noItems: { en: "Nothing here.", ar: "لا يوجد شيء هنا." },
 
