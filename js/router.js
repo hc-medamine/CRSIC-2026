@@ -1,5 +1,6 @@
 /**
  * Client-side routing: section visibility, deep links, history / back-button.
+ * Detail hashes: #news/{slug}, #event/{slug}, #publication/{slug}
  */
 import {
   switchEventsTab,
@@ -7,66 +8,157 @@ import {
   setPubType,
   updateBreadcrumb,
   updateBottomTabs,
-  closeDrawer
+  closeDrawer,
+  closeLightbox,
 } from './ui.js';
 import { getTitleObserver } from './animations.js';
+import { renderDetailPage } from './components/detailPage.js';
 
 /** Maps child pages to their primary nav parent. */
-export const PAGE_PARENT = { org: 'about', research: 'about', cooperation: 'events' };
+export const PAGE_PARENT = { org: 'about', research: 'about', cooperation: 'events', detail: 'home' };
+
+const DETAIL_TYPES = new Set(['news', 'event', 'publication']);
 
 /**
- * Navigate to a page section.
- * @param {string} pageId
- * @param {string} [tab] — events tab (intl|nat) or research tab (r1–r4)
- * @param {string} [filter] — publications filter (all|collective|individual)
+ * @param {string} hashRaw hash without leading #
+ * @returns {{ pageId: string, tab?: string, filter?: string, detailType?: string, detailSlug?: string }}
  */
-export function navigateTo(pageId, tab, filter) {
+export function parseHash(hashRaw) {
+  const raw = (hashRaw || 'home').replace(/^#/, '');
+  const segments = raw.split('/').filter(Boolean).map((s) => {
+    try {
+      return decodeURIComponent(s);
+    } catch {
+      return s;
+    }
+  });
+  const [first, second] = segments;
+  if (DETAIL_TYPES.has(first) && second) {
+    return { pageId: 'detail', detailType: first, detailSlug: second };
+  }
+  return { pageId: first || 'home' };
+}
+
+/**
+ * Navigate to a page section or detail.
+ * @param {string} pageId
+ * @param {string} [tab]
+ * @param {string} [filter]
+ * @param {{ detailType?: string, detailSlug?: string, replace?: boolean }} [opts]
+ */
+export function navigateTo(pageId, tab, filter, opts = {}) {
+  const detailType = opts.detailType;
+  const detailSlug = opts.detailSlug;
+
+  if (detailType && detailSlug) {
+    closeLightbox();
+    const pages = document.querySelectorAll('.page');
+    pages.forEach((p) => p.classList.remove('active'));
+    const target = document.getElementById('page-detail');
+    if (target) {
+      target.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+    renderDetailPage(detailType, detailSlug);
+
+    const parentNav =
+      detailType === 'publication'
+        ? 'publications'
+        : detailType === 'event'
+          ? 'events'
+          : 'home';
+    document.querySelectorAll('.nav-links a[data-page]').forEach((a) => {
+      const isActive = a.dataset.page === parentNav && !a.dataset.tab;
+      a.classList.toggle('active', isActive);
+      if (isActive) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
+
+    const hash = `${detailType}/${encodeURIComponent(detailSlug)}`;
+    if (opts.replace) history.replaceState(null, '', '#' + hash);
+    else history.pushState(null, '', '#' + hash);
+
+    updateBreadcrumb('detail');
+    updateBottomTabs(parentNav);
+    closeDrawer();
+    return;
+  }
+
+  // Legacy: navigateTo('news/slug') string from popstate
+  const parsed = parseHash(pageId);
+  if (parsed.detailType && parsed.detailSlug) {
+    navigateTo('detail', undefined, undefined, {
+      detailType: parsed.detailType,
+      detailSlug: parsed.detailSlug,
+      replace: opts.replace,
+    });
+    return;
+  }
+
+  const resolvedId = parsed.pageId;
   const pages = document.querySelectorAll('.page');
-  pages.forEach(p => p.classList.remove('active'));
-  const target = document.getElementById('page-' + pageId);
+  pages.forEach((p) => p.classList.remove('active'));
+  const target = document.getElementById('page-' + resolvedId);
   if (target) {
     target.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
-  const navPageId = PAGE_PARENT[pageId] || pageId;
-  document.querySelectorAll('.nav-links a[data-page]').forEach(a => {
+  const navPageId = PAGE_PARENT[resolvedId] || resolvedId;
+  document.querySelectorAll('.nav-links a[data-page]').forEach((a) => {
     const isActive = a.dataset.page === navPageId && !a.dataset.tab;
     a.classList.toggle('active', isActive);
     if (isActive) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   });
 
-  document.querySelectorAll('.drawer-item[data-page]').forEach(a => {
-    const isActive = a.dataset.page === pageId && !a.dataset.tab;
+  document.querySelectorAll('.drawer-item[data-page]').forEach((a) => {
+    const isActive = a.dataset.page === resolvedId && !a.dataset.tab;
     a.classList.toggle('active', isActive);
   });
 
-  history.pushState(null, '', '#' + pageId);
+  if (opts.replace) history.replaceState(null, '', '#' + resolvedId);
+  else history.pushState(null, '', '#' + resolvedId);
 
-  if (pageId === 'events' && tab) switchEventsTab(tab);
-  if (pageId === 'research' && tab) switchResearchTab(tab);
-  if (filter && pageId === 'publications') {
+  if (resolvedId === 'events' && tab) switchEventsTab(tab);
+  if (resolvedId === 'research' && tab) switchResearchTab(tab);
+  if (filter && resolvedId === 'publications') {
     const btn = document.querySelector(`#pub-filter .dept-tab[data-pub-type="${filter}"]`);
     setPubType(filter, btn);
   }
 
-  updateBreadcrumb(pageId);
-  updateBottomTabs(pageId);
+  updateBreadcrumb(resolvedId);
+  updateBottomTabs(resolvedId);
   closeDrawer();
 
-  document.querySelectorAll('.has-dropdown, .has-mega').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.has-dropdown, .has-mega').forEach((d) => d.classList.remove('open'));
 
   const titleObserver = getTitleObserver();
   if (titleObserver) {
     const newTitles = target ? target.querySelectorAll('.section-title:not(.drawn)') : [];
-    newTitles.forEach(tt => titleObserver.observe(tt));
+    newTitles.forEach((tt) => titleObserver.observe(tt));
   }
+}
+
+/** Open a detail route by type + slug. */
+export function navigateToDetail(type, slug, replace = false) {
+  if (!type || !slug) return;
+  navigateTo('detail', undefined, undefined, {
+    detailType: type,
+    detailSlug: slug,
+    replace,
+  });
 }
 
 /** Bind navigation click delegation + popstate. */
 export function bindRouter() {
   document.addEventListener('click', function (e) {
+    const detailEl = e.target.closest('[data-detail-type][data-detail-slug]');
+    if (detailEl) {
+      e.preventDefault();
+      navigateToDetail(detailEl.dataset.detailType, detailEl.dataset.detailSlug);
+      return;
+    }
     const el = e.target.closest('[data-page]');
     if (!el) return;
     e.preventDefault();
@@ -75,12 +167,30 @@ export function bindRouter() {
 
   window.addEventListener('popstate', function () {
     const hash = location.hash.replace('#', '') || 'home';
-    navigateTo(hash);
+    const parsed = parseHash(hash);
+    if (parsed.detailType && parsed.detailSlug) {
+      navigateTo('detail', undefined, undefined, {
+        detailType: parsed.detailType,
+        detailSlug: parsed.detailSlug,
+        replace: true,
+      });
+    } else {
+      navigateTo(parsed.pageId, undefined, undefined, { replace: true });
+    }
   });
 }
 
 /** Initial route from URL hash. */
 export function initRoute() {
   const initHash = location.hash.replace('#', '') || 'home';
-  navigateTo(initHash);
+  const parsed = parseHash(initHash);
+  if (parsed.detailType && parsed.detailSlug) {
+    navigateTo('detail', undefined, undefined, {
+      detailType: parsed.detailType,
+      detailSlug: parsed.detailSlug,
+      replace: true,
+    });
+  } else {
+    navigateTo(parsed.pageId, undefined, undefined, { replace: true });
+  }
 }

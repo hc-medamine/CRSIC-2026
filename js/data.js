@@ -207,3 +207,37 @@ export function getJournals() {
 export function getNews() {
   return news;
 }
+
+/**
+ * @param {string} key slug or id
+ * @returns {object|undefined}
+ */
+export function findNewsByKey(key) {
+  const k = decodeURIComponent(String(key || ''));
+  return news.find((n) => n && (n.slug === k || n.id === k));
+}
+
+/**
+ * @param {string} key slug or id
+ * @returns {object|undefined}
+ */
+export function findEventByKey(key) {
+  const k = decodeURIComponent(String(key || ''));
+  return getAllEvents().find((e) => e && (e.slug === k || e.id === k));
+}
+
+/**
+ * @param {string} key slug or id
+ * @returns {{ pub: object, index: number }|null}
+ */
+export function findPublicationByKey(key) {
+  const k = decodeURIComponent(String(key || ''));
+  const index = pubs.findIndex((p) => p && (p.slug === k || p.id === k));
+  if (index < 0) return null;
+  return { pub: pubs[index], index };
+}
+
+/** @param {number} i */
+export function getCoverForPub(i) {
+  return covers[i] || '';
+}

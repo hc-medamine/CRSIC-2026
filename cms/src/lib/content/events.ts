@@ -3,6 +3,8 @@ import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { buildEventPayload, rebuildPublicEventsJson } from "@/lib/publish/eventsJson";
+import { normalizeAttachments, type PublicMediaItem } from "@/lib/publish/media";
+import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
 import { mutateThenRebuildPublic } from "@/lib/publish/safeRebuild";
 import {
   canAccessContentType,
@@ -44,6 +46,7 @@ export type EventItem = {
   image_path: string | null;
   image_alt_ar: string | null;
   image_alt_en: string | null;
+  attachments: PublicMediaItem[] | unknown;
   event_scope: "intl" | "nat" | null;
   event_day: string | null;
   event_month: string | null;
@@ -70,6 +73,8 @@ export type EventInput = {
   imagePath?: string | null;
   imageAltAr?: string;
   imageAltEn?: string;
+  attachments?: PublicMediaItem[];
+  publicSlug?: string | null;
   enStatus?: "pending" | "ready";
   eventScope: "intl" | "nat";
   eventDay: string;
@@ -87,6 +92,8 @@ function snapshotOf(row: EventItem) {
     en_status: row.en_status,
     title_ar: row.title_ar,
     title_en: row.title_en,
+    summary_ar: row.summary_ar,
+    body_ar: row.body_ar,
     event_scope: row.event_scope,
     event_day: row.event_day,
     event_month: row.event_month,
@@ -95,6 +102,8 @@ function snapshotOf(row: EventItem) {
     event_type_en: row.event_type_en,
     event_display_status: row.event_display_status,
     image_path: row.image_path,
+    attachments: normalizeAttachments(row.attachments),
+    public_slug: row.public_slug,
   };
 }
 
@@ -162,20 +171,23 @@ export async function createEvent(user: SessionUser, input: EventInput): Promise
   if (!(await canAccessOrg(user, input.orgUnitId))) throw new Error("No permission for this organisation unit");
   validateEventFields(input);
   const enStatus = input.enStatus ?? (input.titleEn?.trim() ? "ready" : "pending");
+  const attachments = normalizeAttachments(input.attachments);
+  const primaryImage =
+    attachments.find((a) => a.kind === "image")?.src ?? input.imagePath ?? null;
 
   const result = await query<EventItem>(
     `INSERT INTO content_items (
       content_type, status, org_unit_id, created_by, updated_by, en_status,
       title_ar, title_en, summary_ar, summary_en, body_ar, body_en,
-      image_path, image_alt_ar, image_alt_en,
+      image_path, image_alt_ar, image_alt_en, attachments,
       event_scope, event_day, event_month, event_year,
       event_type_ar, event_type_en, event_display_status
     ) VALUES (
       'event', 'draft', $1, $2, $2, $3,
       $4, $5, $6, $7, $8, $9,
-      $10, $11, $12,
-      $13, $14, $15, $16,
-      $17, $18, $19
+      $10, $11, $12, $13::jsonb,
+      $14, $15, $16, $17,
+      $18, $19, $20
     ) RETURNING *`,
     [
       input.orgUnitId,
@@ -187,9 +199,10 @@ export async function createEvent(user: SessionUser, input: EventInput): Promise
       input.summaryEn?.trim() || null,
       input.bodyAr?.trim() || null,
       input.bodyEn?.trim() || null,
-      input.imagePath ?? null,
+      primaryImage,
       input.imageAltAr?.trim() || null,
       input.imageAltEn?.trim() || null,
+      JSON.stringify(attachments),
       input.eventScope,
       input.eventDay.trim(),
       input.eventMonth.trim(),
@@ -217,14 +230,23 @@ export async function updateEventDraft(user: SessionUser, id: string, input: Eve
   if (!(await canAccessOrg(user, input.orgUnitId))) throw new Error("No permission for this organisation unit");
   validateEventFields(input);
   const enStatus = input.enStatus ?? (input.titleEn?.trim() ? "ready" : "pending");
+  const attachments = normalizeAttachments(input.attachments);
+  const primaryImage =
+    attachments.find((a) => a.kind === "image")?.src ?? input.imagePath ?? null;
+  const slugOverride =
+    user.role === "super_admin" && input.publicSlug !== undefined
+      ? input.publicSlug
+      : undefined;
 
   const result = await query<EventItem>(
     `UPDATE content_items SET
       org_unit_id = $2, updated_by = $3, en_status = $4,
       title_ar = $5, title_en = $6, summary_ar = $7, summary_en = $8,
       body_ar = $9, body_en = $10, image_path = $11, image_alt_ar = $12, image_alt_en = $13,
-      event_scope = $14, event_day = $15, event_month = $16, event_year = $17,
-      event_type_ar = $18, event_type_en = $19, event_display_status = $20,
+      attachments = $14::jsonb,
+      event_scope = $15, event_day = $16, event_month = $17, event_year = $18,
+      event_type_ar = $19, event_type_en = $20, event_display_status = $21,
+      public_slug = COALESCE($22, public_slug),
       updated_at = NOW()
      WHERE id = $1 AND content_type = 'event'
      RETURNING *`,
@@ -239,9 +261,10 @@ export async function updateEventDraft(user: SessionUser, id: string, input: Eve
       input.summaryEn?.trim() || null,
       input.bodyAr?.trim() || null,
       input.bodyEn?.trim() || null,
-      input.imagePath ?? null,
+      primaryImage,
       input.imageAltAr?.trim() || null,
       input.imageAltEn?.trim() || null,
+      JSON.stringify(attachments),
       input.eventScope,
       input.eventDay.trim(),
       input.eventMonth.trim(),
@@ -249,6 +272,7 @@ export async function updateEventDraft(user: SessionUser, id: string, input: Eve
       input.eventTypeAr.trim(),
       input.eventTypeEn?.trim() || null,
       input.eventDisplayStatus,
+      slugOverride?.trim() || null,
     ],
   );
   const item = result.rows[0];
@@ -388,8 +412,12 @@ export async function publishEvent(user: SessionUser, id: string) {
   if (!["approved", "unpublished"].includes(existing.status)) {
     throw new Error("Only approved or unpublished items can be published");
   }
-  const slug = existing.public_slug ?? `event-${existing.id.slice(0, 8)}`;
-  const payload = buildEventPayload(existing);
+  const slug = await resolvePublicSlug({
+    itemId: existing.id,
+    titleAr: existing.title_ar,
+    existingSlug: existing.public_slug,
+  });
+  const payload = buildEventPayload({ ...existing, public_slug: slug });
   const item = await mutateThenRebuildPublic({
     itemId: id,
     mutate: async () => {

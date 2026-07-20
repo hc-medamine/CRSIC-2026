@@ -41,10 +41,13 @@ Estimated time: **~5 minutes**.
 |---|--------|-------|
 | D1 | Publications: filter all / collective / individual | ☐ |
 | D2 | Publications: search narrows cards | ☐ |
-| D3 | Publication lightbox opens and closes | ☐ |
+| D3 | Publication lightbox opens and closes; **عرض التفاصيل** opens `#publication/{slug}` | ☐ |
 | D4 | Events: intl / nat tabs switch lists | ☐ |
 | D5 | Contact: empty submit shakes required fields | ☐ |
 | D6 | Contact: filled submit opens `mailto:contact@crsic.dz` | ☐ |
+| D7 | News card → `#news/{slug}` detail; browser back returns | ☐ |
+| D8 | Event card (home or events list) → `#event/{slug}` detail | ☐ |
+| D9 | Direct hash `#publication/…` / `#news/…` / `#event/…` loads after refresh | ☐ |
 
 ## E. Content invariants (when those files changed)
 

@@ -15,20 +15,24 @@ import {
   primeSkeletons,
   showDataLoadErrors
 } from './ui.js';
-import { bindRouter, initRoute } from './router.js';
+import { bindRouter, initRoute, parseHash } from './router.js';
+import { renderDetailPage } from './components/detailPage.js';
 import { initAnimations } from './animations.js';
 
 async function boot() {
   setOnAfterTranslate(() => {
     renderAll();
     showDataLoadErrors(getLoadErrors());
+    const parsed = parseHash(location.hash.replace('#', '') || 'home');
+    if (parsed.detailType && parsed.detailSlug) {
+      renderDetailPage(parsed.detailType, parsed.detailSlug);
+    }
   });
 
   bindLangUI();
   bindUIEvents();
   bindRouter();
   initLangBanner();
-  initRoute();
 
   primeSkeletons();
 
@@ -42,6 +46,7 @@ async function boot() {
       locales: Object.keys(localeResult.errors).join(','),
     });
   }
+  initRoute();
   initAnimations();
 }
 

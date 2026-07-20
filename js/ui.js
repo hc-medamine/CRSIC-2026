@@ -63,6 +63,7 @@ const BC_MAP = {
   events: [{ key: 'bc_events', page: 'events' }, { key: 'bc_events_label', page: 'events' }],
   cooperation: [{ key: 'bc_events', page: 'events' }, { key: 'bc_cooperation', page: 'cooperation' }],
   contact: [{ key: 'bc_contact', page: 'contact' }],
+  detail: [{ key: 'bc_detail', page: 'home' }],
 };
 
 const BOTTOM_TAB_PAGES = ['home', 'publications', 'journals', 'events'];
@@ -336,12 +337,15 @@ export function updateContentLocaleNotices() {
 }
 
 /* ── LIGHTBOX ────────────────────────────────────────── */
+let lightboxPubSlug = null;
+
 export function openLightbox(i, triggerEl) {
   const p = getPub(i);
   if (!p) return;
   const overlay = document.getElementById('lightbox');
   if (!overlay) return;
 
+  lightboxPubSlug = p.slug || p.id || null;
   lightboxTrigger = triggerEl
     || (document.activeElement instanceof HTMLElement ? document.activeElement : null);
 
@@ -349,7 +353,21 @@ export function openLightbox(i, triggerEl) {
   document.getElementById('lb-dept').textContent = p.dept;
   document.getElementById('lb-year').textContent =
     p.type === 'collective' ? t('badge_collective') : t('badge_individual');
-  document.getElementById('lb-desc').textContent = p.desc;
+  const summary = p.summary || p.desc || '';
+  document.getElementById('lb-desc').textContent = summary;
+
+  const detailBtn = document.getElementById('lb-detail-btn');
+  if (detailBtn) {
+    if (lightboxPubSlug) {
+      detailBtn.hidden = false;
+      detailBtn.dataset.detailType = 'publication';
+      detailBtn.dataset.detailSlug = lightboxPubSlug;
+    } else {
+      detailBtn.hidden = true;
+      delete detailBtn.dataset.detailType;
+      delete detailBtn.dataset.detailSlug;
+    }
+  }
 
   const body = overlay.querySelector('.lightbox-body');
   const titleEl = document.getElementById('lb-title');
@@ -402,6 +420,7 @@ export function closeLightbox() {
   if (!lb || !lb.classList.contains('open')) return;
   lb.classList.remove('open');
   lb.setAttribute('aria-hidden', 'true');
+  lightboxPubSlug = null;
   if (releaseLightboxTrap) {
     releaseLightboxTrap();
     releaseLightboxTrap = null;
@@ -554,12 +573,14 @@ export function bindUIEvents() {
   const lightbox = document.getElementById('lightbox');
   if (lightbox) {
     lightbox.addEventListener('click', closeLightboxOutside);
-    lightbox.querySelectorAll('.lightbox-close, .lb-btn-ghost').forEach(btn => {
+    lightbox.querySelectorAll('.lightbox-close, .lb-btn-ghost').forEach((btn) => {
+      if (btn.id === 'lb-detail-btn') return;
       btn.addEventListener('click', closeLightbox);
     });
   }
 
   document.addEventListener('click', (e) => {
+    if (e.target.closest('[data-detail-type][data-detail-slug]')) return;
     const card = e.target.closest('[data-pub-index]');
     if (!card) return;
     const i = parseInt(card.dataset.pubIndex, 10);
@@ -567,6 +588,12 @@ export function bindUIEvents() {
   });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter') return;
+    const detailCard = e.target.closest('[data-detail-type][data-detail-slug]');
+    if (detailCard) {
+      e.preventDefault();
+      detailCard.click();
+      return;
+    }
     const card = e.target.closest('[data-pub-index]');
     if (!card) return;
     const i = parseInt(card.dataset.pubIndex, 10);

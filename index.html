@@ -944,6 +944,12 @@
       </div>
     </section>
 
+    <section class="page" id="page-detail" aria-live="polite">
+      <div class="page-inner detail-page-inner">
+        <div id="detail-root"></div>
+      </div>
+    </section>
+
   </div><!-- /app -->
 
   <!-- ════════════════════════════════════════════════════
@@ -1068,7 +1074,9 @@
         <div class="lightbox-body">
           <p class="lightbox-desc" id="lb-desc"></p>
           <div class="lightbox-actions">
-            <a href="https://www.crsic.dz/?page_id=643" target="_blank" rel="noopener" class="lb-btn-primary"
+            <button type="button" class="lb-btn-primary" id="lb-detail-btn" hidden
+              data-i18n="lb_detail_btn">عرض التفاصيل</button>
+            <a href="https://www.crsic.dz/?page_id=643" target="_blank" rel="noopener" class="lb-btn-ghost"
               data-i18n="lb_view_btn">عرض في المنصة</a>
             <button type="button" class="lb-btn-ghost" data-i18n="lb_close_btn">إغلاق</button>
           </div>

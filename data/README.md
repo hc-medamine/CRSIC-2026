@@ -13,11 +13,11 @@ Project docs index: [docs/README.md](../docs/README.md).
 
 | File | Contents |
 |------|----------|
-| `publications.json` | `covers[]` + `pubs[]` (same length; index-aligned) |
-| `events.json` | `intl[]` + `nat[]` events |
+| `publications.json` | `covers[]` + `pubs[]` (same length; index-aligned). Pubs may include detail fields: `id`, `slug`, `summary`, `body`, `media[]` |
+| `events.json` | `intl[]` + `nat[]` events (detail: `id`, `slug`, `summary`, `body`, `media[]`) |
 | `partners.json` | `nat[]` + `intl[]` partners |
 | `journals.json` | `journals[]` |
-| `news.json` | `news[]` |
+| `news.json` | `news[]` (detail: `id`, `slug`, `summary`, `body`, `media[]`) |
 | `locales/ar.json` | Arabic UI chrome strings (flat key → string) |
 | `locales/en.json` | English UI chrome strings (same keys as `ar`) |
 
@@ -39,12 +39,18 @@ Project docs index: [docs/README.md](../docs/README.md).
   "t": "عنوان المؤلف",
   "type": "collective",
   "dept": "الحضارة الإسلامية",
-  "desc": "وصف مختصر دون وسوم HTML."
+  "desc": "وصف مختصر دون وسوم HTML.",
+  "id": "legacy-publication-عنوان-المؤلف",
+  "slug": "عنوان-المؤلف",
+  "summary": "وصف مختصر دون وسوم HTML.",
+  "body": "",
+  "media": [{ "kind": "image", "src": "img/covers/c28.jpg" }]
 }
 ```
 
 `type` must be `"collective"` or `"individual"`.  
-**Keep `covers.length === pubs.length`.**
+**Keep `covers.length === pubs.length`.**  
+Public deep link: `#publication/{slug}`.
 
 ## Add an event
 
@@ -58,12 +64,18 @@ Append to `intl` or `nat` in `events.json`:
   "title": "عنوان الملتقى",
   "type": "ملتقى وطني",
   "status": "done",
-  "img": "img/Holders/0.jpg"
+  "img": "img/Holders/0.jpg",
+  "id": "legacy-event-عنوان-الملتقى",
+  "slug": "عنوان-الملتقى",
+  "summary": "",
+  "body": "",
+  "media": [{ "kind": "image", "src": "img/Holders/0.jpg" }]
 }
 ```
 
 `status`: `"done"` or `"upcoming"`.  
-`img` is **optional** — used by the home teaser cards; if omitted, the home grid cycles `img/Holders/0.jpg`–`5.jpg`.
+`img` is **optional** — used by the home teaser cards; if omitted, the home grid cycles `img/Holders/0.jpg`–`5.jpg`.  
+Deep link: `#event/{slug}`.
 
 The home section `#home-events-grid` shows the **3 newest** events (intl + nat merged, sorted by date). The full events page still lists every item by year.
 ## Add news
@@ -72,12 +84,20 @@ The home section `#home-events-grid` shows the **3 newest** events (intl + nat m
 {
   "img": "img/Holders/0.jpg",
   "label": "خبر",
-  "title": "عنوان الخبر"
+  "title": "عنوان الخبر",
+  "id": "legacy-news-عنوان-الخبر",
+  "slug": "عنوان-الخبر",
+  "summary": "",
+  "body": "",
+  "media": [{ "kind": "image", "src": "img/Holders/0.jpg" }]
 }
 ```
 
-Use `"img": null` when there is no photo.
+Use `"img": null` when there is no photo. Deep link: `#news/{slug}`.
 
+`media[]` entries: `{ "kind": "image"|"pdf", "src": "…", "alt": "optional" }`.
+
+To re-backfill id/slug/media on legacy files: `node scripts/backfill-public-detail-fields.mjs`.
 ## Editor rules
 
 - Save as **UTF-8** (Arabic text).

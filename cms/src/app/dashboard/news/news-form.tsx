@@ -3,7 +3,9 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MediaUploadField } from "@/app/dashboard/media-upload-field";
+import { MediaAttachmentsField } from "@/app/dashboard/media-attachments-field";
 import { PublishPreview } from "@/app/dashboard/publish-preview";
+import type { PublicMediaItem } from "@/lib/publish/media";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
 
@@ -23,6 +25,8 @@ type Initial = {
   imageAltAr: string;
   imageAltEn: string;
   enStatus: "pending" | "ready";
+  attachments?: PublicMediaItem[];
+  publicSlug?: string | null;
   status?: string;
   reviewNote?: string | null;
 };
@@ -62,6 +66,20 @@ export function NewsEditorForm({
   const [imageAltAr, setImageAltAr] = useState(initial?.imageAltAr ?? "");
   const [imageAltEn, setImageAltEn] = useState(initial?.imageAltEn ?? "");
   const [enStatus, setEnStatus] = useState<"pending" | "ready">(initial?.enStatus ?? "pending");
+  const [attachments, setAttachments] = useState<PublicMediaItem[]>(() => {
+    if (initial?.attachments?.length) return initial.attachments;
+    if (initial?.imagePath) {
+      return [
+        {
+          kind: "image",
+          src: initial.imagePath,
+          ...(initial.imageAltAr ? { alt: initial.imageAltAr } : {}),
+        },
+      ];
+    }
+    return [];
+  });
+  const [publicSlug, setPublicSlug] = useState(initial?.publicSlug ?? "");
   const [checklist, setChecklist] = useState(false);
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -74,6 +92,20 @@ export function NewsEditorForm({
     initial?.status === "changes_requested";
 
   function fields() {
+    const media =
+      attachments.length > 0
+        ? attachments
+        : imagePath.trim()
+          ? [
+              {
+                kind: "image" as const,
+                src: imagePath.trim(),
+                ...(imageAltAr.trim() ? { alt: imageAltAr.trim() } : {}),
+              },
+            ]
+          : [];
+    const primary =
+      (media.find((m) => m.kind === "image")?.src ?? imagePath.trim()) || null;
     return {
       orgUnitId,
       titleAr,
@@ -84,9 +116,11 @@ export function NewsEditorForm({
       summaryEn,
       bodyAr,
       bodyEn,
-      imagePath: imagePath.trim() || null,
+      imagePath: primary,
       imageAltAr,
       imageAltEn,
+      attachments: media,
+      publicSlug: publicSlug.trim() || null,
       enStatus,
     };
   }
@@ -245,12 +279,37 @@ export function NewsEditorForm({
           mediaId={imageMediaId}
           disabled={!editable}
           imagesOnly
-          label="News image"
+          label="News image (primary)"
           onUploaded={({ publicPath, mediaId }) => {
             setImagePath(publicPath);
             setImageMediaId(mediaId);
+            setAttachments((prev) => {
+              const withoutPrimary = prev.filter((a) => a.src !== imagePath);
+              return [{ kind: "image", src: publicPath }, ...withoutPrimary];
+            });
           }}
         />
+        <MediaAttachmentsField
+          bucket="news"
+          items={attachments}
+          disabled={!editable}
+          onChange={(next) => {
+            setAttachments(next);
+            const firstImg = next.find((a) => a.kind === "image");
+            if (firstImg) setImagePath(firstImg.src);
+          }}
+        />
+        <label className="text-sm">
+          <span className="font-medium">Public slug (optional override)</span>
+          <input
+            dir="auto"
+            disabled={!editable}
+            value={publicSlug}
+            onChange={(e) => setPublicSlug(e.target.value)}
+            className="mt-1 w-full rounded border px-3 py-2 font-mono text-xs"
+            placeholder="auto from Arabic title on publish"
+          />
+        </label>
         <label className="text-sm">
           <span className="font-medium">Image alt (AR)</span>
           <input
@@ -375,6 +434,8 @@ export function NewsEditorForm({
           img={imagePath.trim()}
           label={labelAr}
           title={titleAr}
+          slug={publicSlug.trim() || undefined}
+          mediaCount={attachments.length}
         />
       ) : null}
 

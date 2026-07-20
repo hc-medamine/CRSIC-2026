@@ -74,6 +74,10 @@ export default async function PublicationDetailPage({ params }: Props) {
           imageAltEn: item.image_alt_en ?? "",
           enStatus: item.en_status,
           pubKind: item.pub_kind ?? "collective",
+          bodyAr: item.body_ar ?? "",
+          bodyEn: item.body_en ?? "",
+          attachments: Array.isArray(item.attachments) ? item.attachments : [],
+          publicSlug: item.public_slug,
           status: item.status,
           reviewNote: item.review_note,
         }}

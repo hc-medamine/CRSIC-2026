@@ -81,6 +81,7 @@ Estimated time: **~10 minutes**.
 | I7 | Super Admin/Reviewer: **Reassign author** on a draft/changes_requested/submitted item; audit `content.reassign`; new author notified | ☐ |
 | I8 | Cutover: `npm run db:import-legacy` imports current JSON as live items (idempotent; publications keep `covers.length === pubs.length`); does **not** rewrite `data/*.json` | ☐ |
 | I9 | After unpublish (or reject): item appears in **Unpublished** / **Rejected** on dashboard for author + Reviewer/SA (Editors: own or scoped). Super Admin only: **Delete permanently** on unpublished/rejected; audit `*.delete` | ☐ |
+| I10 | Detail publish: attachments list + slug on news/events/publications; published JSON includes `id`/`slug`/`summary`/`body`/`media` | ☐ |
 
 ## G. Gate
 
@@ -91,4 +92,4 @@ Estimated time: **~10 minutes**.
 
 ---
 
-When **all** boxes pass with zero friction → eligible to merge `feature/step4-internal-cms` → `main`.
+CMS Phase 1 is on `main`. Further CMS work ships on feature branches (e.g. detail-page schema).

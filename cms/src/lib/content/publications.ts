@@ -6,6 +6,8 @@ import {
   buildPublicationPayload,
   rebuildPublicPublicationsJson,
 } from "@/lib/publish/publicationsJson";
+import { normalizeAttachments, type PublicMediaItem } from "@/lib/publish/media";
+import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
 import { mutateThenRebuildPublic } from "@/lib/publish/safeRebuild";
 import {
   canAccessContentType,
@@ -49,6 +51,7 @@ export type PublicationItem = {
   image_path: string | null;
   image_alt_ar: string | null;
   image_alt_en: string | null;
+  attachments: PublicMediaItem[] | unknown;
   pub_kind: "collective" | "individual" | null;
   checklist_confirmed: boolean;
   review_note: string | null;
@@ -66,9 +69,13 @@ export type PublicationInput = {
   deptEn?: string;
   descAr: string;
   descEn?: string;
+  bodyAr?: string;
+  bodyEn?: string;
   coverPath: string;
   imageAltAr?: string;
   imageAltEn?: string;
+  attachments?: PublicMediaItem[];
+  publicSlug?: string | null;
   enStatus?: "pending" | "ready";
   pubKind: "collective" | "individual";
 };
@@ -84,8 +91,12 @@ function snapshotOf(row: PublicationItem) {
     label_en: row.label_en,
     summary_ar: row.summary_ar,
     summary_en: row.summary_en,
+    body_ar: row.body_ar,
+    body_en: row.body_en,
     pub_kind: row.pub_kind,
     image_path: row.image_path,
+    attachments: normalizeAttachments(row.attachments),
+    public_slug: row.public_slug,
   };
 }
 
@@ -160,16 +171,19 @@ export async function createPublication(
   }
   validatePublicationFields(input, { requireCover: false });
   const enStatus = input.enStatus ?? (input.titleEn?.trim() ? "ready" : "pending");
+  const attachments = normalizeAttachments(input.attachments);
+  const primaryImage =
+    (attachments.find((a) => a.kind === "image")?.src ?? input.coverPath.trim()) || null;
 
   const result = await query<PublicationItem>(
     `INSERT INTO content_items (
       content_type, status, org_unit_id, created_by, updated_by, en_status,
       title_ar, title_en, label_ar, label_en, summary_ar, summary_en,
-      image_path, image_alt_ar, image_alt_en, pub_kind
+      body_ar, body_en, image_path, image_alt_ar, image_alt_en, pub_kind, attachments
     ) VALUES (
       'publication', 'draft', $1, $2, $2, $3,
       $4, $5, $6, $7, $8, $9,
-      $10, $11, $12, $13
+      $10, $11, $12, $13, $14, $15, $16::jsonb
     ) RETURNING *`,
     [
       input.orgUnitId,
@@ -181,10 +195,13 @@ export async function createPublication(
       input.deptEn?.trim() || null,
       input.descAr.trim(),
       input.descEn?.trim() || null,
-      input.coverPath.trim() || null,
+      input.bodyAr?.trim() || null,
+      input.bodyEn?.trim() || null,
+      primaryImage,
       input.imageAltAr?.trim() || null,
       input.imageAltEn?.trim() || null,
       input.pubKind,
+      JSON.stringify(attachments),
     ],
   );
   const item = result.rows[0];
@@ -211,13 +228,21 @@ export async function updatePublicationDraft(
   }
   validatePublicationFields(input, { requireCover: false });
   const enStatus = input.enStatus ?? (input.titleEn?.trim() ? "ready" : "pending");
+  const attachments = normalizeAttachments(input.attachments);
+  const primaryImage =
+    (attachments.find((a) => a.kind === "image")?.src ?? input.coverPath.trim()) || null;
+  const slugOverride =
+    user.role === "super_admin" && input.publicSlug !== undefined
+      ? input.publicSlug
+      : undefined;
 
   const result = await query<PublicationItem>(
     `UPDATE content_items SET
       org_unit_id = $2, updated_by = $3, en_status = $4,
       title_ar = $5, title_en = $6, label_ar = $7, label_en = $8,
-      summary_ar = $9, summary_en = $10, image_path = $11,
-      image_alt_ar = $12, image_alt_en = $13, pub_kind = $14,
+      summary_ar = $9, summary_en = $10, body_ar = $11, body_en = $12,
+      image_path = $13, image_alt_ar = $14, image_alt_en = $15, pub_kind = $16,
+      attachments = $17::jsonb, public_slug = COALESCE($18, public_slug),
       updated_at = NOW()
      WHERE id = $1 AND content_type = 'publication'
      RETURNING *`,
@@ -232,10 +257,14 @@ export async function updatePublicationDraft(
       input.deptEn?.trim() || null,
       input.descAr.trim(),
       input.descEn?.trim() || null,
-      input.coverPath.trim() || null,
+      input.bodyAr?.trim() || null,
+      input.bodyEn?.trim() || null,
+      primaryImage,
       input.imageAltAr?.trim() || null,
       input.imageAltEn?.trim() || null,
       input.pubKind,
+      JSON.stringify(attachments),
+      slugOverride?.trim() || null,
     ],
   );
   const item = result.rows[0];
@@ -393,9 +422,15 @@ export async function publishPublication(user: SessionUser, id: string) {
   if (!["approved", "unpublished"].includes(existing.status)) {
     throw new Error("Only approved or unpublished items can be published");
   }
-  if (!existing.image_path?.trim()) throw new Error("Cover path is required before publish");
-  const slug = existing.public_slug ?? `pub-${existing.id.slice(0, 8)}`;
-  const payload = buildPublicationPayload(existing);
+  if (!existing.image_path?.trim() && normalizeAttachments(existing.attachments).length === 0) {
+    throw new Error("Cover path is required before publish");
+  }
+  const slug = await resolvePublicSlug({
+    itemId: existing.id,
+    titleAr: existing.title_ar,
+    existingSlug: existing.public_slug,
+  });
+  const payload = buildPublicationPayload({ ...existing, public_slug: slug });
   const item = await mutateThenRebuildPublic({
     itemId: id,
     mutate: async () => {

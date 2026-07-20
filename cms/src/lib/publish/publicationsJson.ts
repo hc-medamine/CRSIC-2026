@@ -1,36 +1,65 @@
 import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
+import {
+  buildMediaList,
+  primaryImageSrc,
+  type PublicMediaItem,
+} from "@/lib/publish/media";
+import { slugifyTitle, uniqueSlug } from "@/lib/publish/slug";
 
 export type PublicPubItem = {
+  id: string;
+  slug: string;
   t: string;
   type: "collective" | "individual";
   dept: string;
   desc: string;
+  summary: string;
+  body: string;
+  media: PublicMediaItem[];
 };
 
 /** Public item plus its cover (kept alongside so covers.length === pubs.length on rebuild). */
 export type StoredPubPayload = PublicPubItem & { cover: string };
 
 type PayloadSource = {
+  id: string;
   title_ar: string;
   pub_kind: "collective" | "individual" | null;
   label_ar: string | null;
   summary_ar: string | null;
+  body_ar: string | null;
   image_path: string | null;
+  image_alt_ar: string | null;
+  public_slug: string | null;
+  attachments?: unknown;
 };
 
-/** P1 public object for a publication row (persisted to content_items.live_payload). */
-export function buildPublicationPayload(row: PayloadSource): StoredPubPayload {
-  const cover = row.image_path?.trim();
+/** Public object for a publication row (persisted to content_items.live_payload). */
+export function buildPublicationPayload(
+  row: PayloadSource,
+  usedSlugs?: Set<string>,
+): StoredPubPayload {
+  const media = buildMediaList(row.attachments, row.image_path, row.image_alt_ar);
+  const cover = primaryImageSrc(media)?.trim() || row.image_path?.trim();
   if (!cover) {
     throw new Error(`Publication "${row.title_ar}" is missing a cover path`);
   }
+  const base = row.public_slug?.trim() || slugifyTitle(row.title_ar);
+  const slug = usedSlugs ? uniqueSlug(base, usedSlugs) : base;
+  if (usedSlugs) usedSlugs.add(slug);
+  const summary = row.summary_ar?.trim() || "";
   return {
+    id: row.id,
+    slug,
     t: row.title_ar.trim(),
     type: row.pub_kind === "individual" ? "individual" : "collective",
     dept: row.label_ar?.trim() || "",
-    desc: row.summary_ar?.trim() || "",
+    desc: summary,
+    summary,
+    body: row.body_ar?.trim() || "",
+    media: media.length > 0 ? media : [{ kind: "image", src: cover }],
     cover,
   };
 }
@@ -40,9 +69,7 @@ function publicPublicationsPath(): string {
 }
 
 /**
- * P1: Arabic plain-text pubs + covers; covers.length === pubs.length.
- * Emits every row whose live_payload is set (published, or under revision with the public
- * copy still live), NOT just status = 'published'.
+ * P1+ detail: Arabic plain-text pubs + covers; covers.length === pubs.length.
  */
 export async function rebuildPublicPublicationsJson(): Promise<{
   count: number;
@@ -60,15 +87,22 @@ export async function rebuildPublicPublicationsJson(): Promise<{
 
   for (const row of result.rows) {
     const p = row.live_payload;
-    const cover = p.cover?.trim();
+    const media = buildMediaList(p.media, p.cover, undefined);
+    const cover = primaryImageSrc(media)?.trim() || p.cover?.trim();
     if (!cover) {
       throw new Error(`Live publication "${p.t}" is missing cover path`);
     }
+    const summary = p.summary?.trim() || p.desc?.trim() || "";
     pubs.push({
+      id: p.id || `legacy-publication-${p.slug || slugifyTitle(p.t || "item")}`,
+      slug: p.slug || slugifyTitle(p.t || "item"),
       t: (p.t ?? "").trim(),
       type: p.type === "individual" ? "individual" : "collective",
       dept: p.dept?.trim() || "",
-      desc: p.desc?.trim() || "",
+      desc: summary,
+      summary,
+      body: p.body?.trim() || "",
+      media: media.length > 0 ? media : [{ kind: "image", src: cover }],
     });
     covers.push(cover);
   }

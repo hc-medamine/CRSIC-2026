@@ -3,7 +3,9 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MediaUploadField } from "@/app/dashboard/media-upload-field";
+import { MediaAttachmentsField } from "@/app/dashboard/media-attachments-field";
 import { PublishPreview } from "@/app/dashboard/publish-preview";
+import type { PublicMediaItem } from "@/lib/publish/media";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
 
@@ -28,6 +30,8 @@ type Initial = {
   eventTypeAr: string;
   eventTypeEn: string;
   eventDisplayStatus: "upcoming" | "done";
+  attachments?: PublicMediaItem[];
+  publicSlug?: string | null;
   status?: string;
   reviewNote?: string | null;
 };
@@ -73,6 +77,12 @@ export function EventEditorForm({
   const [eventDisplayStatus, setEventDisplayStatus] = useState<"upcoming" | "done">(
     initial?.eventDisplayStatus ?? "upcoming",
   );
+  const [attachments, setAttachments] = useState<PublicMediaItem[]>(() => {
+    if (initial?.attachments?.length) return initial.attachments;
+    if (initial?.imagePath) return [{ kind: "image", src: initial.imagePath }];
+    return [];
+  });
+  const [publicSlug, setPublicSlug] = useState(initial?.publicSlug ?? "");
   const [checklist, setChecklist] = useState(false);
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -82,6 +92,13 @@ export function EventEditorForm({
   const editable = mode === "create" || initial?.status === "draft" || initial?.status === "changes_requested";
 
   function fields() {
+    const media =
+      attachments.length > 0
+        ? attachments
+        : imagePath.trim()
+          ? [{ kind: "image" as const, src: imagePath.trim() }]
+          : [];
+    const primary = (media.find((m) => m.kind === "image")?.src ?? imagePath.trim()) || null;
     return {
       orgUnitId,
       titleAr,
@@ -90,9 +107,11 @@ export function EventEditorForm({
       summaryEn,
       bodyAr,
       bodyEn,
-      imagePath: imagePath.trim() || null,
+      imagePath: primary,
       imageAltAr,
       imageAltEn,
+      attachments: media,
+      publicSlug: publicSlug.trim() || null,
       enStatus,
       eventScope,
       eventDay,
@@ -257,8 +276,23 @@ export function EventEditorForm({
           onUploaded={({ publicPath, mediaId }) => {
             setImagePath(publicPath);
             setImageMediaId(mediaId);
+            setAttachments((prev) => [{ kind: "image", src: publicPath }, ...prev.filter((a) => a.src !== imagePath)]);
           }}
         />
+        <MediaAttachmentsField
+          bucket="events"
+          items={attachments}
+          disabled={!editable}
+          onChange={(next) => {
+            setAttachments(next);
+            const firstImg = next.find((a) => a.kind === "image");
+            if (firstImg) setImagePath(firstImg.src);
+          }}
+        />
+        <label className="text-sm">
+          <span className="font-medium">Public slug (optional)</span>
+          <input dir="auto" disabled={!editable} value={publicSlug} onChange={(e) => setPublicSlug(e.target.value)} className="mt-1 w-full rounded border px-3 py-2 font-mono text-xs" />
+        </label>
         <label className="text-sm">
           <span className="font-medium">Image alt (AR)</span>
           <input dir="rtl" disabled={!editable} value={imageAltAr} onChange={(e) => setImageAltAr(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
@@ -328,6 +362,8 @@ export function EventEditorForm({
           type={eventTypeAr}
           status={eventDisplayStatus}
           img={imagePath.trim() || undefined}
+          slug={publicSlug.trim() || undefined}
+          mediaCount={attachments.length}
         />
       ) : null}
 
