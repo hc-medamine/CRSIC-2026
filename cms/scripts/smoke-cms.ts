@@ -71,16 +71,25 @@ function newsJsonPath() {
   return join(process.cwd(), "..", "data", "news.json");
 }
 
-function restoreNewsBak() {
+function snapshotNewsJson(): string {
   const path = newsJsonPath();
+  const snap = `${path}.smoke-snap`;
+  copyFileSync(path, snap);
+  return snap;
+}
+
+function restoreNewsSnapshot(snap: string) {
+  const path = newsJsonPath();
+  if (existsSync(snap)) {
+    copyFileSync(snap, path);
+    console.log("Restored data/news.json from smoke snapshot");
+    return;
+  }
   const bak = `${path}.bak`;
   if (existsSync(bak)) {
     copyFileSync(bak, path);
     console.log("Restored data/news.json from .bak");
-    return true;
   }
-  console.log("No news.json.bak — left current news.json as-is after unpublish");
-  return false;
 }
 
 async function main() {
@@ -144,22 +153,20 @@ async function main() {
   if (!fourEyesOk) throw new Error("Four-eyes check failed — author-reviewer was able to approve");
 
   console.log("Reviewer approve + publish…");
+  const snap = snapshotNewsJson();
   await approveNews(reviewer, draft.id);
   await publishNews(reviewer, draft.id);
 
   const published = JSON.parse(readFileSync(newsJsonPath(), "utf8")) as {
     news: Array<{ title: string }>;
   };
-  if (!published.news.some((n) => n.title === draft.title_ar)) {
-    // title may differ if trimmed — check includes smoke
-    if (!published.news.some((n) => n.title.includes("Smoke news"))) {
-      throw new Error("Published news.json missing smoke item");
-    }
+  if (!published.news.some((n) => n.title.includes("Smoke news"))) {
+    throw new Error("Published news.json missing smoke item");
   }
 
-  console.log("Unpublish…");
+  console.log("Unpublish + restore public JSON…");
   await unpublishNews(reviewer, draft.id);
-  restoreNewsBak();
+  restoreNewsSnapshot(snap);
 
   const audits = await listAuditLog({ limit: 50 });
   const actions = new Set(audits.map((a) => a.action));
