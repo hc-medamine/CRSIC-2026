@@ -35,12 +35,30 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **In progress on `feature/step4-internal-cms`** — PRD [Review](./prds/2026-07-19-internal-content-management.md); local Node + PostgreSQL 18.4-2; merge when zero friction |
+| Step 4 — internal app + DB (no external CMS) | **Phase 0 scaffold** on `feature/step4-internal-cms` — `cms/` Next.js + `crsic_db`; PRD [Review](./prds/2026-07-19-internal-content-management.md) |
 | Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — Phase 0 scaffold: cms/ + crsic_db
+
+**Why:** Start Step 4 implementation after product decisions and Postgres install.
+
+**Done:**
+- Created PostgreSQL database **`crsic_db`** and role **`crsic_cms_app`** (owner; rights scoped to that DB)
+- Scaffolded **Next.js** app at **`cms/`** (App Router, TypeScript, Tailwind)
+- Added `pg` + `src/lib/db.ts` + `GET /api/health/db`
+- Added `cms/.env.example`, local `.env.local` (gitignored), `cms/README.md`
+- Root `.gitignore`: `.next/` / `out/`
+- README tree + PRD decision: app path `cms/`
+
+**Files:** `cms/**`, `.gitignore`, `README.md`, `docs/WORKLOG.md`, `docs/prds/2026-07-19-internal-content-management.md`
+
+**Next:** Auth skeleton (login, Super Admin seed, 30m session) — prompt for first Super Admin identity before seeding.
+
+---
 
 ### 2026-07-20 — Phase 0 product decisions locked (DB, session, i18n, checklist)
 

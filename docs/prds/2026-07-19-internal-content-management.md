@@ -631,8 +631,10 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 | 2026-07-20 | Public JSON fields: **plain text only** |
 | 2026-07-20 | Event status `upcoming`/`done`: **manual** (Reviewer/Editor) |
 | 2026-07-20 | Personal data MVP: editorial checklist + Super Admin unpublish; no legal module |
-| TBD | App directory path in repo (e.g. `cms/`) — prompt before scaffold |
-| TBD | Exact named people for first seed accounts |---
+| 2026-07-20 | App directory: **`cms/`** at repo root |
+| TBD | Exact named people for first seed accounts |
+
+---
 
 ## 19. Mapping to template sections
 

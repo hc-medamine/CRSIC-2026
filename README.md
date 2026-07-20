@@ -64,8 +64,13 @@ Annotated tree of the important layout (binary assets under `img/` summarised):
 
 ```text
 CRSIC 2026/
-├── .gitignore                 # OS / IDE / secrets / optional Node ignores
+├── .gitignore                 # OS / IDE / secrets / Node / Next ignores
 ├── index.html                 # Single HTML shell: all page sections, nav, footer, schema.org
+├── cms/                       # Step 4 internal CMS (Next.js + PostgreSQL) — feature/step4-internal-cms
+│   ├── README.md              # Local CMS setup
+│   ├── package.json
+│   ├── .env.example           # Template only (no secrets)
+│   └── src/                   # App Router (auth/workflow TBD)
 ├── css/
 │   └── style.css              # Design system, layout, animations (CSS variables in :root)
 ├── js/
@@ -650,7 +655,7 @@ Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Product spec:
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-07-20** (Step 4 branch + PRD amendments: no email; local Postgres 18.4-2) |
+| Last updated     | **2026-07-20** (Step 4: `cms/` Next.js scaffold + local `crsic_db`) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes

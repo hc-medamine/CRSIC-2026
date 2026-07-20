@@ -25,8 +25,10 @@ ehthumbs.db
 tmp/
 temp/
 
-# Optional Node tooling (project has no package.json today)
+# Optional Node tooling (project has no root package.json; cms/ has its own)
 node_modules/
 dist/
 build/
 .serve/
+.next/
+out/
