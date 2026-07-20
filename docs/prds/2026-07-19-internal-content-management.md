@@ -156,7 +156,7 @@ Concrete person↔scope mapping for the first 3–5 accounts is an **implementat
 
 1. Editor creates event (intl/nat, dates, type, status upcoming/done, optional image).
 2. Review → publish updates `events.json`.
-3. **Proposed:** after end datetime, system can mark display status `done` via scheduled job or manual review reminder (exact automation = open).
+3. **Manual only (locked):** Reviewer/Editor sets event display status `upcoming` / `done` (no auto-flip in MVP).
 
 ### Journey E — Publication metadata
 
@@ -243,7 +243,7 @@ Dimensions in MVP:
 2. As Super Admin, I can create/deactivate users and assign roles/scopes without deleting historical authorship.  
 3. As any user, after my account is created I can edit my display name and personal info (not my role or scopes).  
 4. As Super Admin, I can set or reset another user’s password in the admin UI (no email).  
-5. As any user, my session expires after inactivity (**Open — prompt for timeout value; do not invent a default**).
+5. As any user, my session expires after **30 minutes** of inactivity.
 
 ### Editor
 
@@ -286,12 +286,13 @@ Dimensions in MVP:
 8. Publish pipeline producing `news.json`, `events.json`, `publications.json` (+ stored media URLs/paths) compatible with [data/CMS.md](../../data/CMS.md).  
 9. AR/EN fields with independent readiness; AR may publish with EN pending.  
 10. Audit log for login (success/fail), user/permission changes, content lifecycle, uploads, publish jobs.  
-11. XSS-safe content policy for public JSON string fields — **Open; prompt** (SPA today uses plain `textContent` / no raw HTML; confirm whether to keep that).  
+11. XSS-safe content policy: **plain text only** for public JSON string fields (matches SPA `textContent` / no raw HTML). Richer body may exist internally in DB for later detail pages (P1).  
 12. RTL-capable editing UI for Arabic.  
 13. Preview of the item payload before publish (public card fields).  
 14. Account deactivation + reassignment of open drafts/tasks.  
-15. User profile self-edit for name/personal info after account creation (roles/scopes remain Super Admin–only).
-
+15. User profile self-edit for name/personal info after account creation (roles/scopes remain Super Admin–only).  
+16. Pre-submit **editorial checklist** (MVP): names/titles correct; photo rights/permission; no unintended private phones/IDs.  
+17. Session idle timeout: **30 minutes**.
 ### Should have (MVP if capacity; else early Phase 2)
 
 1. Editorial pre-submit checklist (non-blocking warnings OK).  
@@ -384,8 +385,7 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 ### Multilingual rule (confirmed)
 
 - Arabic can publish with English pending.  
-- **Open — prompt before locking:** Is Arabic authoritative on conflict? Must EN eventually be required for some types? How should public EN UI behave when EN is pending?
-### Media
+- **Locked (2026-07-20):** Arabic is authoritative when both exist and conflict. EN is not required for MVP publish. While EN is pending, public site keeps current behaviour (Arabic content + notice / language switch) until detail pages ship.### Media
 
 - During local development, store media under the CMS app upload directory; publish into public `img/` (or equivalent) for SPA consumption.  
 - Prefer stable URLs on replace so old links do not silently 404.  
@@ -420,7 +420,7 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 |------|--------|
 | Machine | Local Windows developer workstation |
 | IDE | Cursor Pro |
-| Database | **PostgreSQL 18.4-2** (Windows x64) |
+| Database | **PostgreSQL 18.4-2** (Windows x64); DB name **`crsic_db`**; app role **`crsic_cms_app`** (rights only on `crsic_db`) |
 | App runtime | **Next.js** (App Router) — stakeholder decision 2026-07-20 |
 | Git branch | `feature/step4-internal-cms` until zero-friction merge |
 | Merge / go-live gate | Fully functional, zero known bugs, smoke path green |
@@ -554,13 +554,15 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 5. ~~Stack~~ → **Closed:** Node + PostgreSQL 18.4-2 local; Cursor Pro; feature branch workflow.  
 6. ~~Email~~ → **Closed:** no email features.  
 7. ~~Password reset~~ → **Closed:** Super Admin in-app reset.  
-8. Session timeout value — **Open; prompt stakeholder** (do not invent minutes).  
-9. Public card formatting (plain text vs limited formatting) — **Open if not already confirmed; prompt before build**.  
-10. Event end → `done` (auto vs manual) — **Open; prompt stakeholder**.  
-11. Arabic vs EN conflict rule — **Open; prompt stakeholder** (AR authoritative was previously proposed only).  
+8. ~~Session timeout~~ → **Closed: 30 minutes** (2026-07-20).  
+9. ~~Public card formatting~~ → **Closed: plain text only** for public JSON (2026-07-20).  
+10. ~~Event end → `done`~~ → **Closed: manual only** — Reviewer/Editor sets `upcoming` / `done` (2026-07-20).  
+11. ~~Arabic vs EN conflict~~ → **Closed (2026-07-20):** Arabic authoritative when both exist and conflict; EN not required for MVP publish; EN pending keeps current public AR + notice/switch behaviour until detail pages.  
 12. Exact named people for first accounts — prompt at first seed.  
-13. Privacy SOP for names/photos in news — **Open; prompt stakeholder**.  
-14. ~~Exact Node framework~~ → **Closed: Next.js (App Router)** (2026-07-20).
+13. ~~Privacy SOP~~ → **Closed for MVP (2026-07-20):** editorial checklist only (names/titles correct; photo rights; no unintended phones/IDs; Super Admin can unpublish). No separate legal module.  
+14. ~~Exact Node framework~~ → **Closed: Next.js (App Router)** (2026-07-20).  
+15. ~~Database name~~ → **Closed: `crsic_db`** (broader than CMS-only; future features) (2026-07-20).  
+16. ~~DB app role~~ → **Closed: `crsic_cms_app`** with rights only on `crsic_db` (2026-07-20).
 
 **Process:** any new ambiguity discovered during implementation → prompt → Decision log → then code.
 ---
@@ -574,12 +576,12 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 | A3 | Local Postgres 18.x maps cleanly to prod host later | Deploy friction |
 | A4 | P1 subset acceptable until detail pages | Shallow public cards |
 | A5 | Super Admin password reset without email is acceptable | Locked-out UX if rejected |
-| A6 | _(removed)_ Plain-text / session / AR-authority defaults must not be invented — **prompt** | — |
+| A6 | Plain text public JSON is correct for P1 SPA | Earlier rich text if rejected |
 | A7 | Partners/locales/static pages can wait | Earlier expansion |
 | A8 | Volume quota unnecessary | Later KPI ask |
 | A9 | Merge only from `feature/step4-internal-cms` when smoke is clean | Process drift |
 | A10 | **Ambiguities are resolved only by prompting the stakeholder — never assume, never silent default** | Wrong builds if ignored |
-
+| A11 | DB name `crsic_db` is intentionally broader than CMS for future features | Rename later if wrong |
 ---
 
 ## 17. Future improvements
@@ -623,10 +625,14 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 | 2026-07-20 | Implementation branch: `feature/step4-internal-cms`; merge/`main`/go-live only when zero friction |
 | 2026-07-20 | **Ambiguity policy:** always prompt stakeholder; never assume; never silent default |
 | 2026-07-20 | Node framework: **Next.js (App Router)** |
-| TBD | Session timeout minutes |
-| TBD | AR vs EN conflict / public card formatting / event auto-`done` |
-| TBD | Privacy SOP for personal data in news |
----
+| 2026-07-20 | Database name: **`crsic_db`**; app role: **`crsic_cms_app`** (rights only on that DB) |
+| 2026-07-20 | Session timeout: **30 minutes** |
+| 2026-07-20 | AR authoritative on conflict; EN optional for MVP; EN pending = current public behaviour |
+| 2026-07-20 | Public JSON fields: **plain text only** |
+| 2026-07-20 | Event status `upcoming`/`done`: **manual** (Reviewer/Editor) |
+| 2026-07-20 | Personal data MVP: editorial checklist + Super Admin unpublish; no legal module |
+| TBD | App directory path in repo (e.g. `cms/`) — prompt before scaffold |
+| TBD | Exact named people for first seed accounts |---
 
 ## 19. Mapping to template sections
 

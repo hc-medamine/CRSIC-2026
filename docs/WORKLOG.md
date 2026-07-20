@@ -42,6 +42,25 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ## Changelog
 
+### 2026-07-20 — Phase 0 product decisions locked (DB, session, i18n, checklist)
+
+**Why:** Stakeholder answered remaining open questions before Next.js scaffold.
+
+**Done:**
+- DB: **`crsic_db`** + role **`crsic_cms_app`** (rights only on that DB)
+- Session: **30 minutes**
+- AR authoritative; EN optional/pending; current public EN behaviour for MVP
+- Public JSON: **plain text only**
+- Event `upcoming`/`done`: **manual**
+- Personal data MVP: editorial checklist + Super Admin unpublish
+- PRD §15 / Decision log updated
+
+**Files:** `docs/prds/2026-07-19-internal-content-management.md`, `docs/WORKLOG.md`
+
+**Next:** Prompt for app folder path + Postgres bootstrap credentials → scaffold Next.js on `feature/step4-internal-cms`.
+
+---
+
 ### 2026-07-20 — Node framework locked: Next.js
 
 **Why:** Stakeholder chose framework for Step 4 CMS.
