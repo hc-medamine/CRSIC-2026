@@ -36,11 +36,24 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
 | Step 4 — internal app + DB (no external CMS) | **Done** — on `main` (merge-complete 2026-07-20) |
-| Public detailed news + publication pages | **In progress** — `feature/public-detail-pages` (events too; slug deep links + multi-media) |
+| Public detailed news + publication pages | **Done** on `main` (PR #3) — enrich sample bodies for study-case items |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — Detail pages merged; sample bodies for study cases
+
+**Done:** Merged PR #3 (`feature/public-detail-pages` → `main`). Smoke: news/pub lightbox → detail; deep link; `object-fit: contain`.
+
+**Content:** Filled `summary`/`body` (+ extra image where useful) for three study-case items:
+- News: انطلاق المشروع الوطني لاسترجاع التراث… في ولايات الجنوب
+- Publication: مدخل إلى علم نفس الصحة
+- Event: الملتقى الدولي الثقافي لسماع الشيوخ — الطبعة العاشرة
+
+**Next:** Continue filling remaining items via CMS/JSON; optional gallery polish / Phase 2.
+
+---
 
 ### 2026-07-20 — Public detail pages (news, events, publications)
 
