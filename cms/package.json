@@ -1,0 +1,40 @@
+{
+  "name": "cms",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "predev": "npm run db:migrate",
+    "dev": "next dev",
+    "prebuild": "npm run db:migrate",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:migrate": "node --env-file=.env.local --import tsx scripts/migrate.ts",
+    "db:status": "node --env-file=.env.local --import tsx scripts/check-migrations.ts",
+    "db:smoke": "node --env-file=.env.local --import tsx scripts/smoke-cms.ts",
+    "db:seed:super-admin": "node --env-file=.env.local --import tsx scripts/seed-super-admin.ts",
+    "db:seed:welcome-notifications": "node --env-file=.env.local --import tsx scripts/seed-welcome-notifications.ts",
+    "db:import-legacy": "node --env-file=.env.local --import tsx scripts/import-legacy.ts"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "iron-session": "^8.0.4",
+    "next": "16.2.10",
+    "pg": "^8.22.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20",
+    "@types/pg": "^8.20.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.10",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.1",
+    "typescript": "^5"
+  }
+}

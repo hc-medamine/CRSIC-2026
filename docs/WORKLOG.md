@@ -35,12 +35,403 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **PRD in Review** — [2026-07-19-internal-content-management.md](./prds/2026-07-19-internal-content-management.md) |
-| Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
+| Step 4 — internal app + DB (no external CMS) | **Done** — merged to `main` (merge-complete 2026-07-20) — PRD [Review](./prds/2026-07-19-internal-content-management.md) → update status after merge |
+| Public detailed news + publication pages | **Next** (enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — CMS merge-complete
+
+**Done:** Stakeholder confirmed merge-complete. Restored `data/publications.json` to committed real data (dropped local formatting drift). Merging `feature/step4-internal-cms` → `main`.
+
+**Next:** Public detailed news + publication pages on the SPA.
+
+---
+
+### 2026-07-20 — Super Admin delete + unpublished dashboard queue
+
+**Done:**
+- Super Admin can permanently delete **unpublished** or **rejected** items (`deleteContentItem`; audit `*.delete`; revisions cascade).
+- Dashboard **Unpublished** queue for concerned parties: Reviewer/SA see all; Editors see own + scoped org/type items.
+- Rejected queue also visible to Reviewer/SA (not only author).
+- SMOKE-CMS I1/I9 updated.
+
+**Next:** Confirm UI (unpublish → dashboard queue; SA delete); then merge when stakeholder says merge-complete.
+
+---
+
+### 2026-07-20 — Bugbot fixes before merge-complete
+
+**Why:** Stakeholder requires Bugbot findings fixed before CMS merge-complete.
+
+**Fixed:**
+- Content GET + detail pages enforce `canViewContentItem` (org/content scope)
+- Publish/unpublish rolls back DB live columns if public JSON rebuild fails
+- Rebuild order: `live_at DESC, created_at ASC`; legacy import staggers `live_at` and keys events by title+scope
+- Rejected items moved to their own queue; author can **Reopen as draft**
+
+**Next:** Stakeholder re-smoke / confirm merge-complete.
+
+---
+
+### 2026-07-20 — Phase‑1 completion gaps closed (queues, preview, RTL, revisions, cutover)
+
+**Why:** Merge gate requires the CMS to be fully complete, not only smoke‑green. Closed all nine
+remaining completion items on `feature/step4-internal-cms` (no merge to `main`).
+
+**Done:**
+- **Action‑queue dashboard** (`/dashboard`): Awaiting review, Needs revision, My drafts, Recently
+  published — role/permission scoped; rows link to the right detail page. New helper
+  `cms/src/lib/content/queues.ts`.
+- **Publish preview** (`PublishPreview`) of the P1 public card on all three detail forms.
+- **Full RTL admin chrome**: `CmsChrome` shell with AR RTL / EN LTR toggle persisted in `cms_lang`
+  cookie; localised nav labels (`cms/src/lib/i18n/labels.ts`); nav + logout moved into the shell.
+- **Restore prior revision** (Reviewer/Super Admin): API action `restore_revision` + button in
+  `RevisionHistory`; applies snapshot fields and sets status `draft`.
+- **Published → create revision (public stays live)**: migration `010_live_payload.sql`
+  (`live_payload JSONB`, `live_at`); rebuilders now emit from rows where `live_payload IS NOT NULL`;
+  publish sets it, unpublish clears it, new `start_revision` keeps it while status → `draft`.
+- **Draft reassignment** (Super Admin/Reviewer): API action `reassign` + `ReassignAuthor` UI +
+  `/api/content/assignable-users`; audited as `content.reassign`; new author notified.
+- **Legacy cutover**: `npm run db:import-legacy` imports current `data/*.json` as live published
+  items (idempotent, keeps `covers.length === pubs.length`, does not rewrite JSON) —
+  [runbooks/CMS-CUTOVER.md](./runbooks/CMS-CUTOVER.md).
+- **Backup/restore drill** logged in [runbooks/CMS-OPS.md](./runbooks/CMS-OPS.md) §8: `pg_dump`
+  unavailable on this dev machine → documented SQL fallback (no dump files committed).
+- **Docs**: real staff accounts recorded (`cms/README.md` + PRD decision log, closing the named‑people
+  TBD; `smoke.*` labelled automation‑only); SMOKE‑CMS section I added.
+
+**Verify:** `npm run db:migrate` (010 applied), `npm run build` (green), `npm run db:smoke`
+(SMOKE PASS; `data/news.json` restored from snapshot — no wipe).
+
+**Files:** `cms/sql/010_live_payload.sql`, `cms/src/lib/content/{queues,lifecycle}.ts`,
+`cms/src/lib/i18n/labels.ts`, `cms/src/lib/publish/*Json.ts`, `cms/src/lib/content/{news,events,publications}.ts`,
+`cms/src/app/dashboard/{cms-chrome,publish-preview,reassign-author,revision-history,page,layout}.tsx`,
+`cms/src/app/dashboard/**/[id]/page.tsx`, `cms/src/app/dashboard/**/*-form.tsx`,
+`cms/src/app/api/{news,events,publications}/[id]/route.ts`, `cms/src/app/api/content/assignable-users/`,
+`cms/scripts/import-legacy.ts`, `cms/package.json`, `docs/runbooks/CMS-{OPS,CUTOVER}.md`,
+`docs/qa/SMOKE-CMS.md`, `cms/README.md`, PRD, this file.
+
+**Next:** Manual UI pass of SMOKE‑CMS §A–I; merge `feature/step4-internal-cms` → `main` only when
+explicitly requested.
+
+---
+
+### 2026-07-20 — Merge blocked until CMS fully complete
+
+**Why:** Stakeholder: do not merge until CMS is fully complete (not only smoke-green).
+
+**Gate:** No PR/merge `feature/step4-internal-cms` → `main` until remaining Phase‑1 completion items are done (see list in chat / next entries). Phase 2/3 and public detail pages stay out of this gate unless explicitly added.
+
+**Next:** Close completion gaps (queues, preview, RTL chrome, restore revision, published→revision flow, draft reassignment, backup drill, real staff seeds, legacy JSON policy).
+
+---
+
+### 2026-07-20 — SMOKE-CMS confirmed (manual + automated)
+
+**Why:** Merge gate requires zero-friction CMS path.
+
+**Done:** Stakeholder confirmed SMOKE-CMS (UI + ops checks). Automated `npm run db:smoke` already green.
+
+**Next:** Merge `feature/step4-internal-cms` → `main` when explicitly requested.
+
+---
+
+### 2026-07-20 — CMS runbook + revision history UI
+
+**Why:** Phase 1 remaining gaps before merge gate.
+
+**Done:**
+- Ops runbook: backup/restore DB+media+JSON, Super Admin password reset, offboarding — [runbooks/CMS-OPS.md](./runbooks/CMS-OPS.md)
+- Revision history on news/events/publications detail pages (list + optional side-by-side compare)
+- `GET /api/content/[id]/revisions`
+
+**Files:** `docs/runbooks/CMS-OPS.md`, `cms/src/lib/content/revisions.ts`, `cms/src/app/api/content/[id]/revisions/`, `cms/src/app/dashboard/revision-history.tsx`, detail pages, docs
+
+**Next:** Confirm SMOKE-CMS H1–H3; merge when zero friction.
+
+---
+
+### 2026-07-20 — Audit log + CMS smoke checklist
+
+**Why:** PRD MVP requires audit of auth, user admin, content lifecycle, uploads, publish; merge gate needs a CMS smoke path.
+
+**Done:**
+- `audit_log` table (append-only via app); Super Admin UI `/dashboard/audit` + `GET /api/audit`
+- Instrumented login/logout, user admin, media upload/replace, news/events/publications lifecycle
+- [docs/qa/SMOKE-CMS.md](./qa/SMOKE-CMS.md) + `npm run db:smoke` (news four-eyes path; restores `news.json` from `.bak`)
+
+**Files:** `cms/sql/009_audit_log.sql`, `cms/src/lib/audit.ts`, API/UI/instrumentation, `cms/scripts/smoke-cms.ts`, docs
+
+**Next:** Manual UI pass of SMOKE-CMS; merge when zero friction.
+
+---
+
+### 2026-07-20 — Media upload (5 MB, images+PDF, stable paths)
+
+**Why:** Phase 1 media library; editors need upload instead of hand-typed paths.
+
+**Locked:** 5 MB; JPEG/PNG/WebP + PDF; `img/cms/{news|events|covers}/`; replace keeps same public path.
+
+**Done:**
+- `media_assets` table + magic-byte allowlist validation
+- `POST /api/media`, `POST /api/media/[id]` (replace)
+- Upload UI on news/events/publications forms + `/dashboard/media`
+- Staging `cms/uploads/` + public write under `img/cms/` (gitignored binaries)
+
+**Files:** `cms/sql/008_media.sql`, `cms/src/lib/media/`, `cms/src/app/api/media/`, dashboard media + form wiring, docs
+
+**Next:** Smoke-test draft → review → publish for all three types; audit log if still open; merge when zero friction.
+
+---
+
+### 2026-07-20 — Auto-apply DB migrations on dev/build
+
+**Why:** Avoid forgetting `db:migrate` after pulling new SQL files.
+
+**Done:**
+- `schema_migrations` tracking — each `sql/*.sql` applied once
+- `predev` / `prebuild` run `db:migrate` automatically
+- `npm run db:status` reports tables + event/pub columns
+
+**Files:** `cms/scripts/migrate.ts`, `cms/scripts/check-migrations.ts`, `cms/package.json`, docs
+
+**Next:** Done — see Media upload entry above.
+
+---
+
+### 2026-07-20 — Step 6: publications workflow (draft → publish)
+
+**Why:** Third MVP content type; must keep public `covers.length === pubs.length`.
+
+**Done:**
+- `pub_kind` (collective/individual) on `content_items`; dept via `label_ar`, desc via `summary_ar`, cover via `image_path`
+- Same editorial workflow + four-eyes + notifications as news/events
+- Publish rebuilds `data/publications.json` (with `.bak`); validates cover/pubs alignment
+- UI: `/dashboard/publications`, `/new`, `/[id]`
+
+**Note:** First CMS publish replaces `publications.json` with CMS-published items only (backup at `.bak`).
+
+**Files:** `cms/sql/007_publication_fields.sql`, `cms/src/lib/content/publications.ts`, `cms/src/lib/publish/publicationsJson.ts`, `cms/src/app/api/publications/`, `cms/src/app/dashboard/publications/`, docs
+
+**Next:** Media upload for covers/images, or smoke-test + merge gate when zero friction.
+
+---
+
+### 2026-07-20 — Step 5: events workflow (draft → publish)
+
+**Why:** Second content type per PRD; same review path as news.
+
+**Done:**
+- Event fields on `content_items` (scope intl/nat, day/month/year, type, display upcoming/done)
+- Editor/reviewer workflow + four-eyes + notifications
+- Publish rebuilds `data/events.json` (with `.bak`); P1 Arabic public fields
+- UI: `/dashboard/events`, `/new`, `/[id]`
+
+**Files:** `cms/sql/006_event_fields.sql`, `cms/src/lib/content/events.ts`, `cms/src/lib/publish/eventsJson.ts`, `cms/src/app/api/events/`, `cms/src/app/dashboard/events/`, docs
+
+**Next:** Step 6 — Publications workflow (done — see entry above).
+
+---
+
+### 2026-07-20 — Step 4: news workflow (draft → publish)
+
+**Why:** First content type end-to-end per PRD.
+
+**Done:**
+- `content_items` + `content_revisions` for news
+- Editor: create/edit draft, checklist submit, withdraw
+- Reviewer: request changes / approve / reject / publish / unpublish (four-eyes)
+- In-app notifications on workflow events
+- Publish rebuilds public `data/news.json` (P1: AR title/label/img); writes `.bak` backup first
+- UI: `/dashboard/news`, `/dashboard/news/new`, `/dashboard/news/[id]`
+
+**Note:** First CMS publish replaces `data/news.json` with CMS-published items only (backup at `news.json.bak`). Re-import of legacy static news is a later task.
+
+**Files:** `cms/sql/005_news_content.sql`, `cms/src/lib/content/`, `cms/src/lib/publish/`, `cms/src/app/api/news/`, `cms/src/app/dashboard/news/`, docs
+
+**Next:** Step 5 — Events workflow (or media upload for news images).
+
+---
+
+### 2026-07-20 — Step 3: in-app notifications skeleton
+
+**Why:** PRD requires in-app notifications only (no email) before content workflows emit events.
+
+**Done:**
+- Table `notifications`
+- Helpers + `GET`/`PATCH /api/notifications`
+- UI `/dashboard/notifications` (list, mark read / mark all)
+- Dashboard unread count link
+- Optional welcome seed: `npm run db:seed:welcome-notifications`
+
+**Files:** `cms/sql/004_notifications.sql`, `cms/src/lib/notifications.ts`, `cms/src/app/api/notifications/`, `cms/src/app/dashboard/notifications/`, docs
+
+**Next:** Step 4 — News content workflow (draft → submit → review → publish).
+
+---
+
+### 2026-07-20 — Step 2: profile self-edit
+
+**Why:** PRD — users may edit display name / AR / EN name; not role or scopes.
+
+**Done:**
+- `/dashboard/profile` form
+- `GET`/`PATCH /api/profile` (own account only)
+- Dashboard link “My profile”
+- Email and role shown read-only
+
+**Files:** `cms/src/app/dashboard/profile/`, `cms/src/app/api/profile/route.ts`, `cms/src/app/dashboard/page.tsx`, `docs/WORKLOG.md`
+
+**Next:** Step 3 — in-app notifications skeleton (or stakeholder chooses to jump to content types).
+
+---
+
+### 2026-07-20 — Fix session save in Server Components
+
+**Why:** Next.js forbids modifying cookies from Server Components; `requireUser()` called `session.save()` on `/dashboard` and bounced to login.
+
+**Done:**
+- `requireUser()` is read-only
+- Idle refresh via `POST /api/auth/touch` + `SessionTouch` client component
+
+**Files:** `cms/src/lib/auth/session.ts`, `cms/src/app/api/auth/touch/route.ts`, `cms/src/app/dashboard/session-touch.tsx`, `cms/src/app/dashboard/layout.tsx`
+
+---
+
+**Why:** Login API returned 200 but session cookie was not set on the response, so `/dashboard` redirected back to `/login`.
+
+**Done:**
+- Login/logout use `getIronSession(req, res)` so `Set-Cookie` is attached
+- After login, hard navigate to `/dashboard`
+
+**Files:** `cms/src/lib/auth/session.ts`, `cms/src/app/api/auth/login/route.ts`, `cms/src/app/api/auth/logout/route.ts`, `cms/src/app/login/page.tsx`
+
+**Next:** Confirm login → dashboard works; then Step 2 profile self-edit.
+
+---
+
+### 2026-07-20 — Step 1: org units + Super Admin user management
+
+**Why:** Complete Phase 0 access control before content workflows.
+
+**Done:**
+- Seeded org units: centre-wide + 4 research departments
+- Tables `user_org_scopes`, `user_content_scopes`
+- Super Admin UI `/dashboard/users`: create users, activate/deactivate, reset password (in-app, no email)
+- Reviewer/Super Admin auto-scoped to all orgs + all content types; Editors require explicit scopes
+- Link from dashboard for Super Admin
+
+**Files:** `cms/sql/002_*.sql`, `cms/sql/003_*.sql`, `cms/src/lib/users.ts`, `cms/src/app/dashboard/users/`, `cms/src/app/api/users/`, docs
+
+**Next:** Step 2 — profile self-edit (name/info) for signed-in users.
+
+---
+
+### 2026-07-20 — Auth skeleton + Super Admin seed
+
+**Why:** Phase 0 login path for Step 4 CMS.
+
+**Done:**
+- SQL `users` table + `user_role` enum (`super_admin` / `editor` / `reviewer`)
+- `npm run db:migrate` / `npm run db:seed:super-admin`
+- Login at `/login` (email + password); dashboard at `/dashboard`; logout
+- Session: `iron-session`, idle timeout 30 minutes
+- Seeded Super Admin: **F. Chettih** (`f.chettih@crsic.dz`) — password only in local `.env.local` (not committed)
+- Names stored: AR فاطمة الزهرة شتيح / EN Fatima El Zahra Chettih
+
+**Files:** `cms/sql/`, `cms/scripts/`, `cms/src/lib/auth/`, `cms/src/app/login/`, `cms/src/app/dashboard/`, `cms/src/app/api/auth/`, docs
+
+**Next:** User management UI (create editors/reviewers, Super Admin password reset) or content types — prompt stakeholder.
+
+---
+
+### 2026-07-20 — Phase 0 scaffold: cms/ + crsic_db
+
+**Why:** Start Step 4 implementation after product decisions and Postgres install.
+
+**Done:**
+- Created PostgreSQL database **`crsic_db`** and role **`crsic_cms_app`** (owner; rights scoped to that DB)
+- Scaffolded **Next.js** app at **`cms/`** (App Router, TypeScript, Tailwind)
+- Added `pg` + `src/lib/db.ts` + `GET /api/health/db`
+- Added `cms/.env.example`, local `.env.local` (gitignored), `cms/README.md`
+- Root `.gitignore`: `.next/` / `out/`
+- README tree + PRD decision: app path `cms/`
+
+**Files:** `cms/**`, `.gitignore`, `README.md`, `docs/WORKLOG.md`, `docs/prds/2026-07-19-internal-content-management.md`
+
+**Next:** Auth skeleton (login, Super Admin seed, 30m session) — prompt for first Super Admin identity before seeding.
+
+---
+
+### 2026-07-20 — Phase 0 product decisions locked (DB, session, i18n, checklist)
+
+**Why:** Stakeholder answered remaining open questions before Next.js scaffold.
+
+**Done:**
+- DB: **`crsic_db`** + role **`crsic_cms_app`** (rights only on that DB)
+- Session: **30 minutes**
+- AR authoritative; EN optional/pending; current public EN behaviour for MVP
+- Public JSON: **plain text only**
+- Event `upcoming`/`done`: **manual**
+- Personal data MVP: editorial checklist + Super Admin unpublish
+- PRD §15 / Decision log updated
+
+**Files:** `docs/prds/2026-07-19-internal-content-management.md`, `docs/WORKLOG.md`
+
+**Next:** Prompt for app folder path + Postgres bootstrap credentials → scaffold Next.js on `feature/step4-internal-cms`.
+
+---
+
+### 2026-07-20 — Node framework locked: Next.js
+
+**Why:** Stakeholder chose framework for Step 4 CMS.
+
+**Done:**
+- PRD Decision log + §11: **Next.js (App Router)**
+- Open question §15.14 closed
+
+**Files:** `docs/prds/2026-07-19-internal-content-management.md`, `docs/WORKLOG.md`
+
+**Next:** Prompt remaining Phase 0 questions (DB name/user, session, AR/EN, formatting, events, privacy) → then scaffold.
+
+---
+
+### 2026-07-20 — Ambiguity policy corrected (prompt-only)
+
+**Why:** Stakeholder requires strict prompting for every undecided point — never assume, never silent default.
+
+**Done:**
+- PRD document rule + A10 rewritten to prompt-only policy
+- Re-opened: session timeout, AR/EN conflict, public card formatting, event auto-`done`, Node framework, privacy SOP
+- Removed invented “defaults locked” language from prior same-day entry
+
+**Files:** `docs/prds/2026-07-19-internal-content-management.md`, `docs/WORKLOG.md`
+
+**Next:** Prompt on open questions listed in PRD §15 (items 8–14).
+
+---
+
+### 2026-07-20 — Step 4 implementation branch + PRD amendments
+
+**Why:** Lock no-email policy, local-only development stack, and Git workflow before building.
+
+**Done:**
+- Created branch `feature/step4-internal-cms` (merge to `main` only when fully functional / zero known bugs)
+- PRD amendments: no email/SMTP features; Super Admin in-app password reset; in-app notifications only
+- Dev environment locked: this Windows machine, Cursor Pro, PostgreSQL **18.4-2**, Node
+- Go-live only after zero-friction local completion
+- Ambiguity policy corrected: **always prompt stakeholder; never assume; never silent default**
+- Re-opened for prompt: session timeout, AR/EN conflict, card formatting, event auto-`done`, Node framework, privacy SOP
+- README §10 Step 4 status updated to implementation branch
+
+**Files:** `docs/prds/2026-07-19-internal-content-management.md`, `docs/prds/README.md`, `docs/WORKLOG.md`, `README.md`
+
+**Next:** Prompt stakeholder on open PRD questions → then Phase 0 local scaffold on `feature/step4-internal-cms`.
+
+---
 
 ### 2026-07-19 — Step 4 PRD decisions locked (Review)
 
