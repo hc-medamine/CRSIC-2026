@@ -35,12 +35,20 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **In progress** — Super Admin delete + unpublished queue; awaiting merge-complete — `feature/step4-internal-cms` **not merged** — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
-| Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
+| Step 4 — internal app + DB (no external CMS) | **Done** — merged to `main` (merge-complete 2026-07-20) — PRD [Review](./prds/2026-07-19-internal-content-management.md) → update status after merge |
+| Public detailed news + publication pages | **Next** (enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — CMS merge-complete
+
+**Done:** Stakeholder confirmed merge-complete. Restored `data/publications.json` to committed real data (dropped local formatting drift). Merging `feature/step4-internal-cms` → `main`.
+
+**Next:** Public detailed news + publication pages on the SPA.
+
+---
 
 ### 2026-07-20 — Super Admin delete + unpublished dashboard queue
 
