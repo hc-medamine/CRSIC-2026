@@ -32,13 +32,20 @@ export default async function DashboardPage() {
           </div>
         </dl>
         <p className="mt-4 text-sm text-zinc-500">Session idle timeout is 30 minutes (PRD).</p>
-        {user.role === "super_admin" ? (
-          <p className="mt-4">
-            <Link className="font-medium underline" href="/dashboard/users">
-              User management →
+        <ul className="mt-4 flex flex-col gap-2 text-sm">
+          <li>
+            <Link className="font-medium underline" href="/dashboard/profile">
+              My profile →
             </Link>
-          </p>
-        ) : null}
+          </li>
+          {user.role === "super_admin" ? (
+            <li>
+              <Link className="font-medium underline" href="/dashboard/users">
+                User management →
+              </Link>
+            </li>
+          ) : null}
+        </ul>
       </section>
     </main>
   );

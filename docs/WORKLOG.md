@@ -42,6 +42,22 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ## Changelog
 
+### 2026-07-20 — Step 2: profile self-edit
+
+**Why:** PRD — users may edit display name / AR / EN name; not role or scopes.
+
+**Done:**
+- `/dashboard/profile` form
+- `GET`/`PATCH /api/profile` (own account only)
+- Dashboard link “My profile”
+- Email and role shown read-only
+
+**Files:** `cms/src/app/dashboard/profile/`, `cms/src/app/api/profile/route.ts`, `cms/src/app/dashboard/page.tsx`, `docs/WORKLOG.md`
+
+**Next:** Step 3 — in-app notifications skeleton (or stakeholder chooses to jump to content types).
+
+---
+
 ### 2026-07-20 — Fix session save in Server Components
 
 **Why:** Next.js forbids modifying cookies from Server Components; `requireUser()` called `session.save()` on `/dashboard` and bounced to login.
