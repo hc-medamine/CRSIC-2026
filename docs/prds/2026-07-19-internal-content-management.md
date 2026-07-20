@@ -625,7 +625,6 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 | 2026-07-20 | Node framework: **Next.js (App Router)** |
 | TBD | Session timeout minutes |
 | TBD | AR vs EN conflict / public card formatting / event auto-`done` |
-| TBD | Exact Node framework |
 | TBD | Privacy SOP for personal data in news |
 ---
 
