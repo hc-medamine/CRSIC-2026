@@ -33,7 +33,8 @@ npm run dev
 
 - Roles: `super_admin` | `editor` | `reviewer`
 - Cookie session via `iron-session`; idle timeout **30 minutes**
-- Password reset: Super Admin in-app only (not yet built); no email recovery
+- Password reset: Super Admin in-app only; no email recovery
+- Notifications: in-app only (`/dashboard/notifications`)
 
 ## Secrets
 

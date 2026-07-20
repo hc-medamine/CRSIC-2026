@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/session";
+import { countUnread } from "@/lib/notifications";
 import { LogoutButton } from "./logout-button";
 
 export default async function DashboardPage() {
   const user = await requireUser();
+  const unread = await countUnread(user.id);
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-12 font-sans">
@@ -33,6 +35,11 @@ export default async function DashboardPage() {
         </dl>
         <p className="mt-4 text-sm text-zinc-500">Session idle timeout is 30 minutes (PRD).</p>
         <ul className="mt-4 flex flex-col gap-2 text-sm">
+          <li>
+            <Link className="font-medium underline" href="/dashboard/notifications">
+              Notifications{unread > 0 ? ` (${unread})` : ""} →
+            </Link>
+          </li>
           <li>
             <Link className="font-medium underline" href="/dashboard/profile">
               My profile →

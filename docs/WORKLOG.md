@@ -35,12 +35,29 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **Auth scaffold** on `feature/step4-internal-cms` — login + Super Admin seeded; PRD [Review](./prds/2026-07-19-internal-content-management.md) |
+| Step 4 — internal app + DB (no external CMS) | **Steps 0–3 done** on `feature/step4-internal-cms` (auth, users, profile, notifications); next: news workflow — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
 | Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — Step 3: in-app notifications skeleton
+
+**Why:** PRD requires in-app notifications only (no email) before content workflows emit events.
+
+**Done:**
+- Table `notifications`
+- Helpers + `GET`/`PATCH /api/notifications`
+- UI `/dashboard/notifications` (list, mark read / mark all)
+- Dashboard unread count link
+- Optional welcome seed: `npm run db:seed:welcome-notifications`
+
+**Files:** `cms/sql/004_notifications.sql`, `cms/src/lib/notifications.ts`, `cms/src/app/api/notifications/`, `cms/src/app/dashboard/notifications/`, docs
+
+**Next:** Step 4 — News content workflow (draft → submit → review → publish).
+
+---
 
 ### 2026-07-20 — Step 2: profile self-edit
 
