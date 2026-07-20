@@ -35,12 +35,30 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **PRD in Review** — [2026-07-19-internal-content-management.md](./prds/2026-07-19-internal-content-management.md) |
+| Step 4 — internal app + DB (no external CMS) | **In progress on `feature/step4-internal-cms`** — PRD [Review](./prds/2026-07-19-internal-content-management.md); local Node + PostgreSQL 18.4-2; merge when zero friction |
 | Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — Step 4 implementation branch + PRD amendments
+
+**Why:** Lock no-email policy, local-only development stack, and Git workflow before building.
+
+**Done:**
+- Created branch `feature/step4-internal-cms` (merge to `main` only when fully functional / zero known bugs)
+- PRD amendments: no email/SMTP features; Super Admin in-app password reset; in-app notifications only
+- Dev environment locked: this Windows machine, Cursor Pro, PostgreSQL **18.4-2**, Node
+- Go-live only after zero-friction local completion
+- Defaults locked in PRD (session 30m, AR authoritative, plain-text public cards, manual event `done`)
+- README §10 Step 4 status updated to implementation branch
+
+**Files:** `docs/prds/2026-07-19-internal-content-management.md`, `docs/prds/README.md`, `docs/WORKLOG.md`, `README.md`
+
+**Next:** Phase 0 local scaffold (Postgres + Node app + auth) on `feature/step4-internal-cms`.
+
+---
 
 ### 2026-07-19 — Step 4 PRD decisions locked (Review)
 

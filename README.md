@@ -621,7 +621,7 @@ No separate staging config files exist in-repo.
 | — | Home pubs mobile horizontal carousel | **Done** on `main` |
 | — | Docs layout under `docs/` (+ PRD scaffold) | **Done** — [docs/README.md](./docs/README.md) |
 | — | Root Markdown stubs removed (README only at root) | **Done** |
-| 4 | Internal web app + database (users, roles, publish news/books/etc.) — **no external CMS** | Pending (design next — [docs/prds/](./docs/prds/)) |
+| 4 | Internal web app + database (users, roles, publish news/events/publications) — **no external CMS**, **no email features** | **In progress** — branch [`feature/step4-internal-cms`](https://github.com/hc-medamine/CRSIC-2026/tree/feature/step4-internal-cms); PRD [docs/prds/2026-07-19-internal-content-management.md](./docs/prds/2026-07-19-internal-content-management.md) (Review). Local: Cursor Pro + Node + PostgreSQL 18.4-2. Merge/`main`/go-live only when zero friction. |
 
 ### Known issues / gaps
 
@@ -633,16 +633,16 @@ No separate staging config files exist in-repo.
 
 | Priority | Item |
 |----------|------|
-| High | Step 4 — design internal web app + database (start with a PRD in `docs/prds/`) |
+| High | Step 4 — implement internal CMS on `feature/step4-internal-cms` (PRD in Review; merge when zero friction) |
 | Medium | Dual-field or locale-keyed content if EN parity is required |
 | Medium | Further image compression / WebP for covers and Holders |
 | Low | Introduce linting/formatting once the team grows |
 
 ### Product direction (post–step 3.5)
 
-Own **internal web app + database**: authenticated users with roles and publishing tasks (news, books, etc.). Public site remains the visitor face; no third-party/external CMS.
+Own **internal web app + database** (Node + local PostgreSQL): authenticated users with roles and publishing tasks (news, events, publications metadata). Public site remains the visitor face; no third-party/external CMS; **no email/SMTP features**. Development is local-first on `feature/step4-internal-cms`; go-live only when the product works with zero friction.
 
-Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Write product specs in [docs/prds/](./docs/prds/).
+Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Product spec: [docs/prds/2026-07-19-internal-content-management.md](./docs/prds/2026-07-19-internal-content-management.md).
 
 ---
 
@@ -650,7 +650,7 @@ Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Write product
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-07-19** (docs sync: tests + `a11y.js` in stack/tree; stubs removed) |
+| Last updated     | **2026-07-20** (Step 4 branch + PRD amendments: no email; local Postgres 18.4-2) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes
