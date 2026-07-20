@@ -86,21 +86,31 @@ function buildMediaStage(media, title) {
           el('h2', { className: 'detail-pdfs-title', text: t('detail_pdfs') }),
           el('ul', {
             className: 'detail-pdf-list',
-            children: pdfs.map((pdf) =>
-              el('li', {
+            children: pdfs.map((pdf) => {
+              const href = safeImageSrc(pdf.src) || pdf.src;
+              return el('li', {
+                className: 'detail-pdf-item',
                 children: [
+                  el('iframe', {
+                    className: 'detail-pdf-frame',
+                    attrs: {
+                      src: href,
+                      title: pdf.alt || t('detail_pdfs'),
+                      loading: 'lazy',
+                    },
+                  }),
                   el('a', {
                     className: 'detail-pdf-link',
                     attrs: {
-                      href: safeImageSrc(pdf.src) || pdf.src,
+                      href,
                       target: '_blank',
                       rel: 'noopener',
                     },
                     text: t('detail_open_pdf'),
                   }),
                 ],
-              }),
-            ),
+              });
+            }),
           }),
         ],
       }),

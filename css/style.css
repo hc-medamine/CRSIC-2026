@@ -2897,40 +2897,63 @@ nav.site-nav.scrolled .nav-logo-text span {
 .detail-hero {
   margin: 0 0 1.5rem;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible;
   background: var(--cream-dark, #f0ebe3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem;
 }
 .detail-hero-img {
   display: block;
   width: 100%;
-  max-height: 420px;
-  object-fit: cover;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 .detail-gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
   margin-bottom: 1.5rem;
 }
 .detail-gallery-item {
-  border-radius: 6px;
-  overflow: hidden;
-  aspect-ratio: 4/3;
+  border-radius: 8px;
+  overflow: visible;
   background: var(--cream-dark, #f0ebe3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem;
 }
 .detail-gallery-item img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center;
   display: block;
 }
 .detail-pdfs { margin: 0 0 1.5rem; }
 .detail-pdfs-title {
   font-size: 1rem;
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.75rem;
   color: var(--green-deep);
 }
-.detail-pdf-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; }
+.detail-pdf-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 1.25rem; }
+.detail-pdf-item {
+  display: grid;
+  gap: 0.5rem;
+}
+.detail-pdf-frame {
+  width: 100%;
+  min-height: 70vh;
+  height: 80vh;
+  border: 0.5px solid rgba(27, 67, 50, 0.2);
+  border-radius: 8px;
+  background: #fff;
+}
 .detail-pdf-link {
   display: inline-block;
   padding: 0.55rem 1rem;
@@ -2940,8 +2963,14 @@ nav.site-nav.scrolled .nav-logo-text span {
   text-decoration: none;
   font-weight: 600;
   font-size: 0.9rem;
+  width: fit-content;
 }
 .detail-pdf-link:hover { background: var(--cream-dark, #f0ebe3); }
+@media (min-width: 720px) {
+  .detail-gallery {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
 .detail-meta {
   font-size: 0.85rem;
   color: var(--text-muted, #6b7280);
