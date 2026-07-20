@@ -21,6 +21,7 @@ ehthumbs.db
 
 # CMS publish backups of public JSON
 data/*.json.bak
+data/*.json.smoke-snap
 
 # CMS local uploads + published CMS media (binary; regenerated via upload)
 cms/uploads/**
