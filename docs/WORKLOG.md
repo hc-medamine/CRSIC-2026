@@ -35,12 +35,22 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **MVP local complete** on `feature/step4-internal-cms` (incl. audit, media, runbook, revisions); merge when SMOKE-CMS green — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
+| Step 4 — internal app + DB (no external CMS) | **SMOKE-CMS confirmed** on `feature/step4-internal-cms` — ready to merge when you say so — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
 | Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — SMOKE-CMS confirmed (manual + automated)
+
+**Why:** Merge gate requires zero-friction CMS path.
+
+**Done:** Stakeholder confirmed SMOKE-CMS (UI + ops checks). Automated `npm run db:smoke` already green.
+
+**Next:** Merge `feature/step4-internal-cms` → `main` when explicitly requested.
+
+---
 
 ### 2026-07-20 — CMS runbook + revision history UI
 
