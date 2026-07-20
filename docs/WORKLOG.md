@@ -35,12 +35,30 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **Phase 0 scaffold** on `feature/step4-internal-cms` — `cms/` Next.js + `crsic_db`; PRD [Review](./prds/2026-07-19-internal-content-management.md) |
+| Step 4 — internal app + DB (no external CMS) | **Auth scaffold** on `feature/step4-internal-cms` — login + Super Admin seeded; PRD [Review](./prds/2026-07-19-internal-content-management.md) |
 | Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — Auth skeleton + Super Admin seed
+
+**Why:** Phase 0 login path for Step 4 CMS.
+
+**Done:**
+- SQL `users` table + `user_role` enum (`super_admin` / `editor` / `reviewer`)
+- `npm run db:migrate` / `npm run db:seed:super-admin`
+- Login at `/login` (email + password); dashboard at `/dashboard`; logout
+- Session: `iron-session`, idle timeout 30 minutes
+- Seeded Super Admin: **F. Chettih** (`f.chettih@crsic.dz`) — password only in local `.env.local` (not committed)
+- Names stored: AR فاطمة الزهرة شتيح / EN Fatima El Zahra Chettih
+
+**Files:** `cms/sql/`, `cms/scripts/`, `cms/src/lib/auth/`, `cms/src/app/login/`, `cms/src/app/dashboard/`, `cms/src/app/api/auth/`, docs
+
+**Next:** User management UI (create editors/reviewers, Super Admin password reset) or content types — prompt stakeholder.
+
+---
 
 ### 2026-07-20 — Phase 0 scaffold: cms/ + crsic_db
 

@@ -632,8 +632,8 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 | 2026-07-20 | Event status `upcoming`/`done`: **manual** (Reviewer/Editor) |
 | 2026-07-20 | Personal data MVP: editorial checklist + Super Admin unpublish; no legal module |
 | 2026-07-20 | App directory: **`cms/`** at repo root |
-| TBD | Exact named people for first seed accounts |
-
+| 2026-07-20 | First Super Admin: **F. Chettih** / `f.chettih@crsic.dz` (login = email; no SMTP) |
+| TBD | Exact named people for Editor/Reviewer seed accounts |
 ---
 
 ## 19. Mapping to template sections
