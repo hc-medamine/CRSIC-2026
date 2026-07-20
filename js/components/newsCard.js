@@ -69,10 +69,10 @@ export function createNewsCard(n, i) {
     className: 'news-card news-card--link',
     attrs: slug
       ? {
-          role: 'link',
+          role: 'button',
           tabindex: 0,
-          'data-detail-type': 'news',
-          'data-detail-slug': slug,
+          'data-lightbox-type': 'news',
+          'data-lightbox-slug': slug,
         }
       : {},
     children: [

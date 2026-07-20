@@ -28,6 +28,7 @@ export function createPubCard(p, i) {
     },
   });
 
+  const slug = p.slug || p.id || '';
   return el('article', {
     className: 'pub-card',
     attrs: {
@@ -35,6 +36,12 @@ export function createPubCard(p, i) {
       'data-pub-index': i,
       role: 'button',
       tabindex: 0,
+      ...(slug
+        ? {
+            'data-lightbox-type': 'publication',
+            'data-lightbox-slug': slug,
+          }
+        : {}),
     },
     children: [
       el('div', {

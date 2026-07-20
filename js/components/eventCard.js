@@ -74,10 +74,10 @@ export function createHomeEventCard(e, i = 0) {
     className: 'event-card event-card--link',
     attrs: (e && (e.slug || e.id))
       ? {
-          role: 'link',
+          role: 'button',
           tabindex: 0,
-          'data-detail-type': 'event',
-          'data-detail-slug': e.slug || e.id,
+          'data-lightbox-type': 'event',
+          'data-lightbox-slug': e.slug || e.id,
         }
       : {},
     children: [
@@ -124,10 +124,10 @@ export function createEvCard(e) {
     className: 'ev-card ev-card--link',
     attrs: slug
       ? {
-          role: 'link',
+          role: 'button',
           tabindex: 0,
-          'data-detail-type': 'event',
-          'data-detail-slug': slug,
+          'data-lightbox-type': 'event',
+          'data-lightbox-slug': slug,
         }
       : {},
     children: [

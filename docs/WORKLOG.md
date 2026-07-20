@@ -46,7 +46,7 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 **Done on `feature/public-detail-pages`:**
 - Public JSON + CMS publish emit `id`, `slug`, `summary`, `body`, `media[]`; attachments column + multi-upload UI.
-- SPA hash routes `#news/{slug}`, `#event/{slug}`, `#publication/{slug}` with detail shell; pub lightbox teaser + “View full details”.
+- SPA hash routes `#news/{slug}`, `#event/{slug}`, `#publication/{slug}` with detail shell; **shared lightbox teaser** for news, events, and publications + “View full details”.
 - Legacy JSON backfilled (`scripts/backfill-public-detail-fields.mjs`).
 
 **Next:** Smoke deep links + PR merge when ready.
