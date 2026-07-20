@@ -35,12 +35,32 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **Steps 0–3 done** on `feature/step4-internal-cms` (auth, users, profile, notifications); next: news workflow — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
+| Step 4 — internal app + DB (no external CMS) | **News workflow live** on `feature/step4-internal-cms` (steps 0–4); next: events — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
 | Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — Step 4: news workflow (draft → publish)
+
+**Why:** First content type end-to-end per PRD.
+
+**Done:**
+- `content_items` + `content_revisions` for news
+- Editor: create/edit draft, checklist submit, withdraw
+- Reviewer: request changes / approve / reject / publish / unpublish (four-eyes)
+- In-app notifications on workflow events
+- Publish rebuilds public `data/news.json` (P1: AR title/label/img); writes `.bak` backup first
+- UI: `/dashboard/news`, `/dashboard/news/new`, `/dashboard/news/[id]`
+
+**Note:** First CMS publish replaces `data/news.json` with CMS-published items only (backup at `news.json.bak`). Re-import of legacy static news is a later task.
+
+**Files:** `cms/sql/005_news_content.sql`, `cms/src/lib/content/`, `cms/src/lib/publish/`, `cms/src/app/api/news/`, `cms/src/app/dashboard/news/`, docs
+
+**Next:** Step 5 — Events workflow (or media upload for news images).
+
+---
 
 ### 2026-07-20 — Step 3: in-app notifications skeleton
 

@@ -19,6 +19,9 @@ ehthumbs.db
 .env.*
 !.env.example
 
+# CMS publish backups of public JSON
+data/*.json.bak
+
 # Logs & caches
 *.log
 .cache/

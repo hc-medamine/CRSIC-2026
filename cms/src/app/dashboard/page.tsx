@@ -36,6 +36,11 @@ export default async function DashboardPage() {
         <p className="mt-4 text-sm text-zinc-500">Session idle timeout is 30 minutes (PRD).</p>
         <ul className="mt-4 flex flex-col gap-2 text-sm">
           <li>
+            <Link className="font-medium underline" href="/dashboard/news">
+              News →
+            </Link>
+          </li>
+          <li>
             <Link className="font-medium underline" href="/dashboard/notifications">
               Notifications{unread > 0 ? ` (${unread})` : ""} →
             </Link>
