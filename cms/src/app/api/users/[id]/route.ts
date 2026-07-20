@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession, sessionTimeoutMs } from "@/lib/auth/session";
 import { hashPassword } from "@/lib/auth/password";
 import { query } from "@/lib/db";
+import { clientMeta, writeAudit } from "@/lib/audit";
 import {
   allOrgUnitIds,
   replaceUserScopes,
@@ -28,6 +29,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   if (!admin) {
     return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
   }
+  const meta = clientMeta(request);
 
   const { id } = await params;
   const body = (await request.json()) as {
@@ -53,6 +55,14 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         id,
         body.action === "activate",
       ]);
+      await writeAudit({
+        actor: admin,
+        action: body.action === "activate" ? "user.activate" : "user.deactivate",
+        entityType: "user",
+        entityId: id,
+        summary: `${body.action} user ${id}`,
+        ...meta,
+      });
       return NextResponse.json({ ok: true });
     }
 
@@ -69,6 +79,14 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         `UPDATE users SET password_hash = $2, updated_at = NOW() WHERE id = $1`,
         [id, passwordHash],
       );
+      await writeAudit({
+        actor: admin,
+        action: "user.reset_password",
+        entityType: "user",
+        entityId: id,
+        summary: `Password reset for user ${id}`,
+        ...meta,
+      });
       return NextResponse.json({ ok: true });
     }
 
@@ -97,6 +115,15 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       }
 
       await replaceUserScopes(id, orgUnitIds, contentTypes);
+      await writeAudit({
+        actor: admin,
+        action: "user.update_scopes",
+        entityType: "user",
+        entityId: id,
+        summary: `Updated scopes for user ${id}`,
+        metadata: { orgUnitIds, contentTypes },
+        ...meta,
+      });
       return NextResponse.json({ ok: true });
     }
 
@@ -110,6 +137,14 @@ export async function PATCH(request: NextRequest, { params }: Params) {
          WHERE id = $1`,
         [id, displayName, body.nameAr?.trim() || null, body.nameEn?.trim() || null],
       );
+      await writeAudit({
+        actor: admin,
+        action: "user.update_profile",
+        entityType: "user",
+        entityId: id,
+        summary: `Admin updated profile for user ${id}`,
+        ...meta,
+      });
       return NextResponse.json({ ok: true });
     }
 

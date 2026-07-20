@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth/password";
 import { getSessionForRoute } from "@/lib/auth/session";
+import { clientMeta, writeAudit } from "@/lib/audit";
 
 export const runtime = "nodejs";
 
@@ -15,6 +16,7 @@ type UserRow = {
 };
 
 export async function POST(request: NextRequest) {
+  const meta = clientMeta(request);
   try {
     const body = (await request.json()) as { email?: string; password?: string };
     const email = body.email?.trim().toLowerCase() ?? "";
@@ -32,11 +34,26 @@ export async function POST(request: NextRequest) {
     const user = result.rows[0];
 
     if (!user || !user.is_active) {
+      await writeAudit({
+        actorEmail: email,
+        action: "auth.login.fail",
+        summary: "Login failed (unknown user or inactive)",
+        metadata: { reason: !user ? "not_found" : "inactive" },
+        ...meta,
+      });
       return NextResponse.json({ ok: false, error: "Invalid email or password." }, { status: 401 });
     }
 
     const valid = await verifyPassword(password, user.password_hash);
     if (!valid) {
+      await writeAudit({
+        actorEmail: email,
+        actor: { id: user.id, email: user.email, displayName: user.display_name, role: user.role },
+        action: "auth.login.fail",
+        summary: "Login failed (bad password)",
+        metadata: { reason: "bad_password" },
+        ...meta,
+      });
       return NextResponse.json({ ok: false, error: "Invalid email or password." }, { status: 401 });
     }
 
@@ -58,6 +75,13 @@ export async function POST(request: NextRequest) {
     };
     session.lastActivityAt = Date.now();
     await session.save();
+
+    await writeAudit({
+      actor: session.user,
+      action: "auth.login.success",
+      summary: `Login success for ${user.email}`,
+      ...meta,
+    });
 
     return response;
   } catch (err) {

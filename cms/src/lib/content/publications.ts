@@ -1,5 +1,6 @@
 import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
+import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { rebuildPublicPublicationsJson } from "@/lib/publish/publicationsJson";
 import {
@@ -9,6 +10,22 @@ import {
   getUserOrgIds,
 } from "@/lib/content/permissions";
 import type { ContentStatus } from "@/lib/content/news";
+
+async function auditPublication(
+  user: SessionUser,
+  action: string,
+  item: { id: string; title_ar: string; status: string },
+  summary?: string,
+) {
+  await writeAudit({
+    actor: user,
+    action,
+    entityType: "publication",
+    entityId: item.id,
+    summary: summary ?? `${action} — ${item.title_ar}`,
+    metadata: { status: item.status, title: item.title_ar },
+  });
+}
 
 export type PublicationItem = {
   id: string;
@@ -168,6 +185,7 @@ export async function createPublication(
   );
   const item = result.rows[0];
   await addRevision(item.id, "draft", snapshotOf(item), user.id, "Created");
+  await auditPublication(user, "publication.create", item);
   return item;
 }
 
@@ -266,6 +284,7 @@ export async function submitPublication(
     item.title_ar,
     `/dashboard/publications/${item.id}`,
   );
+  await auditPublication(user, "publication.submit", item);
   return item;
 }
 
@@ -283,6 +302,7 @@ export async function withdrawPublication(user: SessionUser, id: string) {
   );
   const item = result.rows[0];
   await addRevision(item.id, "draft", snapshotOf(item), user.id, "Withdrawn to draft");
+  await auditPublication(user, "publication.withdraw", item);
   return item;
 }
 
@@ -311,6 +331,7 @@ export async function requestPublicationChanges(user: SessionUser, id: string, n
     body: note.trim(),
     linkPath: `/dashboard/publications/${item.id}`,
   });
+  await auditPublication(user, "publication.changes_requested", item, note.trim());
   return item;
 }
 
@@ -333,6 +354,7 @@ export async function approvePublication(user: SessionUser, id: string) {
     body: item.title_ar,
     linkPath: `/dashboard/publications/${item.id}`,
   });
+  await auditPublication(user, "publication.approve", item);
   return item;
 }
 
@@ -356,6 +378,7 @@ export async function rejectPublication(user: SessionUser, id: string, note: str
     body: note.trim(),
     linkPath: `/dashboard/publications/${item.id}`,
   });
+  await auditPublication(user, "publication.reject", item, note.trim());
   return item;
 }
 
@@ -384,6 +407,7 @@ export async function publishPublication(user: SessionUser, id: string) {
     body: item.title_ar,
     linkPath: `/dashboard/publications/${item.id}`,
   });
+  await auditPublication(user, "publication.publish", item, "Published to publications.json");
   return item;
 }
 
@@ -407,5 +431,6 @@ export async function unpublishPublication(user: SessionUser, id: string) {
     body: item.title_ar,
     linkPath: `/dashboard/publications/${item.id}`,
   });
+  await auditPublication(user, "publication.unpublish", item, "Unpublished from publications.json");
   return item;
 }

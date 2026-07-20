@@ -1,5 +1,6 @@
 import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
+import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { rebuildPublicNewsJson } from "@/lib/publish/newsJson";
 import {
@@ -8,6 +9,22 @@ import {
   canReview,
   getUserOrgIds,
 } from "@/lib/content/permissions";
+
+async function auditNews(
+  user: SessionUser,
+  action: string,
+  item: { id: string; title_ar: string; status: string },
+  summary?: string,
+) {
+  await writeAudit({
+    actor: user,
+    action,
+    entityType: "news",
+    entityId: item.id,
+    summary: summary ?? `${action} — ${item.title_ar}`,
+    metadata: { status: item.status, title: item.title_ar },
+  });
+}
 
 export type ContentStatus =
   | "draft"
@@ -172,6 +189,7 @@ export async function createNews(user: SessionUser, input: NewsInput): Promise<N
   );
   const item = result.rows[0];
   await addRevision(item.id, "draft", snapshotOf(item), user.id, "Created");
+  await auditNews(user, "news.create", item);
   return item;
 }
 
@@ -287,6 +305,7 @@ export async function submitNews(user: SessionUser, id: string, checklistConfirm
     item.title_ar,
     `/dashboard/news/${item.id}`,
   );
+  await auditNews(user, "news.submit", item);
   return item;
 }
 
@@ -304,6 +323,7 @@ export async function withdrawNews(user: SessionUser, id: string) {
   );
   const item = result.rows[0];
   await addRevision(item.id, "draft", snapshotOf(item), user.id, "Withdrawn to draft");
+  await auditNews(user, "news.withdraw", item);
   return item;
 }
 
@@ -339,6 +359,7 @@ export async function requestNewsChanges(user: SessionUser, id: string, note: st
     body: note.trim(),
     linkPath: `/dashboard/news/${item.id}`,
   });
+  await auditNews(user, "news.changes_requested", item, note.trim());
   return item;
 }
 
@@ -366,6 +387,7 @@ export async function approveNews(user: SessionUser, id: string) {
     body: item.title_ar,
     linkPath: `/dashboard/news/${item.id}`,
   });
+  await auditNews(user, "news.approve", item);
   return item;
 }
 
@@ -394,6 +416,7 @@ export async function rejectNews(user: SessionUser, id: string, note: string) {
     body: note.trim(),
     linkPath: `/dashboard/news/${item.id}`,
   });
+  await auditNews(user, "news.reject", item, note.trim());
   return item;
 }
 
@@ -426,6 +449,7 @@ export async function publishNews(user: SessionUser, id: string) {
     body: item.title_ar,
     linkPath: `/dashboard/news/${item.id}`,
   });
+  await auditNews(user, "news.publish", item, "Published to news.json");
   return item;
 }
 
@@ -453,5 +477,6 @@ export async function unpublishNews(user: SessionUser, id: string) {
     body: item.title_ar,
     linkPath: `/dashboard/news/${item.id}`,
   });
+  await auditNews(user, "news.unpublish", item, "Unpublished from news.json");
   return item;
 }

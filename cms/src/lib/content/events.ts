@@ -1,5 +1,6 @@
 import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
+import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { rebuildPublicEventsJson } from "@/lib/publish/eventsJson";
 import {
@@ -9,6 +10,22 @@ import {
   getUserOrgIds,
 } from "@/lib/content/permissions";
 import type { ContentStatus } from "@/lib/content/news";
+
+async function auditEvent(
+  user: SessionUser,
+  action: string,
+  item: { id: string; title_ar: string; status: string },
+  summary?: string,
+) {
+  await writeAudit({
+    actor: user,
+    action,
+    entityType: "event",
+    entityId: item.id,
+    summary: summary ?? `${action} — ${item.title_ar}`,
+    metadata: { status: item.status, title: item.title_ar },
+  });
+}
 
 export type EventItem = {
   id: string;
@@ -183,6 +200,7 @@ export async function createEvent(user: SessionUser, input: EventInput): Promise
   );
   const item = result.rows[0];
   await addRevision(item.id, "draft", snapshotOf(item), user.id, "Created");
+  await auditEvent(user, "event.create", item);
   return item;
 }
 
@@ -266,6 +284,7 @@ export async function submitEvent(user: SessionUser, id: string, checklistConfir
   const item = result.rows[0];
   await addRevision(item.id, "submitted", snapshotOf(item), user.id, "Submitted for review");
   await notifyReviewers("Event submitted for review", item.title_ar, `/dashboard/events/${item.id}`);
+  await auditEvent(user, "event.submit", item);
   return item;
 }
 
@@ -281,6 +300,7 @@ export async function withdrawEvent(user: SessionUser, id: string) {
   );
   const item = result.rows[0];
   await addRevision(item.id, "draft", snapshotOf(item), user.id, "Withdrawn to draft");
+  await auditEvent(user, "event.withdraw", item);
   return item;
 }
 
@@ -309,6 +329,7 @@ export async function requestEventChanges(user: SessionUser, id: string, note: s
     body: note.trim(),
     linkPath: `/dashboard/events/${item.id}`,
   });
+  await auditEvent(user, "event.changes_requested", item, note.trim());
   return item;
 }
 
@@ -331,6 +352,7 @@ export async function approveEvent(user: SessionUser, id: string) {
     body: item.title_ar,
     linkPath: `/dashboard/events/${item.id}`,
   });
+  await auditEvent(user, "event.approve", item);
   return item;
 }
 
@@ -354,6 +376,7 @@ export async function rejectEvent(user: SessionUser, id: string, note: string) {
     body: note.trim(),
     linkPath: `/dashboard/events/${item.id}`,
   });
+  await auditEvent(user, "event.reject", item, note.trim());
   return item;
 }
 
@@ -381,6 +404,7 @@ export async function publishEvent(user: SessionUser, id: string) {
     body: item.title_ar,
     linkPath: `/dashboard/events/${item.id}`,
   });
+  await auditEvent(user, "event.publish", item, "Published to events.json");
   return item;
 }
 
@@ -404,5 +428,6 @@ export async function unpublishEvent(user: SessionUser, id: string) {
     body: item.title_ar,
     linkPath: `/dashboard/events/${item.id}`,
   });
+  await auditEvent(user, "event.unpublish", item, "Unpublished from events.json");
   return item;
 }

@@ -35,12 +35,27 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs layout under `docs/` | **Done** |
 | Root redirect stubs removed | **Done** |
 | Docs sync (README tests / tree) | **Done** (this entry) |
-| Step 4 — internal app + DB (no external CMS) | **News + Events + Publications + Media** on `feature/step4-internal-cms`; next: smoke / audit / merge gate — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
+| Step 4 — internal app + DB (no external CMS) | **News + Events + Publications + Media + Audit** on `feature/step4-internal-cms`; smoke: [qa/SMOKE-CMS.md](./qa/SMOKE-CMS.md) — PRD [Review](./prds/2026-07-19-internal-content-management.md) |
 | Public detailed news + publication pages | **Pending** (after CMS P1; enrich SPA beyond card fields) |
 
 ---
 
 ## Changelog
+
+### 2026-07-20 — Audit log + CMS smoke checklist
+
+**Why:** PRD MVP requires audit of auth, user admin, content lifecycle, uploads, publish; merge gate needs a CMS smoke path.
+
+**Done:**
+- `audit_log` table (append-only via app); Super Admin UI `/dashboard/audit` + `GET /api/audit`
+- Instrumented login/logout, user admin, media upload/replace, news/events/publications lifecycle
+- [docs/qa/SMOKE-CMS.md](./qa/SMOKE-CMS.md) + `npm run db:smoke` (news four-eyes path; restores `news.json` from `.bak`)
+
+**Files:** `cms/sql/009_audit_log.sql`, `cms/src/lib/audit.ts`, API/UI/instrumentation, `cms/scripts/smoke-cms.ts`, docs
+
+**Next:** Manual UI pass of SMOKE-CMS; merge when zero friction.
+
+---
 
 ### 2026-07-20 — Media upload (5 MB, images+PDF, stable paths)
 

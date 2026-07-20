@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession, sessionTimeoutMs } from "@/lib/auth/session";
 import { hashPassword } from "@/lib/auth/password";
 import { query } from "@/lib/db";
+import { clientMeta, writeAudit } from "@/lib/audit";
 import {
   allOrgUnitIds,
   listUsers,
@@ -36,6 +37,7 @@ export async function POST(request: NextRequest) {
   if (!admin) {
     return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
   }
+  const meta = clientMeta(request);
 
   try {
     const body = (await request.json()) as {
@@ -104,6 +106,16 @@ export async function POST(request: NextRequest) {
     );
     const userId = inserted.rows[0].id;
     await replaceUserScopes(userId, orgUnitIds, contentTypes);
+
+    await writeAudit({
+      actor: admin,
+      action: "user.create",
+      entityType: "user",
+      entityId: userId,
+      summary: `Created user ${email} (${role})`,
+      metadata: { email, role, orgUnitIds, contentTypes },
+      ...meta,
+    });
 
     return NextResponse.json({ ok: true, id: userId });
   } catch (err) {

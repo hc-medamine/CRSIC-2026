@@ -44,6 +44,7 @@ async function main() {
       "content_items",
       "content_revisions",
       "media_assets",
+      "audit_log",
     ];
     const expectedFiles = [
       "001_users.sql",
@@ -54,6 +55,7 @@ async function main() {
       "006_event_fields.sql",
       "007_publication_fields.sql",
       "008_media.sql",
+      "009_audit_log.sql",
     ];
     const expectedCols = [
       "event_scope",

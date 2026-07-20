@@ -66,11 +66,18 @@ export default async function DashboardPage() {
             </Link>
           </li>
           {user.role === "super_admin" ? (
-            <li>
-              <Link className="font-medium underline" href="/dashboard/users">
-                User management →
-              </Link>
-            </li>
+            <>
+              <li>
+                <Link className="font-medium underline" href="/dashboard/users">
+                  User management →
+                </Link>
+              </li>
+              <li>
+                <Link className="font-medium underline" href="/dashboard/audit">
+                  Audit log →
+                </Link>
+              </li>
+            </>
           ) : null}
         </ul>
       </section>

@@ -54,6 +54,8 @@ Editors need the matching content-type scope (`news` / `event` / `publication`).
 - Replace overwrites the **same** public path
 - Staging: `cms/uploads/` (gitignored); UI: `/dashboard/media` and content forms
 - Migrations auto-run on `npm run dev` / `npm run build`
+- Audit log (Super Admin): `/dashboard/audit`
+- Automated smoke: `npm run db:smoke` — see [docs/qa/SMOKE-CMS.md](../docs/qa/SMOKE-CMS.md)
 
 ## Secrets
 

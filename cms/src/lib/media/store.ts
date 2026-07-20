@@ -2,6 +2,7 @@ import { mkdirSync, writeFileSync, existsSync, copyFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
+import { writeAudit } from "@/lib/audit";
 import {
   isMediaBucket,
   publicPathFor,
@@ -93,7 +94,21 @@ export async function createMediaUpload(
     [row.id, publicPath],
   );
   writeBoth(row.id, validated.extension, publicPath, validated.buffer);
-  return updated.rows[0];
+  const asset = updated.rows[0];
+  await writeAudit({
+    actor: user,
+    action: "media.upload",
+    entityType: "media",
+    entityId: asset.id,
+    summary: `Uploaded ${validated.originalFilename} → ${publicPath}`,
+    metadata: {
+      bucket: bucketRaw,
+      mime: validated.mime,
+      byteSize: validated.byteSize,
+      publicPath,
+    },
+  });
+  return asset;
 }
 
 export async function replaceMediaUpload(
@@ -126,7 +141,20 @@ export async function replaceMediaUpload(
      RETURNING *`,
     [mediaId, validated.originalFilename, validated.mime, validated.byteSize, user.id],
   );
-  return result.rows[0];
+  const asset = result.rows[0];
+  await writeAudit({
+    actor: user,
+    action: "media.replace",
+    entityType: "media",
+    entityId: asset.id,
+    summary: `Replaced media at ${asset.public_path}`,
+    metadata: {
+      mime: validated.mime,
+      byteSize: validated.byteSize,
+      publicPath: asset.public_path,
+    },
+  });
+  return asset;
 }
 
 /** Ensure public file exists (e.g. after clone); copy from staging if needed. */

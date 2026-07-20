@@ -6,7 +6,8 @@ Project docs live under `docs/`. The root [README.md](../README.md) remains the 
 |------|------|
 | [../README.md](../README.md) | Architecture, stack, routes, setup, roadmap |
 | [WORKLOG.md](./WORKLOG.md) | Changelog + status snapshot (append newest at top) |
-| [qa/SMOKE.md](./qa/SMOKE.md) | Pre-merge smoke checklist (~5 min) |
+| [qa/SMOKE.md](./qa/SMOKE.md) | Pre-merge smoke checklist (~5 min) — public SPA |
+| [qa/SMOKE-CMS.md](./qa/SMOKE-CMS.md) | CMS smoke checklist + `npm run db:smoke` |
 | [audits/AUDIT.md](./audits/AUDIT.md) | Closed architecture audit (P0–P3) |
 | [audits/UIUX.md](./audits/UIUX.md) | UI/UX audit findings + fix log |
 | [audits/PARITY.md](./audits/PARITY.md) | AR/EN parity matrix (partial EN) |
