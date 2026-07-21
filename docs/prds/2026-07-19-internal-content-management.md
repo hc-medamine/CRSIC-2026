@@ -208,7 +208,7 @@ Build a **secure internal web application** (same institutional host as `crsic.d
 | `unpublished` | Removed from public snapshot; retained | Reviewer |
 | `rejected` | Not approved; retained | Reviewer |
 
-**Out of MVP / Phase 2+:** `scheduled` (auto-publish), `in_review`, `expired`, emergency bypass states.
+**Out of MVP / Phase 2+:** `in_review`, `expired`. (`scheduled` auto-publish **cancelled** for the project — manual publish only.)
 
 ### Versioning (MVP)
 
@@ -539,8 +539,8 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 Order: **least effort → most complex** (locked 2026-07-21):
 
 2. In-app escalation / delegation (extend reassign + notifications; OOO / backup reviewer) — **Done** on `main` (PR #5).  
-3. Emergency bypass + post-publication review — **implementing** on `feature/phase2-emergency-bypass`.  
-4. Scheduled publish (only if still needed).  
+3. Emergency bypass + post-publication review — **Done** on `main` (PR #6).  
+4. ~~Scheduled publish~~ — **Cancelled** (2026-07-21): manual Approve → Publish only (plus emergency bypass).  
 5. Optional malware scanning (highest ops cost).
 
 ### Phase 3 — Content surface + go-live prep
@@ -555,7 +555,7 @@ Order: **least effort → most complex** (locked 2026-07-21):
 
 1. ~~Exact **N**~~ → **Closed:** no numeric quota.  
 2. ~~Public schema P1 vs P2~~ → **Closed: P1**; detail pages pending.  
-3. ~~Scheduled publish~~ → **Closed:** manual only.  
+3. ~~Scheduled publish~~ → **Closed:** manual only (MVP). **Cancelled for project** (2026-07-21): no timed auto-publish; never add `scheduled` status.  
 4. ~~Role/scope pattern~~ → **Closed** (see §3).  
 5. ~~Stack~~ → **Closed:** Node + PostgreSQL 18.4-2 local; Cursor Pro; feature branch workflow.  
 6. ~~Email~~ → **Closed:** no email features.  
@@ -593,7 +593,7 @@ Order: **least effort → most complex** (locked 2026-07-21):
 ## 17. Future improvements
 
 - ~~Detailed public news / publication pages~~ → shipped (PR #3).  
-- Scheduled publish.  
+- ~~Scheduled publish~~ → **Cancelled** (2026-07-21); manual Approve → Publish only.  
 - Emergency notices workflow.  
 - Configurable multi-step approvals by content type.  
 - Translator role and AR/EN linkage rules.  
@@ -652,6 +652,7 @@ Order: **least effort → most complex** (locked 2026-07-21):
 | 2026-07-21 | Phase 2 #2: review-owner V2 (SA confirm); escalate Author+Reviewer+SA; OOO elevate Editor→Reviewer, freeze Away review actions, notify Away+all Editors; submit notify owner-or-broadcast |
 | 2026-07-21 | **Reminder:** when department notify routing lands, prefer same-department Editors for OOO fan-out (not all Editors) |
 | 2026-07-21 | Phase 2 #3: SA-only emergency publish → live + `needs_post_review`; Confirm OK not by bypass actor; Unpublish / Request changes; Away freeze on post-review |
+| 2026-07-21 | Phase 2 #4 scheduled auto-publish **Cancelled** — project stays on manual Approve → Publish (+ emergency bypass); no cron / `scheduled` status |
 ---
 
 ## 19. Mapping to template sections

@@ -40,11 +40,19 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Fill remaining public detail copy | **Paused** — do not block on editorial; resume only when stakeholder has source text |
 | Feature delivery workflow | **Locked** — new work on a feature branch until fully stable, then merge to `main` |
 | CMS PRD | **Approved** (2026-07-21) |
-| CMS Phase 2 | **In progress** — #3 emergency bypass on `feature/phase2-emergency-bypass` (#1–#2 on `main`) |
+| CMS Phase 2 | **In progress** — #1–#3 on `main`; #4 scheduled publish **Cancelled**; next optional #5 malware |
 
 ---
 
 ## Changelog
+
+### 2026-07-21 — Phase 2 #4 scheduled publish cancelled
+
+**Locked:** Stakeholder dropped timed auto-publish entirely. Publish remains **manual** Approve → Publish (plus Phase 2 #3 emergency bypass). No `scheduled` status, cron, or schedule UI.
+
+**Next:** Optional Phase 2 #5 malware scanning, or pause Phase 2.
+
+---
 
 ### 2026-07-21 — Phase 2 #3 emergency bypass + post-publication review (branch)
 
@@ -54,7 +62,7 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 **Shipped:** migration `014_emergency_bypass.sql`, `emergency.ts` + `/api/content/emergency`, Emergency panel + dashboard queue, smoke paths.
 
-**Next:** Stakeholder smoke → merge → Phase 2 #4 scheduled publish (if still wanted).
+**Next:** Stakeholder smoke → merge → Phase 2 #4 scheduled publish (if still wanted). **Superseded:** #4 cancelled; #3 merged PR #6.
 
 ---
 
@@ -100,7 +108,7 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 1. Richer in-app comments (item-level threads on existing review notes first; field-level later if needed)
 2. In-app escalation / delegation (extend reassign + notifications; OOO / backup reviewer)
 3. Emergency bypass + post-publication review
-4. Scheduled publish (background job + `scheduled` status; only if still wanted)
+4. ~~Scheduled publish~~ — **Cancelled** (2026-07-21); manual publish only
 5. Optional malware scanning (external tool + upload quarantine; highest ops cost)
 
 **Next:** Stakeholder confirms starting with #1 (or picks another number) → open feature branch from `main`.
