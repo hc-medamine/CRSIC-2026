@@ -2,6 +2,7 @@ import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
+import { appendWorkflowComment } from "@/lib/content/comments";
 import {
   buildPublicationPayload,
   rebuildPublicPublicationsJson,
@@ -357,6 +358,7 @@ export async function requestPublicationChanges(user: SessionUser, id: string, n
   );
   const item = result.rows[0];
   await addRevision(item.id, "changes_requested", snapshotOf(item), user.id, note.trim());
+  await appendWorkflowComment(user, item.id, note.trim(), "changes_requested");
   await createNotification({
     userId: item.created_by,
     type: "publication.changes_requested",
@@ -404,6 +406,7 @@ export async function rejectPublication(user: SessionUser, id: string, note: str
   );
   const item = result.rows[0];
   await addRevision(item.id, "rejected", snapshotOf(item), user.id, note.trim());
+  await appendWorkflowComment(user, item.id, note.trim(), "rejected");
   await createNotification({
     userId: item.created_by,
     type: "publication.rejected",

@@ -6,11 +6,18 @@ import { canAccessContentType, canReview, getUserOrgIds } from "@/lib/content/pe
 import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 import { getMediaByPublicPath } from "@/lib/media/store";
 import { listOrgUnits } from "@/lib/users";
+import { getItemPeopleMeta } from "@/lib/content/people";
 import { EventEditorForm } from "../event-form";
 import { RevisionHistory } from "@/app/dashboard/revision-history";
 import { ReassignAuthor } from "@/app/dashboard/reassign-author";
+import { CommentThread } from "@/app/dashboard/comment-thread";
 
 type Props = { params: Promise<{ id: string }> };
+
+function personProp(p: { displayName: string; email: string; role: string } | null) {
+  if (!p) return null;
+  return { displayName: p.displayName, email: p.email, role: p.role };
+}
 
 export default async function EventDetailPage({ params }: Props) {
   const user = await requireUser();
@@ -20,6 +27,7 @@ export default async function EventDetailPage({ params }: Props) {
   if (!item) notFound();
   const meta = await getContentMeta(id);
   if (!meta || !(await canViewContentItem(user, meta))) redirect("/dashboard");
+  const people = await getItemPeopleMeta(id);
 
   const allOrgs = await listOrgUnits();
   const orgIds =
@@ -83,6 +91,9 @@ export default async function EventDetailPage({ params }: Props) {
           publicSlug: item.public_slug,
           status: item.status,
           reviewNote: item.review_note,
+          editor: personProp(people.editor),
+          reviewer: personProp(people.reviewer),
+          publisher: personProp(people.publisher),
         }}
       />
 
@@ -93,6 +104,11 @@ export default async function EventDetailPage({ params }: Props) {
           currentAuthorId={item.created_by}
         />
       ) : null}
+
+      <CommentThread
+        contentItemId={item.id}
+        refreshToken={`${item.status}:${item.review_note ?? ""}:${item.updated_at.toISOString()}`}
+      />
 
       <RevisionHistory contentItemId={item.id} contentType="event" canRestore={canManage} />
     </main>

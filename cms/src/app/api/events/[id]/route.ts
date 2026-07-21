@@ -125,7 +125,8 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     const status =
       message.includes("Four-eyes") ||
       message.includes("permission") ||
-      message.includes("Super Admin role required")
+      message.includes("Super Admin role required") ||
+      message.includes("Only Super Admin can reassign")
         ? 403
         : 400;
     return NextResponse.json({ ok: false, error: message }, { status });

@@ -2,6 +2,7 @@ import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
+import { appendWorkflowComment } from "@/lib/content/comments";
 import { buildEventPayload, rebuildPublicEventsJson } from "@/lib/publish/eventsJson";
 import { normalizeAttachments, type PublicMediaItem } from "@/lib/publish/media";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
@@ -347,6 +348,7 @@ export async function requestEventChanges(user: SessionUser, id: string, note: s
   );
   const item = result.rows[0];
   await addRevision(item.id, "changes_requested", snapshotOf(item), user.id, note.trim());
+  await appendWorkflowComment(user, item.id, note.trim(), "changes_requested");
   await createNotification({
     userId: item.created_by,
     type: "event.changes_requested",
@@ -394,6 +396,7 @@ export async function rejectEvent(user: SessionUser, id: string, note: string) {
   );
   const item = result.rows[0];
   await addRevision(item.id, "rejected", snapshotOf(item), user.id, note.trim());
+  await appendWorkflowComment(user, item.id, note.trim(), "rejected");
   await createNotification({
     userId: item.created_by,
     type: "event.rejected",

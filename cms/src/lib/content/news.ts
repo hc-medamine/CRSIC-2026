@@ -2,6 +2,7 @@ import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
+import { appendWorkflowComment } from "@/lib/content/comments";
 import { buildNewsPayload, rebuildPublicNewsJson } from "@/lib/publish/newsJson";
 import { normalizeAttachments, type PublicMediaItem } from "@/lib/publish/media";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
@@ -377,6 +378,7 @@ export async function requestNewsChanges(user: SessionUser, id: string, note: st
   );
   const item = result.rows[0];
   await addRevision(item.id, "changes_requested", snapshotOf(item), user.id, note.trim());
+  await appendWorkflowComment(user, item.id, note.trim(), "changes_requested");
   await createNotification({
     userId: item.created_by,
     type: "news.changes_requested",
@@ -434,6 +436,7 @@ export async function rejectNews(user: SessionUser, id: string, note: string) {
   );
   const item = result.rows[0];
   await addRevision(item.id, "rejected", snapshotOf(item), user.id, note.trim());
+  await appendWorkflowComment(user, item.id, note.trim(), "rejected");
   await createNotification({
     userId: item.created_by,
     type: "news.rejected",

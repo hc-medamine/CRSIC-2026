@@ -2,13 +2,14 @@
 
 | Field | Value |
 |-------|--------|
-| Status | Review |
+| Status | Approved |
 | Date | 2026-07-19 |
 | Author | Product discovery (CRSIC 2026) |
 | Owners | _(to be assigned — CRSIC + implementing team)_ |
 | Related roadmap step | Step 4 — Internal web app + database (no external CMS) |
 | Supersedes | — |
 | Related | [data/CMS.md](../../data/CMS.md), [README.md §10](../../README.md), [docs/prds/TEMPLATE.md](./TEMPLATE.md) |
+| Approved | 2026-07-21 — stakeholder confirmed (status had remained Review by omission) |
 
 **Document rule:** Facts confirmed in discovery are unmarked. Items that are not yet verified are labeled **Assumption**, **Open question**, or **Proposed**.
 
@@ -486,7 +487,7 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 | Hosted Supabase reintroduced | Compliance | Local Postgres only |
 | Local-only habits break prod deploy | Go-live friction | Document env + publish contract from day one |
 | No email password recovery | Locked-out users | Super Admin reset SOP |
-| Public schema too shallow | Product gap | P1 now; WORKLOG pending detail pages |
+| Public schema too shallow | Product gap | P1 now; detail pages shipped (PR #3) |
 | Malware in uploads | Security | Type/size allowlist; quarantine |
 | Premature merge to `main` | Regressions | Branch gate: zero known bugs + smoke |
 
@@ -535,15 +536,17 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 
 ### Phase 2 — Governance hardening (still no email)
 
-- Emergency bypass + post-publication review.  
-- Scheduled publish (if later needed).  
-- In-app escalation / delegation.  
-- Optional malware scanning.  
-- Richer comments.
+Order: **least effort → most complex** (locked 2026-07-21):
+
+1. Richer in-app comments (item-level threads first; field-level later if needed) — **implementing** on `feature/phase2-item-comments`.  
+2. In-app escalation / delegation (extend reassign + notifications; OOO / backup reviewer).  
+3. Emergency bypass + post-publication review.  
+4. Scheduled publish (only if still needed).  
+5. Optional malware scanning (highest ops cost).
 
 ### Phase 3 — Content surface + go-live prep
 
-- Detailed public news/publication pages (WORKLOG pending).  
+- ~~Detailed public news/publication pages~~ → **Done** on `main` (PR #3, 2026-07-20; events included).  
 - Partners/static pages/alerts as needed.  
 - Production deploy to Algeria / `crsic.dz` when local product is frictionless.
 
@@ -590,7 +593,7 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 
 ## 17. Future improvements
 
-- Detailed public news / publication pages (WORKLOG pending).  
+- ~~Detailed public news / publication pages~~ → shipped (PR #3).  
 - Scheduled publish.  
 - Emergency notices workflow.  
 - Configurable multi-step approvals by content type.  
@@ -642,8 +645,13 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 | 2026-07-20 | Named staff accounts (closes prior TBD): Super Admin **F. Chettih** `f.chettih@crsic.dz`; Reviewer **F. Boufatah** `f.boufatah@crsic.dz`; Editors **i.megoussi** `i.megoussi@crsic.dz` (Megoussi Imen / ايمان مقوسي), **t.medjelled** `t.medjelled@crsic.dz` (Tarek Medjelled / طارق مجلد). `smoke.*` accounts are automation-only, not staff. |
 | 2026-07-20 | Public JSON rebuilt from rows where **`live_payload IS NOT NULL`** (not only `status='published'`); "create revision" keeps the public copy live until next publish (migration `010_live_payload.sql`) |
 | 2026-07-20 | Legacy cutover: import current `data/*.json` into CMS as live items via `npm run db:import-legacy` before first production publish, OR accept loss of non-imported cards ([CMS-CUTOVER.md](../runbooks/CMS-CUTOVER.md)) |
+| 2026-07-21 | PRD status → **Approved** (stakeholder; had remained Review by omission) |
+| 2026-07-21 | Phase 2 order: least effort → most complex (see WORKLOG); feature branches until stable then merge `main` |
+| 2026-07-21 | Phase 2 #1 comments: item-level thread; Author+Reviewer+SA; any status; changes/reject append; keep `review_note`; append-only (no edit/delete) |
+| 2026-07-21 | Reassign: only Super Admin may assign **to** Super Admin; Reviewers may assign to Editor/Reviewer only |
+| 2026-07-21 | Edit/review shows Editor (author), Reviewer (last review action), Publisher (last publish) beside Status |
 ---
 
 ## 19. Mapping to template sections
 
-This PRD expands [TEMPLATE.md](./TEMPLATE.md). Status remains **Review** until marked **Approved**; implementation proceeds on `feature/step4-internal-cms` against locked decisions. Keep [docs/prds/README.md](./README.md), [docs/WORKLOG.md](../WORKLOG.md), and root [README.md](../../README.md) §10 in sync.
+This PRD expands [TEMPLATE.md](./TEMPLATE.md). Status is **Approved** (2026-07-21). Phase 1 CMS and public detail pages are on `main`; Phase 2 proceeds on feature branches until stable. Keep [docs/prds/README.md](./README.md), [docs/WORKLOG.md](../WORKLOG.md), and root [README.md](../../README.md) §10 in sync.

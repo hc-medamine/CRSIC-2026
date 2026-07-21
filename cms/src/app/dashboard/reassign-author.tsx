@@ -68,7 +68,8 @@ export function ReassignAuthor({ contentItemId, contentType, currentAuthorId }: 
       <h2 className="text-lg font-medium text-zinc-900">Reassign author</h2>
       <p className="text-xs text-zinc-500">
         Move this item to another active user (draft / changes requested / submitted only). Audited
-        as <code>content.reassign</code>.
+        as <code>content.reassign</code>. Reviewers may assign to Editors or Reviewers; only Super
+        Admin may assign to a Super Admin.
       </p>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {message ? <p className="text-sm text-green-700">{message}</p> : null}

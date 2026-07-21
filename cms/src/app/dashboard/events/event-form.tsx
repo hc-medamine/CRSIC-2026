@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { MediaUploadField } from "@/app/dashboard/media-upload-field";
 import { MediaAttachmentsField } from "@/app/dashboard/media-attachments-field";
 import { PublishPreview } from "@/app/dashboard/publish-preview";
+import { ItemWorkflowMeta, type PersonDisplay } from "@/app/dashboard/item-workflow-meta";
 import type { PublicMediaItem } from "@/lib/publish/media";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
@@ -34,6 +35,9 @@ type Initial = {
   publicSlug?: string | null;
   status?: string;
   reviewNote?: string | null;
+  editor?: PersonDisplay;
+  reviewer?: PersonDisplay;
+  publisher?: PersonDisplay;
 };
 
 type Props = {
@@ -182,10 +186,13 @@ export function EventEditorForm({
   return (
     <div className="flex flex-col gap-4">
       {initial?.status ? (
-        <p className="text-sm text-zinc-600">
-          Status: <strong>{initial.status}</strong>
-          {initial.reviewNote ? ` — ${initial.reviewNote}` : ""}
-        </p>
+        <ItemWorkflowMeta
+          status={initial.status}
+          reviewNote={initial.reviewNote}
+          editor={initial.editor}
+          reviewer={initial.reviewer}
+          publisher={initial.publisher}
+        />
       ) : null}
 
       <form
