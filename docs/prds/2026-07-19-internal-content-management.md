@@ -593,7 +593,7 @@ Order: **least effort → most complex** (locked 2026-07-21):
 ## 17. Future improvements
 
 - ~~Detailed public news / publication pages~~ → shipped (PR #3).  
-- Scheduled publish.  
+- ~~Scheduled publish~~ → **Cancelled** (2026-07-21); manual Approve → Publish only.  
 - Emergency notices workflow.  
 - Configurable multi-step approvals by content type.  
 - Translator role and AR/EN linkage rules.  
