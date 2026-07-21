@@ -40,11 +40,23 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Fill remaining public detail copy | **Paused** — do not block on editorial; resume only when stakeholder has source text |
 | Feature delivery workflow | **Locked** — new work on a feature branch until fully stable, then merge to `main` |
 | CMS PRD | **Approved** (2026-07-21) |
-| CMS Phase 2 | **In progress** — #2 escalation/delegation/OOO on `feature/phase2-escalation-delegation` |
+| CMS Phase 2 | **In progress** — #3 emergency bypass on `feature/phase2-emergency-bypass` (#1–#2 on `main`) |
 
 ---
 
 ## Changelog
+
+### 2026-07-21 — Phase 2 #3 emergency bypass + post-publication review (branch)
+
+**Branch:** `feature/phase2-emergency-bypass`
+
+**Locked:** SA-only emergency publish from draft/changes_requested/submitted/approved → live + `needs_post_review`; required reason (comment + audit); Confirm OK blocked for bypass actor; Unpublish / Request changes outcomes; Away freeze on post-review; notify Reviewers+SA on bypass.
+
+**Shipped:** migration `014_emergency_bypass.sql`, `emergency.ts` + `/api/content/emergency`, Emergency panel + dashboard queue, smoke paths.
+
+**Next:** Stakeholder smoke → merge → Phase 2 #4 scheduled publish (if still wanted).
+
+---
 
 ### 2026-07-21 — Phase 2 #2 escalation / delegation / OOO (branch)
 
@@ -54,7 +66,7 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 **Future reminder:** when department scopes drive notify routing, revisit “all Editors” fan-out → prefer same-department Editors.
 
-**Next:** Stakeholder smoke → merge → Phase 2 #3 emergency bypass.
+**Next:** Stakeholder smoke → merge → Phase 2 #3 emergency bypass. **Done** — merged PR #5; #3 on branch.
 
 ---
 

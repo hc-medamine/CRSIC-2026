@@ -16,6 +16,7 @@ type Props = {
   publisher?: PersonDisplay;
   reviewOwner?: PersonDisplay;
   escalatedAt?: string | null;
+  needsPostReview?: boolean;
 };
 
 function formatPerson(p: PersonDisplay): string {
@@ -33,6 +34,7 @@ export function ItemWorkflowMeta({
   publisher,
   reviewOwner,
   escalatedAt,
+  needsPostReview,
 }: Props) {
   if (!status) return null;
   return (
@@ -44,6 +46,9 @@ export function ItemWorkflowMeta({
           <span className="ml-2 text-amber-800">
             · Escalated {formatDateTime(escalatedAt)}
           </span>
+        ) : null}
+        {needsPostReview ? (
+          <span className="ml-2 text-red-800">· Emergency · needs post-review</span>
         ) : null}
       </p>
       <dl className="mt-2 grid gap-1 text-xs text-zinc-600 sm:grid-cols-2 lg:grid-cols-4">

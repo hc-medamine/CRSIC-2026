@@ -538,8 +538,8 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 
 Order: **least effort → most complex** (locked 2026-07-21):
 
-2. In-app escalation / delegation (extend reassign + notifications; OOO / backup reviewer) — **implementing** on `feature/phase2-escalation-delegation`.  
-3. Emergency bypass + post-publication review.  
+2. In-app escalation / delegation (extend reassign + notifications; OOO / backup reviewer) — **Done** on `main` (PR #5).  
+3. Emergency bypass + post-publication review — **implementing** on `feature/phase2-emergency-bypass`.  
 4. Scheduled publish (only if still needed).  
 5. Optional malware scanning (highest ops cost).
 
@@ -651,6 +651,7 @@ Order: **least effort → most complex** (locked 2026-07-21):
 | 2026-07-21 | Edit/review shows Editor (author), Reviewer (last review action), Publisher (last publish) beside Status |
 | 2026-07-21 | Phase 2 #2: review-owner V2 (SA confirm); escalate Author+Reviewer+SA; OOO elevate Editor→Reviewer, freeze Away review actions, notify Away+all Editors; submit notify owner-or-broadcast |
 | 2026-07-21 | **Reminder:** when department notify routing lands, prefer same-department Editors for OOO fan-out (not all Editors) |
+| 2026-07-21 | Phase 2 #3: SA-only emergency publish → live + `needs_post_review`; Confirm OK not by bypass actor; Unpublish / Request changes; Away freeze on post-review |
 ---
 
 ## 19. Mapping to template sections

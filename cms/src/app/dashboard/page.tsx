@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { requireUser } from "@/lib/auth/session";
 import { getQueues, type QueueItem } from "@/lib/content/queues";
 import { listPendingReviewOwnerProposals } from "@/lib/content/delegation";
+import { listNeedsPostReview } from "@/lib/content/emergency";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 
 const TYPE_BADGE: Record<QueueItem["contentType"], string> = {
@@ -72,6 +73,7 @@ export default async function DashboardPage() {
   const canReview = user.role === "reviewer" || user.role === "super_admin";
   const pendingOwners =
     user.role === "super_admin" ? await listPendingReviewOwnerProposals() : [];
+  const needsPostReview = canReview ? await listNeedsPostReview() : [];
 
   return (
     <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 px-6 py-8 font-sans">
@@ -84,6 +86,40 @@ export default async function DashboardPage() {
       </header>
 
       <div className="grid gap-4 md:grid-cols-2">
+        {canReview ? (
+          <section className="rounded-lg border border-red-200 bg-white shadow-sm md:col-span-2">
+            <div className="flex items-center justify-between border-b border-red-100 px-4 py-3">
+              <h2 className="text-sm font-semibold text-red-950">
+                Needs post-publication review
+              </h2>
+              <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800">
+                {needsPostReview.length}
+              </span>
+            </div>
+            {needsPostReview.length === 0 ? (
+              <p className="px-4 py-4 text-sm text-zinc-500">No emergency items awaiting review.</p>
+            ) : (
+              <ul className="divide-y divide-zinc-100">
+                {needsPostReview.map((p) => (
+                  <li key={p.id} className="px-4 py-3">
+                    <Link href={p.href} className="font-medium underline" dir="auto">
+                      {p.title}
+                    </Link>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      {p.publishedByName ? `by ${p.publishedByName}` : "Emergency"}
+                      {p.publishedAt ? ` · ${p.publishedAt.slice(0, 16).replace("T", " ")}` : ""}
+                    </p>
+                    {p.reason ? (
+                      <p className="mt-1 text-xs text-red-800" dir="auto">
+                        {p.reason}
+                      </p>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        ) : null}
         {user.role === "super_admin" ? (
           <section className="rounded-lg border border-zinc-200 bg-white shadow-sm md:col-span-2">
             <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3">

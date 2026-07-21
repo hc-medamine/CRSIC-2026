@@ -36,6 +36,7 @@ type Initial = {
   publisher?: PersonDisplay;
   reviewOwner?: PersonDisplay;
   escalatedAt?: string | null;
+  needsPostReview?: boolean;
 };
 
 type Props = {
@@ -185,6 +186,7 @@ export function PublicationEditorForm({
           publisher={initial.publisher}
           reviewOwner={initial.reviewOwner}
           escalatedAt={initial.escalatedAt}
+          needsPostReview={initial.needsPostReview}
         />
       ) : null}
 
