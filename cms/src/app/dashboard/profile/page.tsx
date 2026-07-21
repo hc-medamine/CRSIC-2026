@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { query } from "@/lib/db";
 import { ProfileForm } from "./profile-form";
+import { AwayPanel } from "@/app/dashboard/away-panel";
 
 type ProfileRow = {
   email: string;
@@ -48,6 +49,8 @@ export default async function ProfilePage() {
           role: row.role,
         }}
       />
+
+      <AwayPanel canManage={row.role === "reviewer"} />
     </main>
   );
 }

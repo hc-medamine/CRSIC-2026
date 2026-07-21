@@ -538,8 +538,7 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 
 Order: **least effort → most complex** (locked 2026-07-21):
 
-1. Richer in-app comments (item-level threads first; field-level later if needed) — **implementing** on `feature/phase2-item-comments`.  
-2. In-app escalation / delegation (extend reassign + notifications; OOO / backup reviewer).  
+2. In-app escalation / delegation (extend reassign + notifications; OOO / backup reviewer) — **implementing** on `feature/phase2-escalation-delegation`.  
 3. Emergency bypass + post-publication review.  
 4. Scheduled publish (only if still needed).  
 5. Optional malware scanning (highest ops cost).
@@ -650,6 +649,8 @@ Order: **least effort → most complex** (locked 2026-07-21):
 | 2026-07-21 | Phase 2 #1 comments: item-level thread; Author+Reviewer+SA; any status; changes/reject append; keep `review_note`; append-only (no edit/delete) |
 | 2026-07-21 | Reassign: only Super Admin may assign **to** Super Admin; Reviewers may assign to Editor/Reviewer only |
 | 2026-07-21 | Edit/review shows Editor (author), Reviewer (last review action), Publisher (last publish) beside Status |
+| 2026-07-21 | Phase 2 #2: review-owner V2 (SA confirm); escalate Author+Reviewer+SA; OOO elevate Editor→Reviewer, freeze Away review actions, notify Away+all Editors; submit notify owner-or-broadcast |
+| 2026-07-21 | **Reminder:** when department notify routing lands, prefer same-department Editors for OOO fan-out (not all Editors) |
 ---
 
 ## 19. Mapping to template sections

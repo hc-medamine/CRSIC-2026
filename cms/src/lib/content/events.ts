@@ -13,6 +13,8 @@ import {
   canReview,
   getUserOrgIds,
 } from "@/lib/content/permissions";
+import { notifyOnSubmit } from "@/lib/content/delegation";
+import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
 import type { ContentStatus } from "@/lib/content/news";
 
 async function auditEvent(
@@ -281,13 +283,8 @@ export async function updateEventDraft(user: SessionUser, id: string, input: Eve
   return item;
 }
 
-async function notifyReviewers(title: string, body: string, linkPath: string) {
-  const reviewers = await query<{ id: string }>(
-    `SELECT id FROM users WHERE is_active = TRUE AND role IN ('reviewer', 'super_admin')`,
-  );
-  for (const r of reviewers.rows) {
-    await createNotification({ userId: r.id, type: "event.submitted", title, body, linkPath });
-  }
+async function notifyReviewers(itemId: string, title: string, body: string, linkPath: string) {
+  await notifyOnSubmit(itemId, title, body, linkPath, "event.submitted");
 }
 
 export async function submitEvent(user: SessionUser, id: string, checklistConfirmed: boolean) {
@@ -309,7 +306,12 @@ export async function submitEvent(user: SessionUser, id: string, checklistConfir
   );
   const item = result.rows[0];
   await addRevision(item.id, "submitted", snapshotOf(item), user.id, "Submitted for review");
-  await notifyReviewers("Event submitted for review", item.title_ar, `/dashboard/events/${item.id}`);
+  await notifyReviewers(
+    item.id,
+    "Event submitted for review",
+    item.title_ar,
+    `/dashboard/events/${item.id}`,
+  );
   await auditEvent(user, "event.submit", item);
   return item;
 }
@@ -331,8 +333,10 @@ export async function withdrawEvent(user: SessionUser, id: string) {
 }
 
 async function assertReviewer(user: SessionUser, item: EventItem) {
-  if (!canReview(user)) throw new Error("Reviewer role required");
-  if (item.created_by === user.id) throw new Error("Four-eyes: you cannot review your own item");
+  const effective = (await refreshUserFromDb(user.id)) ?? user;
+  await assertNotAwayFrozen(effective);
+  if (!canReview(effective)) throw new Error("Reviewer role required");
+  if (item.created_by === effective.id) throw new Error("Four-eyes: you cannot review your own item");
 }
 
 export async function requestEventChanges(user: SessionUser, id: string, note: string) {

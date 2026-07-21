@@ -40,11 +40,23 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Fill remaining public detail copy | **Paused** — do not block on editorial; resume only when stakeholder has source text |
 | Feature delivery workflow | **Locked** — new work on a feature branch until fully stable, then merge to `main` |
 | CMS PRD | **Approved** (2026-07-21) |
-| CMS Phase 2 | **In progress** — #1 item comments on `feature/phase2-item-comments` |
+| CMS Phase 2 | **In progress** — #2 escalation/delegation/OOO on `feature/phase2-escalation-delegation` |
 
 ---
 
 ## Changelog
+
+### 2026-07-21 — Phase 2 #2 escalation / delegation / OOO (branch)
+
+**Branch:** `feature/phase2-escalation-delegation`
+
+**Locked:** Delegate (V2 SA confirm) + Escalate (author/reviewer/SA, required note) + OOO (elevate one Editor to temp Reviewer; freeze Away review actions; dual-notify Away + all Editors; until-date). Submit notifies review owner if set, else broadcast.
+
+**Future reminder:** when department scopes drive notify routing, revisit “all Editors” fan-out → prefer same-department Editors.
+
+**Next:** Stakeholder smoke → merge → Phase 2 #3 emergency bypass.
+
+---
 
 ### 2026-07-21 — Phase 2 #1 item-level comment threads (branch)
 

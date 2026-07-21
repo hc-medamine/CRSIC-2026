@@ -18,6 +18,9 @@ export async function POST(request: NextRequest) {
   }
 
   session.lastActivityAt = Date.now();
+  const { refreshUserFromDb } = await import("@/lib/content/ooo");
+  const fresh = await refreshUserFromDb(session.user.id);
+  if (fresh) session.user = fresh;
   await session.save();
   return response;
 }

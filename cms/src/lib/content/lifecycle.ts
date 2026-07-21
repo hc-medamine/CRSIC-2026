@@ -4,6 +4,7 @@ import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { canReview } from "@/lib/content/permissions";
 import { getContentMeta, getRevisionById } from "@/lib/content/revisions";
+import { assertNotAwayFrozen } from "@/lib/content/ooo";
 
 export type ContentType = "news" | "event" | "publication";
 
@@ -263,6 +264,7 @@ export async function reassignAuthor(
   id: string,
   newUserId: string,
 ): Promise<ContentType> {
+  await assertNotAwayFrozen(user);
   if (user.role !== "super_admin" && user.role !== "reviewer") {
     throw new Error("Super Admin or Reviewer role required to reassign");
   }

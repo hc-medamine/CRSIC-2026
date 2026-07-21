@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { formatDateTime } from "@/lib/format-datetime";
 
 type Revision = {
   id: string;
@@ -176,7 +177,7 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
             <p className="text-xs text-zinc-500">
               #{selected.revisionNumber} · {selected.status} ·{" "}
               {selected.authorDisplayName ?? selected.authorEmail ?? "unknown"} ·{" "}
-              {new Date(selected.createdAt).toLocaleString()}
+              {formatDateTime(selected.createdAt)}
               {selected.changeSummary ? ` · ${selected.changeSummary}` : ""}
             </p>
             {canRestore ? (
