@@ -55,7 +55,7 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 **Shipped on branch:** migration `015_phase3_partners_alerts_pages.sql`; partners/alerts/pages libs + APIs + dashboard; SPA alert banner + i18n site-copy overlay; smoke paths; seed-site-pages script.
 
-**Next:** Stakeholder smoke → merge → bug/improvement pass → consider PRD done until go-live.
+**Next (paused for stakeholder):** Local-only until full Phase 3 review next session — **do not push/PR/merge** yet. Then smoke UI → merge → bug/improvement pass → consider PRD done until go-live.
 
 ---
 
