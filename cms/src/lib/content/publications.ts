@@ -471,6 +471,8 @@ export async function unpublishPublication(user: SessionUser, id: string) {
     mutate: async () => {
       const result = await query<PublicationItem>(
         `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
+          needs_post_review = FALSE, emergency_published_at = NULL,
+          emergency_published_by = NULL, emergency_reason = NULL,
           updated_by = $2, updated_at = NOW()
          WHERE id = $1 RETURNING *`,
         [id, user.id],

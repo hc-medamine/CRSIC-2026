@@ -25,6 +25,11 @@ import {
   escalateItem,
   proposeReviewOwner,
 } from "../src/lib/content/delegation";
+import {
+  confirmPostReview,
+  emergencyPublish,
+  unpublishPostReview,
+} from "../src/lib/content/emergency";
 import { clearAway, setAway, refreshUserFromDb } from "../src/lib/content/ooo";
 import { listAuditLog } from "../src/lib/audit";
 
@@ -285,6 +290,76 @@ async function main() {
   if (reverted?.role !== "editor") {
     throw new Error("Expected elevated user to revert to Editor after clear Away");
   }
+
+  console.log("Phase 2 #3: emergency publish + post-review…");
+  const emergSnap = snapshotNewsJson();
+  const emergDraft = await createNews(editor, {
+    orgUnitId,
+    titleAr: `Smoke emergency ${Date.now()}`,
+    labelAr: "خبر",
+    enStatus: "pending",
+  });
+  await emergencyPublish(saUser, emergDraft.id, "Smoke emergency reason");
+  const emergRow = await query<{
+    status: string;
+    needs_post_review: boolean;
+    emergency_published_by: string | null;
+  }>(`SELECT status, needs_post_review, emergency_published_by FROM content_items WHERE id = $1`, [
+    emergDraft.id,
+  ]);
+  if (
+    emergRow.rows[0]?.status !== "published" ||
+    !emergRow.rows[0]?.needs_post_review ||
+    emergRow.rows[0]?.emergency_published_by !== saUser.id
+  ) {
+    throw new Error("Expected emergency published + needs_post_review");
+  }
+  const emergJson = JSON.parse(readFileSync(newsJsonPath(), "utf8")) as {
+    news: Array<{ title: string }>;
+  };
+  if (!emergJson.news.some((n) => n.title.includes("Smoke emergency"))) {
+    throw new Error("Emergency item missing from news.json");
+  }
+  const emergComments = await listCommentsForItem(emergDraft.id);
+  if (!emergComments.some((c) => c.body.includes("Emergency publish: Smoke emergency reason"))) {
+    throw new Error("Expected emergency publish comment");
+  }
+  let selfConfirmBlocked = false;
+  try {
+    await confirmPostReview(saUser, emergDraft.id);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "";
+    if (msg.includes("cannot Confirm OK")) selfConfirmBlocked = true;
+    else throw err;
+  }
+  if (!selfConfirmBlocked) {
+    throw new Error("Bypass actor should not Confirm OK");
+  }
+  await confirmPostReview(reviewer, emergDraft.id);
+  const cleared = await query<{ needs_post_review: boolean }>(
+    `SELECT needs_post_review FROM content_items WHERE id = $1`,
+    [emergDraft.id],
+  );
+  if (cleared.rows[0]?.needs_post_review) {
+    throw new Error("Expected needs_post_review cleared after Confirm OK");
+  }
+  // Second emergency → unpublish rollback path
+  const emerg2 = await createNews(editor, {
+    orgUnitId,
+    titleAr: `Smoke emergency unpub ${Date.now()}`,
+    labelAr: "خبر",
+    enStatus: "pending",
+  });
+  await emergencyPublish(saUser, emerg2.id, "Will unpublish");
+  await unpublishPostReview(saUser, emerg2.id);
+  const unpubRow = await query<{ status: string; needs_post_review: boolean }>(
+    `SELECT status, needs_post_review FROM content_items WHERE id = $1`,
+    [emerg2.id],
+  );
+  if (unpubRow.rows[0]?.status !== "unpublished" || unpubRow.rows[0]?.needs_post_review) {
+    throw new Error("Expected unpublished + flag cleared after post-review unpublish");
+  }
+  restoreNewsSnapshot(emergSnap);
 
   console.log("Reviewer approve + publish…");
   const snap = snapshotNewsJson();

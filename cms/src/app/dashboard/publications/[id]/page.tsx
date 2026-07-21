@@ -8,6 +8,7 @@ import { getMediaByPublicPath } from "@/lib/media/store";
 import { listOrgUnits } from "@/lib/users";
 import { getItemPeopleMeta } from "@/lib/content/people";
 import { getReviewOwnerMeta } from "@/lib/content/delegation";
+import { getEmergencyMeta } from "@/lib/content/emergency";
 import { refreshUserFromDb } from "@/lib/content/ooo";
 import { PublicationEditorForm } from "../publication-form";
 import { RevisionHistory } from "@/app/dashboard/revision-history";
@@ -15,6 +16,7 @@ import { ReassignAuthor } from "@/app/dashboard/reassign-author";
 import { CommentThread } from "@/app/dashboard/comment-thread";
 import { ReviewOwnerPanel } from "@/app/dashboard/review-owner-panel";
 import { EscalatePanel } from "@/app/dashboard/escalate-panel";
+import { EmergencyPanel } from "@/app/dashboard/emergency-panel";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -34,6 +36,7 @@ export default async function PublicationDetailPage({ params }: Props) {
   if (!meta || !(await canViewContentItem(user, meta))) redirect("/dashboard");
   const people = await getItemPeopleMeta(id);
   const ownerMeta = await getReviewOwnerMeta(id);
+  const emergencyMeta = await getEmergencyMeta(id);
 
   const allOrgs = await listOrgUnits();
   const orgIds =
@@ -49,6 +52,13 @@ export default async function PublicationDetailPage({ params }: Props) {
   const canProposeOwner =
     canManage && ["draft", "changes_requested", "submitted"].includes(item.status);
   const canEscalate = trueAuthor || canReview(user);
+  const eligibleEmergency = ["draft", "changes_requested", "submitted", "approved"].includes(
+    item.status,
+  );
+  const canEmergencyPublish =
+    user.role === "super_admin" && eligibleEmergency && !emergencyMeta.needsPostReview;
+  const canPostReview = canManage && emergencyMeta.needsPostReview;
+  const canConfirmOk = canPostReview && emergencyMeta.emergencyPublishedBy !== user.id;
   const media = item.image_path ? await getMediaByPublicPath(item.image_path) : null;
 
   return (
@@ -105,7 +115,19 @@ export default async function PublicationDetailPage({ params }: Props) {
             ? { displayName: ownerMeta.reviewOwnerName, email: "", role: "review_owner" }
             : null,
           escalatedAt: ownerMeta.escalatedAt,
+          needsPostReview: emergencyMeta.needsPostReview,
         }}
+      />
+
+      <EmergencyPanel
+        contentItemId={item.id}
+        canEmergencyPublish={canEmergencyPublish}
+        canPostReview={canPostReview}
+        canConfirmOk={canConfirmOk}
+        needsPostReview={emergencyMeta.needsPostReview}
+        emergencyReason={emergencyMeta.emergencyReason}
+        emergencyPublishedAt={emergencyMeta.emergencyPublishedAt}
+        emergencyPublishedByName={emergencyMeta.emergencyPublishedByName}
       />
 
       <EscalatePanel
@@ -133,7 +155,7 @@ export default async function PublicationDetailPage({ params }: Props) {
 
       <CommentThread
         contentItemId={item.id}
-        refreshToken={`${item.status}:${item.review_note ?? ""}:${item.updated_at.toISOString()}:${ownerMeta.escalatedAt ?? ""}`}
+        refreshToken={`${item.status}:${item.review_note ?? ""}:${item.updated_at.toISOString()}:${ownerMeta.escalatedAt ?? ""}:${emergencyMeta.needsPostReview}`}
       />
 
       <RevisionHistory contentItemId={item.id} contentType="publication" canRestore={canManage} />

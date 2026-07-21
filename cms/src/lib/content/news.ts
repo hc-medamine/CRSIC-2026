@@ -501,6 +501,10 @@ export async function unpublishNews(user: SessionUser, id: string) {
           status = 'unpublished',
           live_payload = NULL,
           live_at = NULL,
+          needs_post_review = FALSE,
+          emergency_published_at = NULL,
+          emergency_published_by = NULL,
+          emergency_reason = NULL,
           updated_by = $2,
           updated_at = NOW()
          WHERE id = $1 RETURNING *`,
