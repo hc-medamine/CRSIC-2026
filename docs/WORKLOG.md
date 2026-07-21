@@ -37,12 +37,61 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Docs sync (README tests / tree) | **Done** (this entry) |
 | Step 4 — internal app + DB (no external CMS) | **Done** on `main` — PR [#2](https://github.com/hc-medamine/CRSIC-2026/pull/2) (2026-07-20) |
 | Public detail pages (news / events / pubs) | **Done** on `main` — PR [#3](https://github.com/hc-medamine/CRSIC-2026/pull/3); study-case sample bodies only |
-| Fill remaining public detail copy | **Paused** — stakeholder resumes next session when source text is available |
-| CMS Phase 2 (emergency bypass, auditor, …) | **Deferred** |
+| Fill remaining public detail copy | **Paused** — do not block on editorial; resume only when stakeholder has source text |
+| Feature delivery workflow | **Locked** — new work on a feature branch until fully stable, then merge to `main` |
+| CMS PRD | **Approved** (2026-07-21) |
+| CMS Phase 2 | **In progress** — #1 item comments on `feature/phase2-item-comments` |
 
 ---
 
 ## Changelog
+
+### 2026-07-21 — Phase 2 #1 item-level comment threads (branch)
+
+**Branch:** `feature/phase2-item-comments`
+
+**Locked decisions:**
+1. Item-level thread only (no field-level / @mentions)
+2. Who posts: Author + Reviewer + Super Admin
+3. Any status
+4. Request changes / Reject notes always append to the thread
+5. Keep `review_note` as latest queue summary
+6. Append-only (no edit/delete) — plan default
+
+**Shipped on branch:** `content_comments` table + backfill; shared `CommentThread` on news/event/publication detail; API `GET/POST /api/content/[id]/comments`; workflow hooks; in-app notify on general comments; smoke coverage.
+
+**Also on this branch (2026-07-21 follow-ups):**
+- Reassign rule **B**: Reviewers assign to Editor/Reviewer only; only Super Admin may assign to Super Admin.
+- Edit/review shows **Editor** (author), **Reviewer** (last approve/changes/reject), **Publisher** (last publish) beside Status.
+
+**Next:** Stakeholder smoke → merge to `main` when stable → Phase 2 #2 escalation/delegation.
+
+---
+
+### 2026-07-21 — PRD Approved; Phase 2 effort order
+
+**Locked:** CMS PRD status → **Approved** (stakeholder; was still marked Review by omission). Editorial fill remains paused. New work stays on feature branches until stable.
+
+**Phase 2 priority (least effort → most complex):**
+1. Richer in-app comments (item-level threads on existing review notes first; field-level later if needed)
+2. In-app escalation / delegation (extend reassign + notifications; OOO / backup reviewer)
+3. Emergency bypass + post-publication review
+4. Scheduled publish (background job + `scheduled` status; only if still wanted)
+5. Optional malware scanning (external tool + upload quarantine; highest ops cost)
+
+**Next:** Stakeholder confirms starting with #1 (or picks another number) → open feature branch from `main`.
+
+---
+
+### 2026-07-21 — Pause editorial fill; feature-branch gate for new work
+
+**Locked:**
+- Editorial fill of remaining public `summary`/`body`/media stays **paused** as long as detail/lightbox/CMS publish behave as shipped.
+- Incoming features: implement on a **feature branch** until fully stable (smoke / stakeholder confirm), then merge to `main`. Do not land unfinished work on `main`.
+
+**Next:** Stakeholder names the next feature → open branch from `main` and start there.
+
+---
 
 ### 2026-07-20 — Session wrap-up (pause)
 

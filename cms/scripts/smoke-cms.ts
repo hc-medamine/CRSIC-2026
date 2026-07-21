@@ -15,9 +15,11 @@ import {
   approveNews,
   createNews,
   publishNews,
+  requestNewsChanges,
   submitNews,
   unpublishNews,
 } from "../src/lib/content/news";
+import { addComment, listCommentsForItem } from "../src/lib/content/comments";
 import { listAuditLog } from "../src/lib/audit";
 
 async function ensureUser(opts: {
@@ -151,6 +153,46 @@ async function main() {
     else throw err;
   }
   if (!fourEyesOk) throw new Error("Four-eyes check failed — author-reviewer was able to approve");
+
+  console.log("Comments: request changes appends thread + author reply…");
+  const commentDraft = await createNews(editor, {
+    orgUnitId,
+    titleAr: `Smoke comments ${Date.now()}`,
+    labelAr: "خبر",
+    enStatus: "pending",
+  });
+  await submitNews(editor, commentDraft.id, true);
+  await requestNewsChanges(reviewer, commentDraft.id, "Please fix the title");
+  const afterRequest = await listCommentsForItem(commentDraft.id);
+  if (
+    afterRequest.length < 1 ||
+    afterRequest[afterRequest.length - 1]?.kind !== "changes_requested" ||
+    !afterRequest[afterRequest.length - 1]?.body.includes("Please fix")
+  ) {
+    throw new Error("Expected changes_requested comment after requestNewsChanges");
+  }
+  await addComment(editor, commentDraft.id, "Will fix and resubmit");
+  const afterReply = await listCommentsForItem(commentDraft.id);
+  if (afterReply.length < afterRequest.length + 1) {
+    throw new Error("Expected author reply in comment thread");
+  }
+  let otherEditorBlocked = false;
+  const otherEditor = await ensureUser({
+    email: "smoke.editor2@crsic.dz",
+    password: editorPass,
+    displayName: "Smoke Editor 2",
+    role: "editor",
+  });
+  try {
+    await addComment(otherEditor, commentDraft.id, "Should not post");
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "";
+    if (msg.includes("Only the author") || msg.includes("Forbidden")) otherEditorBlocked = true;
+    else throw err;
+  }
+  if (!otherEditorBlocked) {
+    throw new Error("Non-author editor was able to comment — expected block");
+  }
 
   console.log("Reviewer approve + publish…");
   const snap = snapshotNewsJson();

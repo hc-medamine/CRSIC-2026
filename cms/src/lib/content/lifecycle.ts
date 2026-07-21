@@ -232,13 +232,23 @@ export type AssignableUser = {
   role: string;
 };
 
-/** Active users a draft can be reassigned to. */
-export async function listAssignableUsers(): Promise<AssignableUser[]> {
+/** Active users a draft can be reassigned to.
+ * Rule B: Reviewers see Editors + Reviewers only; Super Admin sees everyone (incl. SA).
+ */
+export async function listAssignableUsers(
+  actor: SessionUser,
+): Promise<AssignableUser[]> {
   const result = await query<AssignableUser>(
-    `SELECT id, display_name, email, role
-     FROM users
-     WHERE is_active = TRUE
-     ORDER BY display_name ASC`,
+    actor.role === "super_admin"
+      ? `SELECT id, display_name, email, role
+         FROM users
+         WHERE is_active = TRUE
+         ORDER BY display_name ASC`
+      : `SELECT id, display_name, email, role
+         FROM users
+         WHERE is_active = TRUE
+           AND role IN ('editor', 'reviewer')
+         ORDER BY display_name ASC`,
   );
   return result.rows;
 }
@@ -246,6 +256,7 @@ export async function listAssignableUsers(): Promise<AssignableUser[]> {
 /**
  * Gap #6 — reassign authorship of an in-progress item to another active user.
  * Super Admin or Reviewer; only for draft / changes_requested / submitted items.
+ * Reviewers cannot reassign to a Super Admin (only Super Admin may).
  */
 export async function reassignAuthor(
   user: SessionUser,
@@ -263,13 +274,18 @@ export async function reassignAuthor(
     throw new Error("Only draft, changes_requested, or submitted items can be reassigned");
   }
 
-  const target = await query<{ id: string; is_active: boolean; display_name: string }>(
-    `SELECT id, is_active, display_name FROM users WHERE id = $1`,
-    [newUserId],
-  );
+  const target = await query<{
+    id: string;
+    is_active: boolean;
+    display_name: string;
+    role: string;
+  }>(`SELECT id, is_active, display_name, role FROM users WHERE id = $1`, [newUserId]);
   const targetRow = target.rows[0];
   if (!targetRow) throw new Error("Target user not found");
   if (!targetRow.is_active) throw new Error("Target user is not active");
+  if (targetRow.role === "super_admin" && user.role !== "super_admin") {
+    throw new Error("Only Super Admin can reassign to a Super Admin");
+  }
 
   const previous = item.created_by;
   await query(

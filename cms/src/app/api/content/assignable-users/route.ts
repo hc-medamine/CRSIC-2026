@@ -17,6 +17,6 @@ export async function GET() {
   if (user.role !== "super_admin" && user.role !== "reviewer") {
     return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
   }
-  const users = await listAssignableUsers();
+  const users = await listAssignableUsers(user);
   return NextResponse.json({ ok: true, users });
 }

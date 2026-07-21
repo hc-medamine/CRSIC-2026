@@ -16,7 +16,7 @@ Future product specs for CRSIC live here. The public site has no active PRD yet;
 
 | PRD | Status | Notes |
 |-----|--------|-------|
-| [2026-07-19-internal-content-management.md](./2026-07-19-internal-content-management.md) | Review | Step 4 — branch `feature/step4-internal-cms`; Node + PostgreSQL 18.4-2 local; no email; P1 JSON publish |
+| [2026-07-19-internal-content-management.md](./2026-07-19-internal-content-management.md) | **Approved** (2026-07-21) | Step 4 — Phase 1 on `main`; Phase 2 #1 comments on `feature/phase2-item-comments` |
 
 ## Related
 
