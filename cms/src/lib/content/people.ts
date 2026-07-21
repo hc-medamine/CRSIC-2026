@@ -11,6 +11,7 @@ export type ItemPeopleMeta = {
   editor: PersonRef | null;
   reviewer: PersonRef | null;
   publisher: PersonRef | null;
+  reviewOwner: PersonRef | null;
 };
 
 type UserRow = {
@@ -78,13 +79,17 @@ async function lastActorForActions(
  * - Publisher: last who published (no separate Publisher role in MVP)
  */
 export async function getItemPeopleMeta(contentItemId: string): Promise<ItemPeopleMeta> {
-  const item = await query<{ created_by: string; content_type: string }>(
-    `SELECT created_by, content_type FROM content_items WHERE id = $1`,
+  const item = await query<{
+    created_by: string;
+    content_type: string;
+    review_owner_id: string | null;
+  }>(
+    `SELECT created_by, content_type, review_owner_id FROM content_items WHERE id = $1`,
     [contentItemId],
   );
   const row = item.rows[0];
   if (!row) {
-    return { editor: null, reviewer: null, publisher: null };
+    return { editor: null, reviewer: null, publisher: null, reviewOwner: null };
   }
 
   const t = row.content_type;
@@ -95,6 +100,7 @@ export async function getItemPeopleMeta(contentItemId: string): Promise<ItemPeop
     `${t}.reject`,
   ]);
   const publisher = await lastActorForActions(contentItemId, [`${t}.publish`]);
+  const reviewOwner = await userById(row.review_owner_id);
 
-  return { editor, reviewer, publisher };
+  return { editor, reviewer, publisher, reviewOwner };
 }

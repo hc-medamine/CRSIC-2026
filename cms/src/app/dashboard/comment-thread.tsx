@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
+import { formatDateTime } from "@/lib/format-datetime";
 
 type Comment = {
   id: string;
@@ -98,7 +99,7 @@ export function CommentThread({ contentItemId, refreshToken }: Props) {
         {comments.map((c) => {
           const badge = kindLabel(c.kind);
           const who = c.authorDisplayName || c.authorEmail || "Unknown";
-          const when = new Date(c.createdAt).toLocaleString();
+          const when = formatDateTime(c.createdAt);
           return (
             <li key={c.id} className="rounded border border-zinc-100 bg-zinc-50 px-3 py-2 text-sm">
               <div className="mb-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500">

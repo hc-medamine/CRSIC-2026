@@ -7,10 +7,14 @@ import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 import { getMediaByPublicPath } from "@/lib/media/store";
 import { listOrgUnits } from "@/lib/users";
 import { getItemPeopleMeta } from "@/lib/content/people";
+import { getReviewOwnerMeta } from "@/lib/content/delegation";
+import { refreshUserFromDb } from "@/lib/content/ooo";
 import { PublicationEditorForm } from "../publication-form";
 import { RevisionHistory } from "@/app/dashboard/revision-history";
 import { ReassignAuthor } from "@/app/dashboard/reassign-author";
 import { CommentThread } from "@/app/dashboard/comment-thread";
+import { ReviewOwnerPanel } from "@/app/dashboard/review-owner-panel";
+import { EscalatePanel } from "@/app/dashboard/escalate-panel";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -20,7 +24,8 @@ function personProp(p: { displayName: string; email: string; role: string } | nu
 }
 
 export default async function PublicationDetailPage({ params }: Props) {
-  const user = await requireUser();
+  const sessionUser = await requireUser();
+  const user = (await refreshUserFromDb(sessionUser.id)) ?? sessionUser;
   if (!(await canAccessContentType(user, "publication"))) redirect("/dashboard");
   const { id } = await params;
   const item = await getPublicationById(id);
@@ -28,6 +33,7 @@ export default async function PublicationDetailPage({ params }: Props) {
   const meta = await getContentMeta(id);
   if (!meta || !(await canViewContentItem(user, meta))) redirect("/dashboard");
   const people = await getItemPeopleMeta(id);
+  const ownerMeta = await getReviewOwnerMeta(id);
 
   const allOrgs = await listOrgUnits();
   const orgIds =
@@ -36,9 +42,13 @@ export default async function PublicationDetailPage({ params }: Props) {
       : await getUserOrgIds(user.id);
   const orgs = allOrgs.filter((o) => orgIds.includes(o.id));
   const isAuthor = item.created_by === user.id || user.role === "super_admin";
+  const trueAuthor = item.created_by === user.id;
   const reviewer = canReview(user) && item.created_by !== user.id;
   const canManage = user.role === "super_admin" || user.role === "reviewer";
   const canReassign = canManage && ["draft", "changes_requested", "submitted"].includes(item.status);
+  const canProposeOwner =
+    canManage && ["draft", "changes_requested", "submitted"].includes(item.status);
+  const canEscalate = trueAuthor || canReview(user);
   const media = item.image_path ? await getMediaByPublicPath(item.image_path) : null;
 
   return (
@@ -91,7 +101,26 @@ export default async function PublicationDetailPage({ params }: Props) {
           editor: personProp(people.editor),
           reviewer: personProp(people.reviewer),
           publisher: personProp(people.publisher),
+          reviewOwner: ownerMeta.reviewOwnerName
+            ? { displayName: ownerMeta.reviewOwnerName, email: "", role: "review_owner" }
+            : null,
+          escalatedAt: ownerMeta.escalatedAt,
         }}
+      />
+
+      <EscalatePanel
+        contentItemId={item.id}
+        canEscalate={canEscalate}
+        escalatedAt={ownerMeta.escalatedAt}
+      />
+
+      <ReviewOwnerPanel
+        contentItemId={item.id}
+        canPropose={canProposeOwner}
+        canConfirm={user.role === "super_admin"}
+        reviewOwnerName={ownerMeta.reviewOwnerName}
+        proposedOwnerName={ownerMeta.proposedOwnerName}
+        proposedByName={ownerMeta.proposedByName}
       />
 
       {canReassign ? (
@@ -104,7 +133,7 @@ export default async function PublicationDetailPage({ params }: Props) {
 
       <CommentThread
         contentItemId={item.id}
-        refreshToken={`${item.status}:${item.review_note ?? ""}:${item.updated_at.toISOString()}`}
+        refreshToken={`${item.status}:${item.review_note ?? ""}:${item.updated_at.toISOString()}:${ownerMeta.escalatedAt ?? ""}`}
       />
 
       <RevisionHistory contentItemId={item.id} contentType="publication" canRestore={canManage} />

@@ -38,6 +38,8 @@ type Initial = {
   editor?: PersonDisplay;
   reviewer?: PersonDisplay;
   publisher?: PersonDisplay;
+  reviewOwner?: PersonDisplay;
+  escalatedAt?: string | null;
 };
 
 type Props = {
@@ -192,6 +194,8 @@ export function EventEditorForm({
           editor={initial.editor}
           reviewer={initial.reviewer}
           publisher={initial.publisher}
+          reviewOwner={initial.reviewOwner}
+          escalatedAt={initial.escalatedAt}
         />
       ) : null}
 

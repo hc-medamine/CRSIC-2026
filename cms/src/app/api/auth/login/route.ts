@@ -57,22 +57,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: "Invalid email or password." }, { status: 401 });
     }
 
-    const response = NextResponse.json({
-      ok: true,
-      user: {
-        email: user.email,
-        displayName: user.display_name,
-        role: user.role,
-      },
-    });
-
-    const session = await getSessionForRoute(request, response);
-    session.user = {
+    const { refreshUserFromDb } = await import("@/lib/content/ooo");
+    const fresh = (await refreshUserFromDb(user.id)) ?? {
       id: user.id,
       email: user.email,
       displayName: user.display_name,
       role: user.role,
     };
+
+    const response = NextResponse.json({
+      ok: true,
+      user: {
+        email: fresh.email,
+        displayName: fresh.displayName,
+        role: fresh.role,
+      },
+    });
+
+    const session = await getSessionForRoute(request, response);
+    session.user = fresh;
     session.lastActivityAt = Date.now();
     await session.save();
 

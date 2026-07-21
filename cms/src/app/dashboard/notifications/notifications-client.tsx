@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { formatDateTime } from "@/lib/format-datetime";
 
 type Item = {
   id: string;
@@ -86,7 +87,7 @@ export function NotificationsClient({ initialUnread, initialItems }: Props) {
                   <p className="font-medium text-zinc-900">{n.title}</p>
                   {n.body ? <p className="mt-1 text-sm text-zinc-600">{n.body}</p> : null}
                   <p className="mt-1 text-xs text-zinc-400">
-                    {n.type} · {new Date(n.createdAt).toLocaleString()}
+                    {n.type} · {formatDateTime(n.createdAt)}
                   </p>
                 </div>
                 <div className="flex gap-2">

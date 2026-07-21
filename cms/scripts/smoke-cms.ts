@@ -8,7 +8,7 @@
 import { readFileSync, writeFileSync, existsSync, copyFileSync } from "node:fs";
 import { join } from "node:path";
 import { query } from "../src/lib/db";
-import { hashPassword } from "../src/lib/auth/password";
+import { hashPassword, verifyPassword } from "../src/lib/auth/password";
 import type { SessionUser } from "../src/lib/auth/session";
 import { allOrgUnitIds, replaceUserScopes } from "../src/lib/users";
 import {
@@ -20,6 +20,12 @@ import {
   unpublishNews,
 } from "../src/lib/content/news";
 import { addComment, listCommentsForItem } from "../src/lib/content/comments";
+import {
+  confirmReviewOwner,
+  escalateItem,
+  proposeReviewOwner,
+} from "../src/lib/content/delegation";
+import { clearAway, setAway, refreshUserFromDb } from "../src/lib/content/ooo";
 import { listAuditLog } from "../src/lib/audit";
 
 async function ensureUser(opts: {
@@ -194,6 +200,92 @@ async function main() {
     throw new Error("Non-author editor was able to comment — expected block");
   }
 
+  console.log("Phase 2 #2: review owner propose/confirm + escalate + OOO…");
+  const saEmail = (process.env.SMOKE_SA_EMAIL || "f.chettih@crsic.dz").trim().toLowerCase();
+  const saPass = process.env.SMOKE_SA_PASSWORD;
+  const saRow = await query<{
+    id: string;
+    email: string;
+    display_name: string;
+    role: "super_admin" | "editor" | "reviewer";
+    password_hash: string;
+  }>(
+    saPass
+      ? `SELECT id, email, display_name, role, password_hash FROM users
+         WHERE email = $1 AND role = 'super_admin' AND is_active = TRUE LIMIT 1`
+      : `SELECT id, email, display_name, role, password_hash FROM users
+         WHERE role = 'super_admin' AND is_active = TRUE LIMIT 1`,
+    saPass ? [saEmail] : [],
+  );
+  const sa = saRow.rows[0];
+  if (!sa) throw new Error("Need an active Super Admin for smoke confirm");
+  if (saPass) {
+    const ok = await verifyPassword(saPass, sa.password_hash);
+    if (!ok) throw new Error(`Super Admin password check failed for ${sa.email}`);
+    console.log(`Super Admin credential OK: ${sa.email}`);
+  } else {
+    console.log(`Super Admin (DB session only, no password check): ${sa.email}`);
+  }
+  const saUser: SessionUser = {
+    id: sa.id,
+    email: sa.email,
+    displayName: sa.display_name,
+    role: "super_admin",
+  };
+
+  const delDraft = await createNews(editor, {
+    orgUnitId,
+    titleAr: `Smoke delegate ${Date.now()}`,
+    labelAr: "خبر",
+    enStatus: "pending",
+  });
+  await submitNews(editor, delDraft.id, true);
+  await proposeReviewOwner(reviewer, delDraft.id, reviewer.id);
+  const pending = await query<{ review_owner_proposed_id: string | null }>(
+    `SELECT review_owner_proposed_id FROM content_items WHERE id = $1`,
+    [delDraft.id],
+  );
+  if (!pending.rows[0]?.review_owner_proposed_id) {
+    throw new Error("Expected pending review owner proposal");
+  }
+  await confirmReviewOwner(saUser, delDraft.id, true);
+  const owned = await query<{ review_owner_id: string | null }>(
+    `SELECT review_owner_id FROM content_items WHERE id = $1`,
+    [delDraft.id],
+  );
+  if (owned.rows[0]?.review_owner_id !== reviewer.id) {
+    throw new Error("Expected confirmed review_owner_id");
+  }
+
+  await escalateItem(editor, delDraft.id, "Smoke escalate note");
+  const escComments = await listCommentsForItem(delDraft.id);
+  if (!escComments.some((c) => c.body.includes("Escalation: Smoke escalate note"))) {
+    throw new Error("Expected escalation comment");
+  }
+
+  await setAway(reviewer, reviewer.id, {
+    until: new Date(Date.now() + 86400000),
+    elevateEditorId: otherEditor.id,
+  });
+  const elevated = await refreshUserFromDb(otherEditor.id);
+  if (elevated?.role !== "reviewer") {
+    throw new Error("Expected elevated Editor to become Reviewer while Away");
+  }
+  let awayBlocked = false;
+  try {
+    await approveNews(reviewer, delDraft.id);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "";
+    if (msg.includes("Away")) awayBlocked = true;
+    else throw err;
+  }
+  if (!awayBlocked) throw new Error("Away Reviewer should be frozen from approve");
+  await clearAway(reviewer, reviewer.id);
+  const reverted = await refreshUserFromDb(otherEditor.id);
+  if (reverted?.role !== "editor") {
+    throw new Error("Expected elevated user to revert to Editor after clear Away");
+  }
+
   console.log("Reviewer approve + publish…");
   const snap = snapshotNewsJson();
   await approveNews(reviewer, draft.id);
@@ -227,6 +319,7 @@ async function main() {
   console.log("SMOKE PASS");
   console.log(`Editor: ${editor.email} / (SMOKE_EDITOR_PASSWORD or SmokeEditor1!)`);
   console.log(`Reviewer: ${reviewer.email} / (SMOKE_REVIEWER_PASSWORD or SmokeReviewer1!)`);
+  console.log(`Super Admin: ${saUser.email}${saPass ? " (password verified)" : ""}`);
 }
 
 main().catch((err) => {
