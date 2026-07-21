@@ -19,6 +19,27 @@ import {
   submitNews,
   unpublishNews,
 } from "../src/lib/content/news";
+import {
+  approvePartner,
+  createPartner,
+  publishPartner,
+  submitPartner,
+  unpublishPartner,
+} from "../src/lib/content/partners";
+import {
+  approveAlert,
+  createAlert,
+  publishAlert,
+  submitAlert,
+  unpublishAlert,
+} from "../src/lib/content/alerts";
+import {
+  approvePage,
+  createPage,
+  publishPage,
+  submitPage,
+  unpublishPage,
+} from "../src/lib/content/pages";
 import { addComment, listCommentsForItem } from "../src/lib/content/comments";
 import {
   confirmReviewOwner,
@@ -66,10 +87,14 @@ async function ensureUser(opts: {
   }
 
   const orgs = await allOrgUnitIds();
-  const types =
-    opts.role === "reviewer"
-      ? (["news", "event", "publication"] as const)
-      : (["news", "event", "publication"] as const);
+  const types = [
+    "news",
+    "event",
+    "publication",
+    "partner",
+    "alert",
+    "page",
+  ] as const;
   await replaceUserScopes(id, orgs, [...types]);
 
   return {
@@ -377,7 +402,76 @@ async function main() {
   await unpublishNews(reviewer, draft.id);
   restoreNewsSnapshot(snap);
 
-  const audits = await listAuditLog({ limit: 50 });
+  console.log("Phase 3: partner publish…");
+  const partnersPath = join(process.cwd(), "..", "data", "partners.json");
+  const partnersSnap = `${partnersPath}.smoke-snap`;
+  copyFileSync(partnersPath, partnersSnap);
+  const partner = await createPartner(editor, {
+    orgUnitId,
+    titleAr: `Smoke partner ${Date.now()}`,
+    labelAr: "الجزائر",
+    partnerScope: "nat",
+    partnerDate: "يوليو 2026",
+    partnerEmoji: "🏛️",
+  });
+  await submitPartner(editor, partner.id, true);
+  await approvePartner(reviewer, partner.id);
+  await publishPartner(reviewer, partner.id);
+  const partnersJson = JSON.parse(readFileSync(partnersPath, "utf8")) as {
+    nat: Array<{ name: string }>;
+  };
+  if (!partnersJson.nat.some((p) => p.name.includes("Smoke partner"))) {
+    throw new Error("Published partners.json missing smoke partner");
+  }
+  await unpublishPartner(reviewer, partner.id);
+  copyFileSync(partnersSnap, partnersPath);
+
+  console.log("Phase 3: alert publish…");
+  const alertsPath = join(process.cwd(), "..", "data", "alerts.json");
+  const alertsSnap = `${alertsPath}.smoke-snap`;
+  copyFileSync(alertsPath, alertsSnap);
+  const alert = await createAlert(editor, {
+    orgUnitId,
+    titleAr: `Smoke alert ${Date.now()}`,
+    titleEn: "Smoke alert EN",
+  });
+  await submitAlert(editor, alert.id, true);
+  await approveAlert(reviewer, alert.id);
+  await publishAlert(reviewer, alert.id);
+  const alertsJson = JSON.parse(readFileSync(alertsPath, "utf8")) as {
+    items: Array<{ message_ar: string }>;
+  };
+  if (!alertsJson.items.some((a) => a.message_ar.includes("Smoke alert"))) {
+    throw new Error("Published alerts.json missing smoke alert");
+  }
+  await unpublishAlert(reviewer, alert.id);
+  copyFileSync(alertsSnap, alertsPath);
+
+  console.log("Phase 3: page publish (cooperation)…");
+  const siteCopyPath = join(process.cwd(), "..", "data", "site-copy.json");
+  const siteCopySnap = `${siteCopyPath}.smoke-snap`;
+  copyFileSync(siteCopyPath, siteCopySnap);
+  const page = await createPage(editor, {
+    orgUnitId,
+    pageKey: "cooperation",
+    pageFields: {
+      ar: { coop_hero_h1: `Smoke coop ${Date.now()}` },
+      en: { coop_hero_h1: "Smoke coop EN" },
+    },
+  });
+  await submitPage(editor, page.id, true);
+  await approvePage(reviewer, page.id);
+  await publishPage(reviewer, page.id);
+  const siteCopy = JSON.parse(readFileSync(siteCopyPath, "utf8")) as {
+    ar: Record<string, string>;
+  };
+  if (!siteCopy.ar.coop_hero_h1?.includes("Smoke coop")) {
+    throw new Error("Published site-copy.json missing cooperation overlay");
+  }
+  await unpublishPage(reviewer, page.id);
+  copyFileSync(siteCopySnap, siteCopyPath);
+
+  const audits = await listAuditLog({ limit: 80 });
   const actions = new Set(audits.map((a) => a.action));
   for (const need of [
     "news.create",
@@ -385,6 +479,9 @@ async function main() {
     "news.approve",
     "news.publish",
     "news.unpublish",
+    "partner.publish",
+    "alert.publish",
+    "page.publish",
   ]) {
     if (!actions.has(need)) {
       throw new Error(`Missing audit action ${need}`);

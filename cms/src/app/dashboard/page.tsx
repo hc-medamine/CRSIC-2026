@@ -10,6 +10,9 @@ const TYPE_BADGE: Record<QueueItem["contentType"], string> = {
   news: "News",
   event: "Event",
   publication: "Publication",
+  partner: "Partner",
+  alert: "Alert",
+  page: "Page",
 };
 
 function QueueList({

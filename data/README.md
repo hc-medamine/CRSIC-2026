@@ -16,10 +16,12 @@ Project docs index: [docs/README.md](../docs/README.md).
 | `publications.json` | `covers[]` + `pubs[]` (same length; index-aligned). Pubs may include detail fields: `id`, `slug`, `summary`, `body`, `media[]` |
 | `events.json` | `intl[]` + `nat[]` events (detail: `id`, `slug`, `summary`, `body`, `media[]`) |
 | `partners.json` | `nat[]` + `intl[]` partners |
+| `alerts.json` | `items[]` — site-wide banner, at most one live item (empty array when none) |
 | `journals.json` | `journals[]` |
 | `news.json` | `news[]` (detail: `id`, `slug`, `summary`, `body`, `media[]`) |
 | `locales/ar.json` | Arabic UI chrome strings (flat key → string) |
 | `locales/en.json` | English UI chrome strings (same keys as `ar`) |
+| `site-copy.json` | CMS-published static pages overlay: `{ "ar": {}, "en": {} }`, merged on top of `locales/*.json` at load time (see below) |
 
 ## Edit UI labels (i18n)
 
@@ -78,6 +80,48 @@ Append to `intl` or `nat` in `events.json`:
 Deep link: `#event/{slug}`.
 
 The home section `#home-events-grid` shows the **3 newest** events (intl + nat merged, sorted by date). The full events page still lists every item by year.
+
+## Add a site alert
+
+`alerts.json` holds **at most one** live item — the site-wide banner shown under the language banner:
+
+```json
+{
+  "items": [
+    {
+      "id": "unique-id",
+      "message_ar": "نص التنبيه بالعربية",
+      "message_en": "Alert message in English",
+      "link": null,
+      "link_label_ar": "",
+      "link_label_en": ""
+    }
+  ]
+}
+```
+
+Use `"items": []` when there is no active alert. `link` is optional (`null` or a URL); when set, `link_label_ar`/`link_label_en` label the button. A visitor who dismisses an alert won't see it again for the rest of the browser session unless a new `id` is published.
+
+## Static pages (about / cooperation / org / contact)
+
+`site-copy.json` holds the CMS-published overlay for the four static pages:
+
+```json
+{
+  "ar": { "about_hero_h1": "..." },
+  "en": { "about_hero_h1": "..." }
+}
+```
+
+At app start, `js/i18n.js` loads `locales/ar.json` + `locales/en.json` first (the fallback copy
+for these pages), then soft-fetches `site-copy.json` and merges its keys on top — so a missing or
+empty `site-copy.json` (`{ "ar": {}, "en": {} }`, the default) simply means the locale-file copy is
+shown as-is. Only one CMS row can be **published** per page at a time; publishing rebuilds
+`site-copy.json` from every currently-published page (about/cooperation/org/contact), overlaying
+locales/*.json only for the keys that page actually defines a value for. Edit copy for these pages
+through the CMS dashboard (`/dashboard/pages`), not by hand-editing this file — the CMS overwrites
+it on every publish/unpublish.
+
 ## Add news
 
 ```json

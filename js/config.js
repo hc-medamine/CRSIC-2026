@@ -3,7 +3,8 @@
  *
  * Local default: JSON under /data (relative to this module).
  * CDN / remote: set CONTENT_BASE_URL to a base that serves the same file names
- *   publications.json, events.json, partners.json, journals.json, news.json
+ *   publications.json, events.json, partners.json, alerts.json, journals.json, news.json,
+ *   site-copy.json (CMS-published static-pages overlay for about/cooperation/org/contact)
  *   and locales/ar.json, locales/en.json
  *
  * Examples:

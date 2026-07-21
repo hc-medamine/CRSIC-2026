@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ContentType, ManagedUser, OrgUnit, UserRole } from "@/lib/users";
 
-const CONTENT_TYPES: ContentType[] = ["news", "event", "publication"];
+const CONTENT_TYPES: ContentType[] = ["news", "event", "publication", "partner", "alert", "page"];
 
 type Props = {
   initialUsers: ManagedUser[];

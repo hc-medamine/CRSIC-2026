@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 
 export type UserRole = "super_admin" | "editor" | "reviewer";
-export type ContentType = "news" | "event" | "publication";
+export type ContentType = "news" | "event" | "publication" | "partner" | "alert" | "page";
 
 export type OrgUnit = {
   id: string;

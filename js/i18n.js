@@ -105,7 +105,41 @@ async function loadLocaleFile(lang) {
 }
 
 /**
- * Fetch ar + en locale dictionaries in parallel.
+ * Soft-load the CMS-published static-pages overlay (data/site-copy.json).
+ * Missing file (404, e.g. no page published yet) is not an error — locale files
+ * already hold the fallback copy for about/cooperation/org/contact.
+ */
+async function loadSiteCopyOverlay() {
+  const url = contentUrl('site-copy.json', import.meta.url);
+  let res;
+  try {
+    res = await fetch(url);
+  } catch (err) {
+    console.warn('[i18n] site-copy.json fetch failed (soft-fail):', err);
+    return;
+  }
+  if (!res.ok) {
+    if (res.status !== 404) console.warn(`[i18n] site-copy.json HTTP ${res.status} (soft-fail)`);
+    return;
+  }
+  let data;
+  try {
+    data = await res.json();
+  } catch (err) {
+    console.warn('[i18n] site-copy.json invalid JSON (soft-fail):', err);
+    return;
+  }
+  if (!data || typeof data !== 'object') return;
+  for (const lang of ['ar', 'en']) {
+    const overlay = data[lang];
+    if (!overlay || typeof overlay !== 'object') continue;
+    TRANSLATIONS[lang] = { ...(TRANSLATIONS[lang] || {}), ...overlay };
+  }
+}
+
+/**
+ * Fetch ar + en locale dictionaries in parallel, then overlay CMS-published
+ * static-pages copy (data/site-copy.json) on top.
  * Soft-fails per file (empty dict + console error).
  * @returns {Promise<{ ok: boolean, errors: Record<string, string> }>}
  */
@@ -123,6 +157,7 @@ export function loadLocales() {
         TRANSLATIONS[lang] = TRANSLATIONS[lang] || {};
       }
     }));
+    await loadSiteCopyOverlay();
     reportKeyParity();
     return {
       ok: Object.keys(errors).length === 0,

@@ -546,8 +546,10 @@ Order: **least effort → most complex** (locked 2026-07-21):
 ### Phase 3 — Content surface + go-live prep
 
 - ~~Detailed public news/publication pages~~ → **Done** on `main` (PR #3, 2026-07-20; events included).  
-- Partners/static pages/alerts as needed.  
-- Production deploy to Algeria / `crsic.dz` when local product is frictionless.
+- ~~Partners / alerts / About·Cooperation·Organisation·Contact copy~~ → **On branch** `feature/phase3-partners-alerts-pages` (2026-07-21): CMS types + `partners.json` / `alerts.json` / `site-copy.json`.  
+- Production deploy to Algeria / `crsic.dz` when local product is frictionless (later).  
+- Editorial fill of remaining article bodies remains **paused**.  
+- After Phase 3 merge: bug/improvement pass, then treat this PRD as done until go-live (malware revisit).
 
 ---
 
@@ -603,7 +605,8 @@ Order: **least effort → most complex** (locked 2026-07-21):
 - Document expiry and periodic review reminders.  
 - Deeper accessibility linting before submit.  
 - Read-only Auditor role and exportable compliance packs.  
-- Optional migration of selected static pages into CMS.
+- ~~Optional migration of selected static pages into CMS~~ → Phase 3 (about/coop/org/contact).  
+- ~~Emergency notices / site alerts~~ → Phase 3 alerts banner.
 
 **Out of product policy:** email-based features.
 
@@ -655,6 +658,7 @@ Order: **least effort → most complex** (locked 2026-07-21):
 | 2026-07-21 | Phase 2 #3: SA-only emergency publish → live + `needs_post_review`; Confirm OK not by bypass actor; Unpublish / Request changes; Away freeze on post-review |
 | 2026-07-21 | Phase 2 #4 scheduled auto-publish **Cancelled** — project stays on manual Approve → Publish (+ emergency bypass); no cron / `scheduled` status |
 | 2026-07-21 | Phase 2 #5 malware/antivirus **Postponed until go-live** — no ClamAV/quarantine pipeline before host choice; keep MIME/size allowlist; revisit with production environment |
+| 2026-07-21 | Phase 3 content surface: partners + site alerts + About/Cooperation/Organisation/Contact via CMS (`partners.json`, `alerts.json`, `site-copy.json` overlay); go-live/editorial still deferred |
 ---
 
 ## 19. Mapping to template sections

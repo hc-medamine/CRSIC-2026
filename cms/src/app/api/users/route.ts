@@ -13,7 +13,7 @@ import {
 
 export const runtime = "nodejs";
 
-const CONTENT_TYPES: ContentType[] = ["news", "event", "publication"];
+const CONTENT_TYPES: ContentType[] = ["news", "event", "publication", "partner", "alert", "page"];
 
 async function requireSuperAdminApi() {
   const session = await getSession();

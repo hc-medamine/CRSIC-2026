@@ -40,17 +40,30 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Fill remaining public detail copy | **Paused** — do not block on editorial; resume only when stakeholder has source text |
 | Feature delivery workflow | **Locked** — new work on a feature branch until fully stable, then merge to `main` |
 | CMS PRD | **Approved** (2026-07-21) |
-| CMS Phase 2 | **Paused** — #1–#3 on `main`; #4 scheduled publish **Cancelled**; #5 malware **Postponed until go-live** |
+| CMS Phase 2 | **Paused** — #1–#3 on `main`; #4 cancelled; #5 malware postponed until go-live |
+| CMS Phase 3 | **In progress** on `feature/phase3-partners-alerts-pages` — partners + alerts + About/coop/org/contact |
 
 ---
 
 ## Changelog
 
+### 2026-07-21 — Phase 3 partners, alerts, static pages (branch)
+
+**Branch:** `feature/phase3-partners-alerts-pages`
+
+**Locked:** All Phase 3 content-surface items: partners CMS → `partners.json`; site alert banner → `alerts.json` (one published); About/Cooperation/Organisation/Contact → `site-copy.json` overlay on locales. Same draft→publish workflow. Go-live and editorial article fill remain out.
+
+**Shipped on branch:** migration `015_phase3_partners_alerts_pages.sql`; partners/alerts/pages libs + APIs + dashboard; SPA alert banner + i18n site-copy overlay; smoke paths; seed-site-pages script.
+
+**Next:** Stakeholder smoke → merge → bug/improvement pass → consider PRD done until go-live.
+
+---
+
 ### 2026-07-21 — Phase 2 #5 malware scanning postponed until go-live
 
 **Locked:** No in-app ClamAV / quarantine / scan-status pipeline before production host is chosen. Upload security stays MIME/size allowlist (+ magic-byte sniff). Revisit antivirus options at go-live with the real hosting environment.
 
-**Next:** Phase 2 governance slice paused; Phase 3 / go-live prep or other stakeholder-named work.
+**Next:** Phase 2 governance slice paused; Phase 3 / go-live prep or other stakeholder-named work. **Superseded:** Phase 3 started on branch.
 
 ---
 

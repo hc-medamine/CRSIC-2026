@@ -1893,6 +1893,56 @@ footer.site-footer { background: var(--green-deep); }
 }
 .lang-banner-dismiss:hover { color: var(--green-deep); }
 
+/* ── SITE ALERT BANNER (CMS-published) ──────────────── */
+.site-alert-banner {
+  background: #FBF3DE;
+  border-bottom: 0.5px solid #E7D6A0;
+  padding: 9px 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: #5C4A17;
+}
+.site-alert-banner.hidden { display: none; }
+.site-alert-banner p#siteAlertMessage {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  font-weight: 500;
+}
+.site-alert-link {
+  font-family: 'Tajawal', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--gold);
+  border: none;
+  border-radius: 4px;
+  padding: 4px 14px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.site-alert-link:hover { opacity: 0.85; }
+.site-alert-link.hidden { display: none; }
+.site-alert-dismiss {
+  color: #8A7433;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 10px 8px;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+.site-alert-dismiss:hover { color: #5C4A17; }
+
 /* ── DATA LOAD ERROR (P1) ───────────────────────────── */
 .data-error-banner {
   background: #FDF2F0;
@@ -2098,6 +2148,7 @@ html[dir="rtl"] .nav-drawer.open {
 @media (max-width: 768px) {
   .breadcrumb-bar { padding: 0 1.25rem; }
   .lang-banner { padding: 9px 1.25rem; }
+  .site-alert-banner { padding: 9px 1.25rem; }
   .g2 { grid-template-columns: 1fr; }
 }
 
