@@ -16,7 +16,7 @@ Future product specs for CRSIC live here. The public site has no active PRD yet;
 
 | PRD | Status | Notes |
 |-----|--------|-------|
-| [2026-07-19-internal-content-management.md](./2026-07-19-internal-content-management.md) | **Approved** (2026-07-21) | Step 4 — Phase 2 #1–#3 on `main`; #4 scheduled publish cancelled |
+| [2026-07-19-internal-content-management.md](./2026-07-19-internal-content-management.md) | **Approved** (2026-07-21) | Step 4 — Phase 2 #1–#3 done; #4 cancelled; #5 malware postponed until go-live |
 
 ## Related
 

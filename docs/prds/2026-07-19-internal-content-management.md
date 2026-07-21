@@ -75,7 +75,7 @@ This creates operational risk for a public research centre under MESRS: slow upd
 - Multi-step legal/comms dual approval chains.
 - Partners, FAQs, tenders, photo galleries, homepage composition studio as first-class managed types.
 - Enriching public news/publication **detail pages** beyond current SPA cards (tracked separately — see WORKLOG pending).
-- Full malware scanning pipeline if host cannot provide it on day one (**risk** — see §12).
+- Full malware scanning pipeline before go-live host is chosen (**Postponed until go-live** — see Phase 2 #5 / §12).
 - Public-site rewrite to a dynamic API-first architecture.
 
 ---
@@ -488,7 +488,7 @@ Current public news items are shallow (`img`, `label`, `title`). CMS may store r
 | Local-only habits break prod deploy | Go-live friction | Document env + publish contract from day one |
 | No email password recovery | Locked-out users | Super Admin reset SOP |
 | Public schema too shallow | Product gap | P1 now; detail pages shipped (PR #3) |
-| Malware in uploads | Security | Type/size allowlist; quarantine |
+| Malware in uploads | Security | Type/size allowlist now; full AV **postponed until go-live** |
 | Premature merge to `main` | Regressions | Branch gate: zero known bugs + smoke |
 
 ### Dependencies
@@ -541,7 +541,7 @@ Order: **least effort → most complex** (locked 2026-07-21):
 2. In-app escalation / delegation (extend reassign + notifications; OOO / backup reviewer) — **Done** on `main` (PR #5).  
 3. Emergency bypass + post-publication review — **Done** on `main` (PR #6).  
 4. ~~Scheduled publish~~ — **Cancelled** (2026-07-21): manual Approve → Publish only (plus emergency bypass).  
-5. Optional malware scanning (highest ops cost).
+5. ~~Optional malware scanning~~ — **Postponed until go-live** (2026-07-21): revisit when production host and AV options are known; keep upload allowlist until then.
 
 ### Phase 3 — Content surface + go-live prep
 
@@ -556,6 +556,7 @@ Order: **least effort → most complex** (locked 2026-07-21):
 1. ~~Exact **N**~~ → **Closed:** no numeric quota.  
 2. ~~Public schema P1 vs P2~~ → **Closed: P1**; detail pages pending.  
 3. ~~Scheduled publish~~ → **Closed:** manual only (MVP). **Cancelled for project** (2026-07-21): no timed auto-publish; never add `scheduled` status.  
+3b. ~~Malware / antivirus in CMS~~ → **Postponed until go-live** (2026-07-21): choose scanner/options with production host; allowlist remains until then.  
 4. ~~Role/scope pattern~~ → **Closed** (see §3).  
 5. ~~Stack~~ → **Closed:** Node + PostgreSQL 18.4-2 local; Cursor Pro; feature branch workflow.  
 6. ~~Email~~ → **Closed:** no email features.  
@@ -653,8 +654,9 @@ Order: **least effort → most complex** (locked 2026-07-21):
 | 2026-07-21 | **Reminder:** when department notify routing lands, prefer same-department Editors for OOO fan-out (not all Editors) |
 | 2026-07-21 | Phase 2 #3: SA-only emergency publish → live + `needs_post_review`; Confirm OK not by bypass actor; Unpublish / Request changes; Away freeze on post-review |
 | 2026-07-21 | Phase 2 #4 scheduled auto-publish **Cancelled** — project stays on manual Approve → Publish (+ emergency bypass); no cron / `scheduled` status |
+| 2026-07-21 | Phase 2 #5 malware/antivirus **Postponed until go-live** — no ClamAV/quarantine pipeline before host choice; keep MIME/size allowlist; revisit with production environment |
 ---
 
 ## 19. Mapping to template sections
 
-This PRD expands [TEMPLATE.md](./TEMPLATE.md). Status is **Approved** (2026-07-21). Phase 1 CMS and public detail pages are on `main`; Phase 2 proceeds on feature branches until stable. Keep [docs/prds/README.md](./README.md), [docs/WORKLOG.md](../WORKLOG.md), and root [README.md](../../README.md) §10 in sync.
+This PRD expands [TEMPLATE.md](./TEMPLATE.md). Status is **Approved** (2026-07-21). Phase 1 CMS and public detail pages are on `main`; Phase 2 governance items #1–#3 are done, #4 cancelled, #5 postponed until go-live. Keep [docs/prds/README.md](./README.md), [docs/WORKLOG.md](../WORKLOG.md), and root [README.md](../../README.md) §10 in sync.

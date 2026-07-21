@@ -40,17 +40,25 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Fill remaining public detail copy | **Paused** — do not block on editorial; resume only when stakeholder has source text |
 | Feature delivery workflow | **Locked** — new work on a feature branch until fully stable, then merge to `main` |
 | CMS PRD | **Approved** (2026-07-21) |
-| CMS Phase 2 | **In progress** — #1–#3 on `main`; #4 scheduled publish **Cancelled**; next optional #5 malware |
+| CMS Phase 2 | **Paused** — #1–#3 on `main`; #4 scheduled publish **Cancelled**; #5 malware **Postponed until go-live** |
 
 ---
 
 ## Changelog
 
+### 2026-07-21 — Phase 2 #5 malware scanning postponed until go-live
+
+**Locked:** No in-app ClamAV / quarantine / scan-status pipeline before production host is chosen. Upload security stays MIME/size allowlist (+ magic-byte sniff). Revisit antivirus options at go-live with the real hosting environment.
+
+**Next:** Phase 2 governance slice paused; Phase 3 / go-live prep or other stakeholder-named work.
+
+---
+
 ### 2026-07-21 — Phase 2 #4 scheduled publish cancelled
 
 **Locked:** Stakeholder dropped timed auto-publish entirely. Publish remains **manual** Approve → Publish (plus Phase 2 #3 emergency bypass). No `scheduled` status, cron, or schedule UI.
 
-**Next:** Optional Phase 2 #5 malware scanning, or pause Phase 2.
+**Next:** Optional Phase 2 #5 malware scanning, or pause Phase 2. **Superseded:** #5 postponed until go-live; Phase 2 paused.
 
 ---
 
@@ -109,7 +117,7 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 2. In-app escalation / delegation (extend reassign + notifications; OOO / backup reviewer)
 3. Emergency bypass + post-publication review
 4. ~~Scheduled publish~~ — **Cancelled** (2026-07-21); manual publish only
-5. Optional malware scanning (external tool + upload quarantine; highest ops cost)
+5. ~~Optional malware scanning~~ — **Postponed until go-live** (2026-07-21); revisit with production host
 
 **Next:** Stakeholder confirms starting with #1 (or picks another number) → open feature branch from `main`.
 
