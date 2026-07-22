@@ -41,11 +41,33 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Feature delivery workflow | **Locked** — new work on a feature branch until fully stable, then merge to `main` |
 | CMS PRD | **Approved** (2026-07-21) |
 | CMS Phase 2 | **Paused** — #1–#3 on `main`; #4 cancelled; #5 malware postponed until go-live |
-| CMS Phase 3 | **In progress** on `feature/phase3-partners-alerts-pages` — partners + alerts (Pages CMS removed) |
+| CMS Phase 3 | **Done** on `main` — PR [#9](https://github.com/hc-medamine/CRSIC-2026/pull/9); partners + alerts (Pages CMS removed) |
 
 ---
 
 ## Changelog
+
+### 2026-07-22 — Smoke DB cleanup after every test
+
+**Locked:** After every `npm run db:smoke`, purge smoke/test content (and related media/notifications/audit) while keeping real staff + editorial data. Public JSON is rebuilt from remaining live payloads. Standalone: `npm run db:cleanup:smoke`.
+
+---
+
+### 2026-07-22 — CMS polish (title + smoke notification cleanup)
+
+**Shipped:** CMS document title → “CRSIC CMS”; smoke marks notifications read for smoke users/SA so badges do not pile up.
+
+**Next:** Stakeholder confirm → merge → lock PRD done until go-live.
+
+---
+
+### 2026-07-22 — Phase 3 merged (partners + alerts)
+
+**Merged:** PR [#9](https://github.com/hc-medamine/CRSIC-2026/pull/9) → `main`. Stakeholder walk OK; Pages CMS stayed removed.
+
+**Next:** Bug / improvement pass on what’s shipped so far → then treat CMS PRD as done until go-live (malware revisit).
+
+---
 
 ### 2026-07-22 — Phase 3 Pages CMS removed
 

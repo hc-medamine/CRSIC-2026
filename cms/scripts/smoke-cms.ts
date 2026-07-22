@@ -1,9 +1,11 @@
 /**
  * Local CMS smoke (libs + DB). Does not use HTTP cookies.
  * Creates/uses smoke Editor + Reviewer, runs news four-eyes path, unpublishes,
- * restores data/news.json from .bak when present.
+ * restores public JSON snapshots during the run, then always purges smoke/test
+ * DB rows (keeping real staff + editorial content).
  *
  * Usage: npm run db:smoke
+ * Cleanup only: npm run db:cleanup:smoke
  */
 import { readFileSync, writeFileSync, existsSync, copyFileSync } from "node:fs";
 import { join } from "node:path";
@@ -46,6 +48,7 @@ import {
 } from "../src/lib/content/emergency";
 import { clearAway, setAway, refreshUserFromDb } from "../src/lib/content/ooo";
 import { listAuditLog } from "../src/lib/audit";
+import { cleanupSmokeData } from "./cleanup-smoke-data";
 
 async function ensureUser(opts: {
   email: string;
@@ -123,6 +126,18 @@ function restoreNewsSnapshot(snap: string) {
 }
 
 async function main() {
+  console.log("Pre-smoke cleanup (purge leftover smoke/test rows)…");
+  console.log(await cleanupSmokeData());
+
+  try {
+    await runSmoke();
+  } finally {
+    console.log("Post-smoke cleanup (purge smoke/test rows; keep real data)…");
+    console.log(await cleanupSmokeData());
+  }
+}
+
+async function runSmoke() {
   const editorPass = process.env.SMOKE_EDITOR_PASSWORD || "SmokeEditor1!";
   const reviewerPass = process.env.SMOKE_REVIEWER_PASSWORD || "SmokeReviewer1!";
 
