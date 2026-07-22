@@ -1,26 +1,29 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
-import { query } from "@/lib/db";
+import { canAccessMediaBucket, listMediaForUser } from "@/lib/media/store";
+import { MEDIA_BUCKETS, type MediaBucket } from "@/lib/media/config";
 import { MediaLibraryClient } from "./media-library-client";
 
 export default async function MediaLibraryPage() {
-  await requireUser();
-  const result = await query<{
-    id: string;
-    bucket: string;
-    original_filename: string;
-    mime_type: string;
-    byte_size: number;
-    public_path: string;
-    created_at: Date;
-  }>(
-    `SELECT id, bucket, original_filename, mime_type, byte_size, public_path, created_at
-     FROM media_assets
-     ORDER BY created_at DESC
-     LIMIT 100`,
-  );
+  const user = await requireUser();
+  if (user.role !== "super_admin") {
+    redirect("/dashboard");
+  }
 
-  const items = result.rows.map((r) => ({
+  const bucketFlags = await Promise.all(
+    MEDIA_BUCKETS.map(async (bucket) => [bucket, await canAccessMediaBucket(user, bucket)] as const),
+  );
+  const allowedBuckets = bucketFlags
+    .filter(([, ok]) => ok)
+    .map(([bucket]) => bucket) as MediaBucket[];
+
+  if (allowedBuckets.length === 0) {
+    redirect("/dashboard");
+  }
+
+  const assets = await listMediaForUser(user, 100);
+  const items = assets.map((r) => ({
     id: r.id,
     bucket: r.bucket,
     originalFilename: r.original_filename,
@@ -39,7 +42,7 @@ export default async function MediaLibraryPage() {
           <p className="mt-1 text-sm text-zinc-600">
             Max 5 MB · JPEG / PNG / WebP / PDF · public paths under{" "}
             <code className="text-xs">img/cms/{"{news|events|covers}/"}</code>. Replace keeps the
-            same URL.
+            same URL. Super Admin maintenance library — editors upload from article forms.
           </p>
         </div>
         <Link href="/dashboard" className="text-sm underline">
@@ -47,7 +50,7 @@ export default async function MediaLibraryPage() {
         </Link>
       </header>
 
-      <MediaLibraryClient initialItems={items} />
+      <MediaLibraryClient initialItems={items} allowedBuckets={allowedBuckets} />
     </main>
   );
 }

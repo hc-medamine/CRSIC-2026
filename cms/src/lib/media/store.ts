@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
+import { canAccessContentType, isCentreWideViewer } from "@/lib/content/permissions";
 import {
   isMediaBucket,
   publicPathFor,
@@ -49,6 +50,44 @@ function writeBoth(id: string, extension: string, publicPath: string, buffer: Bu
   writeFileSync(publicAbs, buffer);
 }
 
+/** Map media bucket → content-type scope used for editor access. */
+export async function canAccessMediaBucket(
+  user: SessionUser,
+  bucket: MediaBucket,
+): Promise<boolean> {
+  if (isCentreWideViewer(user)) return true;
+  if (bucket === "news") return canAccessContentType(user, "news");
+  if (bucket === "events") return canAccessContentType(user, "event");
+  if (bucket === "covers") return canAccessContentType(user, "publication");
+  return false;
+}
+
+export function canManageMediaAsset(user: SessionUser, asset: MediaAsset): boolean {
+  if (isCentreWideViewer(user)) return true;
+  return asset.uploaded_by === user.id;
+}
+
+export async function listMediaForUser(
+  user: SessionUser,
+  limit = 100,
+): Promise<MediaAsset[]> {
+  if (isCentreWideViewer(user)) {
+    const result = await query<MediaAsset>(
+      `SELECT * FROM media_assets ORDER BY created_at DESC LIMIT $1`,
+      [limit],
+    );
+    return result.rows;
+  }
+  const result = await query<MediaAsset>(
+    `SELECT * FROM media_assets
+     WHERE uploaded_by = $1
+     ORDER BY created_at DESC
+     LIMIT $2`,
+    [user.id, limit],
+  );
+  return result.rows;
+}
+
 export async function getMediaById(id: string): Promise<MediaAsset | null> {
   const result = await query<MediaAsset>(`SELECT * FROM media_assets WHERE id = $1`, [id]);
   return result.rows[0] ?? null;
@@ -69,6 +108,9 @@ export async function createMediaUpload(
   opts?: { imagesOnly?: boolean },
 ): Promise<MediaAsset> {
   if (!isMediaBucket(bucketRaw)) throw new Error("Invalid media bucket");
+  if (!(await canAccessMediaBucket(user, bucketRaw))) {
+    throw new Error("No permission for this media bucket");
+  }
   const validated = await validateUploadFile(file, opts);
   // Pre-generate id via DB default by inserting after we know extension —
   // allocate UUID in SQL RETURNING.
@@ -119,6 +161,12 @@ export async function replaceMediaUpload(
 ): Promise<MediaAsset> {
   const existing = await getMediaById(mediaId);
   if (!existing) throw new Error("Media not found");
+  if (!canManageMediaAsset(user, existing)) {
+    throw new Error("No permission to replace this media");
+  }
+  if (!(await canAccessMediaBucket(user, existing.bucket))) {
+    throw new Error("No permission for this media bucket");
+  }
 
   const validated = await validateUploadFile(file, opts);
   if (validated.extension !== existing.extension) {

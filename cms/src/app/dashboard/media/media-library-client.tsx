@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { MediaUploadField } from "@/app/dashboard/media-upload-field";
 import type { MediaBucket } from "@/lib/media/config";
 
@@ -14,13 +14,34 @@ type Item = {
   createdAt: string;
 };
 
-type Props = { initialItems: Item[] };
+type Props = {
+  initialItems: Item[];
+  allowedBuckets: MediaBucket[];
+};
 
-export function MediaLibraryClient({ initialItems }: Props) {
-  const [bucket, setBucket] = useState<MediaBucket>("news");
+const BUCKET_LABELS: Record<MediaBucket, string> = {
+  news: "news → img/cms/news/",
+  events: "events → img/cms/events/",
+  covers: "covers → img/cms/covers/",
+};
+
+export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
+  const buckets = useMemo(
+    () => (allowedBuckets.length > 0 ? allowedBuckets : (["news"] as MediaBucket[])),
+    [allowedBuckets],
+  );
+  const [bucket, setBucket] = useState<MediaBucket>(buckets[0]);
   const [items, setItems] = useState(initialItems);
   const [lastPath, setLastPath] = useState("");
   const [lastId, setLastId] = useState<string | null>(null);
+
+  if (allowedBuckets.length === 0) {
+    return (
+      <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-sm text-zinc-500">
+        No media buckets in your content scopes.
+      </p>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -36,9 +57,11 @@ export function MediaLibraryClient({ initialItems }: Props) {
             }}
             className="mt-1 w-full rounded border px-3 py-2"
           >
-            <option value="news">news → img/cms/news/</option>
-            <option value="events">events → img/cms/events/</option>
-            <option value="covers">covers → img/cms/covers/</option>
+            {buckets.map((b) => (
+              <option key={b} value={b}>
+                {BUCKET_LABELS[b]}
+              </option>
+            ))}
           </select>
         </label>
         <MediaUploadField

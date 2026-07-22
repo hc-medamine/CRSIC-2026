@@ -1,7 +1,8 @@
 import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
-import { canAccessContentType, canAccessOrg, canReview } from "@/lib/content/permissions";
+import { canAccessContentType, isCentreWideViewer } from "@/lib/content/permissions";
 import type { ContentStatus } from "@/lib/content/news";
+import type { ContentType } from "@/lib/users";
 
 export type ContentRevision = {
   id: string;
@@ -18,7 +19,7 @@ export type ContentRevision = {
 
 type ContentMeta = {
   id: string;
-  content_type: "news" | "event" | "publication";
+  content_type: ContentType;
   org_unit_id: string;
   created_by: string;
 };
@@ -31,14 +32,17 @@ export async function getContentMeta(id: string): Promise<ContentMeta | null> {
   return result.rows[0] ?? null;
 }
 
+/**
+ * Editors: own items only (drafts, returned, and their other statuses).
+ * Reviewers / Super Admin: any item of an allowed content type.
+ */
 export async function canViewContentItem(
   user: SessionUser,
   item: ContentMeta,
 ): Promise<boolean> {
   if (!(await canAccessContentType(user, item.content_type))) return false;
-  if (user.role === "super_admin" || canReview(user)) return true;
-  if (item.created_by === user.id) return true;
-  return canAccessOrg(user, item.org_unit_id);
+  if (isCentreWideViewer(user)) return true;
+  return item.created_by === user.id;
 }
 
 export async function listRevisionsForItem(contentItemId: string): Promise<ContentRevision[]> {

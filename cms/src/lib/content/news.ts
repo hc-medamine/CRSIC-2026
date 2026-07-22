@@ -11,7 +11,6 @@ import {
   canAccessContentType,
   canAccessOrg,
   canReview,
-  getUserOrgIds,
 } from "@/lib/content/permissions";
 import { notifyOnSubmit } from "@/lib/content/delegation";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
@@ -146,13 +145,12 @@ export async function listNewsForUser(user: SessionUser): Promise<NewsItem[]> {
     return result.rows;
   }
 
-  const orgs = await getUserOrgIds(user.id);
-  if (orgs.length === 0) return [];
+  // Editors: own items only (not peers in the same org/type).
   const result = await query<NewsItem>(
     `SELECT * FROM content_items
-     WHERE content_type = 'news' AND org_unit_id = ANY($1::text[])
+     WHERE content_type = 'news' AND created_by = $1
      ORDER BY updated_at DESC`,
-    [orgs],
+    [user.id],
   );
   return result.rows;
 }

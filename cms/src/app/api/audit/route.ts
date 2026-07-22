@@ -18,10 +18,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
   }
 
-  const action = request.nextUrl.searchParams.get("action") ?? undefined;
-  const limitRaw = request.nextUrl.searchParams.get("limit");
+  const sp = request.nextUrl.searchParams;
+  const limitRaw = sp.get("limit");
   const limit = limitRaw ? Number(limitRaw) : 100;
-  const rows = await listAuditLog({ action, limit: Number.isFinite(limit) ? limit : 100 });
+  const rows = await listAuditLog({
+    action: sp.get("action") ?? undefined,
+    actorEmail: sp.get("actor") ?? undefined,
+    actorUserId: sp.get("actorUserId") ?? undefined,
+    entityType: sp.get("entityType") ?? undefined,
+    from: sp.get("from") ?? undefined,
+    to: sp.get("to") ?? undefined,
+    limit: Number.isFinite(limit) ? limit : 100,
+  });
 
   return NextResponse.json({
     ok: true,

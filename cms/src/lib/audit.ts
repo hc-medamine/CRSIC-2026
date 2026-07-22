@@ -51,30 +51,75 @@ export async function writeAudit(input: AuditInput): Promise<void> {
   }
 }
 
-export async function listAuditLog(opts?: {
+export type AuditListFilters = {
   limit?: number;
+  /** Exact action match (audit_log_action_idx). */
   action?: string;
-}): Promise<AuditRow[]> {
-  const limit = Math.min(Math.max(opts?.limit ?? 100, 1), 500);
-  if (opts?.action) {
-    const result = await query<AuditRow>(
-      `SELECT id, created_at, actor_user_id, actor_email, action, entity_type, entity_id,
-              summary, metadata, ip, user_agent
-       FROM audit_log
-       WHERE action = $1
-       ORDER BY created_at DESC
-       LIMIT $2`,
-      [opts.action, limit],
-    );
-    return result.rows;
+  /** Exact actor email, case-insensitive. */
+  actorEmail?: string;
+  /** Exact actor user id (audit_log_actor_idx). */
+  actorUserId?: string;
+  /** Exact entity type (audit_log_entity_idx with entityId). */
+  entityType?: string;
+  /** Exact entity id. */
+  entityId?: string;
+  /** Inclusive start (YYYY-MM-DD or ISO datetime; audit_log_created_at_idx). */
+  from?: string;
+  /** Inclusive end (YYYY-MM-DD → end of that UTC day, or ISO datetime). */
+  to?: string;
+};
+
+function parseBound(raw: string | undefined, endOfDay: boolean): Date | null {
+  if (!raw?.trim()) return null;
+  const s = raw.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    return endOfDay
+      ? new Date(`${s}T23:59:59.999Z`)
+      : new Date(`${s}T00:00:00.000Z`);
   }
+  const d = new Date(s);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+export async function listAuditLog(opts?: AuditListFilters): Promise<AuditRow[]> {
+  const limit = Math.min(Math.max(opts?.limit ?? 100, 1), 500);
+  const where: string[] = [];
+  const params: unknown[] = [];
+
+  const push = (clause: string, value: unknown) => {
+    params.push(value);
+    where.push(clause.replace("?", `$${params.length}`));
+  };
+
+  if (opts?.action?.trim()) {
+    push("action = ?", opts.action.trim());
+  }
+  if (opts?.actorUserId?.trim()) {
+    push("actor_user_id = ?::uuid", opts.actorUserId.trim());
+  } else if (opts?.actorEmail?.trim()) {
+    push("LOWER(actor_email) = LOWER(?)", opts.actorEmail.trim());
+  }
+  if (opts?.entityType?.trim()) {
+    push("entity_type = ?", opts.entityType.trim());
+  }
+  if (opts?.entityId?.trim()) {
+    push("entity_id = ?", opts.entityId.trim());
+  }
+  const from = parseBound(opts?.from, false);
+  if (from) push("created_at >= ?", from);
+  const to = parseBound(opts?.to, true);
+  if (to) push("created_at <= ?", to);
+
+  params.push(limit);
+  const whereSql = where.length > 0 ? `WHERE ${where.join(" AND ")}` : "";
   const result = await query<AuditRow>(
     `SELECT id, created_at, actor_user_id, actor_email, action, entity_type, entity_id,
             summary, metadata, ip, user_agent
      FROM audit_log
+     ${whereSql}
      ORDER BY created_at DESC
-     LIMIT $1`,
-    [limit],
+     LIMIT $${params.length}`,
+    params,
   );
   return result.rows;
 }
