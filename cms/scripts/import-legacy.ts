@@ -1,9 +1,10 @@
 /**
- * Import current public JSON (data/news.json, data/events.json, data/publications.json)
- * into content_items as PUBLISHED rows with live_payload set (Step 4, gap #9 — legacy cutover).
+ * Import current public JSON (data/news.json, data/events.json, data/publications.json,
+ * data/partners.json) into content_items as PUBLISHED rows with live_payload set
+ * (Step 4, gap #9 — legacy cutover).
  *
  * - Does NOT rewrite the public JSON files (payloads already match the source).
- * - Idempotent-ish: skips when the same card already exists (events keyed by title+scope).
+ * - Idempotent-ish: skips when the same card already exists (events/partners keyed by title+scope).
  * - Preserves source array order via staggered live_at (index 0 = newest).
  * - org_unit = centre-wide; created_by = super admin f.chettih@crsic.dz.
  * - Keeps publications covers.length === pubs.length (imports pubs[i] with covers[i]).
@@ -76,6 +77,20 @@ async function alreadyPublishedEvent(
   return (res.rowCount ?? 0) > 0;
 }
 
+async function alreadyPublishedPartner(
+  titleAr: string,
+  partnerScope: "intl" | "nat",
+): Promise<boolean> {
+  const res = await query(
+    `SELECT 1 FROM content_items
+     WHERE content_type = 'partner' AND title_ar = $1 AND partner_scope = $2
+       AND live_payload IS NOT NULL
+     LIMIT 1`,
+    [titleAr, partnerScope],
+  );
+  return (res.rowCount ?? 0) > 0;
+}
+
 async function insertPublished(row: {
   contentType: "news" | "event" | "publication";
   orgUnitId: string;
@@ -127,6 +142,41 @@ async function insertPublished(row: {
   );
 }
 
+async function insertPublishedPartner(row: {
+  orgUnitId: string;
+  createdBy: string;
+  titleAr: string;
+  labelAr: string | null;
+  partnerScope: "intl" | "nat";
+  partnerDate: string | null;
+  partnerEmoji: string | null;
+  payload: unknown;
+  liveAt: Date;
+}) {
+  await query(
+    `INSERT INTO content_items (
+       content_type, status, org_unit_id, created_by, updated_by, en_status,
+       title_ar, label_ar, partner_scope, partner_date, partner_emoji,
+       checklist_confirmed, published_at, live_payload, live_at
+     ) VALUES (
+       'partner', 'published', $1, $2, $2, 'pending',
+       $3, $4, $5, $6, $7,
+       TRUE, $9, $8::jsonb, $9
+     )`,
+    [
+      row.orgUnitId,
+      row.createdBy,
+      row.titleAr,
+      row.labelAr,
+      row.partnerScope,
+      row.partnerDate,
+      row.partnerEmoji,
+      JSON.stringify(row.payload),
+      row.liveAt,
+    ],
+  );
+}
+
 type LegacyNews = { news: Array<{ img: string | null; label: string; title: string }> };
 type LegacyEvent = {
   day: string;
@@ -142,6 +192,8 @@ type LegacyPubs = {
   pubs: Array<{ t: string; type: "collective" | "individual"; dept: string; desc: string }>;
   covers: string[];
 };
+type LegacyPartner = { name: string; country: string; date: string; emoji?: string };
+type LegacyPartners = { intl: LegacyPartner[]; nat: LegacyPartner[] };
 
 async function importNews(orgUnitId: string, createdBy: string) {
   const { news } = readJson<LegacyNews>("news.json");
@@ -257,6 +309,45 @@ async function importPublications(orgUnitId: string, createdBy: string) {
   console.log(`publications: inserted ${inserted}, skipped ${skipped} (already published)`);
 }
 
+async function importPartners(orgUnitId: string, createdBy: string) {
+  const partners = readJson<LegacyPartners>("partners.json");
+  let inserted = 0;
+  let skipped = 0;
+  let globalIndex = 0;
+  for (const scope of ["intl", "nat"] as const) {
+    for (const p of partners[scope] ?? []) {
+      const name = p.name.trim();
+      if (!name) continue;
+      if (await alreadyPublishedPartner(name, scope)) {
+        skipped += 1;
+        globalIndex += 1;
+        continue;
+      }
+      const payload: Record<string, unknown> = {
+        name,
+        country: p.country?.trim() || "",
+        date: p.date?.trim() || "",
+        scope,
+      };
+      if (p.emoji) payload.emoji = p.emoji;
+      await insertPublishedPartner({
+        orgUnitId,
+        createdBy,
+        titleAr: name,
+        labelAr: p.country?.trim() || null,
+        partnerScope: scope,
+        partnerDate: p.date?.trim() || null,
+        partnerEmoji: p.emoji?.trim() || null,
+        payload,
+        liveAt: liveAtForIndex(globalIndex),
+      });
+      inserted += 1;
+      globalIndex += 1;
+    }
+  }
+  console.log(`partners: inserted ${inserted}, skipped ${skipped} (already published)`);
+}
+
 async function main() {
   const orgUnitId = await getCentreWideOrgId();
   const createdBy = await getSuperAdminId();
@@ -266,6 +357,7 @@ async function main() {
   await importNews(orgUnitId, createdBy);
   await importEvents(orgUnitId, createdBy);
   await importPublications(orgUnitId, createdBy);
+  await importPartners(orgUnitId, createdBy);
 
   console.log("Legacy import complete. A future CMS publish will now include these live items.");
 }

@@ -14,6 +14,8 @@ export const LABELS: LabelMap = {
   news: { en: "News", ar: "الأخبار" },
   events: { en: "Events", ar: "الفعاليات" },
   publications: { en: "Publications", ar: "المنشورات" },
+  partners: { en: "Partners", ar: "الشركاء" },
+  alerts: { en: "Alerts", ar: "التنبيهات" },
   media: { en: "Media", ar: "الوسائط" },
   notifications: { en: "Notifications", ar: "الإشعارات" },
   profile: { en: "Profile", ar: "الملف الشخصي" },

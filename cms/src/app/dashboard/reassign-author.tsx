@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-type ContentType = "news" | "event" | "publication";
+type ContentType = "news" | "event" | "publication" | "partner" | "alert";
 
 type AssignableUser = { id: string; display_name: string; email: string; role: string };
 
@@ -16,7 +16,9 @@ type Props = {
 function apiSegment(type: ContentType): string {
   if (type === "news") return "news";
   if (type === "event") return "events";
-  return "publications";
+  if (type === "publication") return "publications";
+  if (type === "partner") return "partners";
+  return "alerts";
 }
 
 export function ReassignAuthor({ contentItemId, contentType, currentAuthorId }: Props) {

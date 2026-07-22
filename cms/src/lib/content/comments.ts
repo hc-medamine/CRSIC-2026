@@ -19,6 +19,8 @@ export type ContentComment = {
 function dashboardPath(contentType: string, id: string): string {
   if (contentType === "news") return `/dashboard/news/${id}`;
   if (contentType === "event") return `/dashboard/events/${id}`;
+  if (contentType === "partner") return `/dashboard/partners/${id}`;
+  if (contentType === "alert") return `/dashboard/alerts/${id}`;
   return `/dashboard/publications/${id}`;
 }
 

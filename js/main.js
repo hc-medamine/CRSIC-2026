@@ -9,6 +9,7 @@ import {
   loadLocales
 } from './i18n.js';
 import { loadData, getLoadErrors } from './data.js';
+import { initSiteAlert, rerenderSiteAlert } from './alerts.js';
 import {
   renderAll,
   bindUIEvents,
@@ -23,6 +24,7 @@ async function boot() {
   setOnAfterTranslate(() => {
     renderAll();
     showDataLoadErrors(getLoadErrors());
+    rerenderSiteAlert();
     const parsed = parseHash(location.hash.replace('#', '') || 'home');
     if (parsed.detailType && parsed.detailSlug) {
       renderDetailPage(parsed.detailType, parsed.detailSlug);
@@ -38,6 +40,7 @@ async function boot() {
 
   // Locales + content in parallel (same CONTENT_BASE_URL / local /data)
   const [localeResult] = await Promise.all([loadLocales(), loadData()]);
+  await initSiteAlert();
 
   applyTranslations();
   if (localeResult && !localeResult.ok) {

@@ -16,6 +16,7 @@ Project docs index: [docs/README.md](../docs/README.md).
 | `publications.json` | `covers[]` + `pubs[]` (same length; index-aligned). Pubs may include detail fields: `id`, `slug`, `summary`, `body`, `media[]` |
 | `events.json` | `intl[]` + `nat[]` events (detail: `id`, `slug`, `summary`, `body`, `media[]`) |
 | `partners.json` | `nat[]` + `intl[]` partners |
+| `alerts.json` | `items[]` — site-wide banner, at most one live item (empty array when none) |
 | `journals.json` | `journals[]` |
 | `news.json` | `news[]` (detail: `id`, `slug`, `summary`, `body`, `media[]`) |
 | `locales/ar.json` | Arabic UI chrome strings (flat key → string) |
@@ -78,6 +79,28 @@ Append to `intl` or `nat` in `events.json`:
 Deep link: `#event/{slug}`.
 
 The home section `#home-events-grid` shows the **3 newest** events (intl + nat merged, sorted by date). The full events page still lists every item by year.
+
+## Add a site alert
+
+`alerts.json` holds **at most one** live item — the site-wide banner shown under the language banner:
+
+```json
+{
+  "items": [
+    {
+      "id": "unique-id",
+      "message_ar": "نص التنبيه بالعربية",
+      "message_en": "Alert message in English",
+      "link": null,
+      "link_label_ar": "",
+      "link_label_en": ""
+    }
+  ]
+}
+```
+
+Use `"items": []` when there is no active alert. `link` is optional (`null` or a URL); when set, `link_label_ar`/`link_label_en` label the button. A visitor who dismisses an alert won't see it again for the rest of the browser session unless a new `id` is published.
+
 ## Add news
 
 ```json

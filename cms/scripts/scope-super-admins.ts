@@ -17,7 +17,7 @@ async function main() {
           [user.id, org.id],
         );
       }
-      for (const t of ["news", "event", "publication"] as const) {
+      for (const t of ["news", "event", "publication", "partner", "alert"] as const) {
         await pool.query(
           `INSERT INTO user_content_scopes (user_id, content_type) VALUES ($1, $2)
            ON CONFLICT DO NOTHING`,

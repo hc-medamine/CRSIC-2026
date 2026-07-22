@@ -15,7 +15,7 @@ type Revision = {
   authorDisplayName: string | null;
 };
 
-type ContentType = "news" | "event" | "publication";
+type ContentType = "news" | "event" | "publication" | "partner" | "alert";
 
 type Props = {
   contentItemId: string;
@@ -26,7 +26,9 @@ type Props = {
 function apiSegment(type: ContentType): string {
   if (type === "news") return "news";
   if (type === "event") return "events";
-  return "publications";
+  if (type === "publication") return "publications";
+  if (type === "partner") return "partners";
+  return "alerts";
 }
 
 const HIGHLIGHT_KEYS = [
@@ -44,6 +46,12 @@ const HIGHLIGHT_KEYS = [
   "event_type_ar",
   "event_display_status",
   "pub_kind",
+  "partner_scope",
+  "partner_date",
+  "partner_emoji",
+  "alert_link_url",
+  "alert_link_label_ar",
+  "alert_link_label_en",
 ];
 
 export function RevisionHistory({ contentItemId, contentType, canRestore }: Props) {

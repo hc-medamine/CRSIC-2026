@@ -6,9 +6,9 @@ import { canReview } from "@/lib/content/permissions";
 import { getContentMeta, getRevisionById } from "@/lib/content/revisions";
 import { assertNotAwayFrozen } from "@/lib/content/ooo";
 
-export type ContentType = "news" | "event" | "publication";
+export type ContentType = "news" | "event" | "publication" | "partner" | "alert";
 
-/** Columns that make up an editable content snapshot (superset across all three types). */
+/** Columns that make up an editable content snapshot (superset across content types). */
 const SNAPSHOT_COLUMNS = [
   "status",
   "org_unit_id",
@@ -32,6 +32,12 @@ const SNAPSHOT_COLUMNS = [
   "event_type_ar",
   "event_type_en",
   "event_display_status",
+  "partner_scope",
+  "partner_date",
+  "partner_emoji",
+  "alert_link_url",
+  "alert_link_label_ar",
+  "alert_link_label_en",
 ] as const;
 
 /** Columns that a restore is allowed to overwrite from a prior snapshot (never status here). */
@@ -40,7 +46,9 @@ const RESTORABLE_COLUMNS = SNAPSHOT_COLUMNS.filter((c) => c !== "status");
 export function contentPathSegment(type: ContentType): string {
   if (type === "news") return "news";
   if (type === "event") return "events";
-  return "publications";
+  if (type === "publication") return "publications";
+  if (type === "partner") return "partners";
+  return "alerts";
 }
 
 async function captureSnapshot(itemId: string): Promise<Record<string, unknown>> {
