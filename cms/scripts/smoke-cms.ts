@@ -46,6 +46,7 @@ import {
 } from "../src/lib/content/emergency";
 import { clearAway, setAway, refreshUserFromDb } from "../src/lib/content/ooo";
 import { listAuditLog } from "../src/lib/audit";
+import { markAllNotificationsRead } from "../src/lib/notifications";
 
 async function ensureUser(opts: {
   email: string;
@@ -454,6 +455,12 @@ async function main() {
       throw new Error(`Missing audit action ${need}`);
     }
   }
+
+  console.log("Clearing smoke notification badges…");
+  await markAllNotificationsRead(editor.id);
+  await markAllNotificationsRead(reviewer.id);
+  await markAllNotificationsRead(otherEditor.id);
+  await markAllNotificationsRead(saUser.id);
 
   console.log("SMOKE PASS");
   console.log(`Editor: ${editor.email} / (SMOKE_EDITOR_PASSWORD or SmokeEditor1!)`);
