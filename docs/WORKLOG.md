@@ -47,6 +47,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ## Changelog
 
+### 2026-07-22 — Smoke DB cleanup after every test
+
+**Locked:** After every `npm run db:smoke`, purge smoke/test content (and related media/notifications/audit) while keeping real staff + editorial data. Public JSON is rebuilt from remaining live payloads. Standalone: `npm run db:cleanup:smoke`.
+
+---
+
 ### 2026-07-22 — CMS polish (title + smoke notification cleanup)
 
 **Shipped:** CMS document title → “CRSIC CMS”; smoke marks notifications read for smoke users/SA so badges do not pile up.
