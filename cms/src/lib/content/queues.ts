@@ -1,6 +1,6 @@
 import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
-import { canReview, getUserContentTypes, getUserOrgIds } from "@/lib/content/permissions";
+import { canReview } from "@/lib/content/permissions";
 import { contentPathSegment, type ContentType } from "@/lib/content/lifecycle";
 
 export type QueueItem = {
@@ -68,36 +68,19 @@ async function runQueue(where: string, params: unknown[], limit: number): Promis
 
 /**
  * Operational action queues for the dashboard, scoped by role/permissions:
- * - awaitingReview: submitted items (Reviewer / Super Admin only)
+ * - awaitingReview: submitted items (Reviewer/SA: all; Editor: own)
  * - needsRevision: changes_requested items (author, or Reviewer/Super Admin)
  * - myDrafts: the current user's drafts
  * - rejected: author's rejected items (Reviewer/SA see all)
- * - unpublished: unpublished items for concerned parties (author, Reviewer/SA, or scoped Editor)
- * - recentlyPublished: recently published (live) items in the user's scope
+ * - unpublished: author's unpublished items (Reviewer/SA see all)
+ * - recentlyPublished: author's recently published items (Reviewer/SA see all)
  */
 export async function getQueues(user: SessionUser): Promise<Queues> {
   const reviewer = canReview(user);
 
-  // Scope clause for non-reviewers: only their content types + org units.
-  let scopeWhere = "";
-  const scopeParams: unknown[] = [];
-  if (!reviewer) {
-    const [types, orgs] = await Promise.all([
-      getUserContentTypes(user.id),
-      getUserOrgIds(user.id),
-    ]);
-    if (types.length === 0 || orgs.length === 0) {
-      // Still allow the user's own items to show in myDrafts / needsRevision.
-      scopeWhere = "FALSE";
-    } else {
-      scopeParams.push(types, orgs);
-      scopeWhere = `c.content_type = ANY($1::text[]) AND c.org_unit_id = ANY($2::text[])`;
-    }
-  }
-
   const awaitingReview = reviewer
     ? await runQueue(`c.status = 'submitted'`, [], 50)
-    : [];
+    : await runQueue(`c.status = 'submitted' AND c.created_by = $1`, [user.id], 50);
 
   const needsRevision = reviewer
     ? await runQueue(`c.status = 'changes_requested'`, [], 50)
@@ -115,19 +98,11 @@ export async function getQueues(user: SessionUser): Promise<Queues> {
 
   const unpublished = reviewer
     ? await runQueue(`c.status = 'unpublished'`, [], 50)
-    : scopeWhere === "FALSE"
-      ? await runQueue(`c.status = 'unpublished' AND c.created_by = $1`, [user.id], 50)
-      : await runQueue(
-          `c.status = 'unpublished' AND (c.created_by = $${scopeParams.length + 1} OR (${scopeWhere}))`,
-          [...scopeParams, user.id],
-          50,
-        );
+    : await runQueue(`c.status = 'unpublished' AND c.created_by = $1`, [user.id], 50);
 
   const recentlyPublished = reviewer
     ? await runQueue(`c.status = 'published'`, [], 10)
-    : scopeWhere === "FALSE"
-      ? []
-      : await runQueue(`c.status = 'published' AND ${scopeWhere}`, scopeParams, 10);
+    : await runQueue(`c.status = 'published' AND c.created_by = $1`, [user.id], 10);
 
   return {
     awaitingReview,

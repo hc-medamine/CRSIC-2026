@@ -14,7 +14,6 @@ import {
   canAccessContentType,
   canAccessOrg,
   canReview,
-  getUserOrgIds,
 } from "@/lib/content/permissions";
 import { notifyOnSubmit } from "@/lib/content/delegation";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
@@ -151,13 +150,11 @@ export async function listPublicationsForUser(user: SessionUser): Promise<Public
     );
     return result.rows;
   }
-  const orgs = await getUserOrgIds(user.id);
-  if (orgs.length === 0) return [];
   const result = await query<PublicationItem>(
     `SELECT * FROM content_items
-     WHERE content_type = 'publication' AND org_unit_id = ANY($1::text[])
+     WHERE content_type = 'publication' AND created_by = $1
      ORDER BY updated_at DESC`,
-    [orgs],
+    [user.id],
   );
   return result.rows;
 }

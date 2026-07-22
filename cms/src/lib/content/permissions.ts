@@ -33,10 +33,23 @@ export async function canAccessOrg(user: SessionUser, orgUnitId: string): Promis
   return orgs.includes(orgUnitId);
 }
 
+/** Reviewer / Super Admin see centre-wide; editors are ownership-scoped. */
+export function isCentreWideViewer(user: SessionUser): boolean {
+  return user.role === "super_admin" || user.role === "reviewer";
+}
+
 export function canReview(user: SessionUser): boolean {
   return user.role === "reviewer" || user.role === "super_admin";
 }
 
 export function canEditAsAuthor(user: SessionUser): boolean {
   return user.role === "editor" || user.role === "super_admin" || user.role === "reviewer";
+}
+
+/** Content-type scopes for nav filtering (editors); privileged roles get all types. */
+export async function getNavContentTypes(user: SessionUser): Promise<ContentType[]> {
+  if (isCentreWideViewer(user)) {
+    return ["news", "event", "publication", "partner", "alert"];
+  }
+  return getUserContentTypes(user.id);
 }

@@ -4,36 +4,58 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { CMS_LANG_COOKIE, t, type CmsLang } from "@/lib/i18n/labels";
+import type { ContentType } from "@/lib/users";
 
-type NavItem = { key: string; href: string; badge?: number };
+type NavItem = { key: string; href: string; badge?: number; contentType?: ContentType };
 
 type Props = {
   initialLang: CmsLang;
   role: "super_admin" | "editor" | "reviewer";
+  contentTypes: ContentType[];
+  showMedia: boolean;
   unread: number;
   displayName: string;
   email: string;
   children: React.ReactNode;
 };
 
-export function CmsChrome({ initialLang, role, unread, displayName, email, children }: Props) {
+export function CmsChrome({
+  initialLang,
+  role,
+  contentTypes,
+  showMedia,
+  unread,
+  displayName,
+  email,
+  children,
+}: Props) {
   const [lang, setLang] = useState<CmsLang>(initialLang);
   const [pending, setPending] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const dir = lang === "ar" ? "rtl" : "ltr";
+  const allowed = new Set(contentTypes);
 
-  const nav: NavItem[] = [
+  const candidates: NavItem[] = [
     { key: "dashboard", href: "/dashboard" },
-    { key: "news", href: "/dashboard/news" },
-    { key: "events", href: "/dashboard/events" },
-    { key: "publications", href: "/dashboard/publications" },
-    { key: "partners", href: "/dashboard/partners" },
-    { key: "alerts", href: "/dashboard/alerts" },
-    { key: "media", href: "/dashboard/media" },
+    { key: "news", href: "/dashboard/news", contentType: "news" },
+    { key: "events", href: "/dashboard/events", contentType: "event" },
+    { key: "publications", href: "/dashboard/publications", contentType: "publication" },
+    { key: "partners", href: "/dashboard/partners", contentType: "partner" },
+    { key: "alerts", href: "/dashboard/alerts", contentType: "alert" },
+  ];
+  if (showMedia) {
+    candidates.push({ key: "media", href: "/dashboard/media" });
+  }
+  candidates.push(
     { key: "notifications", href: "/dashboard/notifications", badge: unread },
     { key: "profile", href: "/dashboard/profile" },
-  ];
+  );
+
+  const nav: NavItem[] = candidates.filter(
+    (item) => !item.contentType || allowed.has(item.contentType),
+  );
+
   if (role === "super_admin") {
     nav.push({ key: "users", href: "/dashboard/users" });
     nav.push({ key: "audit", href: "/dashboard/audit" });

@@ -154,14 +154,12 @@ export default async function DashboardPage() {
             )}
           </section>
         ) : null}
-        {canReview ? (
-          <QueueList
-            title={t("awaitingReview", lang)}
-            items={queues.awaitingReview}
-            emptyLabel={t("noItems", lang)}
-            showAuthor
-          />
-        ) : null}
+        <QueueList
+          title={t("awaitingReview", lang)}
+          items={queues.awaitingReview}
+          emptyLabel={t("noItems", lang)}
+          showAuthor={canReview}
+        />
         <QueueList
           title={t("needsRevision", lang)}
           items={queues.needsRevision}

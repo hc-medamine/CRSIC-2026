@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession, sessionTimeoutMs } from "@/lib/auth/session";
-import { getMediaById, replaceMediaUpload } from "@/lib/media/store";
+import {
+  canManageMediaAsset,
+  getMediaById,
+  replaceMediaUpload,
+} from "@/lib/media/store";
 
 export const runtime = "nodejs";
 
@@ -33,7 +37,9 @@ export async function GET(_request: NextRequest, { params }: Params) {
   if (!user) return NextResponse.json({ ok: false, error: "Unauthenticated" }, { status: 401 });
   const { id } = await params;
   const asset = await getMediaById(id);
-  if (!asset) return NextResponse.json({ ok: false, error: "Not found" }, { status: 404 });
+  if (!asset || !canManageMediaAsset(user, asset)) {
+    return NextResponse.json({ ok: false, error: "Not found" }, { status: 404 });
+  }
   return NextResponse.json({ ok: true, asset: serialize(asset) });
 }
 
@@ -53,7 +59,8 @@ export async function POST(request: NextRequest, { params }: Params) {
     return NextResponse.json({ ok: true, asset: serialize(asset) });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Replace failed";
-    const status = message.includes("not found") ? 404 : 400;
+    const status =
+      message.includes("not found") || message.includes("No permission") ? 404 : 400;
     return NextResponse.json({ ok: false, error: message }, { status });
   }
 }

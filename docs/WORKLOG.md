@@ -47,6 +47,18 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ## Changelog
 
+### 2026-07-22 — RBAC: each role sees only what it concerns
+
+**Branch:** `fix/rbac-role-scoped-access`
+
+**Locked:** Editors only see scoped nav modules; content lists/detail are **own items only** (no peer drafts). Media library page is **Super Admin only** (editors/reviewers upload from article forms). Reviewers/SA remain centre-wide for content.
+
+**Shipped:** scoped nav; ownership ACL + queues (incl. editor awaiting-review); media ACL; SA audit filters (action, actor, entity type, from/to).
+
+**Next:** Merge → treat CMS PRD as done until go-live (malware revisit).
+
+---
+
 ### 2026-07-22 — Smoke DB cleanup after every test
 
 **Locked:** After every `npm run db:smoke`, purge smoke/test content (and related media/notifications/audit) while keeping real staff + editorial data. Public JSON is rebuilt from remaining live payloads. Standalone: `npm run db:cleanup:smoke`.

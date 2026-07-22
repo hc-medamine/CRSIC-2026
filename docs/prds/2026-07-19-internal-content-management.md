@@ -228,7 +228,7 @@ Dimensions in MVP:
 | Department / org unit | Research depts + centre-wide |
 | Language | Create/edit AR and/or EN fields per assignment (**Assumption:** most editors get both; can restrict later) |
 | Action | create, edit (own or scoped), submit, review, approve, publish, unpublish, manage users (admin), view audit (admin) |
-| Ownership | Editors: own drafts + returned items; Reviewers: all items in scope |
+| Ownership | Editors: **own items only** (any status they authored); Reviewers: all items in scope |
 
 **Not MVP:** geographic/regional scopes, separate Publisher role, self-serve permission granting by Reviewers.
 
@@ -661,6 +661,7 @@ Order: **least effort → most complex** (locked 2026-07-21):
 | 2026-07-21 | Phase 2 #5 malware/antivirus **Postponed until go-live** — no ClamAV/quarantine pipeline before host choice; keep MIME/size allowlist; revisit with production environment |
 | 2026-07-21 | Phase 3 content surface: partners + site alerts (+ static pages later dropped) |
 | 2026-07-22 | Phase 3 **Pages CMS removed** — About/coop/org/contact stay locale-only; keep partners + alerts |
+| 2026-07-22 | RBAC tighten: editors see scoped nav only; **own content items only** (no peer drafts); media = own uploads + buckets matching content scopes |
 ---
 
 ## 19. Mapping to template sections
