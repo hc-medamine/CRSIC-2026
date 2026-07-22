@@ -106,8 +106,8 @@ Source: [الإطار التنظيمي](https://www.crsic.dz/?page_id=165) and p
 | Role | Default scope |
 |------|----------------|
 | **Super Admin** | System-wide (users, roles, config, audit, overrides) |
-| **Reviewer** | **Centre-wide + all four research departments** |
-| **Editor** | **Defined scopes** (selected dept(s) and/or content types) **and/or centre-wide**, assigned at account creation by Super Admin |
+| **Reviewer** | **Exclusive org unit(s)** — two Reviewers cannot share the same org; content visibility filtered to those orgs. Nav/types = **union of those orgs’ content-type catalogs**. May edit content types of assigned Editors (org overlap). |
+| **Editor** | **Defined scopes** (selected dept(s) and content types). Types must be in the **union of their orgs’ catalogs**. **Globally exclusive:** at most one Editor in the CMS holds each content type. |
 
 Concrete person↔scope mapping for the first 3–5 accounts is an **implementation dependency** (fill at account provisioning). Names are not required in this PRD.
 
@@ -230,9 +230,9 @@ Dimensions in MVP:
 | Action | create, edit (own or scoped), submit, review, approve, publish, unpublish, manage users (admin), view audit (admin) |
 | Ownership | Editors: **own items only** (any status they authored); Reviewers: all items in scope |
 
-**Not MVP:** geographic/regional scopes, separate Publisher role, self-serve permission granting by Reviewers.
+**Not MVP:** geographic/regional scopes, separate Publisher role.
 
-**Governance:** only Super Admin creates users and assigns roles/scopes (avoids permission creep from “reviewers grant roles”).
+**Governance:** Super Admin creates users, assigns roles/org scopes, and manages **org content-type catalogs** (`/dashboard/org-units`). Reviewers may edit **content types** for Editors assigned via exclusive org overlap (2026-07-22), subject to catalog + global exclusivity. Reviewers cannot create users, change roles/orgs, or reset passwords.
 
 ---
 
@@ -329,9 +329,10 @@ Dimensions in MVP:
 ### AC-RBAC
 
 - Editor cannot publish or approve.  
-- Reviewer cannot manage global users/roles.  
+- Reviewer cannot create/deactivate/delete users, reset passwords, or change org units/roles (may only edit content types on assigned Editors).  
 - Editor cannot see/edit out-of-scope departments/types.  
-- Author cannot approve own item (four-eyes).
+- Author cannot approve own item (four-eyes).  
+- Reviewer content visibility is limited to their exclusive org scopes.
 
 ### AC-News
 
@@ -662,6 +663,12 @@ Order: **least effort → most complex** (locked 2026-07-21):
 | 2026-07-21 | Phase 3 content surface: partners + site alerts (+ static pages later dropped) |
 | 2026-07-22 | Phase 3 **Pages CMS removed** — About/coop/org/contact stay locale-only; keep partners + alerts |
 | 2026-07-22 | RBAC tighten: editors see scoped nav only; **own content items only** (no peer drafts); media = own uploads + buckets matching content scopes |
+| 2026-07-22 | **Reviewer org exclusivity:** each org unit owned by at most one Reviewer; Reviewers are no longer centre-wide for content. SA stays centre-wide. |
+| 2026-07-22 | **Reviewer light manager:** Reviewers may edit **content types only** for Editors whose org scopes intersect theirs (`/dashboard/editors`). No create users / orgs / passwords. |
+| 2026-07-22 | **SA hard delete user:** cascade-delete drafts; non-draft content must be reassigned first; deactivate remains preferred soft offboarding. |
+| 2026-07-22 | **Org content-type catalogs** + **global Editor content-type exclusivity:** each org has allowed types; at most one Editor holds each type CMS-wide; Reviewer↔Editor stays org-overlap. |
+| 2026-07-22 | **Org content-type exclusivity:** each SPA content type (`news`…`alert`) belongs to at most one org. **Superseded for research:** research depts do not take those five types. |
+| 2026-07-22 | **Research groups/projects:** centre-wide keeps SPA five types exclusively; each research dept owns only `research_group` + `research_project` (dept → groups → projects; legacy fields from page 244; SPA JSON publish). Retires “any org can hold any of the five SPA types.” Editor exclusivity: SPA types global; research types per org. |
 ---
 
 ## 19. Mapping to template sections

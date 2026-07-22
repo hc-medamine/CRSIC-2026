@@ -12,6 +12,8 @@ const TYPE_BADGE: Record<QueueItem["contentType"], string> = {
   publication: "Publication",
   partner: "Partner",
   alert: "Alert",
+  research_group: "Research group",
+  research_project: "Research project",
 };
 
 function QueueList({
@@ -158,6 +160,12 @@ export default async function DashboardPage() {
           title={t("awaitingReview", lang)}
           items={queues.awaitingReview}
           emptyLabel={t("noItems", lang)}
+          showAuthor={canReview}
+        />
+        <QueueList
+          title={t("englishPending", lang)}
+          items={queues.englishPending}
+          emptyLabel={t("englishPendingEmpty", lang)}
           showAuthor={canReview}
         />
         <QueueList

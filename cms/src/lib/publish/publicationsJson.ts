@@ -7,6 +7,8 @@ import {
   type PublicMediaItem,
 } from "@/lib/publish/media";
 import { slugifyTitle, uniqueSlug } from "@/lib/publish/slug";
+import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
+import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 
 export type PublicPubItem = {
   id: string;
@@ -18,7 +20,7 @@ export type PublicPubItem = {
   summary: string;
   body: string;
   media: PublicMediaItem[];
-};
+} & PublicSeoFields;
 
 /** Public item plus its cover (kept alongside so covers.length === pubs.length on rebuild). */
 export type StoredPubPayload = PublicPubItem & { cover: string };
@@ -34,6 +36,11 @@ type PayloadSource = {
   image_alt_ar: string | null;
   public_slug: string | null;
   attachments?: unknown;
+  meta_title_ar?: string | null;
+  meta_title_en?: string | null;
+  meta_description_ar?: string | null;
+  meta_description_en?: string | null;
+  og_image?: string | null;
 };
 
 /** Public object for a publication row (persisted to content_items.live_payload). */
@@ -50,18 +57,21 @@ export function buildPublicationPayload(
   const slug = usedSlugs ? uniqueSlug(base, usedSlugs) : base;
   if (usedSlugs) usedSlugs.add(slug);
   const summary = row.summary_ar?.trim() || "";
-  return {
-    id: row.id,
-    slug,
-    t: row.title_ar.trim(),
-    type: row.pub_kind === "individual" ? "individual" : "collective",
-    dept: row.label_ar?.trim() || "",
-    desc: summary,
-    summary,
-    body: row.body_ar?.trim() || "",
-    media: media.length > 0 ? media : [{ kind: "image", src: cover }],
-    cover,
-  };
+  const publicBase = withPublicSeo(
+    {
+      id: row.id,
+      slug,
+      t: row.title_ar.trim(),
+      type: row.pub_kind === "individual" ? ("individual" as const) : ("collective" as const),
+      dept: row.label_ar?.trim() || "",
+      desc: summary,
+      summary,
+      body: sanitizeBodyHtml(row.body_ar) || "",
+      media: (media.length > 0 ? media : [{ kind: "image", src: cover }]) as PublicMediaItem[],
+    },
+    row,
+  );
+  return { ...publicBase, cover };
 }
 
 function publicPublicationsPath(): string {
@@ -103,6 +113,7 @@ export async function rebuildPublicPublicationsJson(): Promise<{
       summary,
       body: p.body?.trim() || "",
       media: media.length > 0 ? media : [{ kind: "image", src: cover }],
+      ...seoFromRow(p),
     });
     covers.push(cover);
   }

@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
+import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
 
 /** Public item shape persisted to content_items.live_payload and served as data/alerts.json. */
 export type PublicAlertItem = {
@@ -10,7 +11,7 @@ export type PublicAlertItem = {
   link: string | null;
   link_label_ar: string;
   link_label_en: string;
-};
+} & PublicSeoFields;
 
 type PayloadSource = {
   id: string;
@@ -19,18 +20,26 @@ type PayloadSource = {
   alert_link_url: string | null;
   alert_link_label_ar: string | null;
   alert_link_label_en: string | null;
+  meta_title_ar?: string | null;
+  meta_title_en?: string | null;
+  meta_description_ar?: string | null;
+  meta_description_en?: string | null;
+  og_image?: string | null;
 };
 
 /** Public object for an alert row (persisted to content_items.live_payload). */
 export function buildAlertPayload(row: PayloadSource): PublicAlertItem {
-  return {
-    id: row.id,
-    message_ar: row.title_ar.trim(),
-    message_en: row.title_en?.trim() || "",
-    link: row.alert_link_url?.trim() || null,
-    link_label_ar: row.alert_link_label_ar?.trim() || "",
-    link_label_en: row.alert_link_label_en?.trim() || "",
-  };
+  return withPublicSeo(
+    {
+      id: row.id,
+      message_ar: row.title_ar.trim(),
+      message_en: row.title_en?.trim() || "",
+      link: row.alert_link_url?.trim() || null,
+      link_label_ar: row.alert_link_label_ar?.trim() || "",
+      link_label_en: row.alert_link_label_en?.trim() || "",
+    },
+    row,
+  );
 }
 
 function publicAlertsPath(): string {
@@ -45,7 +54,10 @@ export async function rebuildPublicAlertsJson(): Promise<{ count: number; path: 
      ORDER BY live_at DESC NULLS LAST, created_at ASC`,
   );
 
-  const items: PublicAlertItem[] = result.rows.map((row) => row.live_payload);
+  const items: PublicAlertItem[] = result.rows.map((row) => ({
+    ...row.live_payload,
+    ...seoFromRow(row.live_payload),
+  }));
 
   const path = publicAlertsPath();
   const dir = dirname(path);

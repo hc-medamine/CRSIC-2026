@@ -7,6 +7,8 @@ import {
   type PublicMediaItem,
 } from "@/lib/publish/media";
 import { slugifyTitle, uniqueSlug } from "@/lib/publish/slug";
+import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
+import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 
 export type PublicNewsItem = {
   id: string;
@@ -17,7 +19,7 @@ export type PublicNewsItem = {
   summary: string;
   body: string;
   media: PublicMediaItem[];
-};
+} & PublicSeoFields;
 
 type PayloadSource = {
   id: string;
@@ -29,6 +31,11 @@ type PayloadSource = {
   image_alt_ar: string | null;
   public_slug: string | null;
   attachments?: unknown;
+  meta_title_ar?: string | null;
+  meta_title_en?: string | null;
+  meta_description_ar?: string | null;
+  meta_description_en?: string | null;
+  og_image?: string | null;
 };
 
 /** Public object for a news row (persisted to content_items.live_payload). */
@@ -37,16 +44,19 @@ export function buildNewsPayload(row: PayloadSource, usedSlugs?: Set<string>): P
   const base = row.public_slug?.trim() || slugifyTitle(row.title_ar);
   const slug = usedSlugs ? uniqueSlug(base, usedSlugs) : base;
   if (usedSlugs) usedSlugs.add(slug);
-  return {
-    id: row.id,
-    slug,
-    img: primaryImageSrc(media) ?? row.image_path ?? null,
-    label: row.label_ar?.trim() || "خبر",
-    title: row.title_ar.trim(),
-    summary: row.summary_ar?.trim() || "",
-    body: row.body_ar?.trim() || "",
-    media,
-  };
+  return withPublicSeo(
+    {
+      id: row.id,
+      slug,
+      img: primaryImageSrc(media) ?? row.image_path ?? null,
+      label: row.label_ar?.trim() || "خبر",
+      title: row.title_ar.trim(),
+      summary: row.summary_ar?.trim() || "",
+      body: sanitizeBodyHtml(row.body_ar) || "",
+      media,
+    },
+    row,
+  );
 }
 
 function publicNewsPath(): string {
@@ -77,6 +87,7 @@ export async function rebuildPublicNewsJson(): Promise<{ count: number; path: st
       summary: p.summary?.trim() || "",
       body: p.body?.trim() || "",
       media,
+      ...seoFromRow(p),
     };
   });
 

@@ -19,6 +19,36 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-07-22 — Research groups & projects CMS + SPA
+
+**Branch:** `feature/cms-authoring-quality-pack`
+
+**Model:** Centre-wide owns SPA types (`news`…`alert`). Each research dept owns `research_group` + `research_project` (dept → groups → projects). Legacy fields from [page_id=244](https://www.crsic.dz/?page_id=244).
+
+**Shipped:** migration `022`; CMS dashboard/API for groups & projects; publish `data/research-groups.json` + `data/research-projects.json`; SPA `#research` loads groups; `#research-project/{slug}` detail. Seed: `npm run db:seed:research-groups` (8 groups + sample project from page 244).
+
+---
+
+### 2026-07-22 — Org content types unique across orgs
+
+**Branch:** `feature/cms-authoring-quality-pack`
+
+Each content type maps to one SPA section and may be assigned to **only one** org. Migration `021` consolidates duplicates (prefer `centre_wide`) + unique index. Org scopes UI shows type ownership map and exclusive assign/unassign per org.
+
+---
+
+### 2026-07-22 — Org catalogs + global Editor content-type exclusivity
+
+**Branch:** `feature/cms-authoring-quality-pack`
+
+**Decisions:** (1) each org unit has a content-type catalog; (2) at most one Editor CMS-wide per content type; (3) Reviewer↔Editor assignment stays org-overlap; Reviewer exclusive orgs unchanged.
+
+**Shipped:** migration `020_org_content_catalog_editor_type_exclusive.sql` (`org_unit_content_types`, `editor_content_type_claims`); lib asserts + claim sync; content create/update rejects org/type pairs outside catalog; Reviewer nav types = org catalog union; Org scopes / Users / Editors UI for catalogs and exclusivity.
+
+**Ops note:** if migrate fails on duplicate Editor types, keep one Editor per type then re-run — see CMS-OPS §4.
+
+---
+
 ## Status snapshot
 
 | Item | Status |
@@ -46,6 +76,101 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 ---
 
 ## Changelog
+
+### 2026-07-22 — Org scopes dedicated CRUD page
+
+**Branch:** `feature/cms-authoring-quality-pack`
+
+**Shipped:** `/dashboard/org-units` (SA) — create / edit / delete org units; `PATCH`/`DELETE /api/org-units/[id]`; delete blocked when content still references the unit. Users page links here instead of inline create.
+
+---
+
+### 2026-07-22 — SA can add org scopes
+
+**Branch:** `feature/cms-authoring-quality-pack`
+
+**Shipped:** `POST /api/org-units` + **Add org scope** form on Users page (name AR/EN, kind, optional id). New units appear in scope checkboxes and content forms; assign to Editors/Reviewers after create. Audit `org.create`.
+
+---
+
+### 2026-07-22 — SA hard delete + Reviewer exclusive orgs / light editor manager
+
+**Branch:** `feature/cms-authoring-quality-pack`
+
+**Shipped:**
+- Migration `019_reviewer_org_exclusive.sql` + `reviewer_org_claims` (one Reviewer per org).
+- Reviewers are org-scoped for queues/lists/view (SA remains centre-wide).
+- `/dashboard/editors` — Reviewer/SA light manager: edit Editor **content types** only for assigned Editors (org overlap).
+- SA Users: create Reviewer with exclusive orgs; edit scopes; hard delete with delete-impact + mandatory reassignment of non-drafts (drafts cascade).
+
+**Also on branch:** authoring quality pack (D/C/B/A1).
+
+**Next:** Stakeholder smoke → PR when ready.
+
+---
+
+### 2026-07-22 — Authoring quality pack: B + A1 on branch
+
+**Branch:** `feature/cms-authoring-quality-pack`
+
+**Shipped on branch (B):** H1 sanitize (`sanitizeBody.ts` + `sanitize-html`); `RichBodyEditor` on news/events/pubs body AR/EN; sanitize on create/update/publish payloads; SPA `js/safeBody.js` + detail list styles. Events form also gained summary fields (were in state/API only).
+
+**Shipped on branch (A1):** migration `018_preview_tokens.sql`; `POST /api/content/[id]/preview`; public `GET /api/public/preview/[token]`; CMS “Open public preview”; SPA `#preview/{token}` + banner. Env: `PUBLIC_SITE_URL` (CMS), `PREVIEW_API_BASE` (SPA `js/config.js`).
+
+**Also on branch:** D (EN queue), C (SEO).
+
+**Next:** Stakeholder smoke (rich body + preview) → PR when ready.
+
+---
+
+### 2026-07-22 — Authoring quality pack: B (rich body) on branch
+
+**Branch:** `feature/cms-authoring-quality-pack`
+
+**Shipped on branch (B):** H1 sanitize (`sanitizeBody.ts` + `sanitize-html`); `RichBodyEditor` on news/events/pubs body AR/EN; sanitize on create/update/publish payloads; SPA `js/safeBody.js` + detail list styles. Events form also gained summary fields (were in state/API only).
+
+**Also on branch:** D (EN queue), C (SEO).
+
+**Next:** A1 draft preview token.
+
+---
+
+### 2026-07-22 — Authoring quality pack: C (SEO) in progress on branch
+
+**Branch:** `feature/cms-authoring-quality-pack`
+
+**Shipped on branch (C):** migration `017_seo_metadata.sql`; CMS SEO fields (F1, L1 60/160) on news/events/pubs/partners/alerts; publish payloads + SPA detail head/OG (`js/seoHead.js`, P1).
+
+**Also on branch (D):** EN-pending dashboard queue + badges.
+
+**Next:** B (rich body editor H1 allowlist) → A (preview token).
+
+---
+
+### 2026-07-22 — Authoring quality pack: start D (EN-pending queue)
+
+**Branch:** `feature/cms-authoring-quality-pack`  
+**PRD:** [2026-07-22-cms-authoring-quality-pack.md](./prds/2026-07-22-cms-authoring-quality-pack.md) (Approved)
+
+**In progress (O1 step D):** Dashboard queue `published` + `en_status=pending`; EN pending/ready badges on lists and item meta. Non-blocking; AR-first unchanged.
+
+**Next on branch:** C (SEO) → B (rich editor) → A (preview token).
+
+---
+
+### 2026-07-22 — PRD approved: CMS authoring quality pack
+
+**Approved:** [docs/prds/2026-07-22-cms-authoring-quality-pack.md](./prds/2026-07-22-cms-authoring-quality-pack.md) — locks: A1 preview token; B2+H1 rich editor; S2+F1+L1+P1 SEO; D1 EN queue; E2 stale deferred; order O1 (D→C→B→A).
+
+**Next:** Implement on feature branches per O1, starting with EN-pending queue.
+
+---
+
+### 2026-07-22 — PRD draft: CMS authoring quality pack
+
+**Draft PRD:** [docs/prds/2026-07-22-cms-authoring-quality-pack.md](./prds/2026-07-22-cms-authoring-quality-pack.md) — public preview, rich body editor, SEO/share meta, EN-pending queue. **Superseded:** approved same day after stakeholder locks.
+
+---
 
 ### 2026-07-22 — RBAC: each role sees only what it concerns
 

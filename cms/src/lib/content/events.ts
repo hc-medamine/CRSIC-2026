@@ -4,6 +4,7 @@ import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { appendWorkflowComment } from "@/lib/content/comments";
 import { buildEventPayload, rebuildPublicEventsJson } from "@/lib/publish/eventsJson";
+import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 import { normalizeAttachments, type PublicMediaItem } from "@/lib/publish/media";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
 import { mutateThenRebuildPublic } from "@/lib/publish/safeRebuild";
@@ -11,9 +12,12 @@ import {
   canAccessContentType,
   canAccessOrg,
   canReview,
+  getUserOrgIds,
+  assertOrgAllowsContentType,
 } from "@/lib/content/permissions";
 import { notifyOnSubmit } from "@/lib/content/delegation";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
+import { normalizeSeoInput, seoSnapshotFields, type SeoInput } from "@/lib/content/seo";
 import type { ContentStatus } from "@/lib/content/news";
 
 async function auditEvent(
@@ -59,6 +63,11 @@ export type EventItem = {
   checklist_confirmed: boolean;
   review_note: string | null;
   public_slug: string | null;
+  meta_title_ar: string | null;
+  meta_title_en: string | null;
+  meta_description_ar: string | null;
+  meta_description_en: string | null;
+  og_image: string | null;
   published_at: Date | null;
   created_at: Date;
   updated_at: Date;
@@ -85,7 +94,7 @@ export type EventInput = {
   eventTypeAr: string;
   eventTypeEn?: string;
   eventDisplayStatus: "upcoming" | "done";
-};
+} & SeoInput;
 
 function snapshotOf(row: EventItem) {
   return {
@@ -106,6 +115,7 @@ function snapshotOf(row: EventItem) {
     image_path: row.image_path,
     attachments: normalizeAttachments(row.attachments),
     public_slug: row.public_slug,
+    ...seoSnapshotFields(row),
   };
 }
 
@@ -151,9 +161,20 @@ export async function getEventById(id: string): Promise<EventItem | null> {
 
 export async function listEventsForUser(user: SessionUser): Promise<EventItem[]> {
   if (!(await canAccessContentType(user, "event"))) return [];
-  if (user.role === "super_admin" || user.role === "reviewer") {
+  if (user.role === "super_admin") {
     const result = await query<EventItem>(
       `SELECT * FROM content_items WHERE content_type = 'event' ORDER BY updated_at DESC`,
+    );
+    return result.rows;
+  }
+  if (user.role === "reviewer") {
+    const orgIds = await getUserOrgIds(user.id);
+    if (orgIds.length === 0) return [];
+    const result = await query<EventItem>(
+      `SELECT * FROM content_items
+       WHERE content_type = 'event' AND org_unit_id = ANY($1::text[])
+       ORDER BY updated_at DESC`,
+      [orgIds],
     );
     return result.rows;
   }
@@ -169,11 +190,13 @@ export async function listEventsForUser(user: SessionUser): Promise<EventItem[]>
 export async function createEvent(user: SessionUser, input: EventInput): Promise<EventItem> {
   if (!(await canAccessContentType(user, "event"))) throw new Error("No event content permission");
   if (!(await canAccessOrg(user, input.orgUnitId))) throw new Error("No permission for this organisation unit");
+  await assertOrgAllowsContentType(input.orgUnitId, "event");
   validateEventFields(input);
   const enStatus = input.enStatus ?? (input.titleEn?.trim() ? "ready" : "pending");
   const attachments = normalizeAttachments(input.attachments);
   const primaryImage =
     attachments.find((a) => a.kind === "image")?.src ?? input.imagePath ?? null;
+  const seo = normalizeSeoInput(input);
 
   const result = await query<EventItem>(
     `INSERT INTO content_items (
@@ -181,13 +204,15 @@ export async function createEvent(user: SessionUser, input: EventInput): Promise
       title_ar, title_en, summary_ar, summary_en, body_ar, body_en,
       image_path, image_alt_ar, image_alt_en, attachments,
       event_scope, event_day, event_month, event_year,
-      event_type_ar, event_type_en, event_display_status
+      event_type_ar, event_type_en, event_display_status,
+      meta_title_ar, meta_title_en, meta_description_ar, meta_description_en, og_image
     ) VALUES (
       'event', 'draft', $1, $2, $2, $3,
       $4, $5, $6, $7, $8, $9,
       $10, $11, $12, $13::jsonb,
       $14, $15, $16, $17,
-      $18, $19, $20
+      $18, $19, $20,
+      $21, $22, $23, $24, $25
     ) RETURNING *`,
     [
       input.orgUnitId,
@@ -197,8 +222,8 @@ export async function createEvent(user: SessionUser, input: EventInput): Promise
       input.titleEn?.trim() || null,
       input.summaryAr?.trim() || null,
       input.summaryEn?.trim() || null,
-      input.bodyAr?.trim() || null,
-      input.bodyEn?.trim() || null,
+      sanitizeBodyHtml(input.bodyAr),
+      sanitizeBodyHtml(input.bodyEn),
       primaryImage,
       input.imageAltAr?.trim() || null,
       input.imageAltEn?.trim() || null,
@@ -210,6 +235,11 @@ export async function createEvent(user: SessionUser, input: EventInput): Promise
       input.eventTypeAr.trim(),
       input.eventTypeEn?.trim() || null,
       input.eventDisplayStatus,
+      seo.meta_title_ar,
+      seo.meta_title_en,
+      seo.meta_description_ar,
+      seo.meta_description_en,
+      seo.og_image,
     ],
   );
   const item = result.rows[0];
@@ -228,6 +258,7 @@ export async function updateEventDraft(user: SessionUser, id: string, input: Eve
     throw new Error("Only the author (or Super Admin) can edit this draft");
   }
   if (!(await canAccessOrg(user, input.orgUnitId))) throw new Error("No permission for this organisation unit");
+  await assertOrgAllowsContentType(input.orgUnitId, "event");
   validateEventFields(input);
   const enStatus = input.enStatus ?? (input.titleEn?.trim() ? "ready" : "pending");
   const attachments = normalizeAttachments(input.attachments);
@@ -237,6 +268,7 @@ export async function updateEventDraft(user: SessionUser, id: string, input: Eve
     user.role === "super_admin" && input.publicSlug !== undefined
       ? input.publicSlug
       : undefined;
+  const seo = normalizeSeoInput(input);
 
   const result = await query<EventItem>(
     `UPDATE content_items SET
@@ -247,6 +279,8 @@ export async function updateEventDraft(user: SessionUser, id: string, input: Eve
       event_scope = $15, event_day = $16, event_month = $17, event_year = $18,
       event_type_ar = $19, event_type_en = $20, event_display_status = $21,
       public_slug = COALESCE($22, public_slug),
+      meta_title_ar = $23, meta_title_en = $24, meta_description_ar = $25,
+      meta_description_en = $26, og_image = $27,
       updated_at = NOW()
      WHERE id = $1 AND content_type = 'event'
      RETURNING *`,
@@ -259,8 +293,8 @@ export async function updateEventDraft(user: SessionUser, id: string, input: Eve
       input.titleEn?.trim() || null,
       input.summaryAr?.trim() || null,
       input.summaryEn?.trim() || null,
-      input.bodyAr?.trim() || null,
-      input.bodyEn?.trim() || null,
+      sanitizeBodyHtml(input.bodyAr),
+      sanitizeBodyHtml(input.bodyEn),
       primaryImage,
       input.imageAltAr?.trim() || null,
       input.imageAltEn?.trim() || null,
@@ -273,6 +307,11 @@ export async function updateEventDraft(user: SessionUser, id: string, input: Eve
       input.eventTypeEn?.trim() || null,
       input.eventDisplayStatus,
       slugOverride?.trim() || null,
+      seo.meta_title_ar,
+      seo.meta_title_en,
+      seo.meta_description_ar,
+      seo.meta_description_en,
+      seo.og_image,
     ],
   );
   const item = result.rows[0];

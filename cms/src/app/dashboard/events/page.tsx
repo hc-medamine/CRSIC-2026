@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listEventsForUser } from "@/lib/content/events";
 import { canAccessContentType } from "@/lib/content/permissions";
+import { EnStatusBadge } from "@/app/dashboard/en-status-badge";
 
 export default async function EventsListPage() {
   const user = await requireUser();
@@ -39,9 +40,12 @@ export default async function EventsListPage() {
                 <Link href={`/dashboard/events/${item.id}`} className="font-medium underline">
                   {item.title_ar || "(untitled)"}
                 </Link>
-                <p className="text-xs text-zinc-500">
-                  {item.status} · {item.event_scope} · {item.event_display_status} ·{" "}
-                  {item.event_day}/{item.event_month}/{item.event_year}
+                <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+                  <span>
+                    {item.status} · {item.event_scope} · {item.event_display_status} ·{" "}
+                    {item.event_day}/{item.event_month}/{item.event_year}
+                  </span>
+                  <EnStatusBadge status={item.en_status} />
                 </p>
               </div>
             </li>

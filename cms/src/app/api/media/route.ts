@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession, sessionTimeoutMs } from "@/lib/auth/session";
-import { createMediaUpload } from "@/lib/media/store";
+import {
+  canAccessMediaBucket,
+  createMediaUpload,
+  listMediaForUser,
+} from "@/lib/media/store";
+import { isMediaBucket } from "@/lib/media/config";
 
 export const runtime = "nodejs";
 
@@ -23,6 +28,47 @@ function serialize(asset: Awaited<ReturnType<typeof createMediaUpload>>) {
     createdAt: asset.created_at.toISOString(),
     updatedAt: asset.updated_at.toISOString(),
   };
+}
+
+/**
+ * List CMS images the actor may use.
+ * Requires `bucket` (related content folder under img/cms/{bucket}/).
+ * Editors: own uploads in that bucket (when they have bucket scope).
+ * Reviewers / Super Admin: all images in that bucket.
+ */
+export async function GET(request: NextRequest) {
+  const user = await requireSessionUser();
+  if (!user) return NextResponse.json({ ok: false, error: "Unauthenticated" }, { status: 401 });
+
+  const bucketParam = request.nextUrl.searchParams.get("bucket")?.trim() ?? "";
+  if (!isMediaBucket(bucketParam)) {
+    return NextResponse.json(
+      { ok: false, error: "bucket is required (news | events | covers)" },
+      { status: 400 },
+    );
+  }
+
+  if (!(await canAccessMediaBucket(user, bucketParam))) {
+    return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
+  }
+
+  const imagesOnly = request.nextUrl.searchParams.get("imagesOnly") !== "0";
+  const assets = await listMediaForUser(user, 200, {
+    bucket: bucketParam,
+    imagesOnly,
+  });
+
+  return NextResponse.json({
+    ok: true,
+    bucket: bucketParam,
+    items: assets.map((a) => ({
+      id: a.id,
+      bucket: a.bucket,
+      originalFilename: a.original_filename,
+      mimeType: a.mime_type,
+      publicPath: a.public_path,
+    })),
+  });
 }
 
 export async function POST(request: NextRequest) {

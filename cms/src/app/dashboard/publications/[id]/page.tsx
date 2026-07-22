@@ -2,10 +2,10 @@ import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { getPublicationById } from "@/lib/content/publications";
-import { canAccessContentType, canReview, getUserOrgIds } from "@/lib/content/permissions";
+import { canAccessContentType, canReview } from "@/lib/content/permissions";
 import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 import { getMediaByPublicPath } from "@/lib/media/store";
-import { listOrgUnits } from "@/lib/users";
+import { listSelectableOrgUnits } from "@/lib/users";
 import { getItemPeopleMeta } from "@/lib/content/people";
 import { getReviewOwnerMeta } from "@/lib/content/delegation";
 import { getEmergencyMeta } from "@/lib/content/emergency";
@@ -38,12 +38,9 @@ export default async function PublicationDetailPage({ params }: Props) {
   const ownerMeta = await getReviewOwnerMeta(id);
   const emergencyMeta = await getEmergencyMeta(id);
 
-  const allOrgs = await listOrgUnits();
-  const orgIds =
-    user.role === "super_admin" || user.role === "reviewer"
-      ? allOrgs.map((o) => o.id)
-      : await getUserOrgIds(user.id);
-  const orgs = allOrgs.filter((o) => orgIds.includes(o.id));
+  const orgs = await listSelectableOrgUnits(user, "publication", {
+    keepOrgId: item.org_unit_id,
+  });
   const isAuthor = item.created_by === user.id || user.role === "super_admin";
   const trueAuthor = item.created_by === user.id;
   const reviewer = canReview(user) && item.created_by !== user.id;
@@ -116,6 +113,11 @@ export default async function PublicationDetailPage({ params }: Props) {
             : null,
           escalatedAt: ownerMeta.escalatedAt,
           needsPostReview: emergencyMeta.needsPostReview,
+          metaTitleAr: item.meta_title_ar ?? "",
+          metaTitleEn: item.meta_title_en ?? "",
+          metaDescriptionAr: item.meta_description_ar ?? "",
+          metaDescriptionEn: item.meta_description_en ?? "",
+          ogImage: item.og_image ?? "",
         }}
       />
 

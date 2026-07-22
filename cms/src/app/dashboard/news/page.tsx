@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/auth/session";
 import { listNewsForUser } from "@/lib/content/news";
 import { canAccessContentType } from "@/lib/content/permissions";
 import { redirect } from "next/navigation";
+import { EnStatusBadge } from "@/app/dashboard/en-status-badge";
 
 export default async function NewsListPage() {
   const user = await requireUser();
@@ -43,8 +44,11 @@ export default async function NewsListPage() {
                 <Link href={`/dashboard/news/${item.id}`} className="font-medium underline">
                   {item.title_ar || "(untitled)"}
                 </Link>
-                <p className="text-xs text-zinc-500">
-                  {item.status} · EN {item.en_status} · {item.org_unit_id}
+                <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+                  <span>
+                    {item.status} · {item.org_unit_id}
+                  </span>
+                  <EnStatusBadge status={item.en_status} />
                 </p>
               </div>
               <span className="text-xs text-zinc-400">

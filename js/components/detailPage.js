@@ -1,30 +1,19 @@
 /**
  * Content detail page renderer (news / event / publication).
- * Plain-text body only — no innerHTML for editorial fields.
+ * Body may be plain text or sanitized HTML (H1 allowlist) — never raw innerHTML.
  */
 import { getLang, t } from '../i18n.js';
 import { el, replaceChildren, safeImageSrc } from '../utils.js';
+import { nodesFromSafeBody } from '../safeBody.js';
 import {
   findNewsByKey,
   findEventByKey,
   findPublicationByKey,
+  findResearchProjectByKey,
+  findResearchGroupByKey,
   getCoverForPub,
 } from '../data.js';
-
-/**
- * @param {string} text
- * @returns {HTMLElement[]}
- */
-function paragraphsFromPlainText(text) {
-  const chunks = String(text || '')
-    .split(/\n{2,}/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-  if (chunks.length === 0 && text && String(text).trim()) {
-    return [el('p', { className: 'detail-body-p', text: String(text).trim() })];
-  }
-  return chunks.map((chunk) => el('p', { className: 'detail-body-p', text: chunk }));
-}
+import { applyItemSeoHead, restoreSiteSeoHead } from '../seoHead.js';
 
 /**
  * @param {object[]} media
@@ -121,15 +110,20 @@ function buildMediaStage(media, title) {
 }
 
 /**
- * @param {'news'|'event'|'publication'} type
+ * @param {'news'|'event'|'publication'|'research-project'} type
  * @param {string} slugOrId
- * @param {{ backPage?: string }} [opts]
+ * @param {{ backPage?: string, previewItem?: object, isPreview?: boolean }} [opts]
  */
 export function renderDetailPage(type, slugOrId, opts = {}) {
   const host = document.getElementById('detail-root');
   if (!host) return;
 
-  let item = null;
+  if (type === 'research-project' && !opts.isPreview) {
+    renderResearchProjectDetail(host, slugOrId);
+    return;
+  }
+
+  let item = opts.previewItem || null;
   let backPage = opts.backPage || 'home';
   let metaLine = '';
   let title = '';
@@ -137,7 +131,38 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
   let body = '';
   let media = [];
 
-  if (type === 'news') {
+  if (item && opts.isPreview) {
+    if (type === 'news') {
+      backPage = 'home';
+      title = item.title || '';
+      metaLine = item.label || '';
+      summary = item.summary || '';
+      body = item.body || '';
+      media = item.media || (item.img ? [{ kind: 'image', src: item.img }] : []);
+    } else if (type === 'event') {
+      backPage = 'events';
+      title = item.title || '';
+      metaLine = [item.type, [item.day, item.month, item.year].filter(Boolean).join(' ')]
+        .filter(Boolean)
+        .join(' · ');
+      summary = item.summary || '';
+      body = item.body || '';
+      media = item.media || (item.img ? [{ kind: 'image', src: item.img }] : []);
+    } else if (type === 'publication') {
+      backPage = 'publications';
+      title = item.t || item.title || '';
+      metaLine = [item.dept, item.type].filter(Boolean).join(' · ');
+      summary = item.summary || item.desc || '';
+      body = item.body || '';
+      const cover = item.cover || item.img || '';
+      media =
+        item.media && item.media.length
+          ? item.media
+          : cover
+            ? [{ kind: 'image', src: cover }]
+            : [];
+    }
+  } else if (type === 'news') {
     item = findNewsByKey(slugOrId);
     backPage = 'home';
     if (item) {
@@ -179,11 +204,14 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
   }
 
   if (!item) {
+    restoreSiteSeoHead();
     replaceChildren(host, [
       el('div', {
         className: 'detail-not-found',
         children: [
-          el('p', { text: t('detail_not_found') }),
+          el('p', {
+            text: opts.isPreview ? t('detail_preview_missing') : t('detail_not_found'),
+          }),
           el('a', {
             className: 'detail-back',
             attrs: { href: `#${backPage}`, 'data-page': backPage },
@@ -195,6 +223,8 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
     return;
   }
 
+  applyItemSeoHead(item, type);
+
   const langAttrs = getLang() === 'en' ? { lang: 'ar' } : {};
   const mediaEl = buildMediaStage(media, title);
   const children = [
@@ -204,6 +234,15 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
       text: t('detail_back'),
     }),
   ];
+  if (opts.isPreview) {
+    children.unshift(
+      el('div', {
+        className: 'detail-preview-banner',
+        attrs: { role: 'status' },
+        text: t('detail_preview_banner'),
+      }),
+    );
+  }
   if (mediaEl) children.push(mediaEl);
   children.push(
     el('header', {
@@ -231,7 +270,7 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
       el('div', {
         className: 'detail-body',
         attrs: langAttrs,
-        children: paragraphsFromPlainText(body),
+        children: nodesFromSafeBody(body),
       }),
     );
   } else if (!summary) {
@@ -247,3 +286,192 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
     el('article', { className: 'detail-article', children }),
   ]);
 }
+
+/**
+ * @param {HTMLElement} host
+ * @param {string} slugOrId
+ */
+function renderResearchProjectDetail(host, slugOrId) {
+  const lang = getLang();
+  const item = findResearchProjectByKey(slugOrId);
+  const backPage = 'research';
+
+  if (!item) {
+    restoreSiteSeoHead();
+    replaceChildren(host, [
+      el('div', {
+        className: 'detail-not-found',
+        children: [
+          el('p', { text: t('detail_not_found') }),
+          el('a', {
+            className: 'detail-back',
+            attrs: { href: `#${backPage}`, 'data-page': backPage },
+            text: t('detail_back'),
+          }),
+        ],
+      }),
+    ]);
+    return;
+  }
+
+  applyItemSeoHead(item, 'research-project');
+  const langAttrs = lang === 'en' ? { lang: 'ar' } : {};
+  const title =
+    lang === 'en' && item.title_en ? item.title_en : item.title_ar || item.title_en || '';
+  const lead =
+    lang === 'en' && item.lead_en ? item.lead_en : item.lead_ar || item.lead_en || '';
+  const dibaja =
+    lang === 'en' && item.dibaja_en ? item.dibaja_en : item.dibaja_ar || item.dibaja_en || '';
+  const questions =
+    lang === 'en' && item.questions_en
+      ? item.questions_en
+      : item.questions_ar || item.questions_en || '';
+  const duration =
+    lang === 'en' && item.duration_en
+      ? item.duration_en
+      : item.duration_ar || item.duration_en || '';
+  const group = item.groupId ? findResearchGroupByKey(item.groupId) : null;
+  const groupLabel = group
+    ? lang === 'en' && group.name_en
+      ? group.name_en
+      : group.name_ar || group.name_en || ''
+    : '';
+
+  const axes = Array.isArray(item.axes) ? item.axes : [];
+  const impacts = Array.isArray(item.impacts) ? item.impacts : [];
+
+  /** @param {object} row */
+  function bilingualLine(row) {
+    if (!row || typeof row !== 'object') return '';
+    if (lang === 'en' && row.en) return row.en;
+    return row.ar || row.en || '';
+  }
+
+  const sections = [];
+  if (groupLabel) {
+    sections.push(
+      el('p', {
+        className: 'detail-meta',
+        text: `${t('research_project_group') || 'Research group'}: ${groupLabel}`,
+      }),
+    );
+  }
+  if (lead) {
+    sections.push(
+      el('p', {
+        className: 'detail-meta',
+        text: `${t('research_project_lead') || 'Project lead'}: ${lead}`,
+      }),
+    );
+  }
+  if (dibaja) {
+    sections.push(
+      el('section', {
+        className: 'detail-section',
+        children: [
+          el('h2', {
+            className: 'detail-section-title',
+            text: t('research_project_dibaja') || 'Project preamble',
+          }),
+          el('div', {
+            className: 'detail-body',
+            attrs: langAttrs,
+            children: nodesFromSafeBody(dibaja),
+          }),
+        ],
+      }),
+    );
+  }
+  if (questions) {
+    sections.push(
+      el('section', {
+        className: 'detail-section',
+        children: [
+          el('h2', {
+            className: 'detail-section-title',
+            text: t('research_project_questions') || 'Research questions',
+          }),
+          el('div', {
+            className: 'detail-body',
+            attrs: langAttrs,
+            children: nodesFromSafeBody(questions),
+          }),
+        ],
+      }),
+    );
+  }
+  if (axes.length > 0) {
+    sections.push(
+      el('section', {
+        className: 'detail-section',
+        children: [
+          el('h2', {
+            className: 'detail-section-title',
+            text: t('research_project_axes') || 'Project axes',
+          }),
+          el('ul', {
+            className: 'detail-list',
+            children: axes
+              .map((a) => bilingualLine(a))
+              .filter(Boolean)
+              .map((text) => el('li', { text })),
+          }),
+        ],
+      }),
+    );
+  }
+  if (duration) {
+    sections.push(
+      el('section', {
+        className: 'detail-section',
+        children: [
+          el('h2', {
+            className: 'detail-section-title',
+            text: t('research_project_duration') || 'Duration',
+          }),
+          el('p', { className: 'detail-summary', attrs: langAttrs, text: duration }),
+        ],
+      }),
+    );
+  }
+  if (impacts.length > 0) {
+    sections.push(
+      el('section', {
+        className: 'detail-section',
+        children: [
+          el('h2', {
+            className: 'detail-section-title',
+            text: t('research_project_impacts') || 'Expected impacts',
+          }),
+          el('ul', {
+            className: 'detail-list',
+            children: impacts
+              .map((a) => bilingualLine(a))
+              .filter(Boolean)
+              .map((text) => el('li', { text })),
+          }),
+        ],
+      }),
+    );
+  }
+
+  replaceChildren(host, [
+    el('article', {
+      className: 'detail-article',
+      children: [
+        el('a', {
+          className: 'detail-back',
+          attrs: { href: `#${backPage}`, 'data-page': backPage },
+          text: t('detail_back'),
+        }),
+        el('header', {
+          className: 'detail-header',
+          attrs: langAttrs,
+          children: [el('h1', { className: 'detail-title section-title', text: title })],
+        }),
+        ...sections,
+      ],
+    }),
+  ]);
+}
+

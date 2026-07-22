@@ -1,0 +1,100 @@
+{
+    "items": [
+        {
+            "id": "10b299ff-8a45-4ccd-91bc-0fb413f4a571",
+            "slug": "islamic-economics",
+            "lead_ar": "",
+            "lead_en": "",
+            "members": [],
+            "name_ar": "فريق الاقتصاد الإسلامي",
+            "name_en": "Islamic Economics Team",
+            "orgUnitId": "dept_islamic_civ",
+            "summary_ar": "يبحث في أسس الاقتصاد الإسلامي والصيرفة الإسلامية والوقف.",
+            "summary_en": "Islamic economics, banking and waqf foundations and applications."
+        },
+        {
+            "id": "0e18ff7b-3ea8-4cc8-9295-9a8343c11257",
+            "slug": "civ-society",
+            "lead_ar": "",
+            "lead_en": "",
+            "members": [],
+            "name_ar": "فريق الحضارة الإسلامية والمجتمع",
+            "name_en": "Islamic Civilization and Society Team",
+            "orgUnitId": "dept_islamic_civ",
+            "summary_ar": "يدرس إسهامات الحضارة الإسلامية في بناء الوعي الإنساني.",
+            "summary_en": "Studies Islamic civilization’s contribution to human consciousness."
+        },
+        {
+            "id": "ca32edaf-53f1-4490-a401-d69f0bd8184f",
+            "slug": "algerian-scholars",
+            "lead_ar": "",
+            "lead_en": "",
+            "members": [],
+            "name_ar": "فريق الأعلام الجزائريين",
+            "name_en": "Algerian Scholars Team",
+            "orgUnitId": "dept_algeria_history",
+            "summary_ar": "يرصد ويوثق الشخصيات العلمية والثقافية الجزائرية عبر التاريخ.",
+            "summary_en": "Documents Algerian scholarly and cultural figures through history."
+        },
+        {
+            "id": "218a9544-4fb1-46b3-8f5e-aceb9991dee2",
+            "slug": "cultural-heritage",
+            "lead_ar": "",
+            "lead_en": "",
+            "members": [],
+            "name_ar": "فريق التراث الثقافي",
+            "name_en": "Cultural Heritage Team",
+            "orgUnitId": "dept_algeria_history",
+            "summary_ar": "يُعنى بالمخطوطات الجزائرية وفهرستها ورقمنتها والتراث الجنوبي.",
+            "summary_en": "Manuscripts, cataloguing, digitisation and southern Algerian heritage."
+        },
+        {
+            "id": "6d30e642-937d-4a53-89be-a2c76015484b",
+            "slug": "creeds-schools",
+            "lead_ar": "",
+            "lead_en": "",
+            "members": [],
+            "name_ar": "فريق العقائد والمذاهب",
+            "name_en": "Creeds and Schools Team",
+            "orgUnitId": "dept_thought_dialogue",
+            "summary_ar": "يدرس أصول العقيدة الإسلامية والمذاهب الفكرية والأمن الفكري.",
+            "summary_en": "Studies Islamic creed, intellectual schools and intellectual security."
+        },
+        {
+            "id": "fba00ea0-23de-4811-9248-af16da5c5317",
+            "slug": "civilizations-dialogue",
+            "lead_ar": "",
+            "lead_en": "",
+            "members": [],
+            "name_ar": "فريق حوار الحضارات",
+            "name_en": "Dialogue of Civilizations Team",
+            "orgUnitId": "dept_thought_dialogue",
+            "summary_ar": "يبحث في مناهج الحوار بين الحضارات والأديان والثقافات وقضايا التسامح.",
+            "summary_en": "Studies inter-civilizational and interfaith dialogue and coexistence."
+        },
+        {
+            "id": "72957999-c18c-49e4-96e4-2e91bea96506",
+            "slug": "fiqh-studies",
+            "lead_ar": "",
+            "lead_en": "",
+            "members": [],
+            "name_ar": "فريق الدراسات الفقهية",
+            "name_en": "Jurisprudential Studies Team",
+            "orgUnitId": "dept_quran_fiqh",
+            "summary_ar": "يتناول مسائل الفقه الإسلامي وأصوله ومناهج الاجتهاد وفقه النوازل.",
+            "summary_en": "Covers Islamic jurisprudence, usul, ijtihad methods and contemporary fatwas."
+        },
+        {
+            "id": "ab960661-6778-47b5-8d63-a0e4fb8d9499",
+            "slug": "quranic-miracles",
+            "lead_ar": "",
+            "lead_en": "",
+            "members": [],
+            "name_ar": "فريق الإعجاز القرآني",
+            "name_en": "Quranic Miracles Team",
+            "orgUnitId": "dept_quran_fiqh",
+            "summary_ar": "يُعنى بالبحث في وجوه الإعجاز القرآني من جوانبه اللغوية والبيانية والعلمية والتشريعية.",
+            "summary_en": "Researches linguistic, rhetorical, scientific and legislative aspects of Quranic inimitability."
+        }
+    ]
+}

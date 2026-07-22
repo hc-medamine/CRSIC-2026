@@ -3,6 +3,12 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ItemWorkflowMeta, type PersonDisplay } from "@/app/dashboard/item-workflow-meta";
+import {
+  SeoFieldsSection,
+  copyMetaTitleFrom,
+  emptySeoFormState,
+  type SeoFormState,
+} from "@/app/dashboard/seo-fields";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
 
@@ -20,6 +26,11 @@ type Initial = {
   editor?: PersonDisplay;
   reviewer?: PersonDisplay;
   publisher?: PersonDisplay;
+  metaTitleAr?: string;
+  metaTitleEn?: string;
+  metaDescriptionAr?: string;
+  metaDescriptionEn?: string;
+  ogImage?: string;
 };
 
 type Props = {
@@ -49,6 +60,14 @@ export function AlertEditorForm({
   const [alertLinkUrl, setAlertLinkUrl] = useState(initial?.alertLinkUrl ?? "");
   const [alertLinkLabelAr, setAlertLinkLabelAr] = useState(initial?.alertLinkLabelAr ?? "");
   const [alertLinkLabelEn, setAlertLinkLabelEn] = useState(initial?.alertLinkLabelEn ?? "");
+  const [seo, setSeo] = useState<SeoFormState>(() => ({
+    ...emptySeoFormState(),
+    metaTitleAr: initial?.metaTitleAr ?? "",
+    metaTitleEn: initial?.metaTitleEn ?? "",
+    metaDescriptionAr: initial?.metaDescriptionAr ?? "",
+    metaDescriptionEn: initial?.metaDescriptionEn ?? "",
+    ogImage: initial?.ogImage ?? "",
+  }));
   const [checklist, setChecklist] = useState(false);
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -66,6 +85,11 @@ export function AlertEditorForm({
       alertLinkUrl,
       alertLinkLabelAr,
       alertLinkLabelEn,
+      metaTitleAr: seo.metaTitleAr,
+      metaTitleEn: seo.metaTitleEn,
+      metaDescriptionAr: seo.metaDescriptionAr,
+      metaDescriptionEn: seo.metaDescriptionEn,
+      ogImage: seo.ogImage.trim() || null,
     };
   }
 
@@ -130,6 +154,7 @@ export function AlertEditorForm({
       {initial?.status ? (
         <ItemWorkflowMeta
           status={initial.status}
+          enStatus={initial.enStatus}
           reviewNote={initial.reviewNote}
           editor={initial.editor}
           reviewer={initial.reviewer}
@@ -219,6 +244,13 @@ export function AlertEditorForm({
             <option value="ready">ready</option>
           </select>
         </label>
+
+        <SeoFieldsSection
+          value={seo}
+          onChange={setSeo}
+          disabled={!editable}
+          onCopyTitleAr={() => setSeo((s) => copyMetaTitleFrom(titleAr, s))}
+        />
 
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
         {message ? <p className="text-sm text-green-700">{message}</p> : null}

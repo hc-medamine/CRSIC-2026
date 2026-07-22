@@ -21,6 +21,10 @@ let intlPartners = [];
 let journals = [];
 /** @type {object[]} */
 let news = [];
+/** @type {object[]} */
+let researchGroups = [];
+/** @type {object[]} */
+let researchProjects = [];
 
 /** @type {Record<string, string>} resource key → error message */
 const loadErrors = {};
@@ -90,6 +94,12 @@ export function loadData() {
       }),
       loadResource('news', 'news.json', (data) => {
         news = Array.isArray(data.news) ? data.news : [];
+      }),
+      loadResource('researchGroups', 'research-groups.json', (data) => {
+        researchGroups = Array.isArray(data.items) ? data.items : [];
+      }),
+      loadResource('researchProjects', 'research-projects.json', (data) => {
+        researchProjects = Array.isArray(data.items) ? data.items : [];
       }),
     ]);
 
@@ -206,6 +216,43 @@ export function getJournals() {
 /** @returns {object[]} */
 export function getNews() {
   return news;
+}
+
+/** @returns {object[]} */
+export function getResearchGroups() {
+  return researchGroups;
+}
+
+/** @returns {object[]} */
+export function getResearchProjects() {
+  return researchProjects;
+}
+
+/**
+ * @param {string} groupId
+ * @returns {object[]}
+ */
+export function getResearchProjectsForGroup(groupId) {
+  const id = String(groupId || '');
+  return researchProjects.filter((p) => p && p.groupId === id);
+}
+
+/**
+ * @param {string} key slug or id
+ * @returns {object|undefined}
+ */
+export function findResearchProjectByKey(key) {
+  const k = decodeURIComponent(String(key || ''));
+  return researchProjects.find((p) => p && (p.slug === k || p.id === k));
+}
+
+/**
+ * @param {string} key slug or id
+ * @returns {object|undefined}
+ */
+export function findResearchGroupByKey(key) {
+  const k = decodeURIComponent(String(key || ''));
+  return researchGroups.find((g) => g && (g.slug === k || g.id === k));
 }
 
 /**

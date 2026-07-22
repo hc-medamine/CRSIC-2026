@@ -102,14 +102,29 @@ That upserts the seed Super Admin password from env. Rotate afterward and remove
 
 ## 4. Offboarding a staff account
 
-1. Super Admin → **User management** → **Deactivate** (do not delete the row — audit and authorship must keep the name).
+**Prefer soft offboarding:**
+
+1. Super Admin → **User management** → **Deactivate**.
 2. Confirm they cannot log in (`auth.login.fail` / inactive).
-3. Reassign in-flight drafts: have another Editor take over, or Super Admin edit drafts if needed.
-4. Reviewer scopes are centre-wide; no extra revoke beyond deactivate.
+3. Reassign in-flight items if needed (content reassign or hard-delete flow).
+4. Reviewer exclusive org claims are released on hard delete; on deactivate, reassign their orgs via **Edit scopes** if another Reviewer must take over.
 5. Optional: reset password to a random unused value after deactivate.
 6. Audit should show `user.deactivate`.
 
-Do **not** delete users in MVP — preserves `created_by` / audit actor history.
+**Hard delete (destructive, SA only):**
+
+1. **Delete…** on the user → review impact (draft count + non-draft list).
+2. If any **non-draft** items exist, choose a reassignment target (active user) — required before delete.
+3. Type the user’s email to confirm.
+4. Drafts authored by the user are deleted; non-drafts move to the reassignment target; leftover FK refs (revisions/comments/media) rehomed; audit `user.delete`.
+
+Deactivate remains the default recommendation when you only need to block login.
+
+**Org scopes:** Super Admin → **Org scopes** (`/dashboard/org-units`). Type sets are **fixed by kind**: centre-wide = SPA five; research_dept = `research_group` + `research_project`. Manage group/project **instances** under Research groups / Research projects. SPA types remain unique across orgs; research types may exist on every research dept. Editor exclusivity: SPA types global; research types per org.
+
+**Research seed:** `cd cms && npm run db:seed:research-groups` creates the 8 locale teams as published groups, seeds one sample project under `quranic-miracles` (legacy page 244), and rebuilds `data/research-groups.json` + `data/research-projects.json`.
+
+**Editor content types (exclusivity):** SPA types — at most one Editor CMS-wide. Research types — at most one Editor **per org**. Types must appear in the union of that Editor’s org catalogs.
 
 ---
 

@@ -4,6 +4,7 @@ import { hashPassword } from "@/lib/auth/password";
 import { query } from "@/lib/db";
 import { clientMeta, writeAudit } from "@/lib/audit";
 import {
+  ALL_CONTENT_TYPES,
   allOrgUnitIds,
   listUsers,
   replaceUserScopes,
@@ -12,8 +13,6 @@ import {
 } from "@/lib/users";
 
 export const runtime = "nodejs";
-
-const CONTENT_TYPES: ContentType[] = ["news", "event", "publication", "partner", "alert"];
 
 async function requireSuperAdminApi() {
   const session = await getSession();
@@ -73,15 +72,20 @@ export async function POST(request: NextRequest) {
     }
 
     let orgUnitIds = body.orgUnitIds ?? [];
-    let contentTypes = (body.contentTypes ?? []).filter((t) => CONTENT_TYPES.includes(t));
+    let contentTypes = (body.contentTypes ?? []).filter((t) => ALL_CONTENT_TYPES.includes(t));
 
-    if (role === "reviewer") {
-      orgUnitIds = await allOrgUnitIds();
-      if (contentTypes.length === 0) contentTypes = [...CONTENT_TYPES];
-    }
     if (role === "super_admin") {
       orgUnitIds = await allOrgUnitIds();
-      contentTypes = [...CONTENT_TYPES];
+      contentTypes = [...ALL_CONTENT_TYPES];
+    }
+    if (role === "reviewer") {
+      if (orgUnitIds.length === 0) {
+        return NextResponse.json(
+          { ok: false, error: "Reviewers need at least one exclusive org unit." },
+          { status: 400 },
+        );
+      }
+      contentTypes = [...ALL_CONTENT_TYPES];
     }
     if (role === "editor" && (orgUnitIds.length === 0 || contentTypes.length === 0)) {
       return NextResponse.json(
@@ -105,7 +109,7 @@ export async function POST(request: NextRequest) {
       ],
     );
     const userId = inserted.rows[0].id;
-    await replaceUserScopes(userId, orgUnitIds, contentTypes);
+    await replaceUserScopes(userId, orgUnitIds, contentTypes, { role });
 
     await writeAudit({
       actor: admin,
@@ -122,6 +126,15 @@ export async function POST(request: NextRequest) {
     const message = err instanceof Error ? err.message : "Create failed";
     if (message.includes("unique") || message.includes("duplicate")) {
       return NextResponse.json({ ok: false, error: "Email already exists." }, { status: 409 });
+    }
+    if (message.includes("already assigned to another reviewer")) {
+      return NextResponse.json({ ok: false, error: message }, { status: 409 });
+    }
+    if (
+      message.includes("already assigned to another editor") ||
+      message.includes("not allowed by selected org")
+    ) {
+      return NextResponse.json({ ok: false, error: message }, { status: 409 });
     }
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }

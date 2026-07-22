@@ -83,6 +83,16 @@ Estimated time: **~10 minutes**.
 | I9 | After unpublish (or reject): item appears in **Unpublished** / **Rejected** on dashboard for author + Reviewer/SA (Editors: own or scoped). Super Admin only: **Delete permanently** on unpublished/rejected; audit `*.delete` | ☐ |
 | I10 | Detail publish: attachments list + slug on news/events/publications; published JSON includes `id`/`slug`/`summary`/`body`/`media` | ☐ |
 
+## J. Research groups & projects
+
+| # | Check | Pass? |
+|---|--------|-------|
+| J1 | Org scopes: centre-wide shows SPA five only; research dept shows `research_group` + `research_project` | ☐ |
+| J2 | Seed: `npm run db:seed:research-groups` → 8 groups in `data/research-groups.json` (+ optional sample project) | ☐ |
+| J3 | SPA `#research`: each dept tab lists published groups; Quranic dept shows sample project link | ☐ |
+| J4 | Open `#research-project/{slug}` — title, lead, dibaja, questions, axes, duration, impacts | ☐ |
+| J5 | CMS: create draft group/project → submit → (other) approve → publish → public JSON updates | ☐ |
+
 ## G. Gate
 
 | # | Check | Pass? |
