@@ -15,7 +15,7 @@ type Revision = {
   authorDisplayName: string | null;
 };
 
-type ContentType = "news" | "event" | "publication" | "partner" | "alert" | "page";
+type ContentType = "news" | "event" | "publication" | "partner" | "alert";
 
 type Props = {
   contentItemId: string;
@@ -28,8 +28,7 @@ function apiSegment(type: ContentType): string {
   if (type === "event") return "events";
   if (type === "publication") return "publications";
   if (type === "partner") return "partners";
-  if (type === "alert") return "alerts";
-  return "pages";
+  return "alerts";
 }
 
 const HIGHLIGHT_KEYS = [

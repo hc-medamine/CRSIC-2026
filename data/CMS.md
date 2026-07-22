@@ -16,7 +16,6 @@ When `CONTENT_BASE_URL` is set (e.g. `https://cdn.example.com/crsic/`), the app 
 | `news.json` | `{ "news": object[] }` — items may include detail fields |
 | `locales/ar.json` | flat key → string |
 | `locales/en.json` | flat key → string |
-| `site-copy.json` | `{ "ar": object, "en": object }` — CMS-published overlay merging every published static page (about / cooperation / org / contact); flat key → string per language, same keys as `locales/*.json`. Empty objects (`{}`) until a page is published. |
 
 SPA deep links (hash): `#news/{slug}`, `#event/{slug}`, `#publication/{slug}`.
 

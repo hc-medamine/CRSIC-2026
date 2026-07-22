@@ -21,7 +21,6 @@ function dashboardPath(contentType: string, id: string): string {
   if (contentType === "event") return `/dashboard/events/${id}`;
   if (contentType === "partner") return `/dashboard/partners/${id}`;
   if (contentType === "alert") return `/dashboard/alerts/${id}`;
-  if (contentType === "page") return `/dashboard/pages/${id}`;
   return `/dashboard/publications/${id}`;
 }
 

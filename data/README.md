@@ -21,7 +21,6 @@ Project docs index: [docs/README.md](../docs/README.md).
 | `news.json` | `news[]` (detail: `id`, `slug`, `summary`, `body`, `media[]`) |
 | `locales/ar.json` | Arabic UI chrome strings (flat key → string) |
 | `locales/en.json` | English UI chrome strings (same keys as `ar`) |
-| `site-copy.json` | CMS-published static pages overlay: `{ "ar": {}, "en": {} }`, merged on top of `locales/*.json` at load time (see below) |
 
 ## Edit UI labels (i18n)
 
@@ -101,26 +100,6 @@ The home section `#home-events-grid` shows the **3 newest** events (intl + nat m
 ```
 
 Use `"items": []` when there is no active alert. `link` is optional (`null` or a URL); when set, `link_label_ar`/`link_label_en` label the button. A visitor who dismisses an alert won't see it again for the rest of the browser session unless a new `id` is published.
-
-## Static pages (about / cooperation / org / contact)
-
-`site-copy.json` holds the CMS-published overlay for the four static pages:
-
-```json
-{
-  "ar": { "about_hero_h1": "..." },
-  "en": { "about_hero_h1": "..." }
-}
-```
-
-At app start, `js/i18n.js` loads `locales/ar.json` + `locales/en.json` first (the fallback copy
-for these pages), then soft-fetches `site-copy.json` and merges its keys on top — so a missing or
-empty `site-copy.json` (`{ "ar": {}, "en": {} }`, the default) simply means the locale-file copy is
-shown as-is. Only one CMS row can be **published** per page at a time; publishing rebuilds
-`site-copy.json` from every currently-published page (about/cooperation/org/contact), overlaying
-locales/*.json only for the keys that page actually defines a value for. Edit copy for these pages
-through the CMS dashboard (`/dashboard/pages`), not by hand-editing this file — the CMS overwrites
-it on every publish/unpublish.
 
 ## Add news
 

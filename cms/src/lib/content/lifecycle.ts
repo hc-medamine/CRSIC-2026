@@ -6,7 +6,7 @@ import { canReview } from "@/lib/content/permissions";
 import { getContentMeta, getRevisionById } from "@/lib/content/revisions";
 import { assertNotAwayFrozen } from "@/lib/content/ooo";
 
-export type ContentType = "news" | "event" | "publication" | "partner" | "alert" | "page";
+export type ContentType = "news" | "event" | "publication" | "partner" | "alert";
 
 /** Columns that make up an editable content snapshot (superset across content types). */
 const SNAPSHOT_COLUMNS = [
@@ -38,8 +38,6 @@ const SNAPSHOT_COLUMNS = [
   "alert_link_url",
   "alert_link_label_ar",
   "alert_link_label_en",
-  "page_key",
-  "page_fields",
 ] as const;
 
 /** Columns that a restore is allowed to overwrite from a prior snapshot (never status here). */
@@ -50,8 +48,7 @@ export function contentPathSegment(type: ContentType): string {
   if (type === "event") return "events";
   if (type === "publication") return "publications";
   if (type === "partner") return "partners";
-  if (type === "alert") return "alerts";
-  return "pages";
+  return "alerts";
 }
 
 async function captureSnapshot(itemId: string): Promise<Record<string, unknown>> {

@@ -41,21 +41,31 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 | Feature delivery workflow | **Locked** — new work on a feature branch until fully stable, then merge to `main` |
 | CMS PRD | **Approved** (2026-07-21) |
 | CMS Phase 2 | **Paused** — #1–#3 on `main`; #4 cancelled; #5 malware postponed until go-live |
-| CMS Phase 3 | **In progress** on `feature/phase3-partners-alerts-pages` — partners + alerts + About/coop/org/contact |
+| CMS Phase 3 | **In progress** on `feature/phase3-partners-alerts-pages` — partners + alerts (Pages CMS removed) |
 
 ---
 
 ## Changelog
 
+### 2026-07-22 — Phase 3 Pages CMS removed
+
+**Locked:** Stakeholder dropped About/Cooperation/Organisation/Contact from the CMS. Those texts stay in `data/locales/*.json` only. Phase 3 keeps **partners** + **alerts**.
+
+**Shipped:** removed Pages dashboard/API/libs, `site-copy.json` overlay, seed-site-pages; migration `016_drop_static_pages.sql`.
+
+**Next (paused for stakeholder):** Local-only until full Phase 3 review — **do not push/PR/merge** yet. Then merge → bug/improvement pass → consider PRD done until go-live.
+
+---
+
 ### 2026-07-21 — Phase 3 partners, alerts, static pages (branch)
 
 **Branch:** `feature/phase3-partners-alerts-pages`
 
-**Locked:** All Phase 3 content-surface items: partners CMS → `partners.json`; site alert banner → `alerts.json` (one published); About/Cooperation/Organisation/Contact → `site-copy.json` overlay on locales. Same draft→publish workflow. Go-live and editorial article fill remain out.
+**Locked:** Partners CMS → `partners.json`; site alert banner → `alerts.json` (one published). Static pages into CMS were included then **removed** 2026-07-22.
 
-**Shipped on branch:** migration `015_phase3_partners_alerts_pages.sql`; partners/alerts/pages libs + APIs + dashboard; SPA alert banner + i18n site-copy overlay; smoke paths; seed-site-pages script.
+**Shipped on branch:** migration `015_phase3_partners_alerts_pages.sql`; partners/alerts libs + APIs + dashboard; SPA alert banner; smoke paths.
 
-**Next (paused for stakeholder):** Local-only until full Phase 3 review next session — **do not push/PR/merge** yet. Then smoke UI → merge → bug/improvement pass → consider PRD done until go-live.
+**Next (paused for stakeholder):** Local-only until full Phase 3 review next session — **do not push/PR/merge** yet. Then smoke UI → merge → bug/improvement pass → consider PRD done until go-live. **Superseded in part:** Pages removed 2026-07-22.
 
 ---
 

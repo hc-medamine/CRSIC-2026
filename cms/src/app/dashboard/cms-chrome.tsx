@@ -30,7 +30,6 @@ export function CmsChrome({ initialLang, role, unread, displayName, email, child
     { key: "publications", href: "/dashboard/publications" },
     { key: "partners", href: "/dashboard/partners" },
     { key: "alerts", href: "/dashboard/alerts" },
-    { key: "pages", href: "/dashboard/pages" },
     { key: "media", href: "/dashboard/media" },
     { key: "notifications", href: "/dashboard/notifications", badge: unread },
     { key: "profile", href: "/dashboard/profile" },

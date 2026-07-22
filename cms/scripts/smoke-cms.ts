@@ -33,13 +33,6 @@ import {
   submitAlert,
   unpublishAlert,
 } from "../src/lib/content/alerts";
-import {
-  approvePage,
-  createPage,
-  publishPage,
-  submitPage,
-  unpublishPage,
-} from "../src/lib/content/pages";
 import { addComment, listCommentsForItem } from "../src/lib/content/comments";
 import {
   confirmReviewOwner,
@@ -93,7 +86,6 @@ async function ensureUser(opts: {
     "publication",
     "partner",
     "alert",
-    "page",
   ] as const;
   await replaceUserScopes(id, orgs, [...types]);
 
@@ -447,30 +439,6 @@ async function main() {
   await unpublishAlert(reviewer, alert.id);
   copyFileSync(alertsSnap, alertsPath);
 
-  console.log("Phase 3: page publish (cooperation)…");
-  const siteCopyPath = join(process.cwd(), "..", "data", "site-copy.json");
-  const siteCopySnap = `${siteCopyPath}.smoke-snap`;
-  copyFileSync(siteCopyPath, siteCopySnap);
-  const page = await createPage(editor, {
-    orgUnitId,
-    pageKey: "cooperation",
-    pageFields: {
-      ar: { coop_hero_h1: `Smoke coop ${Date.now()}` },
-      en: { coop_hero_h1: "Smoke coop EN" },
-    },
-  });
-  await submitPage(editor, page.id, true);
-  await approvePage(reviewer, page.id);
-  await publishPage(reviewer, page.id);
-  const siteCopy = JSON.parse(readFileSync(siteCopyPath, "utf8")) as {
-    ar: Record<string, string>;
-  };
-  if (!siteCopy.ar.coop_hero_h1?.includes("Smoke coop")) {
-    throw new Error("Published site-copy.json missing cooperation overlay");
-  }
-  await unpublishPage(reviewer, page.id);
-  copyFileSync(siteCopySnap, siteCopyPath);
-
   const audits = await listAuditLog({ limit: 80 });
   const actions = new Set(audits.map((a) => a.action));
   for (const need of [
@@ -481,7 +449,6 @@ async function main() {
     "news.unpublish",
     "partner.publish",
     "alert.publish",
-    "page.publish",
   ]) {
     if (!actions.has(need)) {
       throw new Error(`Missing audit action ${need}`);
