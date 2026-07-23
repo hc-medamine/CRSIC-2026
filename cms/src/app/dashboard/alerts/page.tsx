@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listAlertsForUser } from "@/lib/content/alerts";
 import { canAccessContentType } from "@/lib/content/permissions";
+import { EnStatusBadge } from "@/app/dashboard/en-status-badge";
 
 export default async function AlertsListPage() {
   const user = await requireUser();
@@ -39,9 +40,12 @@ export default async function AlertsListPage() {
                 <Link href={`/dashboard/alerts/${item.id}`} className="font-medium underline">
                   {item.title_ar || "(untitled)"}
                 </Link>
-                <p className="text-xs text-zinc-500">
-                  {item.status}
-                  {item.alert_link_url ? ` · ${item.alert_link_url}` : ""}
+                <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+                  <span>
+                    {item.status}
+                    {item.alert_link_url ? ` · ${item.alert_link_url}` : ""}
+                  </span>
+                  <EnStatusBadge status={item.en_status} />
                 </p>
               </div>
             </li>

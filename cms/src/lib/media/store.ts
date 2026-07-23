@@ -6,6 +6,7 @@ import { writeAudit } from "@/lib/audit";
 import { canAccessContentType, isCentreWideViewer } from "@/lib/content/permissions";
 import {
   isMediaBucket,
+  MEDIA_BUCKETS,
   publicPathFor,
   type MediaBucket,
 } from "@/lib/media/config";
@@ -70,20 +71,45 @@ export function canManageMediaAsset(user: SessionUser, asset: MediaAsset): boole
 export async function listMediaForUser(
   user: SessionUser,
   limit = 100,
+  opts?: { bucket?: MediaBucket; imagesOnly?: boolean },
 ): Promise<MediaAsset[]> {
-  if (isCentreWideViewer(user)) {
-    const result = await query<MediaAsset>(
-      `SELECT * FROM media_assets ORDER BY created_at DESC LIMIT $1`,
-      [limit],
-    );
-    return result.rows;
+  const bucket = opts?.bucket;
+  if (bucket && !(await canAccessMediaBucket(user, bucket))) {
+    return [];
   }
+
+  const allowedBuckets: MediaBucket[] = [];
+  for (const b of MEDIA_BUCKETS) {
+    if (await canAccessMediaBucket(user, b)) allowedBuckets.push(b);
+  }
+  if (allowedBuckets.length === 0) return [];
+  if (bucket && !allowedBuckets.includes(bucket)) return [];
+
+  const where: string[] = [];
+  const params: unknown[] = [];
+
+  if (!isCentreWideViewer(user) && user.role !== "reviewer") {
+    params.push(user.id);
+    where.push(`uploaded_by = $${params.length}`);
+  }
+
+  const buckets = bucket ? [bucket] : allowedBuckets;
+  params.push(buckets);
+  where.push(`bucket = ANY($${params.length}::text[])`);
+
+  if (opts?.imagesOnly) {
+    where.push(`mime_type IN ('image/jpeg', 'image/png', 'image/webp')`);
+  }
+
+  where.push(`public_path LIKE 'img/cms/%'`);
+
+  params.push(limit);
   const result = await query<MediaAsset>(
     `SELECT * FROM media_assets
-     WHERE uploaded_by = $1
+     WHERE ${where.join(" AND ")}
      ORDER BY created_at DESC
-     LIMIT $2`,
-    [user.id, limit],
+     LIMIT $${params.length}`,
+    params,
   );
   return result.rows;
 }

@@ -6,7 +6,14 @@ import { canReview } from "@/lib/content/permissions";
 import { getContentMeta, getRevisionById } from "@/lib/content/revisions";
 import { assertNotAwayFrozen } from "@/lib/content/ooo";
 
-export type ContentType = "news" | "event" | "publication" | "partner" | "alert";
+export type ContentType =
+  | "news"
+  | "event"
+  | "publication"
+  | "partner"
+  | "alert"
+  | "research_group"
+  | "research_project";
 
 /** Columns that make up an editable content snapshot (superset across content types). */
 const SNAPSHOT_COLUMNS = [
@@ -38,6 +45,16 @@ const SNAPSHOT_COLUMNS = [
   "alert_link_url",
   "alert_link_label_ar",
   "alert_link_label_en",
+  "research_group_id",
+  "research_lead_ar",
+  "research_lead_en",
+  "research_questions_ar",
+  "research_questions_en",
+  "research_duration_ar",
+  "research_duration_en",
+  // Note: research_members / research_axes / research_impacts are jsonb (like
+  // publications.attachments) and are intentionally excluded here — a generic
+  // restore would need a ::jsonb cast this column-agnostic UPDATE doesn't apply.
 ] as const;
 
 /** Columns that a restore is allowed to overwrite from a prior snapshot (never status here). */
@@ -48,6 +65,8 @@ export function contentPathSegment(type: ContentType): string {
   if (type === "event") return "events";
   if (type === "publication") return "publications";
   if (type === "partner") return "partners";
+  if (type === "research_group") return "research-groups";
+  if (type === "research_project") return "research-projects";
   return "alerts";
 }
 

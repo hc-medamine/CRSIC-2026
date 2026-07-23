@@ -15,7 +15,14 @@ type Revision = {
   authorDisplayName: string | null;
 };
 
-type ContentType = "news" | "event" | "publication" | "partner" | "alert";
+type ContentType =
+  | "news"
+  | "event"
+  | "publication"
+  | "partner"
+  | "alert"
+  | "research_group"
+  | "research_project";
 
 type Props = {
   contentItemId: string;
@@ -28,6 +35,8 @@ function apiSegment(type: ContentType): string {
   if (type === "event") return "events";
   if (type === "publication") return "publications";
   if (type === "partner") return "partners";
+  if (type === "research_group") return "research-groups";
+  if (type === "research_project") return "research-projects";
   return "alerts";
 }
 
@@ -52,6 +61,9 @@ const HIGHLIGHT_KEYS = [
   "alert_link_url",
   "alert_link_label_ar",
   "alert_link_label_en",
+  "research_group_id",
+  "research_lead_ar",
+  "research_duration_ar",
 ];
 
 export function RevisionHistory({ contentItemId, contentType, canRestore }: Props) {

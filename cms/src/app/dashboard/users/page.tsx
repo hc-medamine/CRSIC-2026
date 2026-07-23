@@ -13,7 +13,12 @@ export default async function UsersPage() {
           <p className="text-sm uppercase tracking-wide text-zinc-500">CRSIC CMS · Step 1</p>
           <h1 className="text-2xl font-semibold text-zinc-900">User management</h1>
           <p className="mt-1 text-sm text-zinc-600">
-            Super Admin only. Create users, assign scopes, deactivate, reset passwords (no email).
+            Super Admin only. Create users, assign exclusive Reviewer orgs, deactivate, reset
+            passwords, or hard-delete. Manage organisation units on{" "}
+            <Link href="/dashboard/org-units" className="underline">
+              Org scopes
+            </Link>
+            .
           </p>
         </div>
         <Link href="/dashboard" className="text-sm underline">

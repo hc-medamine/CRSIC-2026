@@ -16,7 +16,8 @@ Future product specs for CRSIC live here. The public site has no active PRD yet;
 
 | PRD | Status | Notes |
 |-----|--------|-------|
-| [2026-07-19-internal-content-management.md](./2026-07-19-internal-content-management.md) | **Approved** (2026-07-21) | Step 4 — Phase 3 partners + alerts on feature branch (Pages CMS removed) |
+| [2026-07-19-internal-content-management.md](./2026-07-19-internal-content-management.md) | **Approved** (2026-07-21) | Step 4 core CMS — Phases 1–3 on `main` |
+| [2026-07-22-cms-authoring-quality-pack.md](./2026-07-22-cms-authoring-quality-pack.md) | **Approved** (2026-07-22) | Preview (A1), rich editor (B2+H1), SEO (S2+F1+L1+P1), EN queue (D1); order O1 |
 
 ## Related
 

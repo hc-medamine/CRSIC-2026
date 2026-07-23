@@ -2,9 +2,9 @@ import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { getAlertById } from "@/lib/content/alerts";
-import { canAccessContentType, canReview, getUserOrgIds } from "@/lib/content/permissions";
+import { canAccessContentType, canReview } from "@/lib/content/permissions";
 import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
-import { listOrgUnits } from "@/lib/users";
+import { listSelectableOrgUnits } from "@/lib/users";
 import { getItemPeopleMeta } from "@/lib/content/people";
 import { refreshUserFromDb } from "@/lib/content/ooo";
 import { AlertEditorForm } from "../alert-form";
@@ -30,12 +30,7 @@ export default async function AlertDetailPage({ params }: Props) {
   if (!meta || !(await canViewContentItem(user, meta))) redirect("/dashboard");
   const people = await getItemPeopleMeta(id);
 
-  const allOrgs = await listOrgUnits();
-  const orgIds =
-    user.role === "super_admin" || user.role === "reviewer"
-      ? allOrgs.map((o) => o.id)
-      : await getUserOrgIds(user.id);
-  const orgs = allOrgs.filter((o) => orgIds.includes(o.id));
+  const orgs = await listSelectableOrgUnits(user, "alert", { keepOrgId: item.org_unit_id });
   const isAuthor = item.created_by === user.id || user.role === "super_admin";
   const reviewer = canReview(user) && item.created_by !== user.id;
   const canManage = user.role === "super_admin" || user.role === "reviewer";
@@ -87,6 +82,11 @@ export default async function AlertDetailPage({ params }: Props) {
           editor: personProp(people.editor),
           reviewer: personProp(people.reviewer),
           publisher: personProp(people.publisher),
+          metaTitleAr: item.meta_title_ar ?? "",
+          metaTitleEn: item.meta_title_en ?? "",
+          metaDescriptionAr: item.meta_description_ar ?? "",
+          metaDescriptionEn: item.meta_description_en ?? "",
+          ogImage: item.og_image ?? "",
         }}
       />
 

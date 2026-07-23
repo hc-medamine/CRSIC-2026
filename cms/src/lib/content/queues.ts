@@ -1,6 +1,6 @@
 import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
-import { canReview } from "@/lib/content/permissions";
+import { canReview, getUserOrgIds } from "@/lib/content/permissions";
 import { contentPathSegment, type ContentType } from "@/lib/content/lifecycle";
 
 export type QueueItem = {
@@ -23,6 +23,8 @@ export type Queues = {
   rejected: QueueItem[];
   unpublished: QueueItem[];
   recentlyPublished: QueueItem[];
+  /** D1: published + en_status = pending (own for editors; org-scoped for reviewer; all for SA). */
+  englishPending: QueueItem[];
 };
 
 type Row = {
@@ -66,50 +68,82 @@ async function runQueue(where: string, params: unknown[], limit: number): Promis
   return result.rows.map(toItem);
 }
 
+function emptyQueues(): Queues {
+  return {
+    awaitingReview: [],
+    needsRevision: [],
+    myDrafts: [],
+    rejected: [],
+    unpublished: [],
+    recentlyPublished: [],
+    englishPending: [],
+  };
+}
+
 /**
- * Operational action queues for the dashboard, scoped by role/permissions:
- * - awaitingReview: submitted items (Reviewer/SA: all; Editor: own)
- * - needsRevision: changes_requested items (author, or Reviewer/Super Admin)
- * - myDrafts: the current user's drafts
- * - rejected: author's rejected items (Reviewer/SA see all)
- * - unpublished: author's unpublished items (Reviewer/SA see all)
- * - recentlyPublished: author's recently published items (Reviewer/SA see all)
+ * Operational action queues scoped by role:
+ * - Super Admin: all items
+ * - Reviewer: items in their exclusive org scopes
+ * - Editor: own items
  */
 export async function getQueues(user: SessionUser): Promise<Queues> {
   const reviewer = canReview(user);
-
-  const awaitingReview = reviewer
-    ? await runQueue(`c.status = 'submitted'`, [], 50)
-    : await runQueue(`c.status = 'submitted' AND c.created_by = $1`, [user.id], 50);
-
-  const needsRevision = reviewer
-    ? await runQueue(`c.status = 'changes_requested'`, [], 50)
-    : await runQueue(`c.status = 'changes_requested' AND c.created_by = $1`, [user.id], 50);
-
   const myDrafts = await runQueue(
     `c.status = 'draft' AND c.created_by = $1`,
     [user.id],
     50,
   );
 
-  const rejected = reviewer
-    ? await runQueue(`c.status = 'rejected'`, [], 50)
-    : await runQueue(`c.status = 'rejected' AND c.created_by = $1`, [user.id], 50);
+  if (!reviewer) {
+    return {
+      awaitingReview: await runQueue(`c.status = 'submitted' AND c.created_by = $1`, [user.id], 50),
+      needsRevision: await runQueue(
+        `c.status = 'changes_requested' AND c.created_by = $1`,
+        [user.id],
+        50,
+      ),
+      myDrafts,
+      rejected: await runQueue(`c.status = 'rejected' AND c.created_by = $1`, [user.id], 50),
+      unpublished: await runQueue(`c.status = 'unpublished' AND c.created_by = $1`, [user.id], 50),
+      recentlyPublished: await runQueue(`c.status = 'published' AND c.created_by = $1`, [user.id], 10),
+      englishPending: await runQueue(
+        `c.status = 'published' AND c.en_status = 'pending' AND c.created_by = $1`,
+        [user.id],
+        50,
+      ),
+    };
+  }
 
-  const unpublished = reviewer
-    ? await runQueue(`c.status = 'unpublished'`, [], 50)
-    : await runQueue(`c.status = 'unpublished' AND c.created_by = $1`, [user.id], 50);
+  if (user.role === "super_admin") {
+    return {
+      awaitingReview: await runQueue(`c.status = 'submitted'`, [], 50),
+      needsRevision: await runQueue(`c.status = 'changes_requested'`, [], 50),
+      myDrafts,
+      rejected: await runQueue(`c.status = 'rejected'`, [], 50),
+      unpublished: await runQueue(`c.status = 'unpublished'`, [], 50),
+      recentlyPublished: await runQueue(`c.status = 'published'`, [], 10),
+      englishPending: await runQueue(`c.status = 'published' AND c.en_status = 'pending'`, [], 50),
+    };
+  }
 
-  const recentlyPublished = reviewer
-    ? await runQueue(`c.status = 'published'`, [], 10)
-    : await runQueue(`c.status = 'published' AND c.created_by = $1`, [user.id], 10);
+  // Reviewer — exclusive org scopes
+  const orgIds = await getUserOrgIds(user.id);
+  if (orgIds.length === 0) {
+    return { ...emptyQueues(), myDrafts };
+  }
 
+  const orgClause = `c.org_unit_id = ANY($1::text[])`;
   return {
-    awaitingReview,
-    needsRevision,
+    awaitingReview: await runQueue(`c.status = 'submitted' AND ${orgClause}`, [orgIds], 50),
+    needsRevision: await runQueue(`c.status = 'changes_requested' AND ${orgClause}`, [orgIds], 50),
     myDrafts,
-    rejected,
-    unpublished,
-    recentlyPublished,
+    rejected: await runQueue(`c.status = 'rejected' AND ${orgClause}`, [orgIds], 50),
+    unpublished: await runQueue(`c.status = 'unpublished' AND ${orgClause}`, [orgIds], 50),
+    recentlyPublished: await runQueue(`c.status = 'published' AND ${orgClause}`, [orgIds], 10),
+    englishPending: await runQueue(
+      `c.status = 'published' AND c.en_status = 'pending' AND ${orgClause}`,
+      [orgIds],
+      50,
+    ),
   };
 }

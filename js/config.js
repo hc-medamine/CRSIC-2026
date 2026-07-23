@@ -16,6 +16,13 @@
 export const CONTENT_BASE_URL = '';
 
 /**
+ * CMS origin for A1 public preview API (no trailing slash).
+ * Example: 'http://localhost:3000' → GET {base}/api/public/preview/{token}
+ * Leave empty only if the SPA is served from the same origin as the CMS.
+ */
+export const PREVIEW_API_BASE = '';
+
+/**
  * Resolve a content path to an absolute URL for fetch().
  * @param {string} relativePath e.g. 'publications.json' or 'locales/ar.json'
  * @param {string} [moduleUrl] import.meta.url of the calling module (for local fallback)

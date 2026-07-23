@@ -1,6 +1,6 @@
 import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
-import { canAccessContentType, isCentreWideViewer } from "@/lib/content/permissions";
+import { canAccessContentType, canAccessOrg } from "@/lib/content/permissions";
 import type { ContentStatus } from "@/lib/content/news";
 import type { ContentType } from "@/lib/users";
 
@@ -33,15 +33,19 @@ export async function getContentMeta(id: string): Promise<ContentMeta | null> {
 }
 
 /**
- * Editors: own items only (drafts, returned, and their other statuses).
- * Reviewers / Super Admin: any item of an allowed content type.
+ * Editors: own items only.
+ * Reviewers: items in their exclusive org scopes (any author).
+ * Super Admin: all items of an allowed content type.
  */
 export async function canViewContentItem(
   user: SessionUser,
   item: ContentMeta,
 ): Promise<boolean> {
   if (!(await canAccessContentType(user, item.content_type))) return false;
-  if (isCentreWideViewer(user)) return true;
+  if (user.role === "super_admin") return true;
+  if (user.role === "reviewer") {
+    return canAccessOrg(user, item.org_unit_id);
+  }
   return item.created_by === user.id;
 }
 

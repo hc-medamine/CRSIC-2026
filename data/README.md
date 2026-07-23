@@ -17,6 +17,8 @@ Project docs index: [docs/README.md](../docs/README.md).
 | `events.json` | `intl[]` + `nat[]` events (detail: `id`, `slug`, `summary`, `body`, `media[]`) |
 | `partners.json` | `nat[]` + `intl[]` partners |
 | `alerts.json` | `items[]` — site-wide banner, at most one live item (empty array when none) |
+| `research-groups.json` | `items[]` — research groups by `orgUnitId` (CMS-published) |
+| `research-projects.json` | `items[]` — research projects with `groupId` (CMS-published); detail via `#research-project/{slug}` |
 | `journals.json` | `journals[]` |
 | `news.json` | `news[]` (detail: `id`, `slug`, `summary`, `body`, `media[]`) |
 | `locales/ar.json` | Arabic UI chrome strings (flat key → string) |

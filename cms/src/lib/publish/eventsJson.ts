@@ -7,6 +7,8 @@ import {
   type PublicMediaItem,
 } from "@/lib/publish/media";
 import { slugifyTitle, uniqueSlug } from "@/lib/publish/slug";
+import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
+import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 
 export type PublicEventItem = {
   id: string;
@@ -21,7 +23,7 @@ export type PublicEventItem = {
   summary: string;
   body: string;
   media: PublicMediaItem[];
-};
+} & PublicSeoFields;
 
 /** Public item plus the scope used to bucket it into intl/nat on rebuild. */
 export type StoredEventPayload = PublicEventItem & { scope: "intl" | "nat" };
@@ -41,6 +43,11 @@ type PayloadSource = {
   image_alt_ar: string | null;
   public_slug: string | null;
   attachments?: unknown;
+  meta_title_ar?: string | null;
+  meta_title_en?: string | null;
+  meta_description_ar?: string | null;
+  meta_description_en?: string | null;
+  og_image?: string | null;
 };
 
 /** Public object for an event row (persisted to content_items.live_payload). */
@@ -53,19 +60,25 @@ export function buildEventPayload(
   const slug = usedSlugs ? uniqueSlug(base, usedSlugs) : base;
   if (usedSlugs) usedSlugs.add(slug);
   const primary = primaryImageSrc(media) ?? row.image_path ?? undefined;
+  const publicBase = withPublicSeo(
+    {
+      id: row.id,
+      slug,
+      day: row.event_day?.trim() || "01",
+      month: row.event_month?.trim() || "",
+      year: row.event_year?.trim() || "",
+      title: row.title_ar.trim(),
+      type: row.event_type_ar?.trim() || "فعالية",
+      status: row.event_display_status === "done" ? ("done" as const) : ("upcoming" as const),
+      summary: row.summary_ar?.trim() || "",
+      body: sanitizeBodyHtml(row.body_ar) || "",
+      media,
+    },
+    row,
+  );
   const item: StoredEventPayload = {
-    id: row.id,
-    slug,
-    day: row.event_day?.trim() || "01",
-    month: row.event_month?.trim() || "",
-    year: row.event_year?.trim() || "",
-    title: row.title_ar.trim(),
-    type: row.event_type_ar?.trim() || "فعالية",
-    status: row.event_display_status === "done" ? "done" : "upcoming",
+    ...publicBase,
     scope: row.event_scope === "nat" ? "nat" : "intl",
-    summary: row.summary_ar?.trim() || "",
-    body: row.body_ar?.trim() || "",
-    media,
   };
   if (primary) item.img = primary;
   return item;
@@ -105,6 +118,7 @@ export async function rebuildPublicEventsJson(): Promise<{
       summary: item.summary?.trim() || "",
       body: item.body?.trim() || "",
       media,
+      ...seoFromRow(item),
     };
     const primary = primaryImageSrc(media) ?? item.img;
     if (primary) publicItem.img = primary;

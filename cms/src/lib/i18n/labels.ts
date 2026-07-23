@@ -16,10 +16,14 @@ export const LABELS: LabelMap = {
   publications: { en: "Publications", ar: "المنشورات" },
   partners: { en: "Partners", ar: "الشركاء" },
   alerts: { en: "Alerts", ar: "التنبيهات" },
+  researchGroups: { en: "Research groups", ar: "الفرق البحثية" },
+  researchProjects: { en: "Research projects", ar: "المشاريع البحثية" },
   media: { en: "Media", ar: "الوسائط" },
   notifications: { en: "Notifications", ar: "الإشعارات" },
   profile: { en: "Profile", ar: "الملف الشخصي" },
   users: { en: "Users", ar: "المستخدمون" },
+  orgUnits: { en: "Org scopes", ar: "نطاقات المؤسسة" },
+  editors: { en: "Editors", ar: "المحررون" },
   audit: { en: "Audit", ar: "سجل التدقيق" },
   logout: { en: "Logout", ar: "تسجيل الخروج" },
 
@@ -30,6 +34,11 @@ export const LABELS: LabelMap = {
   rejected: { en: "Rejected", ar: "مرفوض" },
   unpublished: { en: "Unpublished", ar: "غير منشور" },
   recentlyPublished: { en: "Recently published", ar: "المنشور حديثًا" },
+  englishPending: { en: "English pending", ar: "الإنجليزية معلّقة" },
+  englishPendingEmpty: {
+    en: "No published items waiting on English. AR-first publish is allowed.",
+    ar: "لا توجد عناصر منشورة بانتظار الإنجليزية. يُسمح بالنشر بالعربية أولاً.",
+  },
   noItems: { en: "Nothing here.", ar: "لا يوجد شيء هنا." },
 
   langToggle: { en: "العربية", ar: "English" },

@@ -3,7 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-type ContentType = "news" | "event" | "publication" | "partner" | "alert";
+type ContentType =
+  | "news"
+  | "event"
+  | "publication"
+  | "partner"
+  | "alert"
+  | "research_group"
+  | "research_project";
 
 type AssignableUser = { id: string; display_name: string; email: string; role: string };
 
@@ -18,6 +25,8 @@ function apiSegment(type: ContentType): string {
   if (type === "event") return "events";
   if (type === "publication") return "publications";
   if (type === "partner") return "partners";
+  if (type === "research_group") return "research-groups";
+  if (type === "research_project") return "research-projects";
   return "alerts";
 }
 

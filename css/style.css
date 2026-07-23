@@ -1583,6 +1583,32 @@ footer.site-footer { background: var(--green-deep); }
 }
 .team-card-name { font-size: 14px; font-weight: 600; color: var(--green-deep); margin-bottom: 5px; }
 .team-card-desc { font-size: 12.5px; color: var(--text-subtle); line-height: 1.65; }
+.research-project-list {
+  margin-top: 0.75rem;
+  padding-inline-start: 1.1rem;
+  font-size: 12.5px;
+}
+.research-project-link {
+  color: var(--green-mid);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.research-groups-empty {
+  font-size: 13px;
+  color: var(--text-muted);
+  grid-column: 1 / -1;
+}
+.detail-section { margin-top: 1.25rem; }
+.detail-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--green-deep);
+  margin-bottom: 0.4rem;
+}
+.detail-list {
+  padding-inline-start: 1.25rem;
+  line-height: 1.7;
+}
 
 /* ── NEWS CARDS (home page) ─────────────────────────── */
 .news-card {
@@ -3033,6 +3059,16 @@ nav.site-nav.scrolled .nav-logo-text span {
   line-height: 1.35;
   color: var(--green-deep);
 }
+.detail-preview-banner {
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #b45309;
+  background: #fffbeb;
+  color: #92400e;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
 .detail-summary {
   font-size: 1.05rem;
   line-height: 1.7;
@@ -3045,6 +3081,21 @@ nav.site-nav.scrolled .nav-logo-text span {
   font-size: 1rem;
   color: var(--text-body);
   white-space: pre-wrap;
+}
+.detail-body ul,
+.detail-body ol {
+  margin: 0 0 1rem;
+  padding-inline-start: 1.5rem;
+  line-height: 1.8;
+  color: var(--text-body);
+}
+.detail-body li,
+.detail-body-li {
+  margin: 0 0 0.35rem;
+}
+.detail-body a {
+  color: var(--green-deep);
+  text-decoration: underline;
 }
 .detail-empty-body, .detail-not-found {
   color: var(--text-muted, #6b7280);

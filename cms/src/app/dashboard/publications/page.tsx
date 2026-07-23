@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listPublicationsForUser } from "@/lib/content/publications";
 import { canAccessContentType } from "@/lib/content/permissions";
+import { EnStatusBadge } from "@/app/dashboard/en-status-badge";
 
 export default async function PublicationsListPage() {
   const user = await requireUser();
@@ -41,8 +42,11 @@ export default async function PublicationsListPage() {
                 <Link href={`/dashboard/publications/${item.id}`} className="font-medium underline">
                   {item.title_ar || "(untitled)"}
                 </Link>
-                <p className="text-xs text-zinc-500">
-                  {item.status} · {item.pub_kind} · {item.label_ar}
+                <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+                  <span>
+                    {item.status} · {item.pub_kind} · {item.label_ar}
+                  </span>
+                  <EnStatusBadge status={item.en_status} />
                 </p>
               </div>
             </li>

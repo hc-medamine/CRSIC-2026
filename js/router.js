@@ -1,6 +1,7 @@
 /**
  * Client-side routing: section visibility, deep links, history / back-button.
  * Detail hashes: #news/{slug}, #event/{slug}, #publication/{slug}
+ * Preview: #preview/{token} (A1 — candidate payload from CMS, not live JSON)
  */
 import {
   switchEventsTab,
@@ -13,15 +14,19 @@ import {
 } from './ui.js';
 import { getTitleObserver } from './animations.js';
 import { renderDetailPage } from './components/detailPage.js';
+import { restoreSiteSeoHead } from './seoHead.js';
+import { PREVIEW_API_BASE } from './config.js';
+import { el, replaceChildren } from './utils.js';
+import { t } from './i18n.js';
 
 /** Maps child pages to their primary nav parent. */
 export const PAGE_PARENT = { org: 'about', research: 'about', cooperation: 'events', detail: 'home' };
 
-const DETAIL_TYPES = new Set(['news', 'event', 'publication']);
+const DETAIL_TYPES = new Set(['news', 'event', 'publication', 'research-project']);
 
 /**
  * @param {string} hashRaw hash without leading #
- * @returns {{ pageId: string, tab?: string, filter?: string, detailType?: string, detailSlug?: string }}
+ * @returns {{ pageId: string, tab?: string, filter?: string, detailType?: string, detailSlug?: string, previewToken?: string }}
  */
 export function parseHash(hashRaw) {
   const raw = (hashRaw || 'home').replace(/^#/, '');
@@ -33,10 +38,75 @@ export function parseHash(hashRaw) {
     }
   });
   const [first, second] = segments;
+  if (first === 'preview' && second) {
+    return { pageId: 'detail', previewToken: second };
+  }
   if (DETAIL_TYPES.has(first) && second) {
     return { pageId: 'detail', detailType: first, detailSlug: second };
   }
   return { pageId: first || 'home' };
+}
+
+function showDetailShell() {
+  closeLightbox();
+  const pages = document.querySelectorAll('.page');
+  pages.forEach((p) => p.classList.remove('active'));
+  const target = document.getElementById('page-detail');
+  if (target) {
+    target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+}
+
+/**
+ * @param {string} token
+ * @param {{ replace?: boolean }} [opts]
+ */
+export async function navigateToPreview(token, opts = {}) {
+  if (!token) return;
+  showDetailShell();
+
+  const host = document.getElementById('detail-root');
+  if (host) {
+    replaceChildren(host, [
+      el('p', { className: 'detail-empty-body', text: t('detail_preview_loading') }),
+    ]);
+  }
+
+  const hash = `preview/${encodeURIComponent(token)}`;
+  if (opts.replace) history.replaceState(null, '', '#' + hash);
+  else history.pushState(null, '', '#' + hash);
+
+  updateBreadcrumb('detail');
+  updateBottomTabs('home');
+  closeDrawer();
+
+  const base = typeof PREVIEW_API_BASE === 'string' ? PREVIEW_API_BASE.trim().replace(/\/$/, '') : '';
+  const url = `${base}/api/public/preview/${encodeURIComponent(token)}`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!res.ok || !data.ok || !data.item || !data.type) {
+      renderDetailPage('news', '', { isPreview: true, previewItem: null });
+      return;
+    }
+    const type = data.type;
+    const slug = data.item.slug || token;
+    renderDetailPage(type, slug, { isPreview: true, previewItem: data.item });
+
+    const parentNav =
+      type === 'publication' ? 'publications' : type === 'event' ? 'events' : 'home';
+    document.querySelectorAll('.nav-links a[data-page]').forEach((a) => {
+      const isActive = a.dataset.page === parentNav && !a.dataset.tab;
+      a.classList.toggle('active', isActive);
+      if (isActive) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
+    updateBottomTabs(parentNav);
+  } catch {
+    renderDetailPage('news', '', { isPreview: true, previewItem: null });
+  }
 }
 
 /**
@@ -44,21 +114,19 @@ export function parseHash(hashRaw) {
  * @param {string} pageId
  * @param {string} [tab]
  * @param {string} [filter]
- * @param {{ detailType?: string, detailSlug?: string, replace?: boolean }} [opts]
+ * @param {{ detailType?: string, detailSlug?: string, previewToken?: string, replace?: boolean }} [opts]
  */
 export function navigateTo(pageId, tab, filter, opts = {}) {
+  if (opts.previewToken) {
+    void navigateToPreview(opts.previewToken, { replace: opts.replace });
+    return;
+  }
+
   const detailType = opts.detailType;
   const detailSlug = opts.detailSlug;
 
   if (detailType && detailSlug) {
-    closeLightbox();
-    const pages = document.querySelectorAll('.page');
-    pages.forEach((p) => p.classList.remove('active'));
-    const target = document.getElementById('page-detail');
-    if (target) {
-      target.classList.add('active');
-      window.scrollTo({ top: 0, behavior: 'instant' });
-    }
+    showDetailShell();
     renderDetailPage(detailType, detailSlug);
 
     const parentNav =
@@ -66,7 +134,9 @@ export function navigateTo(pageId, tab, filter, opts = {}) {
         ? 'publications'
         : detailType === 'event'
           ? 'events'
-          : 'home';
+          : detailType === 'research-project'
+            ? 'research'
+            : 'home';
     document.querySelectorAll('.nav-links a[data-page]').forEach((a) => {
       const isActive = a.dataset.page === parentNav && !a.dataset.tab;
       a.classList.toggle('active', isActive);
@@ -86,6 +156,10 @@ export function navigateTo(pageId, tab, filter, opts = {}) {
 
   // Legacy: navigateTo('news/slug') string from popstate
   const parsed = parseHash(pageId);
+  if (parsed.previewToken) {
+    void navigateToPreview(parsed.previewToken, { replace: opts.replace });
+    return;
+  }
   if (parsed.detailType && parsed.detailSlug) {
     navigateTo('detail', undefined, undefined, {
       detailType: parsed.detailType,
@@ -96,6 +170,7 @@ export function navigateTo(pageId, tab, filter, opts = {}) {
   }
 
   const resolvedId = parsed.pageId;
+  restoreSiteSeoHead();
   const pages = document.querySelectorAll('.page');
   pages.forEach((p) => p.classList.remove('active'));
   const target = document.getElementById('page-' + resolvedId);
@@ -168,7 +243,9 @@ export function bindRouter() {
   window.addEventListener('popstate', function () {
     const hash = location.hash.replace('#', '') || 'home';
     const parsed = parseHash(hash);
-    if (parsed.detailType && parsed.detailSlug) {
+    if (parsed.previewToken) {
+      void navigateToPreview(parsed.previewToken, { replace: true });
+    } else if (parsed.detailType && parsed.detailSlug) {
       navigateTo('detail', undefined, undefined, {
         detailType: parsed.detailType,
         detailSlug: parsed.detailSlug,
@@ -184,7 +261,9 @@ export function bindRouter() {
 export function initRoute() {
   const initHash = location.hash.replace('#', '') || 'home';
   const parsed = parseHash(initHash);
-  if (parsed.detailType && parsed.detailSlug) {
+  if (parsed.previewToken) {
+    void navigateToPreview(parsed.previewToken, { replace: true });
+  } else if (parsed.detailType && parsed.detailSlug) {
     navigateTo('detail', undefined, undefined, {
       detailType: parsed.detailType,
       detailSlug: parsed.detailSlug,

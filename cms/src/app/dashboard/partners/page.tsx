@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listPartnersForUser } from "@/lib/content/partners";
 import { canAccessContentType } from "@/lib/content/permissions";
+import { EnStatusBadge } from "@/app/dashboard/en-status-badge";
 
 export default async function PartnersListPage() {
   const user = await requireUser();
@@ -39,8 +40,11 @@ export default async function PartnersListPage() {
                 <Link href={`/dashboard/partners/${item.id}`} className="font-medium underline">
                   {item.title_ar || "(untitled)"}
                 </Link>
-                <p className="text-xs text-zinc-500">
-                  {item.status} · {item.partner_scope} · {item.label_ar} · {item.partner_date}
+                <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+                  <span>
+                    {item.status} · {item.partner_scope} · {item.label_ar} · {item.partner_date}
+                  </span>
+                  <EnStatusBadge status={item.en_status} />
                 </p>
               </div>
             </li>

@@ -9,9 +9,12 @@ import {
   canAccessContentType,
   canAccessOrg,
   canReview,
+  getUserOrgIds,
+  assertOrgAllowsContentType,
 } from "@/lib/content/permissions";
 import { notifyOnSubmit } from "@/lib/content/delegation";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
+import { normalizeSeoInput, seoSnapshotFields, type SeoInput } from "@/lib/content/seo";
 import type { ContentStatus } from "@/lib/content/news";
 
 async function auditPartner(
@@ -47,6 +50,11 @@ export type PartnerItem = {
   checklist_confirmed: boolean;
   review_note: string | null;
   public_slug: string | null;
+  meta_title_ar: string | null;
+  meta_title_en: string | null;
+  meta_description_ar: string | null;
+  meta_description_en: string | null;
+  og_image: string | null;
   published_at: Date | null;
   created_at: Date;
   updated_at: Date;
@@ -62,7 +70,7 @@ export type PartnerInput = {
   partnerScope: "intl" | "nat";
   partnerDate: string;
   partnerEmoji?: string;
-};
+} & SeoInput;
 
 function snapshotOf(row: PartnerItem) {
   return {
@@ -76,6 +84,7 @@ function snapshotOf(row: PartnerItem) {
     partner_scope: row.partner_scope,
     partner_date: row.partner_date,
     partner_emoji: row.partner_emoji,
+    ...seoSnapshotFields(row),
   };
 }
 
@@ -116,9 +125,20 @@ export async function getPartnerById(id: string): Promise<PartnerItem | null> {
 
 export async function listPartnersForUser(user: SessionUser): Promise<PartnerItem[]> {
   if (!(await canAccessContentType(user, "partner"))) return [];
-  if (user.role === "super_admin" || user.role === "reviewer") {
+  if (user.role === "super_admin") {
     const result = await query<PartnerItem>(
       `SELECT * FROM content_items WHERE content_type = 'partner' ORDER BY updated_at DESC`,
+    );
+    return result.rows;
+  }
+  if (user.role === "reviewer") {
+    const orgIds = await getUserOrgIds(user.id);
+    if (orgIds.length === 0) return [];
+    const result = await query<PartnerItem>(
+      `SELECT * FROM content_items
+       WHERE content_type = 'partner' AND org_unit_id = ANY($1::text[])
+       ORDER BY updated_at DESC`,
+      [orgIds],
     );
     return result.rows;
   }
@@ -134,18 +154,22 @@ export async function listPartnersForUser(user: SessionUser): Promise<PartnerIte
 export async function createPartner(user: SessionUser, input: PartnerInput): Promise<PartnerItem> {
   if (!(await canAccessContentType(user, "partner"))) throw new Error("No partner content permission");
   if (!(await canAccessOrg(user, input.orgUnitId))) throw new Error("No permission for this organisation unit");
+  await assertOrgAllowsContentType(input.orgUnitId, "partner");
   validatePartnerFields(input);
   const enStatus = input.enStatus ?? (input.titleEn?.trim() ? "ready" : "pending");
+  const seo = normalizeSeoInput(input);
 
   const result = await query<PartnerItem>(
     `INSERT INTO content_items (
       content_type, status, org_unit_id, created_by, updated_by, en_status,
       title_ar, title_en, label_ar, label_en,
-      partner_scope, partner_date, partner_emoji
+      partner_scope, partner_date, partner_emoji,
+      meta_title_ar, meta_title_en, meta_description_ar, meta_description_en, og_image
     ) VALUES (
       'partner', 'draft', $1, $2, $2, $3,
       $4, $5, $6, $7,
-      $8, $9, $10
+      $8, $9, $10,
+      $11, $12, $13, $14, $15
     ) RETURNING *`,
     [
       input.orgUnitId,
@@ -158,6 +182,11 @@ export async function createPartner(user: SessionUser, input: PartnerInput): Pro
       input.partnerScope,
       input.partnerDate.trim(),
       input.partnerEmoji?.trim() || null,
+      seo.meta_title_ar,
+      seo.meta_title_en,
+      seo.meta_description_ar,
+      seo.meta_description_en,
+      seo.og_image,
     ],
   );
   const item = result.rows[0];
@@ -176,14 +205,18 @@ export async function updatePartnerDraft(user: SessionUser, id: string, input: P
     throw new Error("Only the author (or Super Admin) can edit this draft");
   }
   if (!(await canAccessOrg(user, input.orgUnitId))) throw new Error("No permission for this organisation unit");
+  await assertOrgAllowsContentType(input.orgUnitId, "partner");
   validatePartnerFields(input);
   const enStatus = input.enStatus ?? (input.titleEn?.trim() ? "ready" : "pending");
+  const seo = normalizeSeoInput(input);
 
   const result = await query<PartnerItem>(
     `UPDATE content_items SET
       org_unit_id = $2, updated_by = $3, en_status = $4,
       title_ar = $5, title_en = $6, label_ar = $7, label_en = $8,
       partner_scope = $9, partner_date = $10, partner_emoji = $11,
+      meta_title_ar = $12, meta_title_en = $13, meta_description_ar = $14,
+      meta_description_en = $15, og_image = $16,
       updated_at = NOW()
      WHERE id = $1 AND content_type = 'partner'
      RETURNING *`,
@@ -199,6 +232,11 @@ export async function updatePartnerDraft(user: SessionUser, id: string, input: P
       input.partnerScope,
       input.partnerDate.trim(),
       input.partnerEmoji?.trim() || null,
+      seo.meta_title_ar,
+      seo.meta_title_en,
+      seo.meta_description_ar,
+      seo.meta_description_en,
+      seo.og_image,
     ],
   );
   const item = result.rows[0];

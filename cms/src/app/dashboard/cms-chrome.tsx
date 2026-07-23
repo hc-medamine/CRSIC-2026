@@ -43,6 +43,8 @@ export function CmsChrome({
     { key: "publications", href: "/dashboard/publications", contentType: "publication" },
     { key: "partners", href: "/dashboard/partners", contentType: "partner" },
     { key: "alerts", href: "/dashboard/alerts", contentType: "alert" },
+    { key: "researchGroups", href: "/dashboard/research-groups", contentType: "research_group" },
+    { key: "researchProjects", href: "/dashboard/research-projects", contentType: "research_project" },
   ];
   if (showMedia) {
     candidates.push({ key: "media", href: "/dashboard/media" });
@@ -58,7 +60,11 @@ export function CmsChrome({
 
   if (role === "super_admin") {
     nav.push({ key: "users", href: "/dashboard/users" });
+    nav.push({ key: "orgUnits", href: "/dashboard/org-units" });
+    nav.push({ key: "editors", href: "/dashboard/editors" });
     nav.push({ key: "audit", href: "/dashboard/audit" });
+  } else if (role === "reviewer") {
+    nav.push({ key: "editors", href: "/dashboard/editors" });
   }
 
   function toggleLang() {

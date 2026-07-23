@@ -1,13 +1,14 @@
 import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
+import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
 
 export type PublicPartnerItem = {
   name: string;
   country: string;
   date: string;
   emoji?: string;
-};
+} & PublicSeoFields;
 
 /** Public item plus the scope used to bucket it into intl/nat on rebuild. */
 export type StoredPartnerPayload = PublicPartnerItem & { scope: "intl" | "nat" };
@@ -18,14 +19,25 @@ type PayloadSource = {
   partner_date: string | null;
   partner_emoji: string | null;
   partner_scope: "intl" | "nat" | null;
+  meta_title_ar?: string | null;
+  meta_title_en?: string | null;
+  meta_description_ar?: string | null;
+  meta_description_en?: string | null;
+  og_image?: string | null;
 };
 
 /** Public object for a partner row (persisted to content_items.live_payload). */
 export function buildPartnerPayload(row: PayloadSource): StoredPartnerPayload {
+  const publicBase = withPublicSeo(
+    {
+      name: row.title_ar.trim(),
+      country: row.label_ar?.trim() || "",
+      date: row.partner_date?.trim() || "",
+    },
+    row,
+  );
   const item: StoredPartnerPayload = {
-    name: row.title_ar.trim(),
-    country: row.label_ar?.trim() || "",
-    date: row.partner_date?.trim() || "",
+    ...publicBase,
     scope: row.partner_scope === "nat" ? "nat" : "intl",
   };
   const emoji = row.partner_emoji?.trim();
@@ -58,6 +70,7 @@ export async function rebuildPublicPartnersJson(): Promise<{
       name: (item.name ?? "").trim(),
       country: item.country?.trim() || "",
       date: item.date?.trim() || "",
+      ...seoFromRow(item),
     };
     if (item.emoji?.trim()) publicItem.emoji = item.emoji.trim();
     if (scope === "nat") nat.push(publicItem);

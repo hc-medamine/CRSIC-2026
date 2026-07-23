@@ -9,9 +9,12 @@ import {
   canAccessContentType,
   canAccessOrg,
   canReview,
+  getUserOrgIds,
+  assertOrgAllowsContentType,
 } from "@/lib/content/permissions";
 import { notifyOnSubmit } from "@/lib/content/delegation";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
+import { normalizeSeoInput, seoSnapshotFields, type SeoInput } from "@/lib/content/seo";
 import type { ContentStatus } from "@/lib/content/news";
 
 async function auditAlert(
@@ -45,6 +48,11 @@ export type AlertItem = {
   checklist_confirmed: boolean;
   review_note: string | null;
   public_slug: string | null;
+  meta_title_ar: string | null;
+  meta_title_en: string | null;
+  meta_description_ar: string | null;
+  meta_description_en: string | null;
+  og_image: string | null;
   published_at: Date | null;
   created_at: Date;
   updated_at: Date;
@@ -58,7 +66,7 @@ export type AlertInput = {
   alertLinkUrl?: string;
   alertLinkLabelAr?: string;
   alertLinkLabelEn?: string;
-};
+} & SeoInput;
 
 function snapshotOf(row: AlertItem) {
   return {
@@ -70,6 +78,7 @@ function snapshotOf(row: AlertItem) {
     alert_link_url: row.alert_link_url,
     alert_link_label_ar: row.alert_link_label_ar,
     alert_link_label_en: row.alert_link_label_en,
+    ...seoSnapshotFields(row),
   };
 }
 
@@ -107,9 +116,20 @@ export async function getAlertById(id: string): Promise<AlertItem | null> {
 
 export async function listAlertsForUser(user: SessionUser): Promise<AlertItem[]> {
   if (!(await canAccessContentType(user, "alert"))) return [];
-  if (user.role === "super_admin" || user.role === "reviewer") {
+  if (user.role === "super_admin") {
     const result = await query<AlertItem>(
       `SELECT * FROM content_items WHERE content_type = 'alert' ORDER BY updated_at DESC`,
+    );
+    return result.rows;
+  }
+  if (user.role === "reviewer") {
+    const orgIds = await getUserOrgIds(user.id);
+    if (orgIds.length === 0) return [];
+    const result = await query<AlertItem>(
+      `SELECT * FROM content_items
+       WHERE content_type = 'alert' AND org_unit_id = ANY($1::text[])
+       ORDER BY updated_at DESC`,
+      [orgIds],
     );
     return result.rows;
   }
@@ -125,16 +145,20 @@ export async function listAlertsForUser(user: SessionUser): Promise<AlertItem[]>
 export async function createAlert(user: SessionUser, input: AlertInput): Promise<AlertItem> {
   if (!(await canAccessContentType(user, "alert"))) throw new Error("No alert content permission");
   if (!(await canAccessOrg(user, input.orgUnitId))) throw new Error("No permission for this organisation unit");
+  await assertOrgAllowsContentType(input.orgUnitId, "alert");
   validateAlertFields(input);
   const enStatus = input.enStatus ?? (input.titleEn?.trim() ? "ready" : "pending");
+  const seo = normalizeSeoInput(input);
 
   const result = await query<AlertItem>(
     `INSERT INTO content_items (
       content_type, status, org_unit_id, created_by, updated_by, en_status,
-      title_ar, title_en, alert_link_url, alert_link_label_ar, alert_link_label_en
+      title_ar, title_en, alert_link_url, alert_link_label_ar, alert_link_label_en,
+      meta_title_ar, meta_title_en, meta_description_ar, meta_description_en, og_image
     ) VALUES (
       'alert', 'draft', $1, $2, $2, $3,
-      $4, $5, $6, $7, $8
+      $4, $5, $6, $7, $8,
+      $9, $10, $11, $12, $13
     ) RETURNING *`,
     [
       input.orgUnitId,
@@ -145,6 +169,11 @@ export async function createAlert(user: SessionUser, input: AlertInput): Promise
       input.alertLinkUrl?.trim() || null,
       input.alertLinkLabelAr?.trim() || null,
       input.alertLinkLabelEn?.trim() || null,
+      seo.meta_title_ar,
+      seo.meta_title_en,
+      seo.meta_description_ar,
+      seo.meta_description_en,
+      seo.og_image,
     ],
   );
   const item = result.rows[0];
@@ -163,14 +192,18 @@ export async function updateAlertDraft(user: SessionUser, id: string, input: Ale
     throw new Error("Only the author (or Super Admin) can edit this draft");
   }
   if (!(await canAccessOrg(user, input.orgUnitId))) throw new Error("No permission for this organisation unit");
+  await assertOrgAllowsContentType(input.orgUnitId, "alert");
   validateAlertFields(input);
   const enStatus = input.enStatus ?? (input.titleEn?.trim() ? "ready" : "pending");
+  const seo = normalizeSeoInput(input);
 
   const result = await query<AlertItem>(
     `UPDATE content_items SET
       org_unit_id = $2, updated_by = $3, en_status = $4,
       title_ar = $5, title_en = $6, alert_link_url = $7,
       alert_link_label_ar = $8, alert_link_label_en = $9,
+      meta_title_ar = $10, meta_title_en = $11, meta_description_ar = $12,
+      meta_description_en = $13, og_image = $14,
       updated_at = NOW()
      WHERE id = $1 AND content_type = 'alert'
      RETURNING *`,
@@ -184,6 +217,11 @@ export async function updateAlertDraft(user: SessionUser, id: string, input: Ale
       input.alertLinkUrl?.trim() || null,
       input.alertLinkLabelAr?.trim() || null,
       input.alertLinkLabelEn?.trim() || null,
+      seo.meta_title_ar,
+      seo.meta_title_en,
+      seo.meta_description_ar,
+      seo.meta_description_en,
+      seo.og_image,
     ],
   );
   const item = result.rows[0];

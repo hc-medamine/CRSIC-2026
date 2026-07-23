@@ -7,6 +7,7 @@ import {
   buildPublicationPayload,
   rebuildPublicPublicationsJson,
 } from "@/lib/publish/publicationsJson";
+import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 import { normalizeAttachments, type PublicMediaItem } from "@/lib/publish/media";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
 import { mutateThenRebuildPublic } from "@/lib/publish/safeRebuild";
@@ -14,9 +15,12 @@ import {
   canAccessContentType,
   canAccessOrg,
   canReview,
+  getUserOrgIds,
+  assertOrgAllowsContentType,
 } from "@/lib/content/permissions";
 import { notifyOnSubmit } from "@/lib/content/delegation";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
+import { normalizeSeoInput, seoSnapshotFields, type SeoInput } from "@/lib/content/seo";
 import type { ContentStatus } from "@/lib/content/news";
 
 async function auditPublication(
@@ -58,6 +62,11 @@ export type PublicationItem = {
   checklist_confirmed: boolean;
   review_note: string | null;
   public_slug: string | null;
+  meta_title_ar: string | null;
+  meta_title_en: string | null;
+  meta_description_ar: string | null;
+  meta_description_en: string | null;
+  og_image: string | null;
   published_at: Date | null;
   created_at: Date;
   updated_at: Date;
@@ -80,7 +89,7 @@ export type PublicationInput = {
   publicSlug?: string | null;
   enStatus?: "pending" | "ready";
   pubKind: "collective" | "individual";
-};
+} & SeoInput;
 
 function snapshotOf(row: PublicationItem) {
   return {
@@ -99,6 +108,7 @@ function snapshotOf(row: PublicationItem) {
     image_path: row.image_path,
     attachments: normalizeAttachments(row.attachments),
     public_slug: row.public_slug,
+    ...seoSnapshotFields(row),
   };
 }
 
@@ -144,9 +154,20 @@ export async function getPublicationById(id: string): Promise<PublicationItem | 
 
 export async function listPublicationsForUser(user: SessionUser): Promise<PublicationItem[]> {
   if (!(await canAccessContentType(user, "publication"))) return [];
-  if (user.role === "super_admin" || user.role === "reviewer") {
+  if (user.role === "super_admin") {
     const result = await query<PublicationItem>(
       `SELECT * FROM content_items WHERE content_type = 'publication' ORDER BY updated_at DESC`,
+    );
+    return result.rows;
+  }
+  if (user.role === "reviewer") {
+    const orgIds = await getUserOrgIds(user.id);
+    if (orgIds.length === 0) return [];
+    const result = await query<PublicationItem>(
+      `SELECT * FROM content_items
+       WHERE content_type = 'publication' AND org_unit_id = ANY($1::text[])
+       ORDER BY updated_at DESC`,
+      [orgIds],
     );
     return result.rows;
   }
@@ -169,21 +190,25 @@ export async function createPublication(
   if (!(await canAccessOrg(user, input.orgUnitId))) {
     throw new Error("No permission for this organisation unit");
   }
+  await assertOrgAllowsContentType(input.orgUnitId, "publication");
   validatePublicationFields(input, { requireCover: false });
   const enStatus = input.enStatus ?? (input.titleEn?.trim() ? "ready" : "pending");
   const attachments = normalizeAttachments(input.attachments);
   const primaryImage =
     (attachments.find((a) => a.kind === "image")?.src ?? input.coverPath.trim()) || null;
+  const seo = normalizeSeoInput(input);
 
   const result = await query<PublicationItem>(
     `INSERT INTO content_items (
       content_type, status, org_unit_id, created_by, updated_by, en_status,
       title_ar, title_en, label_ar, label_en, summary_ar, summary_en,
-      body_ar, body_en, image_path, image_alt_ar, image_alt_en, pub_kind, attachments
+      body_ar, body_en, image_path, image_alt_ar, image_alt_en, pub_kind, attachments,
+      meta_title_ar, meta_title_en, meta_description_ar, meta_description_en, og_image
     ) VALUES (
       'publication', 'draft', $1, $2, $2, $3,
       $4, $5, $6, $7, $8, $9,
-      $10, $11, $12, $13, $14, $15, $16::jsonb
+      $10, $11, $12, $13, $14, $15, $16::jsonb,
+      $17, $18, $19, $20, $21
     ) RETURNING *`,
     [
       input.orgUnitId,
@@ -195,13 +220,18 @@ export async function createPublication(
       input.deptEn?.trim() || null,
       input.descAr.trim(),
       input.descEn?.trim() || null,
-      input.bodyAr?.trim() || null,
-      input.bodyEn?.trim() || null,
+      sanitizeBodyHtml(input.bodyAr),
+      sanitizeBodyHtml(input.bodyEn),
       primaryImage,
       input.imageAltAr?.trim() || null,
       input.imageAltEn?.trim() || null,
       input.pubKind,
       JSON.stringify(attachments),
+      seo.meta_title_ar,
+      seo.meta_title_en,
+      seo.meta_description_ar,
+      seo.meta_description_en,
+      seo.og_image,
     ],
   );
   const item = result.rows[0];
@@ -226,6 +256,7 @@ export async function updatePublicationDraft(
   if (!(await canAccessOrg(user, input.orgUnitId))) {
     throw new Error("No permission for this organisation unit");
   }
+  await assertOrgAllowsContentType(input.orgUnitId, "publication");
   validatePublicationFields(input, { requireCover: false });
   const enStatus = input.enStatus ?? (input.titleEn?.trim() ? "ready" : "pending");
   const attachments = normalizeAttachments(input.attachments);
@@ -235,6 +266,7 @@ export async function updatePublicationDraft(
     user.role === "super_admin" && input.publicSlug !== undefined
       ? input.publicSlug
       : undefined;
+  const seo = normalizeSeoInput(input);
 
   const result = await query<PublicationItem>(
     `UPDATE content_items SET
@@ -243,6 +275,8 @@ export async function updatePublicationDraft(
       summary_ar = $9, summary_en = $10, body_ar = $11, body_en = $12,
       image_path = $13, image_alt_ar = $14, image_alt_en = $15, pub_kind = $16,
       attachments = $17::jsonb, public_slug = COALESCE($18, public_slug),
+      meta_title_ar = $19, meta_title_en = $20, meta_description_ar = $21,
+      meta_description_en = $22, og_image = $23,
       updated_at = NOW()
      WHERE id = $1 AND content_type = 'publication'
      RETURNING *`,
@@ -257,14 +291,19 @@ export async function updatePublicationDraft(
       input.deptEn?.trim() || null,
       input.descAr.trim(),
       input.descEn?.trim() || null,
-      input.bodyAr?.trim() || null,
-      input.bodyEn?.trim() || null,
+      sanitizeBodyHtml(input.bodyAr),
+      sanitizeBodyHtml(input.bodyEn),
       primaryImage,
       input.imageAltAr?.trim() || null,
       input.imageAltEn?.trim() || null,
       input.pubKind,
       JSON.stringify(attachments),
       slugOverride?.trim() || null,
+      seo.meta_title_ar,
+      seo.meta_title_en,
+      seo.meta_description_ar,
+      seo.meta_description_en,
+      seo.og_image,
     ],
   );
   const item = result.rows[0];

@@ -5,7 +5,16 @@ import { useRouter } from "next/navigation";
 import { MediaUploadField } from "@/app/dashboard/media-upload-field";
 import { MediaAttachmentsField } from "@/app/dashboard/media-attachments-field";
 import { PublishPreview } from "@/app/dashboard/publish-preview";
+import { PublicPreviewButton } from "@/app/dashboard/public-preview-button";
 import { ItemWorkflowMeta, type PersonDisplay } from "@/app/dashboard/item-workflow-meta";
+import {
+  SeoFieldsSection,
+  copyMetaDescriptionFrom,
+  copyMetaTitleFrom,
+  emptySeoFormState,
+  type SeoFormState,
+} from "@/app/dashboard/seo-fields";
+import { RichBodyEditor } from "@/app/dashboard/rich-body-editor";
 import type { PublicMediaItem } from "@/lib/publish/media";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
@@ -41,6 +50,11 @@ type Initial = {
   reviewOwner?: PersonDisplay;
   escalatedAt?: string | null;
   needsPostReview?: boolean;
+  metaTitleAr?: string;
+  metaTitleEn?: string;
+  metaDescriptionAr?: string;
+  metaDescriptionEn?: string;
+  ogImage?: string;
 };
 
 type Props = {
@@ -90,6 +104,14 @@ export function EventEditorForm({
     return [];
   });
   const [publicSlug, setPublicSlug] = useState(initial?.publicSlug ?? "");
+  const [seo, setSeo] = useState<SeoFormState>(() => ({
+    ...emptySeoFormState(),
+    metaTitleAr: initial?.metaTitleAr ?? "",
+    metaTitleEn: initial?.metaTitleEn ?? "",
+    metaDescriptionAr: initial?.metaDescriptionAr ?? "",
+    metaDescriptionEn: initial?.metaDescriptionEn ?? "",
+    ogImage: initial?.ogImage ?? "",
+  }));
   const [checklist, setChecklist] = useState(false);
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -127,6 +149,11 @@ export function EventEditorForm({
       eventTypeAr,
       eventTypeEn,
       eventDisplayStatus,
+      metaTitleAr: seo.metaTitleAr,
+      metaTitleEn: seo.metaTitleEn,
+      metaDescriptionAr: seo.metaDescriptionAr,
+      metaDescriptionEn: seo.metaDescriptionEn,
+      ogImage: seo.ogImage.trim() || null,
     };
   }
 
@@ -191,6 +218,7 @@ export function EventEditorForm({
       {initial?.status ? (
         <ItemWorkflowMeta
           status={initial.status}
+          enStatus={initial.enStatus}
           reviewNote={initial.reviewNote}
           editor={initial.editor}
           reviewer={initial.reviewer}
@@ -279,6 +307,41 @@ export function EventEditorForm({
           <span className="font-medium">Type (EN)</span>
           <input disabled={!editable} value={eventTypeEn} onChange={(e) => setEventTypeEn(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
         </label>
+        <label className="text-sm">
+          <span className="font-medium">Summary (AR)</span>
+          <textarea
+            dir="rtl"
+            disabled={!editable}
+            value={summaryAr}
+            onChange={(e) => setSummaryAr(e.target.value)}
+            className="mt-1 w-full rounded border px-3 py-2"
+            rows={2}
+          />
+        </label>
+        <label className="text-sm">
+          <span className="font-medium">Summary (EN)</span>
+          <textarea
+            disabled={!editable}
+            value={summaryEn}
+            onChange={(e) => setSummaryEn(e.target.value)}
+            className="mt-1 w-full rounded border px-3 py-2"
+            rows={2}
+          />
+        </label>
+        <RichBodyEditor
+          label="Body (AR)"
+          dir="rtl"
+          disabled={!editable}
+          value={bodyAr}
+          onChange={setBodyAr}
+        />
+        <RichBodyEditor
+          label="Body (EN)"
+          dir="ltr"
+          disabled={!editable}
+          value={bodyEn}
+          onChange={setBodyEn}
+        />
         <MediaUploadField
           bucket="events"
           publicPath={imagePath}
@@ -317,6 +380,16 @@ export function EventEditorForm({
             <option value="ready">ready</option>
           </select>
         </label>
+
+        <SeoFieldsSection
+          value={seo}
+          onChange={setSeo}
+          disabled={!editable}
+          ogBucket="events"
+          ogFallbackHint={imagePath.trim() || "img/cms/..."}
+          onCopyTitleAr={() => setSeo((s) => copyMetaTitleFrom(titleAr, s))}
+          onCopySummaryAr={() => setSeo((s) => copyMetaDescriptionFrom(summaryAr, s))}
+        />
 
         {error ? <p className="text-sm text-red-600">{error}</p> : null}
         {message ? <p className="text-sm text-green-700">{message}</p> : null}
@@ -363,6 +436,10 @@ export function EventEditorForm({
             <button type="button" disabled={pending} className="rounded border border-red-300 px-3 py-1.5 text-sm text-red-700" onClick={() => void run("reject", { note })}>Reject</button>
           </div>
         </div>
+      ) : null}
+
+      {mode === "edit" && initial?.id && (isAuthor || canReview) ? (
+        <PublicPreviewButton contentId={initial.id} disabled={pending} />
       ) : null}
 
       {mode === "edit" ? (

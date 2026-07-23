@@ -11,6 +11,8 @@ import { rebuildPublicEventsJson } from "../src/lib/publish/eventsJson";
 import { rebuildPublicPublicationsJson } from "../src/lib/publish/publicationsJson";
 import { rebuildPublicPartnersJson } from "../src/lib/publish/partnersJson";
 import { rebuildPublicAlertsJson } from "../src/lib/publish/alertsJson";
+import { rebuildPublicResearchGroupsJson } from "../src/lib/publish/researchGroupsJson";
+import { rebuildPublicResearchProjectsJson } from "../src/lib/publish/researchProjectsJson";
 
 /** Fixture accounts used only by automated smoke (kept as users, content purged). */
 export const SMOKE_EMAIL_PATTERN = /^smoke\.[a-z0-9._+-]+@crsic\.dz$/i;
@@ -111,6 +113,8 @@ export async function cleanupSmokeData(): Promise<SmokeCleanupReport> {
   await rebuildPublicPublicationsJson();
   await rebuildPublicPartnersJson();
   await rebuildPublicAlertsJson();
+  await rebuildPublicResearchGroupsJson();
+  await rebuildPublicResearchProjectsJson();
 
   return {
     smokeUserIds: ids,

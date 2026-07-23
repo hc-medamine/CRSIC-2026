@@ -10,6 +10,7 @@ import {
 } from './i18n.js';
 import { loadData, getLoadErrors } from './data.js';
 import { initSiteAlert, rerenderSiteAlert } from './alerts.js';
+import { renderResearchPage } from './research.js';
 import {
   renderAll,
   bindUIEvents,
@@ -23,6 +24,7 @@ import { initAnimations } from './animations.js';
 async function boot() {
   setOnAfterTranslate(() => {
     renderAll();
+    renderResearchPage();
     showDataLoadErrors(getLoadErrors());
     rerenderSiteAlert();
     const parsed = parseHash(location.hash.replace('#', '') || 'home');
@@ -43,6 +45,7 @@ async function boot() {
   await initSiteAlert();
 
   applyTranslations();
+  renderResearchPage();
   if (localeResult && !localeResult.ok) {
     showDataLoadErrors({
       ...getLoadErrors(),

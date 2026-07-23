@@ -255,6 +255,7 @@ export function switchResearchTab(tabId) {
     if (panel) panel.classList.toggle('active', id === tabId);
   });
   updateTabIndicator(document.getElementById('research-tabs'));
+  import('./research.js').then((m) => m.renderResearchGroupsForTab(tabId)).catch(() => {});
 }
 
 export function switchEventsTab(tabId) {
