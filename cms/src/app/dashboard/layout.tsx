@@ -21,7 +21,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
     countUnread(user.id),
     getNavContentTypes(user),
   ]);
-  const showMedia = user.role === "super_admin";
+  const showMedia =
+    user.role === "super_admin" ||
+    user.role === "editor" ||
+    user.role === "reviewer";
 
   return (
     <>

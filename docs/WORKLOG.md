@@ -19,6 +19,51 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-07-23 — CMS UX follow-up polish (density / tip / nav)
+
+**Branch:** `feature/cms-ux-m1-nav-home`
+
+- Home: hide empty secondary queues; quieter EN-pending / overview cards; EN CTA when backlog exists
+- Nav: content on row 1, Media/Notifications/Profile + Admin on row 2; stronger group labels
+- Tip: session dismiss + “Show tip” restore (not forever)
+
+**PRD:** [2026-07-23-cms-navigation-authoring-ux.md](./prds/2026-07-23-cms-navigation-authoring-ux.md)
+
+---
+
+### 2026-07-23 — CMS UX M1–M3 implementation (nav, Home, forms)
+
+**Branch:** `feature/cms-ux-m1-nav-home`
+
+**Done:**
+- Role-grouped chrome (Centre content / Research / Admin separated); mobile menu
+- Home cockpit: primary CTAs, tip banner, clearer empty states; Reviewer inbox prioritized
+- Progressive disclosure on content forms (EN/SEO under Advanced); FormBanner success/error
+- Back links → Home; delete returns to Home; Media nav for Editor/Reviewer/SA
+- Home polish: EN-pending / recently-published caps; no duplicate Create news CTA; restored rejected/unpublished queues
+
+**UI recheck (SA session):** See chat findings — group labels subtle; SA Home still dense with empty queues; Advanced disclosure works on news form.
+
+**PRD:** [2026-07-23-cms-navigation-authoring-ux.md](./prds/2026-07-23-cms-navigation-authoring-ux.md)
+
+---
+
+### 2026-07-23 — CMS navigation & authoring UX (decision lock → PRD Review)
+
+**Decision summary (locked for PRD):**
+
+- Pain: all (nav scatter, round-trips, role confusion, heavy forms). Scope: **wide**.
+- Delivery: **phased** — M1 nav + Home cockpit → M2 forms → M3 empty/error/success + tips (not big-bang).
+- IA: role-grouped chrome; Centre content vs Research; hide empty groups; SA **Admin** separated.
+- Home = “what next” cockpit; keep delegation / post-review queues for Reviewer/SA.
+- URLs stay (`/dashboard/news`, …); chrome + Home first.
+- Forms: AR-first progressive disclosure; checklist mandatory; preview/SEO/rich body/EN preserved.
+- Out of scope: public SPA redesign, new types, email, RBAC rule changes, full brand rethink.
+
+**PRD:** [docs/prds/2026-07-23-cms-navigation-authoring-ux.md](./prds/2026-07-23-cms-navigation-authoring-ux.md) — status **Approved** (2026-07-23). Next: implement M1 (nav + Home) on a feature branch.
+
+---
+
 ### 2026-07-23 — PRD-first product workflow locked
 
 **Done:**

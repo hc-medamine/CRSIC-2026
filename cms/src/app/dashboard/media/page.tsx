@@ -46,7 +46,7 @@ export default async function MediaLibraryPage() {
           </p>
         </div>
         <Link href="/dashboard" className="text-sm underline">
-          ← Dashboard
+          ← Home
         </Link>
       </header>
 

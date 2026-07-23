@@ -27,7 +27,7 @@ export default async function NewsListPage() {
             New news
           </Link>
           <Link href="/dashboard" className="underline">
-            ← Dashboard
+            ← Home
           </Link>
         </div>
       </header>

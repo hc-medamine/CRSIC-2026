@@ -15,6 +15,8 @@ import {
   type SeoFormState,
 } from "@/app/dashboard/seo-fields";
 import { RichBodyEditor } from "@/app/dashboard/rich-body-editor";
+import { AdvancedDisclosure, FormBanner, messageForAction } from "@/app/dashboard/form-ux";
+import { t } from "@/lib/i18n/labels";
 import type { PublicMediaItem } from "@/lib/publish/media";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
@@ -202,11 +204,12 @@ export function EventEditorForm({
         return;
       }
       if (data.deleted) {
-        router.push("/dashboard/events");
+        router.push("/dashboard");
         router.refresh();
         return;
       }
-      setMessage("Saved.");
+      const key = messageForAction(action);
+      setMessage(t(key || "savedStay", "en"));
       router.refresh();
     } finally {
       setPending(false);
@@ -228,6 +231,9 @@ export function EventEditorForm({
           needsPostReview={initial.needsPostReview}
         />
       ) : null}
+
+      {error ? <FormBanner kind="error">{error}</FormBanner> : null}
+      {message ? <FormBanner kind="success">{message}</FormBanner> : null}
 
       <form
         onSubmit={mode === "create" ? create : (e) => e.preventDefault()}
@@ -300,14 +306,6 @@ export function EventEditorForm({
           <input dir="rtl" disabled={!editable} value={eventTypeAr} onChange={(e) => setEventTypeAr(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" placeholder="ملتقى وطني" />
         </label>
         <label className="text-sm">
-          <span className="font-medium">Title (EN)</span>
-          <input disabled={!editable} value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
-        </label>
-        <label className="text-sm">
-          <span className="font-medium">Type (EN)</span>
-          <input disabled={!editable} value={eventTypeEn} onChange={(e) => setEventTypeEn(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
-        </label>
-        <label className="text-sm">
           <span className="font-medium">Summary (AR)</span>
           <textarea
             dir="rtl"
@@ -318,29 +316,12 @@ export function EventEditorForm({
             rows={2}
           />
         </label>
-        <label className="text-sm">
-          <span className="font-medium">Summary (EN)</span>
-          <textarea
-            disabled={!editable}
-            value={summaryEn}
-            onChange={(e) => setSummaryEn(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
-            rows={2}
-          />
-        </label>
         <RichBodyEditor
           label="Body (AR)"
           dir="rtl"
           disabled={!editable}
           value={bodyAr}
           onChange={setBodyAr}
-        />
-        <RichBodyEditor
-          label="Body (EN)"
-          dir="ltr"
-          disabled={!editable}
-          value={bodyEn}
-          onChange={setBodyEn}
         />
         <MediaUploadField
           bucket="events"
@@ -366,33 +347,64 @@ export function EventEditorForm({
           }}
         />
         <label className="text-sm">
-          <span className="font-medium">Public slug (optional)</span>
-          <input dir="auto" disabled={!editable} value={publicSlug} onChange={(e) => setPublicSlug(e.target.value)} className="mt-1 w-full rounded border px-3 py-2 font-mono text-xs" />
-        </label>
-        <label className="text-sm">
           <span className="font-medium">Image alt (AR)</span>
           <input dir="rtl" disabled={!editable} value={imageAltAr} onChange={(e) => setImageAltAr(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
         </label>
-        <label className="text-sm">
-          <span className="font-medium">EN status</span>
-          <select disabled={!editable} value={enStatus} onChange={(e) => setEnStatus(e.target.value as "pending" | "ready")} className="mt-1 w-full rounded border px-3 py-2">
-            <option value="pending">pending</option>
-            <option value="ready">ready</option>
-          </select>
-        </label>
 
-        <SeoFieldsSection
-          value={seo}
-          onChange={setSeo}
-          disabled={!editable}
-          ogBucket="events"
-          ogFallbackHint={imagePath.trim() || "img/cms/..."}
-          onCopyTitleAr={() => setSeo((s) => copyMetaTitleFrom(titleAr, s))}
-          onCopySummaryAr={() => setSeo((s) => copyMetaDescriptionFrom(summaryAr, s))}
-        />
-
-        {error ? <p className="text-sm text-red-600">{error}</p> : null}
-        {message ? <p className="text-sm text-green-700">{message}</p> : null}
+        <AdvancedDisclosure
+          title={t("sectionAdvanced", "en")}
+          hint={t("sectionAdvancedHint", "en")}
+        >
+          <label className="text-sm">
+            <span className="font-medium">Title (EN)</span>
+            <input disabled={!editable} value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium">Type (EN)</span>
+            <input disabled={!editable} value={eventTypeEn} onChange={(e) => setEventTypeEn(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium">Summary (EN)</span>
+            <textarea
+              disabled={!editable}
+              value={summaryEn}
+              onChange={(e) => setSummaryEn(e.target.value)}
+              className="mt-1 w-full rounded border px-3 py-2"
+              rows={2}
+            />
+          </label>
+          <RichBodyEditor
+            label="Body (EN)"
+            dir="ltr"
+            disabled={!editable}
+            value={bodyEn}
+            onChange={setBodyEn}
+          />
+          <label className="text-sm">
+            <span className="font-medium">Image alt (EN)</span>
+            <input disabled={!editable} value={imageAltEn} onChange={(e) => setImageAltEn(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium">Public slug (optional)</span>
+            <input dir="auto" disabled={!editable} value={publicSlug} onChange={(e) => setPublicSlug(e.target.value)} className="mt-1 w-full rounded border px-3 py-2 font-mono text-xs" />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium">EN status</span>
+            <select disabled={!editable} value={enStatus} onChange={(e) => setEnStatus(e.target.value as "pending" | "ready")} className="mt-1 w-full rounded border px-3 py-2">
+              <option value="pending">pending</option>
+              <option value="ready">ready</option>
+            </select>
+          </label>
+          <SeoFieldsSection
+            value={seo}
+            onChange={setSeo}
+            disabled={!editable}
+            ogBucket="events"
+            ogFallbackHint={imagePath.trim() || "img/cms/..."}
+            onCopyTitleAr={() => setSeo((s) => copyMetaTitleFrom(titleAr, s))}
+            onCopySummaryAr={() => setSeo((s) => copyMetaDescriptionFrom(summaryAr, s))}
+          />
+        </AdvancedDisclosure>
 
         <div className="flex flex-wrap gap-2">
           {mode === "create" ? (

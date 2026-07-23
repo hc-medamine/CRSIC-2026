@@ -25,7 +25,7 @@ export default async function AlertsListPage() {
             New alert
           </Link>
           <Link href="/dashboard" className="underline">
-            ← Dashboard
+            ← Home
           </Link>
         </div>
       </header>

@@ -649,7 +649,7 @@ No separate staging config files exist in-repo.
 | — | Home pubs mobile horizontal carousel | **Done** on `main` |
 | — | Docs layout under `docs/` (+ PRD scaffold) | **Done** — [docs/README.md](./docs/README.md) |
 | — | Root Markdown stubs removed (README only at root) | **Done** |
-| 4 | Internal web app + database (users, roles, publish news/events/publications) — **no external CMS**, **no email features** | **In progress** — branch [`feature/step4-internal-cms`](https://github.com/hc-medamine/CRSIC-2026/tree/feature/step4-internal-cms); PRD [docs/prds/2026-07-19-internal-content-management.md](./docs/prds/2026-07-19-internal-content-management.md) (Review). Local: Cursor Pro + Node + PostgreSQL 18.4-2. Merge/`main`/go-live only when zero friction. |
+| 4 | Internal web app + database (users, roles, publish news/events/publications) — **no external CMS**, **no email features** | **On `main`** — core CMS + research groups/projects + authoring pack. Next: [CMS navigation & authoring UX](./docs/prds/2026-07-23-cms-navigation-authoring-ux.md) (**Approved** — implement M1→M3). |
 
 ### Known issues / gaps
 
@@ -661,7 +661,7 @@ No separate staging config files exist in-repo.
 
 | Priority | Item |
 |----------|------|
-| High | Step 4 — implement internal CMS on `feature/step4-internal-cms` (PRD in Review; merge when zero friction) |
+| High | CMS navigation & authoring UX — **Approved** PRD; implement M1→M3 ([PRD](./docs/prds/2026-07-23-cms-navigation-authoring-ux.md)) |
 | Medium | Dual-field or locale-keyed content if EN parity is required |
 | Medium | Further image compression / WebP for covers and Holders |
 | Low | Introduce linting/formatting once the team grows |

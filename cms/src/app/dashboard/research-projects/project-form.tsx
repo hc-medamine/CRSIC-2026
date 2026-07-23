@@ -10,6 +10,8 @@ import {
   emptySeoFormState,
   type SeoFormState,
 } from "@/app/dashboard/seo-fields";
+import { AdvancedDisclosure, FormBanner, messageForAction } from "@/app/dashboard/form-ux";
+import { t } from "@/lib/i18n/labels";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
 
@@ -212,11 +214,12 @@ export function ResearchProjectForm({
         return;
       }
       if (data.deleted) {
-        router.push("/dashboard/research-projects");
+        router.push("/dashboard");
         router.refresh();
         return;
       }
-      setMessage("Saved.");
+      const key = messageForAction(action);
+      setMessage(t(key || "savedStay", "en"));
       router.refresh();
     } finally {
       setPending(false);
@@ -235,6 +238,9 @@ export function ResearchProjectForm({
           publisher={initial.publisher}
         />
       ) : null}
+
+      {error ? <FormBanner kind="error">{error}</FormBanner> : null}
+      {message ? <FormBanner kind="success">{message}</FormBanner> : null}
 
       <form
         onSubmit={mode === "create" ? create : (e) => e.preventDefault()}
@@ -281,37 +287,21 @@ export function ResearchProjectForm({
             </p>
           ) : null}
         </label>
-
         <label className="text-sm">
           <span className="font-medium">Project title (AR) *</span>
           <input dir="rtl" required disabled={!editable} value={titleAr} onChange={(e) => setTitleAr(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
         </label>
+
         <label className="text-sm">
-          <span className="font-medium">Project title (EN)</span>
-          <input disabled={!editable} value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
+          <span className="font-medium">Lead (AR) *</span>
+          <input dir="rtl" disabled={!editable} value={leadAr} onChange={(e) => setLeadAr(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
         </label>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="text-sm">
-            <span className="font-medium">Lead (AR) *</span>
-            <input dir="rtl" disabled={!editable} value={leadAr} onChange={(e) => setLeadAr(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
-          </label>
-          <label className="text-sm">
-            <span className="font-medium">Lead (EN)</span>
-            <input disabled={!editable} value={leadEn} onChange={(e) => setLeadEn(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
-          </label>
-        </div>
-
         <RichBodyEditor label="Dibaja / body (AR)" value={bodyAr} onChange={setBodyAr} disabled={!editable} dir="rtl" />
-        <RichBodyEditor label="Dibaja / body (EN)" value={bodyEn} onChange={setBodyEn} disabled={!editable} dir="ltr" />
 
         <label className="text-sm">
           <span className="font-medium">Research questions (AR)</span>
           <textarea dir="rtl" disabled={!editable} value={questionsAr} onChange={(e) => setQuestionsAr(e.target.value)} rows={3} className="mt-1 w-full rounded border px-3 py-2" />
-        </label>
-        <label className="text-sm">
-          <span className="font-medium">Research questions (EN)</span>
-          <textarea disabled={!editable} value={questionsEn} onChange={(e) => setQuestionsEn(e.target.value)} rows={3} className="mt-1 w-full rounded border px-3 py-2" />
         </label>
 
         <fieldset className="grid gap-2 rounded border border-zinc-200 bg-zinc-50/80 p-3">
@@ -334,16 +324,10 @@ export function ResearchProjectForm({
           ) : null}
         </fieldset>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="text-sm">
-            <span className="font-medium">Duration (AR)</span>
-            <input dir="rtl" disabled={!editable} value={durationAr} onChange={(e) => setDurationAr(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
-          </label>
-          <label className="text-sm">
-            <span className="font-medium">Duration (EN)</span>
-            <input disabled={!editable} value={durationEn} onChange={(e) => setDurationEn(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
-          </label>
-        </div>
+        <label className="text-sm">
+          <span className="font-medium">Duration (AR)</span>
+          <input dir="rtl" disabled={!editable} value={durationAr} onChange={(e) => setDurationAr(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
+        </label>
 
         <fieldset className="grid gap-2 rounded border border-zinc-200 bg-zinc-50/80 p-3">
           <legend className="px-1 text-sm font-semibold text-zinc-900">Impacts</legend>
@@ -365,23 +349,41 @@ export function ResearchProjectForm({
           ) : null}
         </fieldset>
 
-        <label className="text-sm">
-          <span className="font-medium">EN status</span>
-          <select disabled={!editable} value={enStatus} onChange={(e) => setEnStatus(e.target.value as "pending" | "ready")} className="mt-1 w-full rounded border px-3 py-2">
-            <option value="pending">pending</option>
-            <option value="ready">ready</option>
-          </select>
-        </label>
-
-        <SeoFieldsSection
-          value={seo}
-          onChange={setSeo}
-          disabled={!editable}
-          onCopyTitleAr={() => setSeo((s) => copyMetaTitleFrom(titleAr, s))}
-        />
-
-        {error ? <p className="text-sm text-red-600">{error}</p> : null}
-        {message ? <p className="text-sm text-green-700">{message}</p> : null}
+        <AdvancedDisclosure
+          title={t("sectionAdvanced", "en")}
+          hint={t("sectionAdvancedHint", "en")}
+        >
+          <label className="text-sm">
+            <span className="font-medium">Project title (EN)</span>
+            <input disabled={!editable} value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium">Lead (EN)</span>
+            <input disabled={!editable} value={leadEn} onChange={(e) => setLeadEn(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
+          </label>
+          <RichBodyEditor label="Dibaja / body (EN)" value={bodyEn} onChange={setBodyEn} disabled={!editable} dir="ltr" />
+          <label className="text-sm">
+            <span className="font-medium">Research questions (EN)</span>
+            <textarea disabled={!editable} value={questionsEn} onChange={(e) => setQuestionsEn(e.target.value)} rows={3} className="mt-1 w-full rounded border px-3 py-2" />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium">Duration (EN)</span>
+            <input disabled={!editable} value={durationEn} onChange={(e) => setDurationEn(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium">EN status</span>
+            <select disabled={!editable} value={enStatus} onChange={(e) => setEnStatus(e.target.value as "pending" | "ready")} className="mt-1 w-full rounded border px-3 py-2">
+              <option value="pending">pending</option>
+              <option value="ready">ready</option>
+            </select>
+          </label>
+          <SeoFieldsSection
+            value={seo}
+            onChange={setSeo}
+            disabled={!editable}
+            onCopyTitleAr={() => setSeo((s) => copyMetaTitleFrom(titleAr, s))}
+          />
+        </AdvancedDisclosure>
 
         <div className="flex flex-wrap gap-2">
           {mode === "create" ? (
