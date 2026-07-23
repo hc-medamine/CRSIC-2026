@@ -19,7 +19,16 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
-### 2026-07-22 — Research groups & projects CMS + SPA
+### 2026-07-23 — PRD-first product workflow locked
+
+**Done:**
+- Adopted idea → develop → blind spots → improve → lock decision → PRD → lock PRD → implement
+- Agent rule: [`.cursor/rules/prd-first-workflow.mdc`](../.cursor/rules/prd-first-workflow.mdc)
+- Documented in root [README.md](../README.md) §5.1
+
+**Next:** Next product slice (e.g. CMS navigation UX) starts at Idea, not coding.
+
+---
 
 **Branch:** `feature/cms-authoring-quality-pack`
 

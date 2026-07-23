@@ -1,0 +1,29 @@
+---
+description: Idea → PRD → implement workflow (no coding before locked PRD)
+alwaysApply: true
+---
+
+# Product workflow (CRSIC)
+
+Do **not** jump to implementation for product/feature work. Follow this sequence with the stakeholder:
+
+1. **Idea** — capture the rough ask in plain language.
+2. **Develop** — explore options, constraints, and trade-offs together (Plan mode when useful).
+3. **Blind spots** — actively hunt gaps: roles, edge cases, data ownership, exclusivity, cutover, i18n, rollback, out of scope.
+4. **Fix blind spots** — agree fixes before locking; revise the model until gaps are closed or explicitly deferred.
+5. **Improvements** — short pass for simpler UX, fewer round-trips, clearer IA (especially CMS).
+6. **Lock decision** — write a short decision summary; stakeholder confirms.
+7. **Generate PRD** — draft under `docs/prds/` from [TEMPLATE.md](docs/prds/TEMPLATE.md); status **Draft**.
+8. **Lock PRD** — stakeholder marks **Approved**; update `docs/prds/README.md` index + WORKLOG pointer.
+9. **Implement** — only after PRD is **Approved**; PRD is the source of truth. Deviations need a PRD decision-log update first.
+
+## Hard rules
+
+- No feature branch coding for a new slice until step 8 is done (unless stakeholder says "spike/prototype only").
+- Prefer questions and alternatives over assuming requirements.
+- Out of scope must be explicit in the PRD.
+- Small bugfixes / ops chores may skip PRD when stakeholder agrees they are not a product slice.
+
+## Next turn default
+
+When the stakeholder brings a new idea, start at step 1 — do not invent a full design or open an implementation todo list yet.

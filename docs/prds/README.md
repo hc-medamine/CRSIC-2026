@@ -1,6 +1,6 @@
 # Product requirement documents (PRDs)
 
-Future product specs for CRSIC live here. The public site has no active PRD yet; **Step 4** (internal app + database) should start with a PRD from [TEMPLATE.md](./TEMPLATE.md).
+Product specs for CRSIC live here. **New feature slices follow the PRD-first workflow** in root [README.md §5.1](../../README.md#51-product-development-workflow-prd-first) (idea → lock decision → Draft PRD → Approved → implement). Do not start implementation until the PRD is **Approved**.
 
 ## Conventions
 
