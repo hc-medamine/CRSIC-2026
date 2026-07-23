@@ -27,6 +27,7 @@ npm run dev
 Migrations apply **automatically** on `npm run dev` and `npm run build` (`predev` / `prebuild`). Manual: `npm run db:migrate`. Check: `npm run db:status`.
 
 4. Open [http://localhost:3000/login](http://localhost:3000/login). Sign in with the Super Admin **email** (no SMTP — email is the login id only).
+   - **Test login bubbles (dev only):** set `NEXT_PUBLIC_CMS_LOGIN_BUBBLES=1` in `.env.local` (never in production). SA/Reviewer from DB; editors from `EDITOR1_EMAIL`…`EDITORN_EMAIL` sharing `CMS_LOGIN_BUBBLE_EDITOR_PASSWORD`. Remove or leave the flag off before live.
 5. Super Admin: [http://localhost:3000/dashboard/users](http://localhost:3000/dashboard/users) to manage users.
 6. Check DB: [http://localhost:3000/api/health/db](http://localhost:3000/api/health/db).
 
