@@ -1,6 +1,8 @@
-import Link from "next/link";
+import { cookies } from "next/headers";
 import { requireUser } from "@/lib/auth/session";
 import { countUnread, listNotificationsForUser } from "@/lib/notifications";
+import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
+import { PageBreadcrumb } from "@/app/dashboard/ui-bits";
 import { NotificationsClient } from "./notifications-client";
 
 export default async function NotificationsPage() {
@@ -9,20 +11,22 @@ export default async function NotificationsPage() {
     listNotificationsForUser(user.id),
     countUnread(user.id),
   ]);
+  const cookieStore = await cookies();
+  const lang = normalizeLang(cookieStore.get(CMS_LANG_COOKIE)?.value);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-12 font-sans">
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-200 pb-4">
-        <div>
-          <p className="text-sm uppercase tracking-wide text-zinc-500">CRSIC CMS · Step 3</p>
-          <h1 className="text-2xl font-semibold text-zinc-900">Notifications</h1>
-          <p className="mt-1 text-sm text-zinc-600">
-            In-app only (no email). Workflow events will appear here when content review ships.
-          </p>
-        </div>
-        <Link href="/dashboard" className="text-sm underline">
-          ← Home
-        </Link>
+    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
+      <PageBreadcrumb
+        items={[
+          { href: "/dashboard", label: t("home", lang) },
+          { label: t("notifications", lang) },
+        ]}
+      />
+      <header>
+        <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">
+          {t("notifications", lang)}
+        </h1>
+        <p className="mt-1 text-sm text-crs-muted">In-app only (no email).</p>
       </header>
 
       <NotificationsClient

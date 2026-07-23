@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { cmsToast } from "@/app/dashboard/cms-toast";
 import type { ContentType, ManagedUser, OrgUnit, UserRole } from "@/lib/users";
 
 const CONTENT_TYPES: ContentType[] = [
@@ -102,10 +103,13 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Create failed");
+        const msg = data.error ?? "Create failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
       setMessage("User created.");
+      cmsToast.success("User created.");
       setEmail("");
       setPassword("");
       setDisplayName("");
@@ -131,10 +135,15 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Update failed");
+        const msg = data.error ?? "Update failed";
+        setError(msg);
+        cmsToast.error(msg);
         return false;
       }
-      setMessage("Updated.");
+      if (body.action !== "delete") {
+        setMessage("Updated.");
+        cmsToast.success("Updated.");
+      }
       await refresh();
       return true;
     } finally {
@@ -153,7 +162,9 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
       const res = await fetch(`/api/users/${u.id}/delete-impact`);
       const data = (await res.json()) as { ok: boolean; impact?: DeleteImpact; error?: string };
       if (!res.ok || !data.ok || !data.impact) {
-        setError(data.error ?? "Could not load delete impact");
+        const msg = data.error ?? "Could not load delete impact";
+        setError(msg);
+        cmsToast.error(msg);
         setDeleteTarget(null);
         return;
       }
@@ -177,6 +188,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
         setDeleteTarget(null);
         setDeleteImpact(null);
         setMessage("User deleted.");
+        cmsToast.success("User deleted.");
       }
     } finally {
       setPending(false);
@@ -234,7 +246,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {message ? <p className="text-sm text-green-700">{message}</p> : null}
 
-      <p className="text-sm text-zinc-600">
+      <p className="text-sm text-crs-muted">
         Manage organisation units on the{" "}
         <Link href="/dashboard/org-units" className="underline">
           Org scopes
@@ -242,8 +254,8 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
         page.
       </p>
 
-      <form onSubmit={createUser} className="grid gap-3 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-medium text-zinc-900">Create user</h2>
+      <form onSubmit={createUser} className="grid gap-3 cms-form rounded-2xl border border-crs-border bg-crs-surface p-6 shadow-sm">
+        <h2 className="text-lg font-medium text-crs-ink">Create user</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="text-sm">
             <span className="font-medium">Email (login)</span>
@@ -252,7 +264,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded border border-zinc-300 px-3 py-2"
+              className="mt-1 w-full rounded border border-crs-border px-3 py-2"
             />
           </label>
           <label className="text-sm">
@@ -263,7 +275,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded border border-zinc-300 px-3 py-2"
+              className="mt-1 w-full rounded border border-crs-border px-3 py-2"
             />
           </label>
           <label className="text-sm">
@@ -272,7 +284,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
               required
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              className="mt-1 w-full rounded border border-zinc-300 px-3 py-2"
+              className="mt-1 w-full rounded border border-crs-border px-3 py-2"
             />
           </label>
           <label className="text-sm">
@@ -280,7 +292,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
             <select
               value={role}
               onChange={(e) => setRole(e.target.value as UserRole)}
-              className="mt-1 w-full rounded border border-zinc-300 px-3 py-2"
+              className="mt-1 w-full rounded border border-crs-border px-3 py-2"
             >
               <option value="editor">Editor</option>
               <option value="reviewer">Reviewer</option>
@@ -293,7 +305,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
               dir="rtl"
               value={nameAr}
               onChange={(e) => setNameAr(e.target.value)}
-              className="mt-1 w-full rounded border border-zinc-300 px-3 py-2"
+              className="mt-1 w-full rounded border border-crs-border px-3 py-2"
             />
           </label>
           <label className="text-sm">
@@ -301,7 +313,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
             <input
               value={nameEn}
               onChange={(e) => setNameEn(e.target.value)}
-              className="mt-1 w-full rounded border border-zinc-300 px-3 py-2"
+              className="mt-1 w-full rounded border border-crs-border px-3 py-2"
             />
           </label>
         </div>
@@ -313,7 +325,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
                 {role === "reviewer" ? "Exclusive org scopes *" : "Org scopes *"}
               </legend>
               {role === "reviewer" ? (
-                <p className="mt-1 text-xs text-zinc-500">
+                <p className="mt-1 text-xs text-crs-muted">
                   Two reviewers cannot share the same org unit.
                 </p>
               ) : null}
@@ -330,7 +342,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
                       }}
                     />
                     <span>
-                      {o.name_en} <span className="text-zinc-500">({o.name_ar})</span>
+                      {o.name_en} <span className="text-crs-muted">({o.name_ar})</span>
                     </span>
                   </label>
                 ))}
@@ -339,7 +351,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
             {showContentTypes ? (
               <fieldset className="text-sm">
                 <legend className="font-medium">Content types * (globally exclusive)</legend>
-                <p className="mt-1 text-xs text-zinc-500">
+                <p className="mt-1 text-xs text-crs-muted">
                   Only types allowed by selected org catalogs. Two editors cannot share a type.
                 </p>
                 <div className="mt-2 flex flex-col gap-1">
@@ -350,7 +362,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
                     return (
                       <label
                         key={t}
-                        className={`flex items-center gap-2 ${blocked && !contentTypes.includes(t) ? "text-zinc-400" : ""}`}
+                        className={`flex items-center gap-2 ${blocked && !contentTypes.includes(t) ? "text-crs-muted" : ""}`}
                       >
                         <input
                           type="checkbox"
@@ -373,13 +385,13 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
                 </div>
               </fieldset>
             ) : (
-              <p className="text-sm text-zinc-500">
+              <p className="text-sm text-crs-muted">
                 Reviewers review types from their org catalogs; orgs are exclusive.
               </p>
             )}
           </div>
         ) : (
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-crs-muted">
             Super Admins automatically receive all org units and content types.
           </p>
         )}
@@ -387,15 +399,15 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
         <button
           type="submit"
           disabled={pending}
-          className="w-fit rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+          className="w-fit rounded-lg bg-crs-primary hover:bg-crs-secondary px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
         >
           {pending ? "Saving…" : "Create user"}
         </button>
       </form>
 
-      <section className="overflow-x-auto rounded-lg border border-zinc-200 bg-white shadow-sm">
+      <section className="overflow-x-auto rounded-2xl border border-crs-border bg-crs-surface shadow-sm">
         <table className="min-w-full text-left text-sm">
-          <thead className="border-b bg-zinc-50 text-zinc-600">
+          <thead className="border-b bg-crs-bg text-crs-muted">
             <tr>
               <th className="px-3 py-2">User</th>
               <th className="px-3 py-2">Role</th>
@@ -408,11 +420,11 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
             {users.map((u) => (
               <tr key={u.id} className="border-b last:border-0">
                 <td className="px-3 py-3 align-top">
-                  <div className="font-medium text-zinc-900">{u.display_name}</div>
-                  <div className="text-zinc-500">{u.email}</div>
+                  <div className="font-medium text-crs-ink">{u.display_name}</div>
+                  <div className="text-crs-muted">{u.email}</div>
                 </td>
                 <td className="px-3 py-3 align-top">{u.role}</td>
-                <td className="px-3 py-3 align-top text-xs text-zinc-600">
+                <td className="px-3 py-3 align-top text-xs text-crs-muted">
                   {scopeEditId === u.id && (u.role === "editor" || u.role === "reviewer") ? (
                     <div className="grid max-w-xs gap-2">
                       <fieldset>
@@ -545,8 +557,8 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
       {deleteTarget && deleteImpact ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg bg-white p-5 shadow-xl">
-            <h3 className="text-lg font-semibold text-zinc-900">Delete {deleteImpact.user.email}?</h3>
-            <p className="mt-2 text-sm text-zinc-600">
+            <h3 className="text-lg font-semibold text-crs-ink">Delete {deleteImpact.user.email}?</h3>
+            <p className="mt-2 text-sm text-crs-muted">
               Hard delete is destructive. Drafts ({deleteImpact.draftCount}) will be removed.
               Non-draft items ({deleteImpact.nonDraftItems.length}) must be reassigned.
             </p>
@@ -556,7 +568,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
             {deleteImpact.nonDraftItems.length > 0 ? (
               <div className="mt-3">
                 <p className="text-sm font-medium">Reassign these items to:</p>
-                <ul className="mt-1 max-h-32 overflow-y-auto text-xs text-zinc-600">
+                <ul className="mt-1 max-h-32 overflow-y-auto text-xs text-crs-muted">
                   {deleteImpact.nonDraftItems.map((i) => (
                     <li key={i.id}>
                       [{i.status}] {i.contentType}: {i.title}
@@ -564,7 +576,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
                   ))}
                 </ul>
                 <select
-                  className="mt-2 w-full rounded border px-3 py-2 text-sm"
+                  className="mt-2 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
                   value={reassignTo}
                   onChange={(e) => setReassignTo(e.target.value)}
                   required
@@ -583,7 +595,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
               <input
                 value={confirmEmail}
                 onChange={(e) => setConfirmEmail(e.target.value)}
-                className="mt-1 w-full rounded border px-3 py-2 font-mono text-xs"
+                className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink font-mono text-xs"
                 placeholder={deleteImpact.user.email}
               />
             </label>
@@ -603,7 +615,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
               </button>
               <button
                 type="button"
-                className="rounded border px-4 py-2 text-sm"
+                className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg"
                 onClick={() => {
                   setDeleteTarget(null);
                   setDeleteImpact(null);

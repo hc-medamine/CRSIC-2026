@@ -15,7 +15,8 @@ import {
   type SeoFormState,
 } from "@/app/dashboard/seo-fields";
 import { RichBodyEditor } from "@/app/dashboard/rich-body-editor";
-import { AdvancedDisclosure, FormBanner, FormSection, messageForAction } from "@/app/dashboard/form-ux";
+import { cmsToast } from "@/app/dashboard/cms-toast";
+import { AdvancedDisclosure, FormBanner, FormSection, FormStickyActions, messageForAction } from "@/app/dashboard/form-ux";
 import { t } from "@/lib/i18n/labels";
 import type { PublicMediaItem } from "@/lib/publish/media";
 
@@ -173,9 +174,12 @@ export function NewsEditorForm({
       });
       const data = (await res.json()) as { ok: boolean; error?: string; item?: { id: string } };
       if (!res.ok || !data.ok || !data.item) {
-        setError(data.error ?? "Create failed");
+        const msg = data.error ?? "Create failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
+      cmsToast.success("Draft created.");
       router.push(`/dashboard/news/${data.item.id}`);
       router.refresh();
     } finally {
@@ -202,16 +206,21 @@ export function NewsEditorForm({
       });
       const data = (await res.json()) as { ok: boolean; error?: string; deleted?: boolean };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Action failed");
+        const msg = data.error ?? "Action failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
       if (data.deleted) {
+        cmsToast.success("Deleted.");
         router.push("/dashboard");
         router.refresh();
         return;
       }
       const key = messageForAction(action);
-      setMessage(key ? t(key, "en") : "Saved.");
+      const msg = key ? t(key, "en") : "Saved.";
+      setMessage(msg);
+      cmsToast.success(msg);
       router.refresh();
     } finally {
       setPending(false);
@@ -239,16 +248,16 @@ export function NewsEditorForm({
 
       <form
         onSubmit={mode === "create" ? create : (e) => e.preventDefault()}
-        className="flex flex-col gap-1 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm"
+        className="flex flex-col gap-1 cms-form rounded-2xl border border-crs-border bg-crs-surface p-6 shadow-sm"
       >
-        <FormSection title={t("sectionIdentity", "en")}>
+        <FormSection step={1} title={t("sectionIdentity", "en")}>
           <label className="text-sm">
             <span className="font-medium">Organisation unit</span>
             <select
               disabled={!editable}
               value={orgUnitId}
               onChange={(e) => setOrgUnitId(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             >
               {orgUnits.map((o) => (
                 <option key={o.id} value={o.id}>
@@ -266,7 +275,7 @@ export function NewsEditorForm({
               disabled={!editable}
               value={titleAr}
               onChange={(e) => setTitleAr(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             />
           </label>
           <label className="text-sm">
@@ -276,7 +285,7 @@ export function NewsEditorForm({
               disabled={!editable}
               value={labelAr}
               onChange={(e) => setLabelAr(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             />
           </label>
           <label className="text-sm">
@@ -286,13 +295,13 @@ export function NewsEditorForm({
               disabled={!editable}
               value={summaryAr}
               onChange={(e) => setSummaryAr(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
               rows={2}
             />
           </label>
         </FormSection>
 
-        <FormSection title={t("sectionBody", "en")}>
+        <FormSection step={2} title={t("sectionBody", "en")}>
           <RichBodyEditor
             label="Body (AR)"
             dir="rtl"
@@ -302,7 +311,7 @@ export function NewsEditorForm({
           />
         </FormSection>
 
-        <FormSection title={t("sectionMedia", "en")}>
+        <FormSection step={3} title={t("sectionMedia", "en")}>
           <MediaUploadField
             bucket="news"
             publicPath={imagePath}
@@ -336,12 +345,13 @@ export function NewsEditorForm({
               disabled={!editable}
               value={imageAltAr}
               onChange={(e) => setImageAltAr(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             />
           </label>
         </FormSection>
 
         <AdvancedDisclosure
+          step={4}
           title={t("sectionAdvanced", "en")}
           hint={t("sectionAdvancedHint", "en")}
         >
@@ -351,7 +361,7 @@ export function NewsEditorForm({
               disabled={!editable}
               value={titleEn}
               onChange={(e) => setTitleEn(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             />
           </label>
           <label className="text-sm">
@@ -360,7 +370,7 @@ export function NewsEditorForm({
               disabled={!editable}
               value={labelEn}
               onChange={(e) => setLabelEn(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             />
           </label>
           <label className="text-sm">
@@ -369,7 +379,7 @@ export function NewsEditorForm({
               disabled={!editable}
               value={summaryEn}
               onChange={(e) => setSummaryEn(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
               rows={2}
             />
           </label>
@@ -386,7 +396,7 @@ export function NewsEditorForm({
               disabled={!editable}
               value={imageAltEn}
               onChange={(e) => setImageAltEn(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             />
           </label>
           <label className="text-sm">
@@ -396,7 +406,7 @@ export function NewsEditorForm({
               disabled={!editable}
               value={publicSlug}
               onChange={(e) => setPublicSlug(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2 font-mono text-xs"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink font-mono text-xs"
               placeholder="auto from Arabic title on publish"
             />
           </label>
@@ -406,7 +416,7 @@ export function NewsEditorForm({
               disabled={!editable}
               value={enStatus}
               onChange={(e) => setEnStatus(e.target.value as "pending" | "ready")}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             >
               <option value="pending">pending</option>
               <option value="ready">ready</option>
@@ -423,13 +433,13 @@ export function NewsEditorForm({
           />
         </AdvancedDisclosure>
 
-        <FormSection title={t("sectionActions", "en")}>
-          <div className="flex flex-wrap gap-2">
+        <FormStickyActions>
+          <div className="flex w-full flex-wrap items-center justify-end gap-2">
             {mode === "create" ? (
               <button
                 type="submit"
                 disabled={pending}
-                className="rounded bg-zinc-900 px-4 py-2 text-sm text-white disabled:opacity-60"
+                className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
               >
                 {pending ? "Saving…" : "Create draft"}
               </button>
@@ -440,26 +450,26 @@ export function NewsEditorForm({
                 <button
                   type="button"
                   disabled={pending}
-                  className="rounded bg-zinc-900 px-4 py-2 text-sm text-white disabled:opacity-60"
+                  className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60"
                   onClick={() => void run("save", { fields: fields() })}
                 >
                   Save draft
                 </button>
                 {canSubmit ? (
-                  <label className="flex w-full items-center gap-2 text-sm sm:w-auto">
+                  <label className="me-auto flex items-center gap-2 text-sm text-crs-ink">
                     <input
                       type="checkbox"
                       checked={checklist}
                       onChange={(e) => setChecklist(e.target.checked)}
                     />
-                    Checklist OK (names, dates, no private data, photo rights)
+                    Checklist OK
                   </label>
                 ) : null}
                 {canSubmit ? (
                   <button
                     type="button"
                     disabled={pending || !checklist}
-                    className="rounded border px-4 py-2 text-sm disabled:opacity-60"
+                    className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
                     onClick={() => void run("submit", { checklistConfirmed: checklist })}
                   >
                     Submit for review
@@ -472,14 +482,14 @@ export function NewsEditorForm({
               <button
                 type="button"
                 disabled={pending}
-                className="rounded border px-4 py-2 text-sm"
+                className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg"
                 onClick={() => void run("withdraw")}
               >
                 Withdraw
               </button>
             ) : null}
           </div>
-        </FormSection>
+        </FormStickyActions>
       </form>
 
       {mode === "edit" && canReview && initial?.status === "submitted" ? (
@@ -489,14 +499,14 @@ export function NewsEditorForm({
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Note for changes / rejection"
-            className="w-full rounded border px-3 py-2 text-sm"
+            className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             rows={2}
           />
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
               disabled={pending}
-              className="rounded bg-zinc-900 px-3 py-1.5 text-sm text-white"
+              className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white"
               onClick={() => void run("approve")}
             >
               Approve
@@ -504,7 +514,7 @@ export function NewsEditorForm({
             <button
               type="button"
               disabled={pending}
-              className="rounded border px-3 py-1.5 text-sm"
+              className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg"
               onClick={() => void run("request_changes", { note })}
             >
               Request changes
@@ -512,7 +522,7 @@ export function NewsEditorForm({
             <button
               type="button"
               disabled={pending}
-              className="rounded border border-red-300 px-3 py-1.5 text-sm text-red-700"
+              className="inline-flex min-h-11 items-center rounded-lg border border-red-300 bg-crs-surface px-3 py-2 text-sm text-red-700 hover:bg-red-50"
               onClick={() => void run("reject", { note })}
             >
               Reject
@@ -540,7 +550,7 @@ export function NewsEditorForm({
         <button
           type="button"
           disabled={pending}
-          className="w-fit rounded bg-emerald-700 px-4 py-2 text-sm text-white"
+          className="w-fit rounded bg-crs-primary px-4 py-2 text-sm text-white"
           onClick={() => void run("publish")}
         >
           Publish to public news.json
@@ -552,7 +562,7 @@ export function NewsEditorForm({
           <button
             type="button"
             disabled={pending}
-            className="w-fit rounded border border-emerald-300 px-4 py-2 text-sm text-emerald-800"
+            className="w-fit rounded border border-crs-secondary/40 px-4 py-2 text-sm text-crs-primary"
             onClick={() => void run("start_revision")}
           >
             Create revision (public stays live)
@@ -561,7 +571,7 @@ export function NewsEditorForm({
             <button
               type="button"
               disabled={pending}
-              className="w-fit rounded border px-4 py-2 text-sm"
+              className="w-fit inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg"
               onClick={() => void run("unpublish")}
             >
               Unpublish

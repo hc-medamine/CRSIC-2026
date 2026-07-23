@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { cmsToast } from "@/app/dashboard/cms-toast";
 import { formatDateTime } from "@/lib/format-datetime";
 
 type Item = {
@@ -34,65 +35,76 @@ export function NotificationsClient({ initialUnread, initialItems }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (!res.ok) return;
+      if (!res.ok) {
+        cmsToast.error("Could not update notification.");
+        return false;
+      }
       router.refresh();
+      return true;
     } finally {
       setPending(false);
     }
   }
 
   async function markRead(id: string) {
-    await patch({ action: "mark_read", id });
+    const ok = await patch({ action: "mark_read", id });
+    if (!ok) return;
     setItems((prev) =>
       prev.map((n) => (n.id === id ? { ...n, readAt: new Date().toISOString() } : n)),
     );
     setUnread((u) => Math.max(0, u - 1));
+    cmsToast.success("Marked as read.");
   }
 
   async function markAll() {
-    await patch({ action: "mark_all_read" });
+    const ok = await patch({ action: "mark_all_read" });
+    if (!ok) return;
     setItems((prev) => prev.map((n) => ({ ...n, readAt: n.readAt ?? new Date().toISOString() })));
     setUnread(0);
+    cmsToast.success("All marked as read.");
   }
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-zinc-600">
-          Unread: <span className="font-medium text-zinc-900">{unread}</span>
+        <p className="text-sm text-crs-muted">
+          Unread: <span className="font-medium text-crs-ink">{unread}</span>
         </p>
         <button
           type="button"
           disabled={pending || unread === 0}
           onClick={() => void markAll()}
-          className="rounded border border-zinc-300 px-3 py-1.5 text-sm disabled:opacity-50"
+          className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-50"
         >
           Mark all read
         </button>
       </div>
 
       {items.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-zinc-300 bg-white p-6 text-sm text-zinc-500">
+        <p className="rounded-lg border border-dashed border-crs-border bg-white p-6 text-sm text-crs-muted">
           No notifications yet. Submit / review / publish events will create them in later steps.
         </p>
       ) : (
-        <ul className="divide-y rounded-lg border border-zinc-200 bg-white shadow-sm">
+        <ul className="divide-y rounded-2xl border border-crs-border bg-crs-surface shadow-sm">
           {items.map((n) => (
             <li
               key={n.id}
-              className={`flex flex-col gap-1 px-4 py-3 ${n.readAt ? "bg-white" : "bg-zinc-50"}`}
+              className={`flex flex-col gap-1 px-4 py-3 ${n.readAt ? "bg-white" : "bg-crs-bg"}`}
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
-                  <p className="font-medium text-zinc-900">{n.title}</p>
-                  {n.body ? <p className="mt-1 text-sm text-zinc-600">{n.body}</p> : null}
-                  <p className="mt-1 text-xs text-zinc-400">
+                  <p className="font-medium text-crs-ink">{n.title}</p>
+                  {n.body ? <p className="mt-1 text-sm text-crs-muted">{n.body}</p> : null}
+                  <p className="mt-1 text-xs text-crs-muted">
                     {n.type} · {formatDateTime(n.createdAt)}
                   </p>
                 </div>
                 <div className="flex gap-2">
                   {n.linkPath ? (
-                    <Link href={n.linkPath} className="text-xs underline">
+                    <Link
+                      href={n.linkPath}
+                      className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm text-crs-primary hover:bg-crs-bg"
+                    >
                       Open
                     </Link>
                   ) : null}
@@ -100,7 +112,7 @@ export function NotificationsClient({ initialUnread, initialItems }: Props) {
                     <button
                       type="button"
                       disabled={pending}
-                      className="text-xs underline"
+                      className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-50"
                       onClick={() => void markRead(n.id)}
                     >
                       Mark read

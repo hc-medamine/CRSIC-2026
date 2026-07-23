@@ -15,7 +15,8 @@ import {
   type SeoFormState,
 } from "@/app/dashboard/seo-fields";
 import { RichBodyEditor } from "@/app/dashboard/rich-body-editor";
-import { AdvancedDisclosure, FormBanner, messageForAction } from "@/app/dashboard/form-ux";
+import { cmsToast } from "@/app/dashboard/cms-toast";
+import { AdvancedDisclosure, FormBanner, FormSection, FormStickyActions, messageForAction } from "@/app/dashboard/form-ux";
 import { t } from "@/lib/i18n/labels";
 import type { PublicMediaItem } from "@/lib/publish/media";
 
@@ -160,9 +161,12 @@ export function PublicationEditorForm({
       });
       const data = (await res.json()) as { ok: boolean; error?: string; item?: { id: string } };
       if (!res.ok || !data.ok || !data.item) {
-        setError(data.error ?? "Create failed");
+        const msg = data.error ?? "Create failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
+      cmsToast.success("Draft created.");
       router.push(`/dashboard/publications/${data.item.id}`);
       router.refresh();
     } finally {
@@ -189,16 +193,21 @@ export function PublicationEditorForm({
       });
       const data = (await res.json()) as { ok: boolean; error?: string; deleted?: boolean };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Action failed");
+        const msg = data.error ?? "Action failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
       if (data.deleted) {
+        cmsToast.success("Deleted.");
         router.push("/dashboard");
         router.refresh();
         return;
       }
       const key = messageForAction(action);
-      setMessage(t(key || "savedStay", "en"));
+      const msg = t(key || "savedStay", "en");
+      setMessage(msg);
+      cmsToast.success(msg);
       router.refresh();
     } finally {
       setPending(false);
@@ -226,117 +235,126 @@ export function PublicationEditorForm({
 
       <form
         onSubmit={mode === "create" ? create : (e) => e.preventDefault()}
-        className="grid gap-3 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm"
+        className="flex flex-col gap-1 cms-form rounded-2xl border border-crs-border bg-crs-surface p-6 shadow-sm"
       >
-        <label className="text-sm">
-          <span className="font-medium">Organisation unit</span>
-          <select
-            disabled={!editable}
-            value={orgUnitId}
-            onChange={(e) => setOrgUnitId(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
-          >
-            {orgUnits.map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.name_en} ({o.name_ar})
-              </option>
-            ))}
-          </select>
-        </label>
+        <FormSection step={1} title={t("sectionIdentity", "en")}>
+          <label className="text-sm">
+            <span className="font-medium">Organisation unit</span>
+            <select
+              disabled={!editable}
+              value={orgUnitId}
+              onChange={(e) => setOrgUnitId(e.target.value)}
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
+            >
+              {orgUnits.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.name_en} ({o.name_ar})
+                </option>
+              ))}
+            </select>
+          </label>
 
-        <label className="text-sm">
-          <span className="font-medium">Type *</span>
-          <select
-            disabled={!editable}
-            value={pubKind}
-            onChange={(e) => setPubKind(e.target.value as "collective" | "individual")}
-            className="mt-1 w-full rounded border px-3 py-2"
-          >
-            <option value="collective">collective</option>
-            <option value="individual">individual</option>
-          </select>
-        </label>
+          <label className="text-sm">
+            <span className="font-medium">Type *</span>
+            <select
+              disabled={!editable}
+              value={pubKind}
+              onChange={(e) => setPubKind(e.target.value as "collective" | "individual")}
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
+            >
+              <option value="collective">collective</option>
+              <option value="individual">individual</option>
+            </select>
+          </label>
 
-        <label className="text-sm">
-          <span className="font-medium">Title (AR) *</span>
-          <input
-            dir="rtl"
-            required
-            disabled={!editable}
-            value={titleAr}
-            onChange={(e) => setTitleAr(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
-          />
-        </label>
-        <label className="text-sm">
-          <span className="font-medium">Department (AR) *</span>
-          <input
-            dir="rtl"
-            required
-            disabled={!editable}
-            value={deptAr}
-            onChange={(e) => setDeptAr(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
-            placeholder="الحضارة الإسلامية"
-          />
-        </label>
-        <label className="text-sm">
-          <span className="font-medium">Description (AR) *</span>
-          <textarea
-            dir="rtl"
-            required
-            disabled={!editable}
-            value={descAr}
-            onChange={(e) => setDescAr(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
-            rows={3}
-          />
-        </label>
-        <MediaUploadField
-          bucket="covers"
-          publicPath={coverPath}
-          mediaId={coverMediaId}
-          disabled={!editable}
-          imagesOnly
-          label="Cover image *"
-          onUploaded={({ publicPath, mediaId }) => {
-            setCoverPath(publicPath);
-            setCoverMediaId(mediaId);
-            setAttachments((prev) => [
-              { kind: "image", src: publicPath },
-              ...prev.filter((a) => a.src !== coverPath),
-            ]);
-          }}
-        />
-        <MediaAttachmentsField
-          bucket="covers"
-          items={attachments}
-          disabled={!editable}
-          onChange={(next) => {
-            setAttachments(next);
-            const firstImg = next.find((a) => a.kind === "image");
-            if (firstImg) setCoverPath(firstImg.src);
-          }}
-        />
-        <RichBodyEditor
-          label="Body (AR)"
-          dir="rtl"
-          disabled={!editable}
-          value={bodyAr}
-          onChange={setBodyAr}
-        />
-        <label className="text-sm">
-          <span className="font-medium">Cover alt (AR) *</span>
-          <input
+          <label className="text-sm">
+            <span className="font-medium">Title (AR) *</span>
+            <input
+              dir="rtl"
+              required
+              disabled={!editable}
+              value={titleAr}
+              onChange={(e) => setTitleAr(e.target.value)}
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
+            />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium">Department (AR) *</span>
+            <input
+              dir="rtl"
+              required
+              disabled={!editable}
+              value={deptAr}
+              onChange={(e) => setDeptAr(e.target.value)}
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
+              placeholder="الحضارة الإسلامية"
+            />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium">Description (AR) *</span>
+            <textarea
+              dir="rtl"
+              required
+              disabled={!editable}
+              value={descAr}
+              onChange={(e) => setDescAr(e.target.value)}
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
+              rows={3}
+            />
+          </label>
+        </FormSection>
+
+        <FormSection step={2} title={t("sectionBody", "en")}>
+          <RichBodyEditor
+            label="Body (AR)"
             dir="rtl"
             disabled={!editable}
-            value={imageAltAr}
-            onChange={(e) => setImageAltAr(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
+            value={bodyAr}
+            onChange={setBodyAr}
           />
-        </label>
+        </FormSection>
+
+        <FormSection step={3} title={t("sectionMedia", "en")}>
+          <MediaUploadField
+            bucket="covers"
+            publicPath={coverPath}
+            mediaId={coverMediaId}
+            disabled={!editable}
+            imagesOnly
+            label="Cover image *"
+            onUploaded={({ publicPath, mediaId }) => {
+              setCoverPath(publicPath);
+              setCoverMediaId(mediaId);
+              setAttachments((prev) => [
+                { kind: "image", src: publicPath },
+                ...prev.filter((a) => a.src !== coverPath),
+              ]);
+            }}
+          />
+          <MediaAttachmentsField
+            bucket="covers"
+            items={attachments}
+            disabled={!editable}
+            onChange={(next) => {
+              setAttachments(next);
+              const firstImg = next.find((a) => a.kind === "image");
+              if (firstImg) setCoverPath(firstImg.src);
+            }}
+          />
+          <label className="text-sm">
+            <span className="font-medium">Cover alt (AR) *</span>
+            <input
+              dir="rtl"
+              disabled={!editable}
+              value={imageAltAr}
+              onChange={(e) => setImageAltAr(e.target.value)}
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
+            />
+          </label>
+        </FormSection>
 
         <AdvancedDisclosure
+          step={4}
           title={t("sectionAdvanced", "en")}
           hint={t("sectionAdvancedHint", "en")}
         >
@@ -353,7 +371,7 @@ export function PublicationEditorForm({
               disabled={!editable}
               value={titleEn}
               onChange={(e) => setTitleEn(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             />
           </label>
           <label className="text-sm">
@@ -362,7 +380,7 @@ export function PublicationEditorForm({
               disabled={!editable}
               value={deptEn}
               onChange={(e) => setDeptEn(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             />
           </label>
           <label className="text-sm">
@@ -371,7 +389,7 @@ export function PublicationEditorForm({
               disabled={!editable}
               value={descEn}
               onChange={(e) => setDescEn(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
               rows={2}
             />
           </label>
@@ -381,7 +399,7 @@ export function PublicationEditorForm({
               disabled={!editable}
               value={imageAltEn}
               onChange={(e) => setImageAltEn(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             />
           </label>
           <label className="text-sm">
@@ -391,7 +409,7 @@ export function PublicationEditorForm({
               disabled={!editable}
               value={publicSlug}
               onChange={(e) => setPublicSlug(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2 font-mono text-xs"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink font-mono text-xs"
             />
           </label>
           <label className="text-sm">
@@ -400,7 +418,7 @@ export function PublicationEditorForm({
               disabled={!editable}
               value={enStatus}
               onChange={(e) => setEnStatus(e.target.value as "pending" | "ready")}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             >
               <option value="pending">pending</option>
               <option value="ready">ready</option>
@@ -417,59 +435,61 @@ export function PublicationEditorForm({
           />
         </AdvancedDisclosure>
 
-        <div className="flex flex-wrap gap-2">
-          {mode === "create" ? (
-            <button
-              type="submit"
-              disabled={pending}
-              className="rounded bg-zinc-900 px-4 py-2 text-sm text-white disabled:opacity-60"
-            >
-              {pending ? "Saving…" : "Create draft"}
-            </button>
-          ) : null}
-          {mode === "edit" && editable && isAuthor ? (
-            <>
+        <FormStickyActions>
+          <div className="flex w-full flex-wrap items-center justify-end gap-2">
+            {mode === "create" ? (
+              <button
+                type="submit"
+                disabled={pending}
+                className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
+              >
+                {pending ? "Saving…" : "Create draft"}
+              </button>
+            ) : null}
+            {mode === "edit" && editable && isAuthor ? (
+              <>
+                <button
+                  type="button"
+                  disabled={pending}
+                  className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60"
+                  onClick={() => void run("save", { fields: fields() })}
+                >
+                  Save draft
+                </button>
+                {canSubmit ? (
+                  <label className="me-auto flex items-center gap-2 text-sm text-crs-ink">
+                    <input
+                      type="checkbox"
+                      checked={checklist}
+                      onChange={(e) => setChecklist(e.target.checked)}
+                    />
+                    Checklist OK
+                  </label>
+                ) : null}
+                {canSubmit ? (
+                  <button
+                    type="button"
+                    disabled={pending || !checklist}
+                    className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
+                    onClick={() => void run("submit", { checklistConfirmed: checklist })}
+                  >
+                    Submit for review
+                  </button>
+                ) : null}
+              </>
+            ) : null}
+            {mode === "edit" && initial?.status === "submitted" && isAuthor ? (
               <button
                 type="button"
                 disabled={pending}
-                className="rounded bg-zinc-900 px-4 py-2 text-sm text-white"
-                onClick={() => void run("save", { fields: fields() })}
+                className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg"
+                onClick={() => void run("withdraw")}
               >
-                Save draft
+                Withdraw
               </button>
-              {canSubmit ? (
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={checklist}
-                    onChange={(e) => setChecklist(e.target.checked)}
-                  />
-                  Checklist OK
-                </label>
-              ) : null}
-              {canSubmit ? (
-                <button
-                  type="button"
-                  disabled={pending || !checklist}
-                  className="rounded border px-4 py-2 text-sm disabled:opacity-60"
-                  onClick={() => void run("submit", { checklistConfirmed: checklist })}
-                >
-                  Submit for review
-                </button>
-              ) : null}
-            </>
-          ) : null}
-          {mode === "edit" && initial?.status === "submitted" && isAuthor ? (
-            <button
-              type="button"
-              disabled={pending}
-              className="rounded border px-4 py-2 text-sm"
-              onClick={() => void run("withdraw")}
-            >
-              Withdraw
-            </button>
-          ) : null}
-        </div>
+            ) : null}
+          </div>
+        </FormStickyActions>
       </form>
 
       {mode === "edit" && canReview && initial?.status === "submitted" ? (
@@ -479,14 +499,14 @@ export function PublicationEditorForm({
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Note for changes / rejection"
-            className="w-full rounded border px-3 py-2 text-sm"
+            className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             rows={2}
           />
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
               disabled={pending}
-              className="rounded bg-zinc-900 px-3 py-1.5 text-sm text-white"
+              className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white"
               onClick={() => void run("approve")}
             >
               Approve
@@ -494,7 +514,7 @@ export function PublicationEditorForm({
             <button
               type="button"
               disabled={pending}
-              className="rounded border px-3 py-1.5 text-sm"
+              className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg"
               onClick={() => void run("request_changes", { note })}
             >
               Request changes
@@ -502,7 +522,7 @@ export function PublicationEditorForm({
             <button
               type="button"
               disabled={pending}
-              className="rounded border border-red-300 px-3 py-1.5 text-sm text-red-700"
+              className="inline-flex min-h-11 items-center rounded-lg border border-red-300 bg-crs-surface px-3 py-2 text-sm text-red-700 hover:bg-red-50"
               onClick={() => void run("reject", { note })}
             >
               Reject
@@ -534,7 +554,7 @@ export function PublicationEditorForm({
         <button
           type="button"
           disabled={pending}
-          className="w-fit rounded bg-emerald-700 px-4 py-2 text-sm text-white"
+          className="w-fit rounded bg-crs-primary px-4 py-2 text-sm text-white"
           onClick={() => void run("publish")}
         >
           Publish to public publications.json
@@ -546,7 +566,7 @@ export function PublicationEditorForm({
           <button
             type="button"
             disabled={pending}
-            className="w-fit rounded border border-emerald-300 px-4 py-2 text-sm text-emerald-800"
+            className="w-fit rounded border border-crs-secondary/40 px-4 py-2 text-sm text-crs-primary"
             onClick={() => void run("start_revision")}
           >
             Create revision (public stays live)
@@ -555,7 +575,7 @@ export function PublicationEditorForm({
             <button
               type="button"
               disabled={pending}
-              className="w-fit rounded border px-4 py-2 text-sm"
+              className="w-fit inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg"
               onClick={() => void run("unpublish")}
             >
               Unpublish

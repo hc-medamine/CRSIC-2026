@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { cmsToast } from "@/app/dashboard/cms-toast";
 import type { ContentType, OrgUnit } from "@/lib/users";
 
 const SPA_TYPES: ContentType[] = ["news", "event", "publication", "partner", "alert"];
@@ -63,10 +64,13 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Create failed");
+        const msg = data.error ?? "Create failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
       setMessage("Org unit created with the fixed type set for its kind.");
+      cmsToast.success("Org unit created with the fixed type set for its kind.");
       setNewId("");
       setNewNameAr("");
       setNewNameEn("");
@@ -107,10 +111,13 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Update failed");
+        const msg = data.error ?? "Update failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
       setMessage("Org unit updated.");
+      cmsToast.success("Org unit updated.");
       setEditId(null);
       await refresh();
     } finally {
@@ -128,14 +135,16 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
       error?: string;
     };
     if (!impactRes.ok || !impactData.ok || !impactData.impact) {
-      setError(impactData.error ?? "Could not check delete impact");
+      const msg = impactData.error ?? "Could not check delete impact";
+      setError(msg);
+      cmsToast.error(msg);
       return;
     }
     const { contentCount, userScopeCount, reviewerClaim } = impactData.impact;
     if (contentCount > 0) {
-      setError(
-        `Cannot delete "${o.id}": ${contentCount} content item(s) still use it. Move content first.`,
-      );
+      const msg = `Cannot delete "${o.id}": ${contentCount} content item(s) still use it. Move content first.`;
+      setError(msg);
+      cmsToast.error(msg);
       return;
     }
     const ok = window.confirm(
@@ -153,10 +162,14 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Delete failed");
+        const msg = data.error ?? "Delete failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
-      setMessage(`Deleted ${o.id}.`);
+      const msg = `Deleted ${o.id}.`;
+      setMessage(msg);
+      cmsToast.success(msg);
       if (editId === o.id) setEditId(null);
       await refresh();
     } finally {
@@ -169,8 +182,8 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {message ? <p className="text-sm text-green-700">{message}</p> : null}
 
-      <section className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-700">
-        <p className="font-medium text-zinc-900">Fixed content-type sets by org kind</p>
+      <section className="rounded-lg border border-crs-border bg-crs-bg px-4 py-3 text-sm text-crs-ink/90">
+        <p className="font-medium text-crs-ink">Fixed content-type sets by org kind</p>
         <ul className="mt-2 list-disc ps-5 text-xs">
           <li>
             <span className="font-medium">Centre-wide:</span> {SPA_TYPES.join(", ")} (SPA
@@ -191,10 +204,10 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
 
       <form
         onSubmit={createOrg}
-        className="grid gap-3 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm"
+        className="grid gap-3 cms-form rounded-2xl border border-crs-border bg-crs-surface p-6 shadow-sm"
       >
-        <h2 className="text-lg font-medium text-zinc-900">Create org unit</h2>
-        <p className="text-xs text-zinc-500">
+        <h2 className="text-lg font-medium text-crs-ink">Create org unit</h2>
+        <p className="text-xs text-crs-muted">
           Type catalogs are fixed by kind. Create research groups and projects from the Research
           nav after assigning Editors to the dept.
         </p>
@@ -205,7 +218,7 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
               required
               value={newNameEn}
               onChange={(e) => setNewNameEn(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             />
           </label>
           <label className="text-sm">
@@ -215,7 +228,7 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
               dir="rtl"
               value={newNameAr}
               onChange={(e) => setNewNameAr(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             />
           </label>
           <label className="text-sm">
@@ -223,7 +236,7 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
             <select
               value={newKind}
               onChange={(e) => setNewKind(e.target.value as "centre_wide" | "research_dept")}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             >
               <option value="research_dept">Research department</option>
               <option value="centre_wide">Centre-wide</option>
@@ -234,7 +247,7 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
             <input
               value={newId}
               onChange={(e) => setNewId(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2 font-mono text-xs"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink font-mono text-xs"
               placeholder="auto from EN name"
             />
           </label>
@@ -244,27 +257,27 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
               type="number"
               value={newSort}
               onChange={(e) => setNewSort(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
               placeholder="auto"
             />
           </label>
         </div>
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-crs-muted">
           Will assign:{" "}
           {(newKind === "centre_wide" ? SPA_TYPES : RESEARCH_TYPES).join(", ")}
         </p>
         <button
           type="submit"
           disabled={pending}
-          className="w-fit rounded bg-zinc-900 px-4 py-2 text-sm text-white disabled:opacity-60"
+          className="w-fit rounded-lg bg-crs-primary hover:bg-crs-secondary px-4 py-2 text-sm text-white disabled:opacity-60"
         >
           {pending ? "Saving…" : "Create"}
         </button>
       </form>
 
-      <section className="overflow-x-auto rounded-lg border border-zinc-200 bg-white shadow-sm">
+      <section className="overflow-x-auto rounded-2xl border border-crs-border bg-crs-surface shadow-sm">
         <table className="min-w-full text-left text-sm">
-          <thead className="border-b bg-zinc-50 text-zinc-600">
+          <thead className="border-b bg-crs-bg text-crs-muted">
             <tr>
               <th className="px-3 py-2">Id</th>
               <th className="px-3 py-2">Names</th>
@@ -297,7 +310,7 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
                   ) : (
                     <>
                       <div className="font-medium">{o.name_en}</div>
-                      <div dir="rtl" className="text-zinc-500">
+                      <div dir="rtl" className="text-crs-muted">
                         {o.name_ar}
                       </div>
                     </>
@@ -318,7 +331,7 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
                   ) : (
                     <>
                       <div>{o.kind}</div>
-                      <div className="mt-1 text-xs text-zinc-500">
+                      <div className="mt-1 text-xs text-crs-muted">
                         {(o.content_types ?? []).join(", ") || "—"}
                       </div>
                     </>

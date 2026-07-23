@@ -1,115 +1,27 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { requireUser } from "@/lib/auth/session";
-import { getQueues, type QueueItem } from "@/lib/content/queues";
+import { getQueues } from "@/lib/content/queues";
 import { listPendingReviewOwnerProposals } from "@/lib/content/delegation";
 import { listNeedsPostReview } from "@/lib/content/emergency";
-import { canAccessContentType } from "@/lib/content/permissions";
+import { canEditAsAuthor, getNavContentTypes } from "@/lib/content/permissions";
+import { contentPathSegment } from "@/lib/content/lifecycle";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
+import type { ContentType } from "@/lib/users";
 import { HomeTipBanner } from "./home-tip-banner";
+import { CreateContentMenu } from "./create-content-menu";
+import { IconArrow, IconDoc, IconGlobe, IconInbox } from "./cms-icons";
+import { QueueCard } from "./ui-bits";
 
-const TYPE_BADGE: Record<QueueItem["contentType"], string> = {
-  news: "News",
-  event: "Event",
-  publication: "Publication",
-  partner: "Partner",
-  alert: "Alert",
-  research_group: "Research group",
-  research_project: "Research project",
+const CREATE_LABEL_KEY: Record<ContentType, string> = {
+  news: "news",
+  event: "events",
+  publication: "publications",
+  partner: "partners",
+  alert: "alerts",
+  research_group: "researchGroups",
+  research_project: "researchProjects",
 };
-
-function QueueList({
-  title,
-  items,
-  emptyLabel,
-  emptyCta,
-  showAuthor,
-  showNote,
-  maxVisible,
-  hideWhenEmpty,
-  quiet,
-  moreLabel,
-}: {
-  title: string;
-  items: QueueItem[];
-  emptyLabel: string;
-  emptyCta?: { href: string; label: string };
-  showAuthor?: boolean;
-  showNote?: boolean;
-  /** Cap list length for dense queues (e.g. EN pending). */
-  maxVisible?: number;
-  /** Skip the card entirely when there is nothing to show. */
-  hideWhenEmpty?: boolean;
-  /** Secondary/overview styling — less visual weight. */
-  quiet?: boolean;
-  moreLabel: string;
-}) {
-  if (hideWhenEmpty && items.length === 0) return null;
-
-  const visible =
-    typeof maxVisible === "number" && maxVisible > 0 ? items.slice(0, maxVisible) : items;
-  const hiddenCount = items.length - visible.length;
-  const shell = quiet
-    ? "rounded-lg border border-zinc-100 bg-zinc-50/60"
-    : "rounded-lg border border-zinc-200 bg-white shadow-sm";
-
-  return (
-    <section className={shell}>
-      <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3">
-        <h2 className={`text-sm font-semibold ${quiet ? "text-zinc-700" : "text-zinc-900"}`}>
-          {title}
-        </h2>
-        <span
-          className={`rounded-full px-2 py-0.5 text-xs ${
-            quiet ? "bg-zinc-200/80 text-zinc-600" : "bg-zinc-100 text-zinc-600"
-          }`}
-        >
-          {items.length}
-        </span>
-      </div>
-      {items.length === 0 ? (
-        <div className="px-4 py-4 text-sm text-zinc-500">
-          <p>{emptyLabel}</p>
-          {emptyCta ? (
-            <Link href={emptyCta.href} className="mt-2 inline-block text-zinc-800 underline">
-              {emptyCta.label}
-            </Link>
-          ) : null}
-        </div>
-      ) : (
-        <ul className="divide-y divide-zinc-100">
-          {visible.map((item) => (
-            <li key={item.id} className="px-4 py-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <Link href={item.href} className="font-medium text-zinc-900 underline" dir="auto">
-                  {item.title}
-                </Link>
-                <span className="rounded bg-zinc-100 px-2 py-0.5 text-[11px] uppercase tracking-wide text-zinc-500">
-                  {TYPE_BADGE[item.contentType]}
-                </span>
-              </div>
-              <p className="mt-1 text-xs text-zinc-500">
-                {item.status}
-                {showAuthor && item.authorName ? ` · ${item.authorName}` : ""}
-                {` · ${item.updatedAt.slice(0, 16).replace("T", " ")}`}
-              </p>
-              {showNote && item.reviewNote ? (
-                <p className="mt-1 text-xs text-amber-700" dir="auto">
-                  {item.reviewNote}
-                </p>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-      )}
-      {hiddenCount > 0 ? (
-        <p className="border-t border-zinc-100 px-4 py-2 text-xs text-zinc-500">
-          +{hiddenCount} {moreLabel}
-        </p>
-      ) : null}
-    </section>
-  );
-}
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -120,218 +32,150 @@ export default async function DashboardPage() {
   const pendingOwners =
     user.role === "super_admin" ? await listPendingReviewOwnerProposals() : [];
   const needsPostReview = canReview ? await listNeedsPostReview() : [];
-  const canNews = await canAccessContentType(user, "news");
+  const navTypes = canEditAsAuthor(user) ? await getNavContentTypes(user) : [];
+  const createOptions = navTypes.map((type) => ({
+    href: `/dashboard/${contentPathSegment(type)}/new`,
+    label: t(CREATE_LABEL_KEY[type], lang),
+  }));
 
-  const subtitle =
-    user.role === "editor"
-      ? t("homeSubtitleEditor", lang)
-      : user.role === "reviewer"
-        ? t("homeSubtitleReviewer", lang)
-        : t("homeSubtitleSa", lang);
-
+  const firstName = user.displayName.trim().split(/\s+/)[0] || user.displayName;
   const primaryReview = queues.awaitingReview[0];
   const primaryDraft = queues.myDrafts[0];
   const primaryRevision = queues.needsRevision[0];
-  const primaryEn = queues.englishPending[0];
-  const moreLabel = t("moreInQueue", lang);
+
+  const primaryCta = canReview
+    ? primaryReview
+      ? { href: primaryReview.href, label: t("openNextReview", lang) }
+      : null
+    : primaryRevision
+      ? { href: primaryRevision.href, label: t("ctaFixRevision", lang) }
+      : primaryDraft
+        ? { href: primaryDraft.href, label: t("ctaContinueDraft", lang) }
+        : null;
+
+  const draftsQueue =
+    queues.needsRevision.length > 0
+      ? [...queues.needsRevision, ...queues.myDrafts]
+      : queues.myDrafts;
+
+  const hasNews = navTypes.includes("news");
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 px-6 py-8 font-sans">
-      <header className="border-b border-zinc-200 pb-4">
-        <p className="text-sm uppercase tracking-wide text-zinc-500">CRSIC CMS</p>
-        <h1 className="text-2xl font-semibold text-zinc-900">{t("homeTitle", lang)}</h1>
-        <p className="mt-1 text-sm text-zinc-600">
-          {subtitle} · {user.displayName} · {user.role}
-        </p>
+    <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-8 font-sans lg:px-10">
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">
+            {t("welcomeBack", lang)}, {firstName}.
+          </h1>
+          <p className="mt-3 text-lg font-medium text-crs-ink">{t("yourQueues", lang)}</p>
+          <p className="mt-1 text-sm text-crs-muted">{t("queuesSubtitle", lang)}</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {primaryCta ? (
+            <Link
+              href={primaryCta.href}
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-crs-primary px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-crs-secondary"
+            >
+              {primaryCta.label}
+              <IconArrow className="h-4 w-4" />
+            </Link>
+          ) : null}
+          <CreateContentMenu options={createOptions} menuLabel={t("ctaCreate", lang)} />
+        </div>
       </header>
 
       <HomeTipBanner lang={lang} />
 
-      <div className="flex flex-wrap gap-2">
-        {canReview && primaryReview ? (
-          <Link
-            href={primaryReview.href}
-            className="rounded bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-          >
-            {t("ctaReviewNext", lang)}
-          </Link>
-        ) : null}
-        {!canReview && primaryRevision ? (
-          <Link
-            href={primaryRevision.href}
-            className="rounded bg-amber-700 px-3 py-2 text-sm font-medium text-white hover:bg-amber-800"
-          >
-            {t("ctaFixRevision", lang)}
-          </Link>
-        ) : null}
-        {!canReview && primaryDraft ? (
-          <Link
-            href={primaryDraft.href}
-            className="rounded bg-zinc-900 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800"
-          >
-            {t("ctaContinueDraft", lang)}
-          </Link>
-        ) : null}
-        {canNews ? (
-          <Link
-            href="/dashboard/news/new"
-            className="rounded border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 hover:bg-zinc-50"
-          >
-            {t("ctaCreateNews", lang)}
-          </Link>
-        ) : (
-          <Link
-            href="/dashboard/news"
-            className="rounded border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-800 hover:bg-zinc-50"
-          >
-            {t("ctaBrowseContent", lang)}
-          </Link>
-        )}
-        {queues.englishPending.length > 0 && primaryEn ? (
-          <Link
-            href={primaryEn.href}
-            className="rounded border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100"
-          >
-            {t("ctaEnglishNext", lang)} ({queues.englishPending.length})
-          </Link>
-        ) : null}
-      </div>
+      {canReview && needsPostReview.length > 0 ? (
+        <section className="rounded-2xl border border-red-200 bg-crs-surface p-4 shadow-sm">
+          <h2 className="text-sm font-semibold text-red-950">Needs post-publication review</h2>
+          <ul className="mt-3 divide-y divide-crs-border/70">
+            {needsPostReview.map((p) => (
+              <li key={p.id} className="py-3">
+                <Link href={p.href} className="font-medium text-crs-ink underline" dir="auto">
+                  {p.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* Primary work — always visible */}
-        {canReview && needsPostReview.length > 0 ? (
-          <section className="rounded-lg border border-red-200 bg-white shadow-sm md:col-span-2">
-            <div className="flex items-center justify-between border-b border-red-100 px-4 py-3">
-              <h2 className="text-sm font-semibold text-red-950">
-                Needs post-publication review
-              </h2>
-              <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800">
-                {needsPostReview.length}
-              </span>
-            </div>
-            <ul className="divide-y divide-zinc-100">
-              {needsPostReview.map((p) => (
-                <li key={p.id} className="px-4 py-3">
-                  <Link href={p.href} className="font-medium underline" dir="auto">
-                    {p.title}
-                  </Link>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    {p.publishedByName ? `by ${p.publishedByName}` : "Emergency"}
-                    {p.publishedAt ? ` · ${p.publishedAt.slice(0, 16).replace("T", " ")}` : ""}
-                  </p>
-                  {p.reason ? (
-                    <p className="mt-1 text-xs text-red-800" dir="auto">
-                      {p.reason}
-                    </p>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
+      {user.role === "super_admin" && pendingOwners.length > 0 ? (
+        <section className="rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm">
+          <h2 className="text-sm font-semibold text-crs-ink">Pending review-owner proposals</h2>
+          <ul className="mt-3 divide-y divide-crs-border/70">
+            {pendingOwners.map((p) => (
+              <li key={p.id} className="py-3">
+                <Link href={p.href} className="font-medium text-crs-ink underline" dir="auto">
+                  {p.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
-        {user.role === "super_admin" && pendingOwners.length > 0 ? (
-          <section className="rounded-lg border border-zinc-200 bg-white shadow-sm md:col-span-2">
-            <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3">
-              <h2 className="text-sm font-semibold text-zinc-900">
-                Pending review-owner proposals
-              </h2>
-              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
-                {pendingOwners.length}
-              </span>
-            </div>
-            <ul className="divide-y divide-zinc-100">
-              {pendingOwners.map((p) => (
-                <li key={p.id} className="px-4 py-3">
-                  <Link href={p.href} className="font-medium underline" dir="auto">
-                    {p.title}
-                  </Link>
-                  <p className="mt-1 text-xs text-zinc-500">
-                    Propose {p.proposedOwnerName ?? "—"}
-                    {p.proposedByName ? ` · by ${p.proposedByName}` : ""}
-                    {p.proposedAt ? ` · ${p.proposedAt.slice(0, 16).replace("T", " ")}` : ""}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
-
-        {canReview ? (
-          <QueueList
-            title={t("awaitingReview", lang)}
-            items={queues.awaitingReview}
-            emptyLabel={t("emptyAwaitingReview", lang)}
-            showAuthor
-            moreLabel={moreLabel}
-          />
-        ) : null}
-
-        <QueueList
-          title={t("needsRevision", lang)}
-          items={queues.needsRevision}
-          emptyLabel={t("emptyNeedsRevision", lang)}
-          showAuthor={canReview}
-          showNote
-          moreLabel={moreLabel}
-        />
-        <QueueList
-          title={t("myDrafts", lang)}
-          items={queues.myDrafts}
+      <div className="grid gap-4 lg:grid-cols-3">
+        <QueueCard
+          title={t("draftsNeedingWork", lang)}
+          hint={t("draftsNeedingWorkHint", lang)}
+          icon={<IconDoc />}
+          items={draftsQueue}
           emptyLabel={t("emptyMyDrafts", lang)}
-          moreLabel={moreLabel}
+          footerHref={hasNews ? "/dashboard/news" : undefined}
+          footerLabel={t("viewAllDrafts", lang)}
         />
-
-        {/* Secondary / overview — quieter, hide when empty */}
-        <QueueList
-          title={t("englishPending", lang)}
-          items={queues.englishPending}
-          emptyLabel={t("englishPendingEmpty", lang)}
+        <QueueCard
+          title={canReview ? t("reviewInbox", lang) : t("awaitingReview", lang)}
+          hint={t("reviewInboxHint", lang)}
+          icon={<IconInbox />}
+          items={queues.awaitingReview}
+          emptyLabel={t("emptyAwaitingReview", lang)}
           showAuthor={canReview}
-          maxVisible={3}
-          hideWhenEmpty
-          quiet
-          moreLabel={moreLabel}
+          authorPrefix={t("submittedBy", lang)}
+          footerHref={canReview ? "/dashboard/news" : undefined}
+          footerLabel={t("viewFullInbox", lang)}
         />
-        <QueueList
-          title={t("rejected", lang)}
-          items={queues.rejected}
-          emptyLabel={t("noItems", lang)}
-          showAuthor={canReview}
-          showNote
-          hideWhenEmpty
-          quiet
-          moreLabel={moreLabel}
-        />
-        <QueueList
-          title={t("unpublished", lang)}
-          items={queues.unpublished}
-          emptyLabel={t("noItems", lang)}
-          showAuthor={canReview}
-          hideWhenEmpty
-          quiet
-          moreLabel={moreLabel}
-        />
-        <QueueList
+        <QueueCard
           title={t("recentlyPublished", lang)}
+          hint={t("recentlyPublishedHint", lang)}
+          icon={<IconGlobe />}
           items={queues.recentlyPublished}
           emptyLabel={t("noItems", lang)}
-          showAuthor={canReview}
-          maxVisible={5}
-          hideWhenEmpty
-          quiet
-          moreLabel={moreLabel}
+          footerHref={hasNews ? "/dashboard/news" : undefined}
+          footerLabel={t("viewAllPublished", lang)}
         />
-        {canReview ? null : (
-          <QueueList
-            title={t("awaitingReview", lang)}
-            items={queues.awaitingReview}
-            emptyLabel={t("emptyAwaitingReview", lang)}
-            hideWhenEmpty
-            quiet
-            moreLabel={moreLabel}
+        {queues.englishPending.length > 0 ? (
+          <QueueCard
+            title={t("englishPending", lang)}
+            hint={t("englishPendingEmpty", lang)}
+            icon={<IconDoc />}
+            items={queues.englishPending}
+            emptyLabel={t("englishPendingEmpty", lang)}
+            showAuthor={canReview}
           />
-        )}
+        ) : null}
+        {queues.rejected.length > 0 ? (
+          <QueueCard
+            title={t("rejected", lang)}
+            hint={t("noItems", lang)}
+            icon={<IconDoc />}
+            items={queues.rejected}
+            emptyLabel={t("noItems", lang)}
+            showAuthor={canReview}
+          />
+        ) : null}
+        {queues.unpublished.length > 0 ? (
+          <QueueCard
+            title={t("unpublished", lang)}
+            hint={t("noItems", lang)}
+            icon={<IconDoc />}
+            items={queues.unpublished}
+            emptyLabel={t("noItems", lang)}
+            showAuthor={canReview}
+          />
+        ) : null}
       </div>
     </main>
   );

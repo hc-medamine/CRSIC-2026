@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { cmsToast } from "@/app/dashboard/cms-toast";
 import { useRouter } from "next/navigation";
 
 type Editor = { id: string; display_name: string; email: string };
@@ -37,7 +38,9 @@ export function AwayPanel({ targetUserId, canManage }: Props) {
       error?: string;
     };
     if (!res.ok || !data.ok) {
-      setError(data.error ?? "Failed to load Away state");
+      const msg = data.error ?? "Failed to load Away state";
+      setError(msg);
+      cmsToast.error(msg);
       return;
     }
     setIsAway(Boolean(data.away?.isAway));
@@ -69,10 +72,14 @@ export function AwayPanel({ targetUserId, canManage }: Props) {
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Failed");
+        const msg = data.error ?? "Failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
-      setMessage(action === "set" ? "Away set." : "Away cleared.");
+      const msg = action === "set" ? "Away set." : "Away cleared.";
+      setMessage(msg);
+      cmsToast.success(msg);
       await load();
       router.refresh();
     } finally {
@@ -81,9 +88,9 @@ export function AwayPanel({ targetUserId, canManage }: Props) {
   }
 
   return (
-    <section className="grid gap-2 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-      <h2 className="text-lg font-medium text-zinc-900">Out of office (Away)</h2>
-      <p className="text-xs text-zinc-500">
+    <section className="grid gap-2 rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm">
+      <h2 className="text-lg font-medium text-crs-ink">Out of office (Away)</h2>
+      <p className="text-xs text-crs-muted">
         While Away, your review actions are frozen. Pick one Editor to elevate to temporary Reviewer.
         All Editors are notified. Role reverts when you clear Away or the until-date passes.
       </p>
@@ -94,7 +101,7 @@ export function AwayPanel({ targetUserId, canManage }: Props) {
           {delegateName ? ` · temp Reviewer: ${delegateName}` : ""}
         </p>
       ) : (
-        <p className="text-sm text-zinc-600">Not Away.</p>
+        <p className="text-sm text-crs-muted">Not Away.</p>
       )}
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {message ? <p className="text-sm text-green-700">{message}</p> : null}
@@ -106,7 +113,7 @@ export function AwayPanel({ targetUserId, canManage }: Props) {
             <select
               value={elevateId}
               onChange={(e) => setElevateId(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             >
               <option value="">— select Editor —</option>
               {editors.map((e) => (
@@ -122,14 +129,14 @@ export function AwayPanel({ targetUserId, canManage }: Props) {
               type="date"
               value={awayUntil}
               onChange={(e) => setAwayUntil(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             />
           </label>
           <button
             type="button"
             disabled={pending || !elevateId}
             onClick={() => void run("set")}
-            className="w-fit rounded bg-zinc-900 px-3 py-2 text-sm text-white disabled:opacity-60"
+            className="w-fit rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-2 text-sm text-white disabled:opacity-60"
           >
             {pending ? "Saving…" : "Set Away"}
           </button>
@@ -139,7 +146,7 @@ export function AwayPanel({ targetUserId, canManage }: Props) {
           type="button"
           disabled={pending}
           onClick={() => void run("clear")}
-          className="w-fit rounded border px-3 py-2 text-sm disabled:opacity-60"
+          className="w-fit inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60"
         >
           {pending ? "Clearing…" : "Clear Away"}
         </button>

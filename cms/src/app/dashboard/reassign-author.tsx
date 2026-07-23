@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { cmsToast } from "@/app/dashboard/cms-toast";
 import { useRouter } from "next/navigation";
 
 type ContentType =
@@ -64,10 +65,13 @@ export function ReassignAuthor({ contentItemId, contentType, currentAuthorId }: 
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Reassign failed");
+        const msg = data.error ?? "Reassign failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
       setMessage("Author reassigned.");
+      cmsToast.success("Author reassigned.");
       router.refresh();
     } finally {
       setPending(false);
@@ -75,9 +79,9 @@ export function ReassignAuthor({ contentItemId, contentType, currentAuthorId }: 
   }
 
   return (
-    <section className="grid gap-2 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-      <h2 className="text-lg font-medium text-zinc-900">Reassign author</h2>
-      <p className="text-xs text-zinc-500">
+    <section className="grid gap-2 rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm">
+      <h2 className="text-lg font-medium text-crs-ink">Reassign author</h2>
+      <p className="text-xs text-crs-muted">
         Move this item to another active user (draft / changes requested / submitted only). Audited
         as <code>content.reassign</code>. Reviewers may assign to Editors or Reviewers; only Super
         Admin may assign to a Super Admin.
@@ -88,7 +92,7 @@ export function ReassignAuthor({ contentItemId, contentType, currentAuthorId }: 
         <select
           value={target}
           onChange={(e) => setTarget(e.target.value)}
-          className="rounded border px-3 py-2 text-sm"
+          className="min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
         >
           <option value="">— select user —</option>
           {users.map((u) => (
@@ -101,7 +105,7 @@ export function ReassignAuthor({ contentItemId, contentType, currentAuthorId }: 
           type="button"
           disabled={pending || !target}
           onClick={() => void reassign()}
-          className="rounded border px-3 py-2 text-sm disabled:opacity-60"
+          className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60"
         >
           {pending ? "Reassigning…" : "Reassign"}
         </button>

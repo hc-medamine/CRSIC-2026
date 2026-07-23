@@ -36,6 +36,31 @@ export const LABELS: LabelMap = {
 
   // Home cockpit
   homeTitle: { en: "What to do next", ar: "ماذا تفعل الآن" },
+  welcomeBack: { en: "Welcome back", ar: "مرحبًا بعودتك" },
+  yourQueues: { en: "Your queues", ar: "طوابيرك" },
+  queuesSubtitle: {
+    en: "An overview of content awaiting your attention.",
+    ar: "نظرة عامة على المحتوى الذي يحتاج انتباهك.",
+  },
+  openNextReview: { en: "Open next review", ar: "افتح المراجعة التالية" },
+  draftsNeedingWork: { en: "Drafts needing work", ar: "مسودات تحتاج عملاً" },
+  draftsNeedingWorkHint: {
+    en: "Continue editing before you submit.",
+    ar: "تابع التحرير قبل الإرسال.",
+  },
+  reviewInbox: { en: "Review inbox", ar: "صندوق المراجعة" },
+  reviewInboxHint: {
+    en: "Submitted items waiting for a decision.",
+    ar: "عناصر مُرسلة بانتظار قرار.",
+  },
+  recentlyPublishedHint: {
+    en: "Latest items live on the public site.",
+    ar: "أحدث العناصر على الموقع العام.",
+  },
+  viewAllDrafts: { en: "View all drafts", ar: "عرض كل المسودات" },
+  viewFullInbox: { en: "View full inbox", ar: "عرض صندوق المراجعة" },
+  viewAllPublished: { en: "View all published", ar: "عرض المنشور" },
+  submittedBy: { en: "Submitted by", ar: "أرسله" },
   homeSubtitleEditor: {
     en: "Your drafts, revisions, and recent publishes.",
     ar: "مسوداتك والتعديلات والمنشورات الحديثة.",
@@ -52,6 +77,8 @@ export const LABELS: LabelMap = {
   ctaContinueDraft: { en: "Continue draft", ar: "تابع المسودة" },
   ctaFixRevision: { en: "Fix revision", ar: "أصلح التعديل" },
   ctaCreateNews: { en: "Create news", ar: "أنشئ خبرًا" },
+  ctaCreate: { en: "Create", ar: "أنشئ" },
+  ctaCreateContent: { en: "Create content", ar: "أنشئ محتوى" },
   ctaBrowseContent: { en: "Browse my content", ar: "تصفح محتواي" },
   homeTip: {
     en: "Tip: start from Home. Content types are under Centre content or Research.",

@@ -1,0 +1,7 @@
+{
+  "name": "crsic-2026",
+  "private": true,
+  "scripts": {
+    "spa": "npx --yes serve -l 5500 ."
+  }
+}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { cmsToast } from "@/app/dashboard/cms-toast";
 import { formatDateTime } from "@/lib/format-datetime";
 
 type Props = {
@@ -37,10 +38,13 @@ export function EscalatePanel({ contentItemId, canEscalate, escalatedAt }: Props
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Escalate failed");
+        const msg = data.error ?? "Escalate failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
       setMessage("Escalated to Super Admin.");
+      cmsToast.success("Escalated to Super Admin.");
       setNote("");
       router.refresh();
     } finally {
@@ -66,7 +70,7 @@ export function EscalatePanel({ contentItemId, canEscalate, escalatedAt }: Props
         onChange={(e) => setNote(e.target.value)}
         rows={2}
         placeholder="Why escalate?"
-        className="w-full rounded border px-3 py-2 text-sm"
+        className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
         disabled={pending}
       />
       <button

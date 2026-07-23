@@ -48,7 +48,7 @@ function Counter({ value, max }: { value: string; max: number }) {
   const n = value.trim().length;
   const over = n > max;
   return (
-    <span className={over ? "text-xs text-red-700" : "text-xs text-zinc-400"}>
+    <span className={over ? "text-xs text-red-700" : "text-xs text-crs-muted"}>
       {n}/{max}
     </span>
   );
@@ -118,9 +118,9 @@ export function SeoFieldsSection({
   }
 
   return (
-    <fieldset className="grid gap-3 rounded border border-zinc-200 bg-zinc-50/80 p-3">
-      <legend className="px-1 text-sm font-semibold text-zinc-900">SEO / share</legend>
-      <p className="text-xs text-zinc-500">
+    <fieldset className="grid gap-3 rounded border border-crs-border bg-crs-bg/80 p-3">
+      <legend className="px-1 text-sm font-semibold text-crs-ink">SEO / share</legend>
+      <p className="text-xs text-crs-muted">
         Optional. Empty fields fall back to title / summary / primary image on the public site. Max{" "}
         {META_TITLE_MAX} (title) / {META_DESCRIPTION_MAX} (description).
       </p>
@@ -149,7 +149,7 @@ export function SeoFieldsSection({
           value={value.metaTitleAr}
           maxLength={META_TITLE_MAX + 20}
           onChange={(e) => set("metaTitleAr", e.target.value)}
-          className="mt-1 w-full rounded border px-3 py-2"
+          className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
         />
       </label>
       <label className="text-sm">
@@ -162,7 +162,7 @@ export function SeoFieldsSection({
           value={value.metaTitleEn}
           maxLength={META_TITLE_MAX + 20}
           onChange={(e) => set("metaTitleEn", e.target.value)}
-          className="mt-1 w-full rounded border px-3 py-2"
+          className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
         />
       </label>
       <label className="text-sm">
@@ -176,7 +176,7 @@ export function SeoFieldsSection({
           rows={2}
           maxLength={META_DESCRIPTION_MAX + 40}
           onChange={(e) => set("metaDescriptionAr", e.target.value)}
-          className="mt-1 w-full rounded border px-3 py-2"
+          className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
         />
       </label>
       <label className="text-sm">
@@ -190,7 +190,7 @@ export function SeoFieldsSection({
           rows={2}
           maxLength={META_DESCRIPTION_MAX + 40}
           onChange={(e) => set("metaDescriptionEn", e.target.value)}
-          className="mt-1 w-full rounded border px-3 py-2"
+          className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
         />
       </label>
       <div className="text-sm">
@@ -201,14 +201,14 @@ export function SeoFieldsSection({
             value={value.ogImage}
             onChange={(e) => set("ogImage", e.target.value)}
             placeholder={ogFallbackHint || "img/cms/..."}
-            className="min-w-0 flex-1 rounded border px-3 py-2 font-mono text-xs"
+            className="min-h-11 min-w-0 flex-1 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 font-mono text-xs text-crs-ink"
           />
           {canBrowse ? (
             <button
               type="button"
               disabled={disabled}
               onClick={openPicker}
-              className="rounded border border-zinc-300 bg-white px-3 py-2 text-xs font-medium text-zinc-800 hover:bg-zinc-100 disabled:opacity-50"
+              className="rounded border border-crs-border bg-white px-3 py-2 text-xs font-medium text-crs-ink hover:bg-crs-bg disabled:opacity-50"
             >
               Browse…
             </button>
@@ -217,13 +217,13 @@ export function SeoFieldsSection({
             <button
               type="button"
               onClick={() => set("ogImage", "")}
-              className="rounded border border-zinc-300 bg-white px-3 py-2 text-xs text-zinc-600 hover:bg-zinc-100"
+              className="rounded border border-crs-border bg-white px-3 py-2 text-xs text-crs-muted hover:bg-crs-bg"
             >
               Clear
             </button>
           ) : null}
         </div>
-        <p className="mt-1 text-xs text-zinc-500">
+        <p className="mt-1 text-xs text-crs-muted">
           {canBrowse ? (
             <>
               Browse lists images in{" "}
@@ -239,13 +239,13 @@ export function SeoFieldsSection({
       {canBrowse ? (
         <dialog
           ref={dialogRef}
-          className="w-[min(36rem,calc(100vw-2rem))] max-h-[80vh] rounded-lg border border-zinc-300 bg-white p-0 shadow-xl backdrop:bg-black/40"
+          className="w-[min(36rem,calc(100vw-2rem))] max-h-[80vh] rounded-lg border border-crs-border bg-white p-0 shadow-xl backdrop:bg-black/40"
           onClose={() => setPickerOpen(false)}
         >
-          <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3">
+          <div className="flex items-center justify-between border-b border-crs-border px-4 py-3">
             <div>
-              <p className="text-sm font-semibold text-zinc-900">Select OG image</p>
-              <p className="font-mono text-xs text-zinc-500">img/cms/{ogBucket}/</p>
+              <p className="text-sm font-semibold text-crs-ink">Select OG image</p>
+              <p className="font-mono text-xs text-crs-muted">img/cms/{ogBucket}/</p>
             </div>
             <button
               type="button"
@@ -256,10 +256,10 @@ export function SeoFieldsSection({
             </button>
           </div>
           <div className="max-h-[50vh] overflow-y-auto p-3">
-            {loading ? <p className="text-sm text-zinc-500">Loading…</p> : null}
+            {loading ? <p className="text-sm text-crs-muted">Loading…</p> : null}
             {error ? <p className="text-sm text-red-600">{error}</p> : null}
             {!loading && !error && items.length === 0 ? (
-              <p className="text-sm text-zinc-500">
+              <p className="text-sm text-crs-muted">
                 No accessible images in this folder yet. Upload via the related image field first.
               </p>
             ) : null}
@@ -271,21 +271,21 @@ export function SeoFieldsSection({
                     <button
                       type="button"
                       onClick={() => pick(item.publicPath)}
-                      className={`flex w-full items-center gap-3 rounded border px-2 py-2 text-left hover:bg-zinc-50 ${
-                        selected ? "border-emerald-500 bg-emerald-50" : "border-zinc-200"
+                      className={`flex w-full items-center gap-3 rounded border px-2 py-2 text-left hover:bg-crs-bg ${
+                        selected ? "border-crs-primary bg-crs-primary/10" : "border-crs-border"
                       }`}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={`/${item.publicPath}`}
                         alt=""
-                        className="h-12 w-12 shrink-0 rounded object-cover bg-zinc-100"
+                        className="h-12 w-12 shrink-0 rounded object-cover bg-crs-bg"
                       />
                       <span className="min-w-0">
                         <span className="block truncate text-sm font-medium">
                           {item.originalFilename}
                         </span>
-                        <span className="block truncate font-mono text-[11px] text-zinc-500">
+                        <span className="block truncate font-mono text-[11px] text-crs-muted">
                           {item.publicPath}
                         </span>
                       </span>

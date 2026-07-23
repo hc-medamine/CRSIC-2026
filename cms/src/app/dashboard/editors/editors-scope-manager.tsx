@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { cmsToast } from "@/app/dashboard/cms-toast";
 import type {
   ContentType,
   EditorContentTypeClaim,
@@ -99,10 +100,13 @@ export function EditorsScopeManager({
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Save failed");
+        const msg = data.error ?? "Save failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
       setMessage("Content types updated.");
+      cmsToast.success("Content types updated.");
       await refresh();
     } finally {
       setPending(false);
@@ -111,7 +115,7 @@ export function EditorsScopeManager({
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-sm text-zinc-600">
+      <p className="text-sm text-crs-muted">
         {actorRole === "reviewer"
           ? "Editors whose org scopes overlap yours. Content types are globally exclusive and must be in the org catalog."
           : "All Editors. Prefer the full Users page for org scopes and account actions."}
@@ -120,7 +124,7 @@ export function EditorsScopeManager({
       {message ? <p className="text-sm text-green-700">{message}</p> : null}
 
       {editors.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-sm text-zinc-500">
+        <p className="rounded-lg border border-dashed border-crs-border p-6 text-sm text-crs-muted">
           No assigned editors yet.
         </p>
       ) : (
@@ -130,12 +134,12 @@ export function EditorsScopeManager({
             return (
               <li
                 key={ed.id}
-                className="grid gap-3 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm"
+                className="grid gap-3 rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm"
               >
                 <div>
-                  <p className="font-medium text-zinc-900">{ed.display_name}</p>
-                  <p className="text-xs text-zinc-500">{ed.email}</p>
-                  <p className="mt-1 text-xs text-zinc-500">
+                  <p className="font-medium text-crs-ink">{ed.display_name}</p>
+                  <p className="text-xs text-crs-muted">{ed.email}</p>
+                  <p className="mt-1 text-xs text-crs-muted">
                     Orgs:{" "}
                     {ed.org_unit_ids.map((id) => orgName(id)).join(", ") || "—"}
                   </p>
@@ -152,7 +156,7 @@ export function EditorsScopeManager({
                       return (
                         <label
                           key={t}
-                          className={`flex items-center gap-1.5 ${blocked && !checked ? "text-zinc-400" : ""}`}
+                          className={`flex items-center gap-1.5 ${blocked && !checked ? "text-crs-muted" : ""}`}
                           title={
                             !inCatalog
                               ? "Not in org catalog"
@@ -187,7 +191,7 @@ export function EditorsScopeManager({
                   type="button"
                   disabled={pending}
                   onClick={() => void save(ed.id)}
-                  className="w-fit rounded bg-zinc-900 px-3 py-1.5 text-sm text-white disabled:opacity-60"
+                  className="w-fit rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white disabled:opacity-60"
                 >
                   Save
                 </button>

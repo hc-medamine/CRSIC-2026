@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { cmsToast } from "@/app/dashboard/cms-toast";
 import { formatDateTime } from "@/lib/format-datetime";
 
 type Props = {
@@ -44,18 +45,21 @@ export function EmergencyPanel({
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Failed");
+        const msg = data.error ?? "Failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
-      setMessage(
+      const msg =
         action === "publish"
           ? "Published with post-review flag."
           : action === "confirm"
             ? "Post-review confirmed."
             : action === "unpublish"
               ? "Unpublished."
-              : "Change request posted.",
-      );
+              : "Change request posted.";
+      setMessage(msg);
+      cmsToast.success(msg);
       setReason("");
       setNote("");
       router.refresh();
@@ -99,7 +103,7 @@ export function EmergencyPanel({
             onChange={(e) => setReason(e.target.value)}
             rows={2}
             placeholder="Why emergency publish?"
-            className="w-full rounded border px-3 py-2 text-sm"
+            className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             disabled={pending}
           />
           <button
@@ -126,7 +130,7 @@ export function EmergencyPanel({
                   : "The Super Admin who emergency-published cannot Confirm OK"
               }
               onClick={() => void run("confirm")}
-              className="rounded bg-zinc-900 px-3 py-1.5 text-sm text-white disabled:opacity-60"
+              className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white disabled:opacity-60"
             >
               Confirm OK
             </button>
@@ -144,14 +148,14 @@ export function EmergencyPanel({
             onChange={(e) => setNote(e.target.value)}
             rows={2}
             placeholder="Request changes (keeps live + flag)…"
-            className="w-full rounded border px-3 py-2 text-sm"
+            className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             disabled={pending}
           />
           <button
             type="button"
             disabled={pending || !note.trim()}
             onClick={() => void run("request_changes", { note })}
-            className="w-fit rounded border px-3 py-1.5 text-sm disabled:opacity-60"
+            className="inline-flex min-h-11 w-fit items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60"
           >
             Request changes
           </button>

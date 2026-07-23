@@ -17,10 +17,10 @@ export const CONTENT_BASE_URL = '';
 
 /**
  * CMS origin for A1 public preview API (no trailing slash).
- * Example: 'http://localhost:3000' → GET {base}/api/public/preview/{token}
- * Leave empty only if the SPA is served from the same origin as the CMS.
+ * Must point at the Next CMS (where GET /api/public/preview/{token} lives).
+ * Local default: CMS on :3000. Override for staging/production.
  */
-export const PREVIEW_API_BASE = '';
+export const PREVIEW_API_BASE = 'http://localhost:3000';
 
 /**
  * Resolve a content path to an absolute URL for fetch().

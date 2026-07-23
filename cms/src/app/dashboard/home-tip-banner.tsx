@@ -25,7 +25,7 @@ export function HomeTipBanner({ lang }: { lang: CmsLang }) {
     return (
       <button
         type="button"
-        className="self-start text-xs text-zinc-500 underline hover:text-zinc-800"
+        className="self-start text-xs text-crs-muted underline hover:text-crs-ink"
         onClick={() => {
           try {
             sessionStorage.removeItem(TIP_KEY);
@@ -41,11 +41,11 @@ export function HomeTipBanner({ lang }: { lang: CmsLang }) {
   }
 
   return (
-    <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+    <div className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-crs-accent/40 bg-crs-accent/10 px-4 py-3 text-sm text-crs-ink">
       <p>{t("homeTip", lang)}</p>
       <button
         type="button"
-        className="shrink-0 rounded border border-amber-300 bg-white px-2 py-1 text-xs hover:bg-amber-100"
+        className="shrink-0 rounded-lg border border-crs-accent/50 bg-crs-surface px-2 py-1 text-xs hover:bg-crs-bg"
         onClick={() => {
           try {
             sessionStorage.setItem(TIP_KEY, "1");
