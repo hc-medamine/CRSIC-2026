@@ -19,6 +19,20 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-07-23 — CMS Direction B visual + Themes decisions (branch / rollback)
+
+**Branch:** `feature/cms-direction-b-visual`  
+**Stable rollback tag:** `stable/pre-cms-b-visual` (points at pre–Direction B baseline including login-bubbles commit on `main`)
+
+**Locked**
+- CMS visual = Direction B (Soft modernize); implement after PRD **Approved**
+- Public Themes = next PRD: SA-only; catalog Default+A/B/C (+ custom JSON later); preview before live; full look (layout/nav/hero); instant rollback to Current; visitors see theme on reload/instant; theme names AR/EN
+- Ship order = CMS B first → Themes PRD after
+
+**PRD:** [2026-07-23-cms-direction-b-visual.md](./prds/2026-07-23-cms-direction-b-visual.md) (Draft)
+
+---
+
 ### 2026-07-23 — CMS UX follow-up polish (density / tip / nav)
 
 **Branch:** `feature/cms-ux-m1-nav-home`
