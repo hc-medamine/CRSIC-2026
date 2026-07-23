@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { MediaUploadField } from "@/app/dashboard/media-upload-field";
+import { MediaLightbox } from "@/app/dashboard/media-lightbox";
+import { cmsMediaSrc, isPdfPath } from "@/lib/media/cms-src";
 import type { MediaBucket } from "@/lib/media/config";
 
 type Item = {
@@ -30,14 +32,15 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
     () => (allowedBuckets.length > 0 ? allowedBuckets : (["news"] as MediaBucket[])),
     [allowedBuckets],
   );
-  const [bucket, setBucket] = useState<MediaBucket>(buckets[0]);
+  const [bucket, setBucket] = useState<MediaBucket>(buckets[0]!);
   const [items, setItems] = useState(initialItems);
   const [lastPath, setLastPath] = useState("");
   const [lastId, setLastId] = useState<string | null>(null);
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
   if (allowedBuckets.length === 0) {
     return (
-      <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-sm text-zinc-500">
+      <p className="rounded-lg border border-dashed border-crs-border p-6 text-sm text-crs-muted">
         No media buckets in your content scopes.
       </p>
     );
@@ -45,7 +48,7 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid gap-3 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
+      <div className="grid gap-3 rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm">
         <label className="text-sm">
           <span className="font-medium">Bucket</span>
           <select
@@ -55,7 +58,7 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
               setLastId(null);
               setLastPath("");
             }}
-            className="mt-1 w-full rounded border px-3 py-2"
+            className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
           >
             {buckets.map((b) => (
               <option key={b} value={b}>
@@ -90,32 +93,59 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
       </div>
 
       {items.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-sm text-zinc-500">
+        <p className="rounded-lg border border-dashed border-crs-border p-6 text-sm text-crs-muted">
           No uploads yet.
         </p>
       ) : (
-        <ul className="divide-y rounded-lg border border-zinc-200 bg-white shadow-sm">
-          {items.map((item) => (
-            <li key={item.id} className="px-4 py-3 text-sm">
-              <p className="font-medium">{item.originalFilename}</p>
-              <p className="break-all text-xs text-zinc-500">
-                {item.bucket} · {item.mimeType} · <code>{item.publicPath}</code>
-              </p>
-              <button
-                type="button"
-                className="mt-1 text-xs underline"
-                onClick={() => {
-                  setBucket(item.bucket as MediaBucket);
-                  setLastId(item.id);
-                  setLastPath(item.publicPath);
-                }}
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((item) => {
+            const src = cmsMediaSrc(item.publicPath);
+            const pdf = item.mimeType.includes("pdf") || isPdfPath(item.publicPath);
+            return (
+              <li
+                key={item.id}
+                className="flex flex-col gap-2 rounded-2xl border border-crs-border bg-crs-surface p-3 shadow-sm"
               >
-                Select to replace (same URL)
-              </button>
-            </li>
-          ))}
+                {pdf || !src ? (
+                  <div className="flex h-36 items-center justify-center rounded-xl bg-crs-bg text-sm font-semibold uppercase text-crs-muted">
+                    PDF
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="overflow-hidden rounded-xl ring-1 ring-crs-border"
+                    onClick={() => setLightboxSrc(src)}
+                    aria-label={`Preview ${item.originalFilename}`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={src}
+                      alt={item.originalFilename}
+                      className="h-36 w-full object-cover"
+                    />
+                  </button>
+                )}
+                <p className="truncate text-sm font-medium text-crs-ink">{item.originalFilename}</p>
+                <p className="break-all text-[11px] text-crs-muted">
+                  {item.bucket} · <code>{item.publicPath}</code>
+                </p>
+                <button
+                  type="button"
+                  className="text-start text-xs text-crs-primary underline"
+                  onClick={() => {
+                    setBucket(item.bucket as MediaBucket);
+                    setLastId(item.id);
+                    setLastPath(item.publicPath);
+                  }}
+                >
+                  Select to replace (same URL)
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
+      <MediaLightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />
     </div>
   );
 }

@@ -1,11 +1,11 @@
+import { LoginForm } from "./login-form";
 import { query } from "@/lib/db";
-import { LoginForm, type LoginBubble } from "./login-form";
+import type { LoginBubble } from "./login-form";
 
 function env(name: string): string {
   return (process.env[name] ?? "").trim();
 }
 
-/** Collect EDITOR1_EMAIL, EDITOR2_EMAIL, … from env (order preserved). */
 function editorEmailsFromEnv(): string[] {
   const found: { n: number; email: string }[] = [];
   for (const [key, raw] of Object.entries(process.env)) {
@@ -33,7 +33,6 @@ function passwordForUser(email: string, role: string, sharedEditorPassword: stri
   if (role === "reviewer") {
     return env("CMS_LOGIN_BUBBLE_REVIEWER_PASSWORD") || env(`CMS_LOGIN_BUBBLE_PW_${local}`);
   }
-  // All editors share CMS_LOGIN_BUBBLE_EDITOR_PASSWORD (per-user override optional).
   return (
     env(`CMS_LOGIN_BUBBLE_PW_${local}`) ||
     sharedEditorPassword ||
@@ -47,7 +46,6 @@ function rolePrefix(role: string): string {
   return "Editor";
 }
 
-/** Dev/test only — never enable NEXT_PUBLIC_CMS_LOGIN_BUBBLES in production. */
 async function loginBubbles(): Promise<LoginBubble[]> {
   const gated =
     process.env.NODE_ENV !== "production" &&
@@ -57,7 +55,6 @@ async function loginBubbles(): Promise<LoginBubble[]> {
   const sharedEditorPassword = env("CMS_LOGIN_BUBBLE_EDITOR_PASSWORD");
   const bubbles: LoginBubble[] = [];
 
-  // SA + Reviewer from DB (real accounts only).
   try {
     const result = await query<{
       email: string;
@@ -105,7 +102,6 @@ async function loginBubbles(): Promise<LoginBubble[]> {
     }
   }
 
-  // Editors: prefer EDITOR1_EMAIL…EDITORN_EMAIL (shared password).
   const envEditorEmails = editorEmailsFromEnv();
   if (envEditorEmails.length > 0 && sharedEditorPassword) {
     const nameByEmail = new Map<string, string>();
@@ -126,10 +122,7 @@ async function loginBubbles(): Promise<LoginBubble[]> {
     for (const email of envEditorEmails) {
       const password = passwordForUser(email, "editor", sharedEditorPassword);
       if (!password) continue;
-      const name =
-        nameByEmail.get(email) ||
-        email.split("@")[0] ||
-        email;
+      const name = nameByEmail.get(email) || email.split("@")[0] || email;
       bubbles.push({
         label: `Editor · ${name}`,
         email,
@@ -139,7 +132,6 @@ async function loginBubbles(): Promise<LoginBubble[]> {
     return bubbles;
   }
 
-  // Fallback: every active editor in DB with shared (or per-user) password.
   try {
     const eds = await query<{ email: string; display_name: string }>(
       `SELECT email, display_name FROM users
@@ -166,16 +158,36 @@ export default async function LoginPage() {
   const bubbles = await loginBubbles();
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-6 py-16 font-sans">
-      <div>
-        <p className="text-sm uppercase tracking-wide text-zinc-500">CRSIC CMS</p>
-        <h1 className="mt-1 text-2xl font-semibold text-zinc-900">Sign in</h1>
-        <p className="mt-2 text-sm text-zinc-600">
-          Use your institutional email. No email is sent by this app.
+    <main className="relative flex min-h-screen flex-col justify-center overflow-hidden px-6 py-16 font-sans">
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 60% at 20% 20%, rgba(45,106,79,0.12), transparent 55%), radial-gradient(ellipse 70% 50% at 90% 80%, rgba(201,168,76,0.14), transparent 50%), linear-gradient(160deg, #f7f6f2 0%, #ebe8e0 100%)",
+        }}
+        aria-hidden
+      />
+      <div className="relative mx-auto w-full max-w-md">
+        <div className="rounded-3xl border border-crs-border/80 bg-crs-surface/95 p-8 shadow-[0_20px_50px_rgba(26,46,38,0.08)] backdrop-blur">
+          <div className="mb-6 flex flex-col items-center text-center">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-crs-primary text-lg font-bold text-white shadow-sm">
+              C
+            </span>
+            <p className="mt-3 text-base font-semibold tracking-tight text-crs-ink">CRSIC</p>
+            <p className="text-[11px] uppercase tracking-[0.14em] text-crs-muted">
+              Centre CMS
+            </p>
+            <h1 className="mt-5 text-2xl font-semibold text-crs-ink">Sign in</h1>
+            <p className="mt-1.5 text-sm text-crs-muted">
+              Welcome back. Use your institutional email.
+            </p>
+          </div>
+          <LoginForm bubbles={bubbles} />
+        </div>
+        <p className="mt-6 text-center text-xs text-crs-muted">
+          No email is sent by this app. Contact your Super Admin for access.
         </p>
       </div>
-
-      <LoginForm bubbles={bubbles} />
     </main>
   );
 }

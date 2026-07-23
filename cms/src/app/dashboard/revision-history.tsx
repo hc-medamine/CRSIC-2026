@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { cmsToast } from "@/app/dashboard/cms-toast";
 import { formatDateTime } from "@/lib/format-datetime";
 
 type Revision = {
@@ -83,7 +84,9 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
       const res = await fetch(`/api/content/${contentItemId}/revisions`);
       const data = (await res.json()) as { ok: boolean; error?: string; revisions?: Revision[] };
       if (!res.ok || !data.ok || !data.revisions) {
-        setError(data.error ?? "Failed to load revisions");
+        const msg = data.error ?? "Failed to load revisions";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
       setRevisions(data.revisions);
@@ -111,10 +114,13 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Restore failed");
+        const msg = data.error ?? "Restore failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
       setMessage("Revision restored onto the editable draft.");
+      cmsToast.success("Revision restored onto the editable draft.");
       await load();
       router.refresh();
     } finally {
@@ -140,20 +146,20 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
   })();
 
   return (
-    <section className="grid gap-3 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
+    <section className="grid gap-3 rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm">
       <div>
-        <h2 className="text-lg font-medium text-zinc-900">Revision history</h2>
-        <p className="text-xs text-zinc-500">
+        <h2 className="text-lg font-medium text-crs-ink">Revision history</h2>
+        <p className="text-xs text-crs-muted">
           Select a revision to inspect. Optionally compare with a prior revision (read-only).
         </p>
       </div>
 
-      {loading ? <p className="text-sm text-zinc-500">Loading…</p> : null}
+      {loading ? <p className="text-sm text-crs-muted">Loading…</p> : null}
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {message ? <p className="text-sm text-green-700">{message}</p> : null}
 
       {!loading && revisions.length === 0 ? (
-        <p className="text-sm text-zinc-500">No revisions recorded yet.</p>
+        <p className="text-sm text-crs-muted">No revisions recorded yet.</p>
       ) : null}
 
       {revisions.length > 0 ? (
@@ -163,7 +169,7 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
             <select
               value={selectedId ?? ""}
               onChange={(e) => setSelectedId(e.target.value || null)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             >
               {revisions.map((r) => (
                 <option key={r.id} value={r.id}>
@@ -178,7 +184,7 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
             <select
               value={compareId ?? ""}
               onChange={(e) => setCompareId(e.target.value || null)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             >
               <option value="">— none —</option>
               {revisions.map((r) => (
@@ -192,9 +198,9 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
       ) : null}
 
       {selected ? (
-        <div className="rounded border border-zinc-100 bg-zinc-50 p-3 text-sm">
+        <div className="rounded border border-crs-border/70 bg-crs-bg p-3 text-sm">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-crs-muted">
               #{selected.revisionNumber} · {selected.status} ·{" "}
               {selected.authorDisplayName ?? selected.authorEmail ?? "unknown"} ·{" "}
               {formatDateTime(selected.createdAt)}
@@ -205,7 +211,7 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
                 type="button"
                 disabled={restoring}
                 onClick={() => void restore()}
-                className="rounded border border-emerald-300 px-2 py-1 text-xs text-emerald-800 hover:bg-emerald-50 disabled:opacity-60"
+                className="rounded border border-crs-secondary/40 px-2 py-1 text-xs text-crs-primary hover:bg-crs-primary/10 disabled:opacity-60"
               >
                 {restoring ? "Restoring…" : "Restore this revision (→ draft)"}
               </button>
@@ -215,7 +221,7 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
           <div className="mt-3 overflow-x-auto">
             <table className="w-full min-w-[28rem] border-collapse text-left text-xs">
               <thead>
-                <tr className="border-b border-zinc-200 text-zinc-500">
+                <tr className="border-b border-crs-border text-crs-muted">
                   <th className="py-1 pr-2 font-medium">Field</th>
                   <th className="py-1 pr-2 font-medium">Selected</th>
                   {compare ? <th className="py-1 font-medium">Compare #{compare.revisionNumber}</th> : null}
@@ -231,7 +237,7 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
                       key={key}
                       className={changed ? "bg-amber-50" : undefined}
                     >
-                      <td className="py-1 pr-2 align-top font-mono text-[11px] text-zinc-600">{key}</td>
+                      <td className="py-1 pr-2 align-top font-mono text-[11px] text-crs-muted">{key}</td>
                       <td className="py-1 pr-2 align-top break-all" dir="auto">
                         {a}
                       </td>

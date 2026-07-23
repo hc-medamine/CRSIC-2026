@@ -11,14 +11,14 @@ export default async function NewPartnerPage() {
   const orgs = await listSelectableOrgUnits(user, "partner");
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 px-6 py-12 font-sans">
-      <header className="flex items-center justify-between border-b border-zinc-200 pb-4">
+    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
+      <header className="flex items-center justify-between border-b border-crs-border pb-4">
         <div>
-          <p className="text-sm uppercase tracking-wide text-zinc-500">Partners</p>
-          <h1 className="text-2xl font-semibold">Create partner</h1>
+          <p className="text-sm uppercase tracking-wide text-crs-muted">Partners</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">Create partner</h1>
         </div>
-        <Link href="/dashboard/partners" className="text-sm underline">
-          ← Back
+        <Link href="/dashboard/partners" className="inline-flex min-h-11 items-center text-sm text-crs-primary hover:underline">
+          Back
         </Link>
       </header>
       <PartnerEditorForm mode="create" orgUnits={orgs} />

@@ -23,7 +23,29 @@ export type PreviewRecord = {
 };
 
 function publicSiteBase(): string {
-  return (process.env.PUBLIC_SITE_URL || "").trim().replace(/\/$/, "");
+  const configured = (process.env.PUBLIC_SITE_URL || "").trim().replace(/\/$/, "");
+  if (configured) return configured;
+  // Local Live Server / static SPA default when env is unset (dev only).
+  if (process.env.NODE_ENV !== "production") return "http://localhost:5500";
+  return "";
+}
+
+export function isPublicSiteConfigured(): boolean {
+  return Boolean((process.env.PUBLIC_SITE_URL || "").trim());
+}
+
+export function getPublicSiteBaseForClient(): {
+  baseUrl: string | null;
+  configured: boolean;
+  usingDevFallback: boolean;
+} {
+  const configured = isPublicSiteConfigured();
+  const base = publicSiteBase();
+  return {
+    baseUrl: base || null,
+    configured,
+    usingDevFallback: !configured && Boolean(base),
+  };
 }
 
 async function purgeExpired(): Promise<void> {
@@ -63,6 +85,8 @@ export async function createPreviewToken(
   expiresAt: string;
   hash: string;
   publicUrl: string | null;
+  siteConfigured: boolean;
+  usingDevFallback: boolean;
 }> {
   const itemMeta = await getContentMeta(contentItemId);
   if (!itemMeta) throw new Error("Not found");
@@ -99,13 +123,15 @@ export async function createPreviewToken(
   });
 
   const hash = `#preview/${token}`;
-  const base = publicSiteBase();
+  const site = getPublicSiteBaseForClient();
   return {
     token,
     contentType,
     expiresAt: expiresAt.toISOString(),
     hash,
-    publicUrl: base ? `${base}${hash}` : null,
+    publicUrl: site.baseUrl ? `${site.baseUrl}${hash}` : null,
+    siteConfigured: site.configured,
+    usingDevFallback: site.usingDevFallback,
   };
 }
 

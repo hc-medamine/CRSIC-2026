@@ -75,7 +75,8 @@ async function lastActorForActions(
 /**
  * People shown on Edit/review:
  * - Editor: current author (created_by)
- * - Reviewer: last who approved / requested changes / rejected
+ * - Reviewer: last who approved / requested changes / rejected;
+ *   falls back to review_owner when no review action yet (legacy / assigned owner)
  * - Publisher: last who published (no separate Publisher role in MVP)
  */
 export async function getItemPeopleMeta(contentItemId: string): Promise<ItemPeopleMeta> {
@@ -94,13 +95,14 @@ export async function getItemPeopleMeta(contentItemId: string): Promise<ItemPeop
 
   const t = row.content_type;
   const editor = await userById(row.created_by);
-  const reviewer = await lastActorForActions(contentItemId, [
+  const lastReviewer = await lastActorForActions(contentItemId, [
     `${t}.approve`,
     `${t}.changes_requested`,
     `${t}.reject`,
   ]);
   const publisher = await lastActorForActions(contentItemId, [`${t}.publish`]);
   const reviewOwner = await userById(row.review_owner_id);
+  const reviewer = lastReviewer ?? reviewOwner;
 
   return { editor, reviewer, publisher, reviewOwner };
 }

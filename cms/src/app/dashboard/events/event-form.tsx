@@ -15,7 +15,8 @@ import {
   type SeoFormState,
 } from "@/app/dashboard/seo-fields";
 import { RichBodyEditor } from "@/app/dashboard/rich-body-editor";
-import { AdvancedDisclosure, FormBanner, messageForAction } from "@/app/dashboard/form-ux";
+import { cmsToast } from "@/app/dashboard/cms-toast";
+import { AdvancedDisclosure, FormBanner, FormSection, FormStickyActions, messageForAction } from "@/app/dashboard/form-ux";
 import { t } from "@/lib/i18n/labels";
 import type { PublicMediaItem } from "@/lib/publish/media";
 
@@ -171,9 +172,12 @@ export function EventEditorForm({
       });
       const data = (await res.json()) as { ok: boolean; error?: string; item?: { id: string } };
       if (!res.ok || !data.ok || !data.item) {
-        setError(data.error ?? "Create failed");
+        const msg = data.error ?? "Create failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
+      cmsToast.success("Draft created.");
       router.push(`/dashboard/events/${data.item.id}`);
       router.refresh();
     } finally {
@@ -200,16 +204,21 @@ export function EventEditorForm({
       });
       const data = (await res.json()) as { ok: boolean; error?: string; deleted?: boolean };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Action failed");
+        const msg = data.error ?? "Action failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
       if (data.deleted) {
+        cmsToast.success("Deleted.");
         router.push("/dashboard");
         router.refresh();
         return;
       }
       const key = messageForAction(action);
-      setMessage(t(key || "savedStay", "en"));
+      const msg = t(key || "savedStay", "en");
+      setMessage(msg);
+      cmsToast.success(msg);
       router.refresh();
     } finally {
       setPending(false);
@@ -237,131 +246,140 @@ export function EventEditorForm({
 
       <form
         onSubmit={mode === "create" ? create : (e) => e.preventDefault()}
-        className="grid gap-3 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm"
+        className="flex flex-col gap-1 cms-form rounded-2xl border border-crs-border bg-crs-surface p-6 shadow-sm"
       >
-        <label className="text-sm">
-          <span className="font-medium">Organisation unit</span>
-          <select
-            disabled={!editable}
-            value={orgUnitId}
-            onChange={(e) => setOrgUnitId(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
-          >
-            {orgUnits.map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.name_en} ({o.name_ar})
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <div className="grid gap-3 sm:grid-cols-2">
+        <FormSection step={1} title={t("sectionIdentity", "en")}>
           <label className="text-sm">
-            <span className="font-medium">Scope</span>
+            <span className="font-medium">Organisation unit</span>
             <select
               disabled={!editable}
-              value={eventScope}
-              onChange={(e) => setEventScope(e.target.value as "intl" | "nat")}
-              className="mt-1 w-full rounded border px-3 py-2"
+              value={orgUnitId}
+              onChange={(e) => setOrgUnitId(e.target.value)}
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             >
-              <option value="nat">National (nat)</option>
-              <option value="intl">International (intl)</option>
+              {orgUnits.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.name_en} ({o.name_ar})
+                </option>
+              ))}
             </select>
           </label>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="text-sm">
+              <span className="font-medium">Scope</span>
+              <select
+                disabled={!editable}
+                value={eventScope}
+                onChange={(e) => setEventScope(e.target.value as "intl" | "nat")}
+                className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
+              >
+                <option value="nat">National (nat)</option>
+                <option value="intl">International (intl)</option>
+              </select>
+            </label>
+            <label className="text-sm">
+              <span className="font-medium">Display status</span>
+              <select
+                disabled={!editable}
+                value={eventDisplayStatus}
+                onChange={(e) => setEventDisplayStatus(e.target.value as "upcoming" | "done")}
+                className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
+              >
+                <option value="upcoming">upcoming</option>
+                <option value="done">done</option>
+              </select>
+            </label>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            <label className="text-sm">
+              <span className="font-medium">Day *</span>
+              <input disabled={!editable} value={eventDay} onChange={(e) => setEventDay(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" placeholder="05" />
+            </label>
+            <label className="text-sm">
+              <span className="font-medium">Month (AR display) *</span>
+              <input dir="rtl" disabled={!editable} value={eventMonth} onChange={(e) => setEventMonth(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" placeholder="ماي" />
+            </label>
+            <label className="text-sm">
+              <span className="font-medium">Year *</span>
+              <input disabled={!editable} value={eventYear} onChange={(e) => setEventYear(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" placeholder="2026" />
+            </label>
+          </div>
+
           <label className="text-sm">
-            <span className="font-medium">Display status</span>
-            <select
+            <span className="font-medium">Title (AR) *</span>
+            <input dir="rtl" required disabled={!editable} value={titleAr} onChange={(e) => setTitleAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium">Type (AR) *</span>
+            <input dir="rtl" disabled={!editable} value={eventTypeAr} onChange={(e) => setEventTypeAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" placeholder="ملتقى وطني" />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium">Summary (AR)</span>
+            <textarea
+              dir="rtl"
               disabled={!editable}
-              value={eventDisplayStatus}
-              onChange={(e) => setEventDisplayStatus(e.target.value as "upcoming" | "done")}
-              className="mt-1 w-full rounded border px-3 py-2"
-            >
-              <option value="upcoming">upcoming</option>
-              <option value="done">done</option>
-            </select>
+              value={summaryAr}
+              onChange={(e) => setSummaryAr(e.target.value)}
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
+              rows={2}
+            />
           </label>
-        </div>
+        </FormSection>
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          <label className="text-sm">
-            <span className="font-medium">Day *</span>
-            <input disabled={!editable} value={eventDay} onChange={(e) => setEventDay(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" placeholder="05" />
-          </label>
-          <label className="text-sm">
-            <span className="font-medium">Month (AR display) *</span>
-            <input dir="rtl" disabled={!editable} value={eventMonth} onChange={(e) => setEventMonth(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" placeholder="ماي" />
-          </label>
-          <label className="text-sm">
-            <span className="font-medium">Year *</span>
-            <input disabled={!editable} value={eventYear} onChange={(e) => setEventYear(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" placeholder="2026" />
-          </label>
-        </div>
-
-        <label className="text-sm">
-          <span className="font-medium">Title (AR) *</span>
-          <input dir="rtl" required disabled={!editable} value={titleAr} onChange={(e) => setTitleAr(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
-        </label>
-        <label className="text-sm">
-          <span className="font-medium">Type (AR) *</span>
-          <input dir="rtl" disabled={!editable} value={eventTypeAr} onChange={(e) => setEventTypeAr(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" placeholder="ملتقى وطني" />
-        </label>
-        <label className="text-sm">
-          <span className="font-medium">Summary (AR)</span>
-          <textarea
+        <FormSection step={2} title={t("sectionBody", "en")}>
+          <RichBodyEditor
+            label="Body (AR)"
             dir="rtl"
             disabled={!editable}
-            value={summaryAr}
-            onChange={(e) => setSummaryAr(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
-            rows={2}
+            value={bodyAr}
+            onChange={setBodyAr}
           />
-        </label>
-        <RichBodyEditor
-          label="Body (AR)"
-          dir="rtl"
-          disabled={!editable}
-          value={bodyAr}
-          onChange={setBodyAr}
-        />
-        <MediaUploadField
-          bucket="events"
-          publicPath={imagePath}
-          mediaId={imageMediaId}
-          disabled={!editable}
-          imagesOnly
-          label="Event image (optional)"
-          onUploaded={({ publicPath, mediaId }) => {
-            setImagePath(publicPath);
-            setImageMediaId(mediaId);
-            setAttachments((prev) => [{ kind: "image", src: publicPath }, ...prev.filter((a) => a.src !== imagePath)]);
-          }}
-        />
-        <MediaAttachmentsField
-          bucket="events"
-          items={attachments}
-          disabled={!editable}
-          onChange={(next) => {
-            setAttachments(next);
-            const firstImg = next.find((a) => a.kind === "image");
-            if (firstImg) setImagePath(firstImg.src);
-          }}
-        />
-        <label className="text-sm">
-          <span className="font-medium">Image alt (AR)</span>
-          <input dir="rtl" disabled={!editable} value={imageAltAr} onChange={(e) => setImageAltAr(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
-        </label>
+        </FormSection>
+
+        <FormSection step={3} title={t("sectionMedia", "en")}>
+          <MediaUploadField
+            bucket="events"
+            publicPath={imagePath}
+            mediaId={imageMediaId}
+            disabled={!editable}
+            imagesOnly
+            label="Event image (optional)"
+            onUploaded={({ publicPath, mediaId }) => {
+              setImagePath(publicPath);
+              setImageMediaId(mediaId);
+              setAttachments((prev) => [{ kind: "image", src: publicPath }, ...prev.filter((a) => a.src !== imagePath)]);
+            }}
+          />
+          <MediaAttachmentsField
+            bucket="events"
+            items={attachments}
+            disabled={!editable}
+            onChange={(next) => {
+              setAttachments(next);
+              const firstImg = next.find((a) => a.kind === "image");
+              if (firstImg) setImagePath(firstImg.src);
+            }}
+          />
+          <label className="text-sm">
+            <span className="font-medium">Image alt (AR)</span>
+            <input dir="rtl" disabled={!editable} value={imageAltAr} onChange={(e) => setImageAltAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
+          </label>
+        </FormSection>
 
         <AdvancedDisclosure
+          step={4}
           title={t("sectionAdvanced", "en")}
           hint={t("sectionAdvancedHint", "en")}
         >
           <label className="text-sm">
             <span className="font-medium">Title (EN)</span>
-            <input disabled={!editable} value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
+            <input disabled={!editable} value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
             <span className="font-medium">Type (EN)</span>
-            <input disabled={!editable} value={eventTypeEn} onChange={(e) => setEventTypeEn(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
+            <input disabled={!editable} value={eventTypeEn} onChange={(e) => setEventTypeEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
             <span className="font-medium">Summary (EN)</span>
@@ -369,7 +387,7 @@ export function EventEditorForm({
               disabled={!editable}
               value={summaryEn}
               onChange={(e) => setSummaryEn(e.target.value)}
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
               rows={2}
             />
           </label>
@@ -382,15 +400,15 @@ export function EventEditorForm({
           />
           <label className="text-sm">
             <span className="font-medium">Image alt (EN)</span>
-            <input disabled={!editable} value={imageAltEn} onChange={(e) => setImageAltEn(e.target.value)} className="mt-1 w-full rounded border px-3 py-2" />
+            <input disabled={!editable} value={imageAltEn} onChange={(e) => setImageAltEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
             <span className="font-medium">Public slug (optional)</span>
-            <input dir="auto" disabled={!editable} value={publicSlug} onChange={(e) => setPublicSlug(e.target.value)} className="mt-1 w-full rounded border px-3 py-2 font-mono text-xs" />
+            <input dir="auto" disabled={!editable} value={publicSlug} onChange={(e) => setPublicSlug(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink font-mono text-xs" />
           </label>
           <label className="text-sm">
             <span className="font-medium">EN status</span>
-            <select disabled={!editable} value={enStatus} onChange={(e) => setEnStatus(e.target.value as "pending" | "ready")} className="mt-1 w-full rounded border px-3 py-2">
+            <select disabled={!editable} value={enStatus} onChange={(e) => setEnStatus(e.target.value as "pending" | "ready")} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink">
               <option value="pending">pending</option>
               <option value="ready">ready</option>
             </select>
@@ -406,46 +424,67 @@ export function EventEditorForm({
           />
         </AdvancedDisclosure>
 
-        <div className="flex flex-wrap gap-2">
-          {mode === "create" ? (
-            <button type="submit" disabled={pending} className="rounded bg-zinc-900 px-4 py-2 text-sm text-white disabled:opacity-60">
-              {pending ? "Saving…" : "Create draft"}
-            </button>
-          ) : null}
-          {mode === "edit" && editable && isAuthor ? (
-            <>
-              <button type="button" disabled={pending} className="rounded bg-zinc-900 px-4 py-2 text-sm text-white" onClick={() => void run("save", { fields: fields() })}>
-                Save draft
+        <FormStickyActions>
+          <div className="flex w-full flex-wrap items-center justify-end gap-2">
+            {mode === "create" ? (
+              <button
+                type="submit"
+                disabled={pending}
+                className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
+              >
+                {pending ? "Saving…" : "Create draft"}
               </button>
-              {canSubmit ? (
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" checked={checklist} onChange={(e) => setChecklist(e.target.checked)} />
-                  Checklist OK
-                </label>
-              ) : null}
-              {canSubmit ? (
-                <button type="button" disabled={pending || !checklist} className="rounded border px-4 py-2 text-sm disabled:opacity-60" onClick={() => void run("submit", { checklistConfirmed: checklist })}>
-                  Submit for review
+            ) : null}
+            {mode === "edit" && editable && isAuthor ? (
+              <>
+                <button
+                  type="button"
+                  disabled={pending}
+                  className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60"
+                  onClick={() => void run("save", { fields: fields() })}
+                >
+                  Save draft
                 </button>
-              ) : null}
-            </>
-          ) : null}
-          {mode === "edit" && initial?.status === "submitted" && isAuthor ? (
-            <button type="button" disabled={pending} className="rounded border px-4 py-2 text-sm" onClick={() => void run("withdraw")}>
-              Withdraw
-            </button>
-          ) : null}
-        </div>
+                {canSubmit ? (
+                  <label className="me-auto flex items-center gap-2 text-sm text-crs-ink">
+                    <input type="checkbox" checked={checklist} onChange={(e) => setChecklist(e.target.checked)} />
+                    Checklist OK
+                  </label>
+                ) : null}
+                {canSubmit ? (
+                  <button
+                    type="button"
+                    disabled={pending || !checklist}
+                    className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
+                    onClick={() => void run("submit", { checklistConfirmed: checklist })}
+                  >
+                    Submit for review
+                  </button>
+                ) : null}
+              </>
+            ) : null}
+            {mode === "edit" && initial?.status === "submitted" && isAuthor ? (
+              <button
+                type="button"
+                disabled={pending}
+                className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg"
+                onClick={() => void run("withdraw")}
+              >
+                Withdraw
+              </button>
+            ) : null}
+          </div>
+        </FormStickyActions>
       </form>
 
       {mode === "edit" && canReview && initial?.status === "submitted" ? (
         <div className="grid gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
           <p className="text-sm font-medium">Reviewer actions</p>
-          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note for changes / rejection" className="w-full rounded border px-3 py-2 text-sm" rows={2} />
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note for changes / rejection" className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" rows={2} />
           <div className="flex flex-wrap gap-2">
-            <button type="button" disabled={pending} className="rounded bg-zinc-900 px-3 py-1.5 text-sm text-white" onClick={() => void run("approve")}>Approve</button>
-            <button type="button" disabled={pending} className="rounded border px-3 py-1.5 text-sm" onClick={() => void run("request_changes", { note })}>Request changes</button>
-            <button type="button" disabled={pending} className="rounded border border-red-300 px-3 py-1.5 text-sm text-red-700" onClick={() => void run("reject", { note })}>Reject</button>
+            <button type="button" disabled={pending} className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white" onClick={() => void run("approve")}>Approve</button>
+            <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg" onClick={() => void run("request_changes", { note })}>Request changes</button>
+            <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-red-300 bg-crs-surface px-3 py-2 text-sm text-red-700 hover:bg-red-50" onClick={() => void run("reject", { note })}>Reject</button>
           </div>
         </div>
       ) : null}
@@ -470,18 +509,18 @@ export function EventEditorForm({
       ) : null}
 
       {mode === "edit" && canReview && (initial?.status === "approved" || initial?.status === "unpublished") ? (
-        <button type="button" disabled={pending} className="w-fit rounded bg-emerald-700 px-4 py-2 text-sm text-white" onClick={() => void run("publish")}>
+        <button type="button" disabled={pending} className="w-fit rounded bg-crs-primary px-4 py-2 text-sm text-white" onClick={() => void run("publish")}>
           Publish to public events.json
         </button>
       ) : null}
 
       {mode === "edit" && (isAuthor || canReview) && initial?.status === "published" ? (
         <div className="flex flex-wrap gap-2">
-          <button type="button" disabled={pending} className="w-fit rounded border border-emerald-300 px-4 py-2 text-sm text-emerald-800" onClick={() => void run("start_revision")}>
+          <button type="button" disabled={pending} className="w-fit rounded border border-crs-secondary/40 px-4 py-2 text-sm text-crs-primary" onClick={() => void run("start_revision")}>
             Create revision (public stays live)
           </button>
           {canReview ? (
-            <button type="button" disabled={pending} className="w-fit rounded border px-4 py-2 text-sm" onClick={() => void run("unpublish")}>
+            <button type="button" disabled={pending} className="w-fit inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg" onClick={() => void run("unpublish")}>
               Unpublish
             </button>
           ) : null}

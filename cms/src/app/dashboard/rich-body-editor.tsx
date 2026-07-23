@@ -97,8 +97,8 @@ export function RichBodyEditor({ label, value, onChange, disabled, dir = "auto" 
         </button>
       </div>
       {!htmlMode ? (
-        <div className="mt-1 overflow-hidden rounded border border-zinc-300 bg-white">
-          <div className="flex flex-wrap gap-1 border-b border-zinc-200 bg-zinc-50 px-2 py-1">
+        <div className="mt-1 overflow-hidden rounded-2xl border border-crs-border bg-crs-surface">
+          <div className="flex flex-wrap gap-1 border-b border-crs-border bg-crs-bg px-2 py-1.5">
             <ToolbarBtn disabled={disabled} onClick={() => run("bold")} label="B" title="Bold" />
             <ToolbarBtn disabled={disabled} onClick={() => run("italic")} label="I" title="Italic" />
             <ToolbarBtn
@@ -142,11 +142,11 @@ export function RichBodyEditor({ label, value, onChange, disabled, dir = "auto" 
             lastEmitted.current = e.target.value;
             onChange(e.target.value);
           }}
-          className="mt-1 w-full rounded border px-3 py-2 font-mono text-xs"
+          className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink font-mono text-xs"
           rows={8}
         />
       )}
-      <p className="mt-1 text-xs text-zinc-500">
+      <p className="mt-1 text-xs text-crs-muted">
         Allowed: paragraphs, bold/italic, lists, links. Scripts and other tags are stripped on save.
       </p>
     </div>
@@ -170,7 +170,7 @@ function ToolbarBtn({
       title={title}
       disabled={disabled}
       onClick={onClick}
-      className="rounded border border-zinc-300 bg-white px-2 py-0.5 text-xs font-medium text-zinc-800 hover:bg-zinc-100 disabled:opacity-50"
+      className="min-h-9 rounded-lg border border-crs-border bg-crs-surface px-2.5 py-1 text-xs font-medium text-crs-ink hover:bg-crs-bg disabled:opacity-50"
     >
       {label}
     </button>

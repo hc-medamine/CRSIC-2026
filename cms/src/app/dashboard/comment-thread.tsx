@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
+import { cmsToast } from "@/app/dashboard/cms-toast";
 import { formatDateTime } from "@/lib/format-datetime";
 
 type Comment = {
@@ -44,7 +45,9 @@ export function CommentThread({ contentItemId, refreshToken }: Props) {
         canComment?: boolean;
       };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Failed to load comments");
+        const msg = data.error ?? "Failed to load comments";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
       setComments(data.comments ?? []);
@@ -71,28 +74,31 @@ export function CommentThread({ contentItemId, refreshToken }: Props) {
       });
       const data = (await res.json()) as { ok: boolean; error?: string; comment?: Comment };
       if (!res.ok || !data.ok || !data.comment) {
-        setError(data.error ?? "Failed to post comment");
+        const msg = data.error ?? "Failed to post comment";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
       setComments((prev) => [...prev, data.comment!]);
       setBody("");
+      cmsToast.success("Comment posted.");
     } finally {
       setPending(false);
     }
   }
 
   return (
-    <section className="rounded border border-zinc-200 bg-white p-4">
+    <section className="rounded border border-crs-border bg-white p-4">
       <h2 className="mb-3 text-lg font-semibold">Comments</h2>
-      <p className="mb-4 text-xs text-zinc-500">
+      <p className="mb-4 text-xs text-crs-muted">
         Append-only thread. Request changes / reject notes appear here automatically.
       </p>
 
-      {loading ? <p className="text-sm text-zinc-500">Loading…</p> : null}
+      {loading ? <p className="text-sm text-crs-muted">Loading…</p> : null}
       {error ? <p className="mb-3 text-sm text-red-700">{error}</p> : null}
 
       {!loading && comments.length === 0 ? (
-        <p className="mb-4 text-sm text-zinc-500">No comments yet.</p>
+        <p className="mb-4 text-sm text-crs-muted">No comments yet.</p>
       ) : null}
 
       <ul className="mb-4 flex flex-col gap-3">
@@ -101,15 +107,15 @@ export function CommentThread({ contentItemId, refreshToken }: Props) {
           const who = c.authorDisplayName || c.authorEmail || "Unknown";
           const when = formatDateTime(c.createdAt);
           return (
-            <li key={c.id} className="rounded border border-zinc-100 bg-zinc-50 px-3 py-2 text-sm">
-              <div className="mb-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
-                <span className="font-medium text-zinc-700">{who}</span>
+            <li key={c.id} className="rounded border border-crs-border/70 bg-crs-bg px-3 py-2 text-sm">
+              <div className="mb-1 flex flex-wrap items-center gap-2 text-xs text-crs-muted">
+                <span className="font-medium text-crs-ink/90">{who}</span>
                 <span>{when}</span>
                 {badge ? (
                   <span className="rounded bg-amber-100 px-1.5 py-0.5 text-amber-900">{badge}</span>
                 ) : null}
               </div>
-              <p className="whitespace-pre-wrap text-zinc-900">{c.body}</p>
+              <p className="whitespace-pre-wrap text-crs-ink">{c.body}</p>
             </li>
           );
         })}
@@ -122,19 +128,19 @@ export function CommentThread({ contentItemId, refreshToken }: Props) {
             onChange={(e) => setBody(e.target.value)}
             rows={3}
             placeholder="Add a comment…"
-            className="w-full rounded border px-3 py-2 text-sm"
+            className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             disabled={pending}
           />
           <button
             type="submit"
             disabled={pending || !body.trim()}
-            className="w-fit rounded bg-zinc-900 px-3 py-1.5 text-sm text-white disabled:opacity-50"
+            className="w-fit rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white disabled:opacity-50"
           >
             {pending ? "Posting…" : "Post comment"}
           </button>
         </form>
       ) : (
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-crs-muted">
           Only the author, Reviewer, or Super Admin can comment on this item.
         </p>
       )}

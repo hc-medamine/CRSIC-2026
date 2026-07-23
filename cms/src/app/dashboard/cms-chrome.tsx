@@ -2,11 +2,27 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { CMS_LANG_COOKIE, t, type CmsLang } from "@/lib/i18n/labels";
 import type { ContentType } from "@/lib/users";
+import {
+  IconBell,
+  IconDoc,
+  IconGlobe,
+  IconHome,
+  IconMedia,
+  IconShield,
+  IconUser,
+  IconUsers,
+} from "./cms-icons";
 
-type NavItem = { key: string; href: string; badge?: number; contentType?: ContentType };
+type NavItem = {
+  key: string;
+  href: string;
+  badge?: number;
+  contentType?: ContentType;
+  icon?: ReactNode;
+};
 
 type Props = {
   initialLang: CmsLang;
@@ -20,51 +36,31 @@ type Props = {
 };
 
 const CENTRE: NavItem[] = [
-  { key: "news", href: "/dashboard/news", contentType: "news" },
-  { key: "events", href: "/dashboard/events", contentType: "event" },
-  { key: "publications", href: "/dashboard/publications", contentType: "publication" },
-  { key: "partners", href: "/dashboard/partners", contentType: "partner" },
-  { key: "alerts", href: "/dashboard/alerts", contentType: "alert" },
+  { key: "news", href: "/dashboard/news", contentType: "news", icon: <IconDoc /> },
+  { key: "events", href: "/dashboard/events", contentType: "event", icon: <IconGlobe /> },
+  { key: "publications", href: "/dashboard/publications", contentType: "publication", icon: <IconDoc /> },
+  { key: "partners", href: "/dashboard/partners", contentType: "partner", icon: <IconUsers /> },
+  { key: "alerts", href: "/dashboard/alerts", contentType: "alert", icon: <IconBell /> },
 ];
 
 const RESEARCH: NavItem[] = [
-  { key: "researchGroups", href: "/dashboard/research-groups", contentType: "research_group" },
-  { key: "researchProjects", href: "/dashboard/research-projects", contentType: "research_project" },
+  { key: "researchGroups", href: "/dashboard/research-groups", contentType: "research_group", icon: <IconUsers /> },
+  { key: "researchProjects", href: "/dashboard/research-projects", contentType: "research_project", icon: <IconDoc /> },
 ];
-
-function linkClass(active: boolean) {
-  return active
-    ? "font-medium text-zinc-900 underline underline-offset-4"
-    : "text-zinc-600 hover:text-zinc-900";
-}
 
 function GroupLabel({ children }: { children: React.ReactNode }) {
   return (
-    <span className="shrink-0 text-[11px] font-semibold tracking-wide text-zinc-500">
+    <p className="px-3 pb-1.5 pt-5 text-[10px] font-semibold uppercase tracking-[0.08em] text-crs-muted">
       {children}
-    </span>
+    </p>
   );
 }
 
-function NavGroup({
-  label,
-  children,
-  divided,
-}: {
-  label?: string;
-  children: React.ReactNode;
-  divided?: boolean;
-}) {
-  return (
-    <span
-      className={`flex flex-wrap items-center gap-x-2.5 gap-y-1 ${
-        divided ? "border-s border-zinc-200 ps-3" : ""
-      }`}
-    >
-      {label ? <GroupLabel>{label}</GroupLabel> : null}
-      {children}
-    </span>
-  );
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0]!.slice(0, 2).toUpperCase();
+  return `${parts[0]![0] ?? ""}${parts[1]![0] ?? ""}`.toUpperCase();
 }
 
 export function CmsChrome({
@@ -114,15 +110,27 @@ export function CmsChrome({
   }
 
   function NavLink({ item }: { item: NavItem }) {
+    const active = isActive(item.href);
     return (
       <Link
         href={item.href}
-        className={linkClass(isActive(item.href))}
+        className={`relative flex min-h-11 items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${
+          active
+            ? "bg-crs-primary/10 font-semibold text-crs-primary"
+            : "text-crs-ink/75 hover:bg-crs-bg hover:text-crs-ink"
+        }`}
+        aria-current={active ? "page" : undefined}
         onClick={() => setMenuOpen(false)}
       >
-        {t(item.key, lang)}
+        {active ? (
+          <span className="absolute inset-y-2 start-0 w-1 rounded-full bg-crs-primary" aria-hidden />
+        ) : null}
+        <span className={`shrink-0 ${active ? "text-crs-primary" : "text-crs-muted"}`}>
+          {item.icon ?? <IconDoc />}
+        </span>
+        <span className="flex-1 truncate">{t(item.key, lang)}</span>
         {item.badge && item.badge > 0 ? (
-          <span className="ms-1 rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] text-white">
+          <span className="rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-medium text-white">
             {item.badge}
           </span>
         ) : null}
@@ -131,97 +139,141 @@ export function CmsChrome({
   }
 
   const utility: NavItem[] = [];
-  if (showMedia) utility.push({ key: "media", href: "/dashboard/media" });
+  if (showMedia) utility.push({ key: "media", href: "/dashboard/media", icon: <IconMedia /> });
   utility.push(
-    { key: "notifications", href: "/dashboard/notifications", badge: unread },
-    { key: "profile", href: "/dashboard/profile" },
+    { key: "notifications", href: "/dashboard/notifications", badge: unread, icon: <IconBell /> },
+    { key: "profile", href: "/dashboard/profile", icon: <IconUser /> },
   );
 
   const adminItems: NavItem[] = [];
   if (role === "super_admin") {
     adminItems.push(
-      { key: "users", href: "/dashboard/users" },
-      { key: "orgUnits", href: "/dashboard/org-units" },
-      { key: "editors", href: "/dashboard/editors" },
-      { key: "audit", href: "/dashboard/audit" },
+      { key: "users", href: "/dashboard/users", icon: <IconUsers /> },
+      { key: "orgUnits", href: "/dashboard/org-units", icon: <IconShield /> },
+      { key: "editors", href: "/dashboard/editors", icon: <IconUsers /> },
+      { key: "audit", href: "/dashboard/audit", icon: <IconShield /> },
     );
   } else if (role === "reviewer") {
-    adminItems.push({ key: "editors", href: "/dashboard/editors" });
+    adminItems.push({ key: "editors", href: "/dashboard/editors", icon: <IconUsers /> });
   }
 
-  const contentNav = (
+  const roleLabel =
+    role === "super_admin" ? "Super Admin" : role === "reviewer" ? "Reviewer" : "Editor";
+
+  const navBody = (
     <>
-      <NavLink item={{ key: "home", href: "/dashboard" }} />
+      <NavLink item={{ key: "home", href: "/dashboard", icon: <IconHome /> }} />
 
       {centreItems.length > 0 ? (
-        <NavGroup label={t("centreContent", lang)} divided>
+        <>
+          <GroupLabel>{t("centreContent", lang)}</GroupLabel>
           {centreItems.map((item) => (
             <NavLink key={item.key} item={item} />
           ))}
-        </NavGroup>
+        </>
       ) : null}
 
       {researchItems.length > 0 ? (
-        <NavGroup label={t("research", lang)} divided>
+        <>
+          <GroupLabel>{t("research", lang)}</GroupLabel>
           {researchItems.map((item) => (
             <NavLink key={item.key} item={item} />
           ))}
-        </NavGroup>
+        </>
       ) : null}
-    </>
-  );
 
-  const toolsNav = (
-    <>
       {utility.length > 0 ? (
-        <NavGroup divided={false}>
+        <>
+          <div className="mx-3 my-3 border-t border-crs-border" />
           {utility.map((item) => (
             <NavLink key={item.key} item={item} />
           ))}
-        </NavGroup>
+        </>
       ) : null}
 
       {adminItems.length > 0 ? (
-        <NavGroup label={t("admin", lang)} divided={utility.length > 0}>
+        <>
+          <GroupLabel>{t("admin", lang)}</GroupLabel>
           {adminItems.map((item) => (
             <NavLink key={item.key} item={item} />
           ))}
-        </NavGroup>
+        </>
       ) : null}
     </>
   );
 
   return (
-    <div dir={dir} lang={lang} className="min-h-full">
-      <header className="sticky top-0 z-20 border-b border-zinc-200 bg-white/90 backdrop-blur">
-        <div className="mx-auto max-w-5xl px-4 py-2">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <span className="text-sm font-semibold text-zinc-900">CRSIC CMS</span>
+    <div dir={dir} lang={lang} className="min-h-full bg-[#f3f2ed]">
+      <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-crs-border bg-crs-surface/95 px-4 backdrop-blur md:hidden">
+        <button
+          type="button"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-crs-border text-sm text-crs-ink hover:bg-crs-bg"
+          aria-expanded={menuOpen}
+          aria-controls="cms-sidebar"
+          onClick={() => setMenuOpen((o) => !o)}
+        >
+          {menuOpen ? t("menuClose", lang) : t("menuOpen", lang)}
+        </button>
+        <span className="text-sm font-semibold text-crs-ink">CRSIC</span>
+        <button
+          type="button"
+          onClick={toggleLang}
+          className="ms-auto min-h-11 rounded-xl border border-crs-border px-3 text-xs text-crs-ink hover:bg-crs-bg"
+          aria-label="Toggle language / direction"
+        >
+          {t("langToggle", lang)}
+        </button>
+      </header>
 
-            <button
-              type="button"
-              className="rounded border border-zinc-300 px-2 py-1 text-xs text-zinc-700 hover:bg-zinc-50 md:hidden"
-              aria-expanded={menuOpen}
-              aria-controls="cms-main-nav"
-              onClick={() => setMenuOpen((o) => !o)}
+      {menuOpen ? (
+        <button
+          type="button"
+          className="fixed inset-0 z-30 bg-crs-ink/40 md:hidden"
+          aria-label={t("menuClose", lang)}
+          onClick={() => setMenuOpen(false)}
+        />
+      ) : null}
+
+      <div className="flex min-h-[calc(100vh-3.5rem)] md:min-h-screen">
+        <aside
+          id="cms-sidebar"
+          className={`fixed inset-y-0 start-0 z-40 flex h-dvh max-h-dvh w-[17rem] flex-col border-e border-crs-border bg-crs-surface shadow-[1px_0_0_rgba(26,46,38,0.03)] transition-transform md:sticky md:top-0 md:z-0 md:h-screen md:max-h-screen md:translate-x-0 md:self-start ${
+            menuOpen ? "translate-x-0" : "-translate-x-full rtl:translate-x-full md:translate-x-0"
+          }`}
+        >
+          <div className="hidden shrink-0 items-center gap-3 px-5 py-5 md:flex">
+            <span
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-crs-primary text-sm font-bold text-white shadow-sm"
+              aria-hidden
             >
-              {menuOpen ? t("menuClose", lang) : t("menuOpen", lang)}
-            </button>
+              C
+            </span>
+            <div>
+              <p className="text-[15px] font-semibold tracking-tight text-crs-ink">CRSIC</p>
+              <p className="text-[11px] text-crs-muted">Content CMS</p>
+            </div>
+          </div>
 
-            {/* Desktop: content types stay on the primary row */}
-            <nav className="hidden items-center gap-x-3 gap-y-1 text-sm md:flex md:flex-wrap">
-              {contentNav}
-            </nav>
+          <nav className="min-h-0 flex-1 overflow-y-auto px-3 pb-4 pt-2" aria-label="Main">
+            {navBody}
+          </nav>
 
-            <div className="ms-auto flex items-center gap-2">
-              <span className="hidden text-xs text-zinc-500 sm:inline">
-                {t("signedInAs", lang)}{" "}
-                <span className="font-medium text-zinc-700">{displayName}</span>
+          <div className="shrink-0 border-t border-crs-border p-3">
+            <div className="flex items-center gap-3 rounded-xl px-2 py-2">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-crs-primary/15 text-xs font-semibold text-crs-primary">
+                {initials(displayName)}
               </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-crs-ink">{displayName}</p>
+                <p className="truncate text-[11px] text-crs-muted">{roleLabel}</p>
+              </div>
+            </div>
+            <p className="sr-only">{email}</p>
+            <div className="mt-2 flex gap-2">
               <button
                 type="button"
                 onClick={toggleLang}
-                className="rounded border border-zinc-300 px-2 py-1 text-xs text-zinc-700 hover:bg-zinc-50"
+                className="hidden min-h-10 flex-1 rounded-xl border border-crs-border text-xs text-crs-ink hover:bg-crs-bg md:inline-flex md:items-center md:justify-center"
                 aria-label="Toggle language / direction"
               >
                 {t("langToggle", lang)}
@@ -230,34 +282,16 @@ export function CmsChrome({
                 type="button"
                 onClick={logout}
                 disabled={pending}
-                className="rounded border border-zinc-300 px-2 py-1 text-xs text-zinc-800 hover:bg-zinc-50 disabled:opacity-60"
+                className="min-h-10 flex-1 rounded-xl border border-crs-border text-xs text-crs-ink hover:bg-crs-bg disabled:opacity-60"
               >
                 {t("logout", lang)}
               </button>
             </div>
           </div>
+        </aside>
 
-          {/* Desktop: utilities + Admin on a quieter second row */}
-          {(utility.length > 0 || adminItems.length > 0) && (
-            <nav className="mt-1.5 hidden items-center gap-x-3 gap-y-1 border-t border-zinc-100 pt-1.5 text-sm md:flex md:flex-wrap">
-              {toolsNav}
-            </nav>
-          )}
-
-          {/* Mobile accordion */}
-          <nav
-            id="cms-main-nav"
-            className={`${
-              menuOpen ? "flex" : "hidden"
-            } mt-2 w-full flex-col gap-2 border-t border-zinc-100 pt-2 text-sm md:hidden`}
-          >
-            {contentNav}
-            {toolsNav}
-          </nav>
-        </div>
-        <span className="sr-only">{email}</span>
-      </header>
-      {children}
+        <div className="min-w-0 flex-1 bg-[#f3f2ed]">{children}</div>
+      </div>
     </div>
   );
 }

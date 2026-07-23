@@ -1,56 +1,97 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listEventsForUser } from "@/lib/content/events";
 import { canAccessContentType } from "@/lib/content/permissions";
+import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { EnStatusBadge } from "@/app/dashboard/en-status-badge";
+import { ContentListFilters, filterContentItems } from "@/app/dashboard/content-list-filters";
+import { IconPlus } from "@/app/dashboard/cms-icons";
+import { PageBreadcrumb, StatusPill } from "@/app/dashboard/ui-bits";
 
-export default async function EventsListPage() {
+export default async function EventsListPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ q?: string; status?: string }>;
+}) {
   const user = await requireUser();
   if (!(await canAccessContentType(user, "event"))) redirect("/dashboard");
-  const items = await listEventsForUser(user);
+  const params = (await searchParams) ?? {};
+  const q = (params.q ?? "").trim();
+  const statusFilter = (params.status ?? "").trim();
+  const items = filterContentItems(await listEventsForUser(user), q, statusFilter);
+  const cookieStore = await cookies();
+  const lang = normalizeLang(cookieStore.get(CMS_LANG_COOKIE)?.value);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-6 px-6 py-12 font-sans">
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-200 pb-4">
+    <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
+      <PageBreadcrumb
+        items={[
+          { href: "/dashboard", label: t("home", lang) },
+          { label: t("events", lang) },
+        ]}
+      />
+      <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm uppercase tracking-wide text-zinc-500">CRSIC CMS · Step 5</p>
-          <h1 className="text-2xl font-semibold text-zinc-900">Events</h1>
-          <p className="mt-1 text-sm text-zinc-600">
-            Draft → review → publish to public events.json (intl / nat). Display status upcoming/done is manual.
-          </p>
+          <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">{t("events", lang)}</h1>
+          <p className="mt-1 text-sm text-crs-muted">Draft → review → publish</p>
         </div>
-        <div className="flex gap-3 text-sm">
-          <Link href="/dashboard/events/new" className="rounded bg-zinc-900 px-3 py-1.5 text-white">
-            New event
-          </Link>
-          <Link href="/dashboard" className="underline">
-            ← Home
-          </Link>
-        </div>
+        <Link
+          href="/dashboard/events/new"
+          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-crs-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-crs-secondary"
+        >
+          <IconPlus className="h-4 w-4" />
+          New event
+        </Link>
       </header>
 
+      <ContentListFilters q={params.q ?? ""} status={statusFilter} placeholder="Search events…" />
+
       {items.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-zinc-300 p-6 text-sm text-zinc-500">No events yet.</p>
+        <p className="rounded-2xl border border-dashed border-crs-border bg-crs-surface p-8 text-sm text-crs-muted">
+          No events yet.
+        </p>
       ) : (
-        <ul className="divide-y rounded-lg border border-zinc-200 bg-white shadow-sm">
-          {items.map((item) => (
-            <li key={item.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
-              <div>
-                <Link href={`/dashboard/events/${item.id}`} className="font-medium underline">
-                  {item.title_ar || "(untitled)"}
-                </Link>
-                <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
-                  <span>
-                    {item.status} · {item.event_scope} · {item.event_display_status} ·{" "}
-                    {item.event_day}/{item.event_month}/{item.event_year}
-                  </span>
-                  <EnStatusBadge status={item.en_status} />
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <div className="overflow-hidden rounded-2xl border border-crs-border bg-crs-surface shadow-[0_1px_3px_rgba(26,46,38,0.06)]">
+          <table className="w-full min-w-[640px] text-left text-sm">
+            <thead className="border-b border-crs-border bg-crs-bg/80 text-xs uppercase tracking-wide text-crs-muted">
+              <tr>
+                <th className="px-4 py-3 font-semibold">Title</th>
+                <th className="px-4 py-3 font-semibold">Status</th>
+                <th className="px-4 py-3 font-semibold">EN</th>
+                <th className="px-4 py-3 font-semibold">Updated</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-crs-border/70">
+              {items.map((item) => (
+                <tr key={item.id} className="hover:bg-crs-bg/50">
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/dashboard/events/${item.id}`}
+                      className="font-medium text-crs-ink hover:text-crs-primary hover:underline"
+                      dir="auto"
+                    >
+                      {item.title_ar || "(untitled)"}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-3">
+                    <StatusPill status={item.status} />
+                  </td>
+                  <td className="px-4 py-3">
+                    <EnStatusBadge status={item.en_status} />
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-crs-muted">
+                    {item.updated_at.toISOString().slice(0, 16).replace("T", " ")}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="border-t border-crs-border/70 px-4 py-3 text-xs text-crs-muted">
+            Showing {items.length} result{items.length === 1 ? "" : "s"}
+          </div>
+        </div>
       )}
     </main>
   );

@@ -2,7 +2,8 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Draft** |
+| Status | **Approved** |
+| Approved | 2026-07-23 — stakeholder Approve in chat |
 | Date | 2026-07-23 |
 | Author | Product discovery (CRSIC 2026) |
 | Owners | _(to be assigned — CRSIC + implementing team)_ |
@@ -12,7 +13,7 @@
 | Samples | Direction B mockups under Cursor assets (`B-cms*.png`) — design reference only |
 | Rollback | Git tag `stable/pre-cms-b-visual` on commit before this slice’s implementation merges |
 
-**Document rule:** Locked decisions are unmarked. Open items labeled **Open question**. No implementation until Status = **Approved**.
+**Document rule:** Locked decisions are unmarked. Open items labeled **Open question**. Status = **Approved** — implementation proceeds on `feature/cms-direction-b-visual`.
 
 ---
 
@@ -124,4 +125,4 @@ Locked stakeholder decisions for the **following** PRD (do not implement in this
 
 ## 9. Open questions
 
-_None blocking Draft → Approve for CMS B visual._ Stakeholder marks **Approved** to start implementation.
+_None. Approved 2026-07-23 — implementation on `feature/cms-direction-b-visual`._

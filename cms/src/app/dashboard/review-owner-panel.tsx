@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { cmsToast } from "@/app/dashboard/cms-toast";
 import { useRouter } from "next/navigation";
 
 type Eligible = { id: string; display_name: string; email: string; role: string };
@@ -52,10 +53,14 @@ export function ReviewOwnerPanel({
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Failed");
+        const msg = data.error ?? "Failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
-      setMessage(action === "propose" ? "Proposal sent to Super Admin." : "Saved.");
+      const msg = action === "propose" ? "Proposal sent to Super Admin." : "Saved.";
+      setMessage(msg);
+      cmsToast.success(msg);
       setTarget("");
       router.refresh();
     } finally {
@@ -68,13 +73,13 @@ export function ReviewOwnerPanel({
   }
 
   return (
-    <section className="grid gap-2 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
-      <h2 className="text-lg font-medium text-zinc-900">Review owner</h2>
-      <p className="text-xs text-zinc-500">
+    <section className="grid gap-2 rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm">
+      <h2 className="text-lg font-medium text-crs-ink">Review owner</h2>
+      <p className="text-xs text-crs-muted">
         Named Reviewer for this item. Reviewer proposals need Super Admin confirmation; Super Admin
         applies immediately.
       </p>
-      <p className="text-sm text-zinc-700">
+      <p className="text-sm text-crs-ink/90">
         Current: <strong>{reviewOwnerName ?? "—"}</strong>
         {proposedOwnerName ? (
           <>
@@ -92,7 +97,7 @@ export function ReviewOwnerPanel({
           <select
             value={target}
             onChange={(e) => setTarget(e.target.value)}
-            className="rounded border px-3 py-2 text-sm"
+            className="min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
           >
             <option value="">— select review owner —</option>
             {users.map((u) => (
@@ -105,7 +110,7 @@ export function ReviewOwnerPanel({
             type="button"
             disabled={pending || !target}
             onClick={() => void run("propose", { newOwnerId: target })}
-            className="rounded border px-3 py-2 text-sm disabled:opacity-60"
+            className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60"
           >
             {pending ? "Saving…" : canConfirm ? "Set / propose owner" : "Propose owner"}
           </button>
@@ -118,7 +123,7 @@ export function ReviewOwnerPanel({
             type="button"
             disabled={pending}
             onClick={() => void run("confirm")}
-            className="rounded bg-zinc-900 px-3 py-2 text-sm text-white disabled:opacity-60"
+            className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-2 text-sm text-white disabled:opacity-60"
           >
             Confirm proposal
           </button>
@@ -126,7 +131,7 @@ export function ReviewOwnerPanel({
             type="button"
             disabled={pending}
             onClick={() => void run("reject")}
-            className="rounded border px-3 py-2 text-sm disabled:opacity-60"
+            className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60"
           >
             Reject proposal
           </button>

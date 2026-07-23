@@ -19,6 +19,23 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-07-23 — CMS Direction B **Accepted** (stakeholder) → ship then pause
+
+**Branch:** `feature/cms-direction-b-visual`  
+**Stakeholder:** Accepted Direction B visual + polish in chat (2026-07-23).
+
+**Shipped on branch (beyond initial B chrome)**
+- Home create-content dropdown by scopes; equal queue card grid; pinned sidebar footer
+- Success/error toasts (top, auto-dismiss)
+- FormSection + sticky actions on all content types; Events/Publications list search+status filters
+- In-CMS A1 preview (`/dashboard/preview/{token}`); media file API serves `img/cms/*` + legacy `img/covers/*`
+- Public SPA `PREVIEW_API_BASE` → CMS; root `npm run spa` (port 5500)
+- Ops scripts: legacy authorship reassign + publisher attribution to F. Boufatah (local DB)
+
+**Pause:** No Themes PRD until **next Sunday** session. Themes remains next product slice after this merge.
+
+---
+
 ### 2026-07-23 — CMS Direction B visual + Themes decisions (branch / rollback)
 
 **Branch:** `feature/cms-direction-b-visual`  
@@ -29,7 +46,15 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 - Public Themes = next PRD: SA-only; catalog Default+A/B/C (+ custom JSON later); preview before live; full look (layout/nav/hero); instant rollback to Current; visitors see theme on reload/instant; theme names AR/EN
 - Ship order = CMS B first → Themes PRD after
 
-**PRD:** [2026-07-23-cms-direction-b-visual.md](./prds/2026-07-23-cms-direction-b-visual.md) (Draft)
+**PRD:** [2026-07-23-cms-direction-b-visual.md](./prds/2026-07-23-cms-direction-b-visual.md) (**Approved** 2026-07-23)
+
+**Implementation (on branch)**
+- Tokens in `cms/src/app/globals.css` (`crs-*`) + `.cms-form` control styling
+- Sidebar chrome (`cms-chrome.tsx`), login, Home 3-column queues
+- Shared: `ContentListPage`, `EditPageShell`, `form-ux` (numbered sections + sticky actions), drag-drop media upload
+- All content lists on table pattern; admin/utility pages use breadcrumbs + large titles
+- Primary/secondary CTAs, soft `rounded-2xl` surfaces, ≥44px actions
+- Shared class helpers: `cms/src/lib/cms-ui.ts`
 
 ---
 

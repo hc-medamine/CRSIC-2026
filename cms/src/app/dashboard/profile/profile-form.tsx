@@ -2,6 +2,8 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { cmsToast } from "@/app/dashboard/cms-toast";
+import { FormBanner } from "@/app/dashboard/form-ux";
 
 type Props = {
   initial: {
@@ -35,70 +37,77 @@ export function ProfileForm({ initial }: Props) {
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Update failed");
+        const msg = data.error ?? "Update failed";
+        setError(msg);
+        cmsToast.error(msg);
         return;
       }
       setMessage("Profile saved.");
+      cmsToast.success("Profile saved.");
       router.refresh();
     } catch {
       setError("Network error");
+      cmsToast.error("Network error");
     } finally {
       setPending(false);
     }
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm">
+    <form
+      onSubmit={onSubmit}
+      className="cms-form flex flex-col gap-4 rounded-2xl border border-crs-border bg-crs-surface p-6 shadow-sm"
+    >
       <label className="text-sm">
-        <span className="font-medium text-zinc-700">Email (login — read only)</span>
+        <span className="font-medium text-crs-ink">Email (login — read only)</span>
         <input
           value={initial.email}
           readOnly
-          className="mt-1 w-full rounded border border-zinc-200 bg-zinc-50 px-3 py-2 text-zinc-600"
+          className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-bg px-3 py-2 text-crs-muted"
         />
       </label>
       <label className="text-sm">
-        <span className="font-medium text-zinc-700">Role (read only)</span>
+        <span className="font-medium text-crs-ink">Role (read only)</span>
         <input
           value={initial.role}
           readOnly
-          className="mt-1 w-full rounded border border-zinc-200 bg-zinc-50 px-3 py-2 text-zinc-600"
+          className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-bg px-3 py-2 text-crs-muted"
         />
       </label>
       <label className="text-sm">
-        <span className="font-medium text-zinc-700">Display name</span>
+        <span className="font-medium text-crs-ink">Display name</span>
         <input
           required
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
-          className="mt-1 w-full rounded border border-zinc-300 px-3 py-2"
+          className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-crs-ink"
         />
       </label>
       <label className="text-sm">
-        <span className="font-medium text-zinc-700">Name (AR)</span>
+        <span className="font-medium text-crs-ink">Name (AR)</span>
         <input
           dir="rtl"
           value={nameAr}
           onChange={(e) => setNameAr(e.target.value)}
-          className="mt-1 w-full rounded border border-zinc-300 px-3 py-2"
+          className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-crs-ink"
         />
       </label>
       <label className="text-sm">
-        <span className="font-medium text-zinc-700">Name (EN)</span>
+        <span className="font-medium text-crs-ink">Name (EN)</span>
         <input
           value={nameEn}
           onChange={(e) => setNameEn(e.target.value)}
-          className="mt-1 w-full rounded border border-zinc-300 px-3 py-2"
+          className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-crs-ink"
         />
       </label>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
-      {message ? <p className="text-sm text-green-700">{message}</p> : null}
+      {error ? <FormBanner kind="error">{error}</FormBanner> : null}
+      {message ? <FormBanner kind="success">{message}</FormBanner> : null}
 
       <button
         type="submit"
         disabled={pending}
-        className="w-fit rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+        className="inline-flex min-h-11 w-fit items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
       >
         {pending ? "Saving…" : "Save profile"}
       </button>
