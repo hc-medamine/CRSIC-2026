@@ -10,7 +10,7 @@ Living single source of truth for the public site of **مركز البحث في 
 | [docs/audits/AUDIT.md](./docs/audits/AUDIT.md) | Closed architecture audit (P0–P3) |
 | [docs/audits/UIUX.md](./docs/audits/UIUX.md) | UI/UX audit log |
 | [docs/audits/PARITY.md](./docs/audits/PARITY.md) | AR/EN parity matrix (partial) |
-| [docs/prds/](./docs/prds/) | Product requirement documents (future) |
+| [docs/prds/](./docs/prds/) | Product requirement documents — **PRD-first workflow** (README §5.1) |
 | [data/README.md](./data/README.md) | Content-editor guide for JSON / locales |
 | [data/CMS.md](./data/CMS.md) | Remote JSON publish contract (`CONTENT_BASE_URL`) |
 
@@ -298,7 +298,30 @@ Remote publish contract (optional CDN / same JSON filenames): [data/CMS.md](./da
 
 ## 5. Organisation & collaboration rules
 
-### 5.1 Git status
+### 5.1 Product development workflow (PRD-first)
+
+**Locked 2026-07-23.** All product / feature slices follow this sequence before coding. Agent reminder: [`.cursor/rules/prd-first-workflow.mdc`](./.cursor/rules/prd-first-workflow.mdc).
+
+| Step | What |
+|------|------|
+| 1. Idea | Capture the rough ask in plain language |
+| 2. Develop | Explore options, constraints, and trade-offs with the stakeholder |
+| 3. Blind spots | Hunt gaps (roles, edge cases, ownership, exclusivity, cutover, i18n, rollback, out of scope) |
+| 4. Fix blind spots | Agree fixes; revise the model until gaps are closed or explicitly deferred |
+| 5. Improvements | Short pass for simpler UX / fewer round-trips / clearer IA |
+| 6. Lock decision | Short decision summary; stakeholder confirms |
+| 7. Generate PRD | Draft under [`docs/prds/`](./docs/prds/) from [`TEMPLATE.md`](./docs/prds/TEMPLATE.md) — status **Draft** |
+| 8. Lock PRD | Stakeholder marks **Approved**; update [`docs/prds/README.md`](./docs/prds/README.md) index + WORKLOG |
+| 9. Implement | Only after **Approved**; PRD is source of truth. Deviations need a PRD decision-log update first |
+
+Hard rules:
+
+- No feature-branch coding for a new slice until step 8 (unless stakeholder says spike/prototype only).
+- Prefer questions and alternatives over assuming requirements.
+- Out of scope must be explicit in the PRD.
+- Small bugfixes / ops chores may skip the PRD when the stakeholder agrees they are not a product slice.
+
+### 5.2 Git status
 
 | Topic | Current state |
 |-------|----------------|
@@ -315,7 +338,7 @@ Remote publish contract (optional CDN / same JSON filenames): [data/CMS.md](./da
 
 **PATH note (Windows):** Git lives at `C:\Program Files\Git\cmd\git.exe`. If `git` is not recognised in a terminal, add that `cmd` folder to the user PATH, or call git via the full path.
 
-### 5.2 Branching strategy
+### 5.3 Branching strategy
 
 | Branch | Purpose |
 |--------|---------|
@@ -343,7 +366,7 @@ git commit -m "feat: describe why"
 # open PR / merge into main when ready
 ```
 
-### 5.3 Commit message convention
+### 5.4 Commit message convention
 
 Use [Conventional Commits](https://www.conventionalcommits.org/):
 
@@ -366,7 +389,7 @@ content: add July 2026 national seminar
 style: smooth publication card hover on mobile
 ```
 
-### 5.4 What to document after every completed change
+### 5.5 What to document after every completed change
 
 | Done work | Update these files |
 |-----------|-------------------|
@@ -391,7 +414,7 @@ Minimum WORKLOG entry shape:
 **Next:** (optional)
 ```
 
-### 5.5 Code review checklist (before merge to `main`)
+### 5.6 Code review checklist (before merge to `main`)
 
 Short gate (always):
 
@@ -403,7 +426,7 @@ Short gate (always):
 
 **Full smoke run:** use **[docs/qa/SMOKE.md](./docs/qa/SMOKE.md)** (~5 minutes) before merging to `main`. Habit: no merge without at least sections A–D checked.
 
-### 5.6 First-time identity (required once per machine)
+### 5.7 First-time identity (required once per machine)
 
 Git needs your name and email before the first commit (global config is fine):
 
@@ -620,7 +643,7 @@ No separate staging config files exist in-repo.
 |------|------|--------|
 | 1 | Git workflow (init, ignore, branching/commits docs) | **Done** — see §5; remote [hc-medamine/CRSIC-2026](https://github.com/hc-medamine/CRSIC-2026) |
 | 2 | Home content fully from data (events teaser) | **Done** — `#home-events-grid` ← `getHomeEvents(3)` |
-| 3 | Smoke-check habit before merges | **Done** — [docs/qa/SMOKE.md](./docs/qa/SMOKE.md) + README §5.5 |
+| 3 | Smoke-check habit before merges | **Done** — [docs/qa/SMOKE.md](./docs/qa/SMOKE.md) + README §5.6 |
 | 3.5 | Full UI/UX audit → responsiveness → animation smoothness | **Done** — [docs/audits/UIUX.md](./docs/audits/UIUX.md) |
 | P2 | Focus traps, org stack, will-change, partial EN parity | **Done** on `main` — [docs/audits/PARITY.md](./docs/audits/PARITY.md) |
 | — | Home pubs mobile horizontal carousel | **Done** on `main` |
