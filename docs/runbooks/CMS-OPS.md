@@ -124,6 +124,8 @@ Deactivate remains the default recommendation when you only need to block login.
 
 **Research seed:** `cd cms && npm run db:seed:research-groups` creates the 8 locale teams as published groups, seeds one sample project under `quranic-miracles` (legacy page 244), and rebuilds `data/research-groups.json` + `data/research-projects.json`.
 
+**Research smoke:** `cd cms && npm run db:smoke:research` — SA author + smoke Reviewer four-eyes for group then project; verifies public JSON; purges smoke rows and rebuilds research JSON. Optional SPA check: `KEEP_RESEARCH_SMOKE=1 npm run db:smoke:research` then refresh `#research` (cleanup afterward with `npm run db:cleanup:smoke`).
+
 **Editor content types (exclusivity):** SPA types — at most one Editor CMS-wide. Research types — at most one Editor **per org**. Types must appear in the union of that Editor’s org catalogs.
 
 ---
@@ -141,6 +143,7 @@ First CMS publish for a content type **replaces** that public JSON with **CMS-pu
 | DB | `http://localhost:3000/api/health/db` |
 | Migrations | `cd cms && npm run db:status` |
 | Automated smoke | `cd cms && npm run db:smoke` |
+| Research smoke | `cd cms && npm run db:smoke:research` |
 | Manual smoke | [SMOKE-CMS.md](../qa/SMOKE-CMS.md) |
 | Audit | `/dashboard/audit` (Super Admin) |
 

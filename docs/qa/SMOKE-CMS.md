@@ -92,6 +92,7 @@ Estimated time: **~10 minutes**.
 | J3 | SPA `#research`: each dept tab lists published groups; Quranic dept shows sample project link | ☐ |
 | J4 | Open `#research-project/{slug}` — title, lead, dibaja, questions, axes, duration, impacts | ☐ |
 | J5 | CMS: create draft group/project → submit → (other) approve → publish → public JSON updates | ☐ |
+| J6 | Automated: `npm run db:smoke:research` (group + project four-eyes; cleans smoke titles) | ☐ |
 
 ## G. Gate
 

@@ -25,7 +25,9 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 **Model:** Centre-wide owns SPA types (`news`…`alert`). Each research dept owns `research_group` + `research_project` (dept → groups → projects). Legacy fields from [page_id=244](https://www.crsic.dz/?page_id=244).
 
-**Shipped:** migration `022`; CMS dashboard/API for groups & projects; publish `data/research-groups.json` + `data/research-projects.json`; SPA `#research` loads groups; `#research-project/{slug}` detail. Seed: `npm run db:seed:research-groups` (8 groups + sample project from page 244).
+**Shipped:** migration `022`; CMS dashboard/API for groups & projects; publish `data/research-groups.json` + `data/research-projects.json`; SPA `#research` loads groups; `#research-project/{slug}` detail. Seed: `npm run db:seed:research-groups` (8 groups + sample project from page 244). Smoke: `npm run db:smoke:research` (group+project four-eyes → JSON).
+
+**Next (UX):** CMS navigation revisit — role-grouped IA, fewer round-trips between lists/forms/queues, smoother day-to-day authoring (stakeholder note 2026-07-23).
 
 ---
 

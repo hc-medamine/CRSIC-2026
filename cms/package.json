@@ -12,6 +12,7 @@
     "db:migrate": "node --env-file=.env.local --import tsx scripts/migrate.ts",
     "db:status": "node --env-file=.env.local --import tsx scripts/check-migrations.ts",
     "db:smoke": "node --env-file=.env.local --import tsx scripts/smoke-cms.ts",
+    "db:smoke:research": "node --env-file=.env.local --import tsx scripts/smoke-research.ts",
     "db:cleanup:smoke": "node --env-file=.env.local --import tsx scripts/cleanup-smoke-data.ts",
     "db:seed:super-admin": "node --env-file=.env.local --import tsx scripts/seed-super-admin.ts",
     "db:seed:research-groups": "node --env-file=.env.local --import tsx scripts/seed-research-groups.ts",
