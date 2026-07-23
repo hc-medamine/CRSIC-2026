@@ -27,7 +27,7 @@ export default async function EditorsPage() {
           </p>
         </div>
         <Link href="/dashboard" className="text-sm underline">
-          ← Dashboard
+          ← Home
         </Link>
       </header>
 

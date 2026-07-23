@@ -22,7 +22,7 @@ export default async function UsersPage() {
           </p>
         </div>
         <Link href="/dashboard" className="text-sm underline">
-          ← Dashboard
+          ← Home
         </Link>
       </header>
 

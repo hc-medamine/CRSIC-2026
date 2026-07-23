@@ -21,7 +21,7 @@ export default async function NotificationsPage() {
           </p>
         </div>
         <Link href="/dashboard" className="text-sm underline">
-          ← Dashboard
+          ← Home
         </Link>
       </header>
 

@@ -25,7 +25,7 @@ export default async function ResearchProjectsListPage() {
             New research project
           </Link>
           <Link href="/dashboard" className="underline">
-            ← Dashboard
+            ← Home
           </Link>
         </div>
       </header>

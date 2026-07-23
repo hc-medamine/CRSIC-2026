@@ -25,7 +25,7 @@ export default async function PublicationsListPage() {
             New publication
           </Link>
           <Link href="/dashboard" className="underline">
-            ← Dashboard
+            ← Home
           </Link>
         </div>
       </header>

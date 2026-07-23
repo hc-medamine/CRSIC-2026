@@ -9,6 +9,8 @@ import {
   emptySeoFormState,
   type SeoFormState,
 } from "@/app/dashboard/seo-fields";
+import { AdvancedDisclosure, FormBanner, messageForAction } from "@/app/dashboard/form-ux";
+import { t } from "@/lib/i18n/labels";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
 
@@ -138,11 +140,12 @@ export function AlertEditorForm({
         return;
       }
       if (data.deleted) {
-        router.push("/dashboard/alerts");
+        router.push("/dashboard");
         router.refresh();
         return;
       }
-      setMessage("Saved.");
+      const key = messageForAction(action);
+      setMessage(t(key || "savedStay", "en"));
       router.refresh();
     } finally {
       setPending(false);
@@ -161,6 +164,9 @@ export function AlertEditorForm({
           publisher={initial.publisher}
         />
       ) : null}
+
+      {error ? <FormBanner kind="error">{error}</FormBanner> : null}
+      {message ? <FormBanner kind="success">{message}</FormBanner> : null}
 
       <form
         onSubmit={mode === "create" ? create : (e) => e.preventDefault()}
@@ -194,16 +200,6 @@ export function AlertEditorForm({
             rows={2}
           />
         </label>
-        <label className="text-sm">
-          <span className="font-medium">Banner message (EN)</span>
-          <textarea
-            disabled={!editable}
-            value={titleEn}
-            onChange={(e) => setTitleEn(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
-            rows={2}
-          />
-        </label>
 
         <div className="grid gap-3 sm:grid-cols-3">
           <label className="text-sm sm:col-span-3">
@@ -226,6 +222,22 @@ export function AlertEditorForm({
               className="mt-1 w-full rounded border px-3 py-2"
             />
           </label>
+        </div>
+
+        <AdvancedDisclosure
+          title={t("sectionAdvanced", "en")}
+          hint={t("sectionAdvancedHint", "en")}
+        >
+          <label className="text-sm">
+            <span className="font-medium">Banner message (EN)</span>
+            <textarea
+              disabled={!editable}
+              value={titleEn}
+              onChange={(e) => setTitleEn(e.target.value)}
+              className="mt-1 w-full rounded border px-3 py-2"
+              rows={2}
+            />
+          </label>
           <label className="text-sm">
             <span className="font-medium">Link label (EN)</span>
             <input
@@ -235,25 +247,20 @@ export function AlertEditorForm({
               className="mt-1 w-full rounded border px-3 py-2"
             />
           </label>
-        </div>
-
-        <label className="text-sm">
-          <span className="font-medium">EN status</span>
-          <select disabled={!editable} value={enStatus} onChange={(e) => setEnStatus(e.target.value as "pending" | "ready")} className="mt-1 w-full rounded border px-3 py-2">
-            <option value="pending">pending</option>
-            <option value="ready">ready</option>
-          </select>
-        </label>
-
-        <SeoFieldsSection
-          value={seo}
-          onChange={setSeo}
-          disabled={!editable}
-          onCopyTitleAr={() => setSeo((s) => copyMetaTitleFrom(titleAr, s))}
-        />
-
-        {error ? <p className="text-sm text-red-600">{error}</p> : null}
-        {message ? <p className="text-sm text-green-700">{message}</p> : null}
+          <label className="text-sm">
+            <span className="font-medium">EN status</span>
+            <select disabled={!editable} value={enStatus} onChange={(e) => setEnStatus(e.target.value as "pending" | "ready")} className="mt-1 w-full rounded border px-3 py-2">
+              <option value="pending">pending</option>
+              <option value="ready">ready</option>
+            </select>
+          </label>
+          <SeoFieldsSection
+            value={seo}
+            onChange={setSeo}
+            disabled={!editable}
+            onCopyTitleAr={() => setSeo((s) => copyMetaTitleFrom(titleAr, s))}
+          />
+        </AdvancedDisclosure>
 
         <div className="flex flex-wrap gap-2">
           {mode === "create" ? (

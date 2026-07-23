@@ -58,7 +58,7 @@ export default async function AuditLogPage({ searchParams }: Props) {
           </p>
         </div>
         <Link href="/dashboard" className="text-sm underline">
-          ← Dashboard
+          ← Home
         </Link>
       </header>
 

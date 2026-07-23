@@ -25,7 +25,7 @@ export default async function ResearchGroupsListPage() {
             New research group
           </Link>
           <Link href="/dashboard" className="underline">
-            ← Dashboard
+            ← Home
           </Link>
         </div>
       </header>

@@ -15,6 +15,8 @@ import {
   type SeoFormState,
 } from "@/app/dashboard/seo-fields";
 import { RichBodyEditor } from "@/app/dashboard/rich-body-editor";
+import { AdvancedDisclosure, FormBanner, FormSection, messageForAction } from "@/app/dashboard/form-ux";
+import { t } from "@/lib/i18n/labels";
 import type { PublicMediaItem } from "@/lib/publish/media";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
@@ -204,11 +206,12 @@ export function NewsEditorForm({
         return;
       }
       if (data.deleted) {
-        router.push("/dashboard/news");
+        router.push("/dashboard");
         router.refresh();
         return;
       }
-      setMessage("Saved.");
+      const key = messageForAction(action);
+      setMessage(key ? t(key, "en") : "Saved.");
       router.refresh();
     } finally {
       setPending(false);
@@ -231,47 +234,41 @@ export function NewsEditorForm({
         />
       ) : null}
 
+      {error ? <FormBanner kind="error">{error}</FormBanner> : null}
+      {message ? <FormBanner kind="success">{message}</FormBanner> : null}
+
       <form
         onSubmit={mode === "create" ? create : (e) => e.preventDefault()}
-        className="grid gap-3 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm"
+        className="flex flex-col gap-1 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm"
       >
-        <label className="text-sm">
-          <span className="font-medium">Organisation unit</span>
-          <select
-            disabled={!editable}
-            value={orgUnitId}
-            onChange={(e) => setOrgUnitId(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
-          >
-            {orgUnits.map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.name_en} ({o.name_ar})
-              </option>
-            ))}
-          </select>
-        </label>
+        <FormSection title={t("sectionIdentity", "en")}>
+          <label className="text-sm">
+            <span className="font-medium">Organisation unit</span>
+            <select
+              disabled={!editable}
+              value={orgUnitId}
+              onChange={(e) => setOrgUnitId(e.target.value)}
+              className="mt-1 w-full rounded border px-3 py-2"
+            >
+              {orgUnits.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.name_en} ({o.name_ar})
+                </option>
+              ))}
+            </select>
+          </label>
 
-        <label className="text-sm">
-          <span className="font-medium">Title (AR) *</span>
-          <input
-            dir="rtl"
-            required
-            disabled={!editable}
-            value={titleAr}
-            onChange={(e) => setTitleAr(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
-          />
-        </label>
-        <label className="text-sm">
-          <span className="font-medium">Title (EN)</span>
-          <input
-            disabled={!editable}
-            value={titleEn}
-            onChange={(e) => setTitleEn(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
-          />
-        </label>
-        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="text-sm">
+            <span className="font-medium">Title (AR) *</span>
+            <input
+              dir="rtl"
+              required
+              disabled={!editable}
+              value={titleAr}
+              onChange={(e) => setTitleAr(e.target.value)}
+              className="mt-1 w-full rounded border px-3 py-2"
+            />
+          </label>
           <label className="text-sm">
             <span className="font-medium">Label (AR)</span>
             <input
@@ -279,6 +276,81 @@ export function NewsEditorForm({
               disabled={!editable}
               value={labelAr}
               onChange={(e) => setLabelAr(e.target.value)}
+              className="mt-1 w-full rounded border px-3 py-2"
+            />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium">Summary (AR)</span>
+            <textarea
+              dir="rtl"
+              disabled={!editable}
+              value={summaryAr}
+              onChange={(e) => setSummaryAr(e.target.value)}
+              className="mt-1 w-full rounded border px-3 py-2"
+              rows={2}
+            />
+          </label>
+        </FormSection>
+
+        <FormSection title={t("sectionBody", "en")}>
+          <RichBodyEditor
+            label="Body (AR)"
+            dir="rtl"
+            disabled={!editable}
+            value={bodyAr}
+            onChange={setBodyAr}
+          />
+        </FormSection>
+
+        <FormSection title={t("sectionMedia", "en")}>
+          <MediaUploadField
+            bucket="news"
+            publicPath={imagePath}
+            mediaId={imageMediaId}
+            disabled={!editable}
+            imagesOnly
+            label="News image (primary)"
+            onUploaded={({ publicPath, mediaId }) => {
+              setImagePath(publicPath);
+              setImageMediaId(mediaId);
+              setAttachments((prev) => {
+                const withoutPrimary = prev.filter((a) => a.src !== imagePath);
+                return [{ kind: "image", src: publicPath }, ...withoutPrimary];
+              });
+            }}
+          />
+          <MediaAttachmentsField
+            bucket="news"
+            items={attachments}
+            disabled={!editable}
+            onChange={(next) => {
+              setAttachments(next);
+              const firstImg = next.find((a) => a.kind === "image");
+              if (firstImg) setImagePath(firstImg.src);
+            }}
+          />
+          <label className="text-sm">
+            <span className="font-medium">Image alt (AR)</span>
+            <input
+              dir="rtl"
+              disabled={!editable}
+              value={imageAltAr}
+              onChange={(e) => setImageAltAr(e.target.value)}
+              className="mt-1 w-full rounded border px-3 py-2"
+            />
+          </label>
+        </FormSection>
+
+        <AdvancedDisclosure
+          title={t("sectionAdvanced", "en")}
+          hint={t("sectionAdvancedHint", "en")}
+        >
+          <label className="text-sm">
+            <span className="font-medium">Title (EN)</span>
+            <input
+              disabled={!editable}
+              value={titleEn}
+              onChange={(e) => setTitleEn(e.target.value)}
               className="mt-1 w-full rounded border px-3 py-2"
             />
           </label>
@@ -291,156 +363,123 @@ export function NewsEditorForm({
               className="mt-1 w-full rounded border px-3 py-2"
             />
           </label>
-        </div>
-        <label className="text-sm">
-          <span className="font-medium">Summary (AR)</span>
-          <textarea
-            dir="rtl"
+          <label className="text-sm">
+            <span className="font-medium">Summary (EN)</span>
+            <textarea
+              disabled={!editable}
+              value={summaryEn}
+              onChange={(e) => setSummaryEn(e.target.value)}
+              className="mt-1 w-full rounded border px-3 py-2"
+              rows={2}
+            />
+          </label>
+          <RichBodyEditor
+            label="Body (EN)"
+            dir="ltr"
             disabled={!editable}
-            value={summaryAr}
-            onChange={(e) => setSummaryAr(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
-            rows={2}
+            value={bodyEn}
+            onChange={setBodyEn}
           />
-        </label>
-        <RichBodyEditor
-          label="Body (AR)"
-          dir="rtl"
-          disabled={!editable}
-          value={bodyAr}
-          onChange={setBodyAr}
-        />
-        <RichBodyEditor
-          label="Body (EN)"
-          dir="ltr"
-          disabled={!editable}
-          value={bodyEn}
-          onChange={setBodyEn}
-        />
-        <MediaUploadField
-          bucket="news"
-          publicPath={imagePath}
-          mediaId={imageMediaId}
-          disabled={!editable}
-          imagesOnly
-          label="News image (primary)"
-          onUploaded={({ publicPath, mediaId }) => {
-            setImagePath(publicPath);
-            setImageMediaId(mediaId);
-            setAttachments((prev) => {
-              const withoutPrimary = prev.filter((a) => a.src !== imagePath);
-              return [{ kind: "image", src: publicPath }, ...withoutPrimary];
-            });
-          }}
-        />
-        <MediaAttachmentsField
-          bucket="news"
-          items={attachments}
-          disabled={!editable}
-          onChange={(next) => {
-            setAttachments(next);
-            const firstImg = next.find((a) => a.kind === "image");
-            if (firstImg) setImagePath(firstImg.src);
-          }}
-        />
-        <label className="text-sm">
-          <span className="font-medium">Public slug (optional override)</span>
-          <input
-            dir="auto"
-            disabled={!editable}
-            value={publicSlug}
-            onChange={(e) => setPublicSlug(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2 font-mono text-xs"
-            placeholder="auto from Arabic title on publish"
-          />
-        </label>
-        <label className="text-sm">
-          <span className="font-medium">Image alt (AR)</span>
-          <input
-            dir="rtl"
-            disabled={!editable}
-            value={imageAltAr}
-            onChange={(e) => setImageAltAr(e.target.value)}
-            className="mt-1 w-full rounded border px-3 py-2"
-          />
-        </label>
-        <label className="text-sm">
-          <span className="font-medium">EN status</span>
-          <select
-            disabled={!editable}
-            value={enStatus}
-            onChange={(e) => setEnStatus(e.target.value as "pending" | "ready")}
-            className="mt-1 w-full rounded border px-3 py-2"
-          >
-            <option value="pending">pending</option>
-            <option value="ready">ready</option>
-          </select>
-        </label>
-
-        <SeoFieldsSection
-          value={seo}
-          onChange={setSeo}
-          disabled={!editable}
-          ogBucket="news"
-          ogFallbackHint={imagePath.trim() || "img/cms/..."}
-          onCopyTitleAr={() => setSeo((s) => copyMetaTitleFrom(titleAr, s))}
-          onCopySummaryAr={() => setSeo((s) => copyMetaDescriptionFrom(summaryAr, s))}
-        />
-
-        {error ? <p className="text-sm text-red-600">{error}</p> : null}
-        {message ? <p className="text-sm text-green-700">{message}</p> : null}
-
-        <div className="flex flex-wrap gap-2">
-          {mode === "create" ? (
-            <button
-              type="submit"
-              disabled={pending}
-              className="rounded bg-zinc-900 px-4 py-2 text-sm text-white disabled:opacity-60"
+          <label className="text-sm">
+            <span className="font-medium">Image alt (EN)</span>
+            <input
+              disabled={!editable}
+              value={imageAltEn}
+              onChange={(e) => setImageAltEn(e.target.value)}
+              className="mt-1 w-full rounded border px-3 py-2"
+            />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium">Public slug (optional override)</span>
+            <input
+              dir="auto"
+              disabled={!editable}
+              value={publicSlug}
+              onChange={(e) => setPublicSlug(e.target.value)}
+              className="mt-1 w-full rounded border px-3 py-2 font-mono text-xs"
+              placeholder="auto from Arabic title on publish"
+            />
+          </label>
+          <label className="text-sm">
+            <span className="font-medium">EN status</span>
+            <select
+              disabled={!editable}
+              value={enStatus}
+              onChange={(e) => setEnStatus(e.target.value as "pending" | "ready")}
+              className="mt-1 w-full rounded border px-3 py-2"
             >
-              {pending ? "Saving…" : "Create draft"}
-            </button>
-          ) : null}
+              <option value="pending">pending</option>
+              <option value="ready">ready</option>
+            </select>
+          </label>
+          <SeoFieldsSection
+            value={seo}
+            onChange={setSeo}
+            disabled={!editable}
+            ogBucket="news"
+            ogFallbackHint={imagePath.trim() || "img/cms/..."}
+            onCopyTitleAr={() => setSeo((s) => copyMetaTitleFrom(titleAr, s))}
+            onCopySummaryAr={() => setSeo((s) => copyMetaDescriptionFrom(summaryAr, s))}
+          />
+        </AdvancedDisclosure>
 
-          {mode === "edit" && editable && isAuthor ? (
-            <>
+        <FormSection title={t("sectionActions", "en")}>
+          <div className="flex flex-wrap gap-2">
+            {mode === "create" ? (
+              <button
+                type="submit"
+                disabled={pending}
+                className="rounded bg-zinc-900 px-4 py-2 text-sm text-white disabled:opacity-60"
+              >
+                {pending ? "Saving…" : "Create draft"}
+              </button>
+            ) : null}
+
+            {mode === "edit" && editable && isAuthor ? (
+              <>
+                <button
+                  type="button"
+                  disabled={pending}
+                  className="rounded bg-zinc-900 px-4 py-2 text-sm text-white disabled:opacity-60"
+                  onClick={() => void run("save", { fields: fields() })}
+                >
+                  Save draft
+                </button>
+                {canSubmit ? (
+                  <label className="flex w-full items-center gap-2 text-sm sm:w-auto">
+                    <input
+                      type="checkbox"
+                      checked={checklist}
+                      onChange={(e) => setChecklist(e.target.checked)}
+                    />
+                    Checklist OK (names, dates, no private data, photo rights)
+                  </label>
+                ) : null}
+                {canSubmit ? (
+                  <button
+                    type="button"
+                    disabled={pending || !checklist}
+                    className="rounded border px-4 py-2 text-sm disabled:opacity-60"
+                    onClick={() => void run("submit", { checklistConfirmed: checklist })}
+                  >
+                    Submit for review
+                  </button>
+                ) : null}
+              </>
+            ) : null}
+
+            {mode === "edit" && initial?.status === "submitted" && isAuthor ? (
               <button
                 type="button"
                 disabled={pending}
-                className="rounded bg-zinc-900 px-4 py-2 text-sm text-white disabled:opacity-60"
-                onClick={() => void run("save", { fields: fields() })}
+                className="rounded border px-4 py-2 text-sm"
+                onClick={() => void run("withdraw")}
               >
-                Save draft
+                Withdraw
               </button>
-              {canSubmit ? (
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" checked={checklist} onChange={(e) => setChecklist(e.target.checked)} />
-                  Checklist OK (names, dates, no private data, photo rights)
-                </label>
-              ) : null}
-              {canSubmit ? (
-                <button
-                  type="button"
-                  disabled={pending || !checklist}
-                  className="rounded border px-4 py-2 text-sm disabled:opacity-60"
-                  onClick={() => void run("submit", { checklistConfirmed: checklist })}
-                >
-                  Submit for review
-                </button>
-              ) : null}
-            </>
-          ) : null}
-
-          {mode === "edit" && initial?.status === "submitted" && isAuthor ? (
-            <button
-              type="button"
-              disabled={pending}
-              className="rounded border px-4 py-2 text-sm"
-              onClick={() => void run("withdraw")}
-            >
-              Withdraw
-            </button>
-          ) : null}
-        </div>
+            ) : null}
+          </div>
+        </FormSection>
       </form>
 
       {mode === "edit" && canReview && initial?.status === "submitted" ? (

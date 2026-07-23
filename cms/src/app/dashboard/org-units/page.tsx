@@ -23,7 +23,7 @@ export default async function OrgUnitsPage() {
             Users
           </Link>
           <Link href="/dashboard" className="underline">
-            ← Dashboard
+            ← Home
           </Link>
         </div>
       </header>
