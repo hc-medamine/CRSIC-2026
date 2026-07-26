@@ -23,6 +23,7 @@ Estimated time: **~5 minutes**.
 |---|--------|-------|
 | B1 | Hash `#about` shows about page | ☐ |
 | B2 | `#publications`, `#events`, `#journals`, `#contact` each open | ☐ |
+| B2b | Partner card with id/slug opens `#partner/{slug}`; research group name opens `#research-group/{slug}` | ☐ |
 | B3 | `#org`, `#research`, `#cooperation` open (child pages) | ☐ |
 | B3b | `#research`: 4 dept tabs show groups from `research-groups.json`; project links open `#research-project/{slug}` | ☐ |
 | B4 | Browser back/forward restores the previous section | ☐ |

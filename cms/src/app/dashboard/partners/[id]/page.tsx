@@ -72,6 +72,7 @@ export default async function PartnerDetailPage({ params }: Props) {
           partnerScope: item.partner_scope ?? "nat",
           partnerDate: item.partner_date ?? "",
           partnerEmoji: item.partner_emoji ?? "",
+          imagePath: item.image_path ?? "",
           status: item.status,
           reviewNote: item.review_note,
           editor: personProp(people.editor),

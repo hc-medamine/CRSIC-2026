@@ -6,13 +6,38 @@ import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 import { getNewsById } from "@/lib/content/news";
 import { getEventById } from "@/lib/content/events";
 import { getPublicationById } from "@/lib/content/publications";
+import { getPartnerById } from "@/lib/content/partners";
+import { getAlertById } from "@/lib/content/alerts";
+import { getResearchGroupById } from "@/lib/content/researchGroups";
+import { getResearchProjectById } from "@/lib/content/researchProjects";
 import { buildNewsPayload } from "@/lib/publish/newsJson";
 import { buildEventPayload } from "@/lib/publish/eventsJson";
 import { buildPublicationPayload } from "@/lib/publish/publicationsJson";
+import { buildPartnerPayload } from "@/lib/publish/partnersJson";
+import { buildAlertPayload } from "@/lib/publish/alertsJson";
+import { buildResearchGroupPayload } from "@/lib/publish/researchGroupsJson";
+import { buildResearchProjectPayload } from "@/lib/publish/researchProjectsJson";
 
 export const PREVIEW_TTL_MS = 30 * 60 * 1000;
 
-export type PreviewContentType = "news" | "event" | "publication";
+export type PreviewContentType =
+  | "news"
+  | "event"
+  | "publication"
+  | "partner"
+  | "alert"
+  | "research_group"
+  | "research_project";
+
+const PREVIEW_TYPES = new Set<PreviewContentType>([
+  "news",
+  "event",
+  "publication",
+  "partner",
+  "alert",
+  "research_group",
+  "research_project",
+]);
 
 export type PreviewRecord = {
   token: string;
@@ -25,7 +50,6 @@ export type PreviewRecord = {
 function publicSiteBase(): string {
   const configured = (process.env.PUBLIC_SITE_URL || "").trim().replace(/\/$/, "");
   if (configured) return configured;
-  // Local Live Server / static SPA default when env is unset (dev only).
   if (process.env.NODE_ENV !== "production") return "http://localhost:5500";
   return "";
 }
@@ -66,9 +90,29 @@ async function buildCandidatePayload(
     if (!row) return null;
     return buildEventPayload(row) as unknown as Record<string, unknown>;
   }
-  const row = await getPublicationById(id);
+  if (contentType === "publication") {
+    const row = await getPublicationById(id);
+    if (!row) return null;
+    return buildPublicationPayload(row) as unknown as Record<string, unknown>;
+  }
+  if (contentType === "partner") {
+    const row = await getPartnerById(id);
+    if (!row) return null;
+    return buildPartnerPayload(row) as unknown as Record<string, unknown>;
+  }
+  if (contentType === "alert") {
+    const row = await getAlertById(id);
+    if (!row) return null;
+    return buildAlertPayload(row) as unknown as Record<string, unknown>;
+  }
+  if (contentType === "research_group") {
+    const row = await getResearchGroupById(id);
+    if (!row) return null;
+    return buildResearchGroupPayload(row) as unknown as Record<string, unknown>;
+  }
+  const row = await getResearchProjectById(id);
   if (!row) return null;
-  return buildPublicationPayload(row) as unknown as Record<string, unknown>;
+  return buildResearchProjectPayload(row) as unknown as Record<string, unknown>;
 }
 
 /**
@@ -93,8 +137,8 @@ export async function createPreviewToken(
   if (!(await canViewContentItem(user, itemMeta))) throw new Error("Forbidden");
 
   const contentType = itemMeta.content_type as PreviewContentType;
-  if (contentType !== "news" && contentType !== "event" && contentType !== "publication") {
-    throw new Error("Preview is only available for news, events, and publications");
+  if (!PREVIEW_TYPES.has(contentType)) {
+    throw new Error("Preview is not available for this content type");
   }
 
   const payload = await buildCandidatePayload(contentType, contentItemId);

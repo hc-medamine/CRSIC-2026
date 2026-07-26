@@ -27,7 +27,7 @@ type Props = {
   ogFallbackHint?: string;
   /**
    * Related CMS media folder for Browse (news → img/cms/news, etc.).
-   * When omitted (e.g. partners/alerts), Browse is hidden — no related image bucket.
+   * When omitted, Browse is hidden.
    */
   ogBucket?: MediaBucket;
   /** Optional: fill meta title AR from display title. */

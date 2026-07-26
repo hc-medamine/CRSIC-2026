@@ -37,6 +37,9 @@ const BUCKET_LABELS: Record<MediaBucket, string> = {
   news: "news → img/cms/news/",
   events: "events → img/cms/events/",
   covers: "covers → img/cms/covers/",
+  partners: "partners → img/cms/partners/",
+  research: "research → img/cms/research/",
+  alerts: "alerts → img/cms/alerts/",
 };
 
 function sourceLabel(ref: MediaRef): string {

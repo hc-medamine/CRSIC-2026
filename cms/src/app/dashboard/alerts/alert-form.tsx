@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ItemWorkflowMeta, type PersonDisplay } from "@/app/dashboard/item-workflow-meta";
+import { PublicPreviewButton } from "@/app/dashboard/public-preview-button";
 import {
   SeoFieldsSection,
   copyMetaTitleFrom,
@@ -268,6 +269,8 @@ export function AlertEditorForm({
             value={seo}
             onChange={setSeo}
             disabled={!editable}
+            ogBucket="alerts"
+            ogFallbackHint="img/cms/alerts/..."
             onCopyTitleAr={() => setSeo((s) => copyMetaTitleFrom(titleAr, s))}
           />
         </AdvancedDisclosure>
@@ -335,6 +338,10 @@ export function AlertEditorForm({
             <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-red-300 bg-crs-surface px-3 py-2 text-sm text-red-700 hover:bg-red-50" onClick={() => void run("reject", { note })}>Reject</button>
           </div>
         </div>
+      ) : null}
+
+      {mode === "edit" && initial?.id ? (
+        <PublicPreviewButton contentId={initial.id} disabled={pending} />
       ) : null}
 
       {mode === "edit" && canReview && (initial?.status === "approved" || initial?.status === "unpublished") ? (

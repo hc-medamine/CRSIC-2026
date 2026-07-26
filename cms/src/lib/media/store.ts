@@ -83,6 +83,14 @@ export async function canAccessMediaBucket(
   if (bucket === "news") return canAccessContentType(user, "news");
   if (bucket === "events") return canAccessContentType(user, "event");
   if (bucket === "covers") return canAccessContentType(user, "publication");
+  if (bucket === "partners") return canAccessContentType(user, "partner");
+  if (bucket === "alerts") return canAccessContentType(user, "alert");
+  if (bucket === "research") {
+    return (
+      (await canAccessContentType(user, "research_group")) ||
+      (await canAccessContentType(user, "research_project"))
+    );
+  }
   return false;
 }
 

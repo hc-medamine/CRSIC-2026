@@ -97,13 +97,22 @@ export function renderResearchGroupsForTab(tabId) {
             })
           : null;
 
+      const groupSlug = group.slug || group.id;
+      const nameEl = groupSlug
+        ? el('a', {
+            className: 'team-card-name',
+            attrs: { href: `#research-group/${encodeURIComponent(groupSlug)}` },
+            text: groupName(group, lang),
+          })
+        : el('div', {
+            className: 'team-card-name',
+            text: groupName(group, lang),
+          });
+
       return el('div', {
         className: 'team-card research-group-card',
         children: [
-          el('div', {
-            className: 'team-card-name',
-            text: groupName(group, lang),
-          }),
+          nameEl,
           groupSummary(group, lang)
             ? el('div', {
                 className: 'team-card-desc',

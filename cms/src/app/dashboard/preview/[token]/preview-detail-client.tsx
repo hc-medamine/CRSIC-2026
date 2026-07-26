@@ -35,12 +35,29 @@ export function PreviewDetailClient({ type, item }: Props) {
   const title =
     type === "publication"
       ? asString(item.t || item.title)
-      : asString(item.title);
+      : type === "partner"
+        ? asString(item.name)
+        : type === "alert"
+          ? asString(item.message_ar || item.message_en)
+          : type === "research_group"
+            ? asString(item.name_ar || item.name_en)
+            : type === "research_project"
+              ? asString(item.title_ar || item.title_en)
+              : asString(item.title);
   const summary =
     type === "publication"
       ? asString(item.summary || item.desc)
-      : asString(item.summary);
-  const body = asString(item.body);
+      : type === "partner"
+        ? [asString(item.country), asString(item.date)].filter(Boolean).join(" · ")
+        : type === "research_group"
+          ? asString(item.summary_ar || item.summary_en)
+          : type === "research_project"
+            ? asString(item.lead_ar || item.lead_en)
+            : asString(item.summary);
+  const body =
+    type === "alert"
+      ? asString(item.message_en || item.link || "")
+      : asString(item.body || item.dibaja_ar || "");
   const label =
     type === "news"
       ? asString(item.label)
@@ -48,12 +65,16 @@ export function PreviewDetailClient({ type, item }: Props) {
         ? [asString(item.type), [asString(item.day), asString(item.month), asString(item.year)].filter(Boolean).join(" ")]
             .filter(Boolean)
             .join(" · ")
-        : [asString(item.dept), asString(item.type)].filter(Boolean).join(" · ");
+        : type === "alert"
+          ? "Alert banner preview"
+          : type === "partner"
+            ? asString(item.emoji)
+            : [asString(item.dept), asString(item.type)].filter(Boolean).join(" · ");
 
   const coverPath =
     type === "publication"
       ? asString(item.cover || item.img)
-      : asString(item.img);
+      : asString(item.img || item.og_image);
   const media = mediaList(item, coverPath);
   const hero = media.find((m) => m.kind === "image") ?? null;
   const heroSrc = hero ? cmsMediaSrc(hero.src) : null;

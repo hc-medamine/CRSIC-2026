@@ -77,6 +77,7 @@ export default async function ResearchGroupDetailPage({ params }: Props) {
           leadAr: item.research_lead_ar ?? "",
           leadEn: item.research_lead_en ?? "",
           members,
+          imagePath: item.image_path ?? "",
           enStatus: item.en_status,
           status: item.status,
           reviewNote: item.review_note,

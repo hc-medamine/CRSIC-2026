@@ -4,6 +4,7 @@ import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { appendWorkflowComment } from "@/lib/content/comments";
 import { buildPartnerPayload, rebuildPublicPartnersJson } from "@/lib/publish/partnersJson";
+import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
 import { mutateThenRebuildPublic } from "@/lib/publish/safeRebuild";
 import {
   canAccessContentType,
@@ -47,6 +48,7 @@ export type PartnerItem = {
   partner_scope: "intl" | "nat" | null;
   partner_date: string | null;
   partner_emoji: string | null;
+  image_path: string | null;
   checklist_confirmed: boolean;
   review_note: string | null;
   public_slug: string | null;
@@ -70,6 +72,7 @@ export type PartnerInput = {
   partnerScope: "intl" | "nat";
   partnerDate: string;
   partnerEmoji?: string;
+  imagePath?: string | null;
 } & SeoInput;
 
 function snapshotOf(row: PartnerItem) {
@@ -84,6 +87,7 @@ function snapshotOf(row: PartnerItem) {
     partner_scope: row.partner_scope,
     partner_date: row.partner_date,
     partner_emoji: row.partner_emoji,
+    image_path: row.image_path,
     ...seoSnapshotFields(row),
   };
 }
@@ -163,13 +167,13 @@ export async function createPartner(user: SessionUser, input: PartnerInput): Pro
     `INSERT INTO content_items (
       content_type, status, org_unit_id, created_by, updated_by, en_status,
       title_ar, title_en, label_ar, label_en,
-      partner_scope, partner_date, partner_emoji,
+      partner_scope, partner_date, partner_emoji, image_path,
       meta_title_ar, meta_title_en, meta_description_ar, meta_description_en, og_image
     ) VALUES (
       'partner', 'draft', $1, $2, $2, $3,
       $4, $5, $6, $7,
-      $8, $9, $10,
-      $11, $12, $13, $14, $15
+      $8, $9, $10, $11,
+      $12, $13, $14, $15, $16
     ) RETURNING *`,
     [
       input.orgUnitId,
@@ -182,6 +186,7 @@ export async function createPartner(user: SessionUser, input: PartnerInput): Pro
       input.partnerScope,
       input.partnerDate.trim(),
       input.partnerEmoji?.trim() || null,
+      input.imagePath?.trim() || null,
       seo.meta_title_ar,
       seo.meta_title_en,
       seo.meta_description_ar,
@@ -214,9 +219,9 @@ export async function updatePartnerDraft(user: SessionUser, id: string, input: P
     `UPDATE content_items SET
       org_unit_id = $2, updated_by = $3, en_status = $4,
       title_ar = $5, title_en = $6, label_ar = $7, label_en = $8,
-      partner_scope = $9, partner_date = $10, partner_emoji = $11,
-      meta_title_ar = $12, meta_title_en = $13, meta_description_ar = $14,
-      meta_description_en = $15, og_image = $16,
+      partner_scope = $9, partner_date = $10, partner_emoji = $11, image_path = $12,
+      meta_title_ar = $13, meta_title_en = $14, meta_description_ar = $15,
+      meta_description_en = $16, og_image = $17,
       updated_at = NOW()
      WHERE id = $1 AND content_type = 'partner'
      RETURNING *`,
@@ -232,6 +237,7 @@ export async function updatePartnerDraft(user: SessionUser, id: string, input: P
       input.partnerScope,
       input.partnerDate.trim(),
       input.partnerEmoji?.trim() || null,
+      input.imagePath?.trim() || null,
       seo.meta_title_ar,
       seo.meta_title_en,
       seo.meta_description_ar,
@@ -378,17 +384,22 @@ export async function publishPartner(user: SessionUser, id: string) {
   if (!["approved", "unpublished"].includes(existing.status)) {
     throw new Error("Only approved or unpublished items can be published");
   }
-  const payload = buildPartnerPayload(existing);
+  const slug = await resolvePublicSlug({
+    itemId: existing.id,
+    titleAr: existing.title_ar,
+    existingSlug: existing.public_slug,
+  });
+  const payload = buildPartnerPayload({ ...existing, public_slug: slug });
   const item = await mutateThenRebuildPublic({
     itemId: id,
     mutate: async () => {
       const result = await query<PartnerItem>(
-        `UPDATE content_items SET status = 'published',
+        `UPDATE content_items SET status = 'published', public_slug = $2,
           published_at = COALESCE(published_at, NOW()),
-          live_payload = $3::jsonb, live_at = NOW(),
-          updated_by = $2, updated_at = NOW()
+          live_payload = $4::jsonb, live_at = NOW(),
+          updated_by = $3, updated_at = NOW()
          WHERE id = $1 RETURNING *`,
-        [id, user.id, JSON.stringify(payload)],
+        [id, slug, user.id, JSON.stringify(payload)],
       );
       return result.rows[0];
     },

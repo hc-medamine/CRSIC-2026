@@ -1,8 +1,21 @@
 export const MEDIA_MAX_BYTES = 5 * 1024 * 1024;
 
-export type MediaBucket = "news" | "events" | "covers";
+export type MediaBucket =
+  | "news"
+  | "events"
+  | "covers"
+  | "partners"
+  | "research"
+  | "alerts";
 
-export const MEDIA_BUCKETS: MediaBucket[] = ["news", "events", "covers"];
+export const MEDIA_BUCKETS: MediaBucket[] = [
+  "news",
+  "events",
+  "covers",
+  "partners",
+  "research",
+  "alerts",
+];
 
 /** MIME → canonical extension (allowlist) */
 export const ALLOWED_MIME: Record<string, string> = {

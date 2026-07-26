@@ -3,6 +3,8 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ItemWorkflowMeta, type PersonDisplay } from "@/app/dashboard/item-workflow-meta";
+import { MediaUploadField } from "@/app/dashboard/media-upload-field";
+import { PublicPreviewButton } from "@/app/dashboard/public-preview-button";
 import {
   SeoFieldsSection,
   copyMetaTitleFrom,
@@ -26,6 +28,7 @@ type Initial = {
   partnerScope: "intl" | "nat";
   partnerDate: string;
   partnerEmoji: string;
+  imagePath?: string;
   status?: string;
   reviewNote?: string | null;
   editor?: PersonDisplay;
@@ -67,6 +70,7 @@ export function PartnerEditorForm({
   const [partnerScope, setPartnerScope] = useState<"intl" | "nat">(initial?.partnerScope ?? "nat");
   const [partnerDate, setPartnerDate] = useState(initial?.partnerDate ?? "");
   const [partnerEmoji, setPartnerEmoji] = useState(initial?.partnerEmoji ?? "");
+  const [imagePath, setImagePath] = useState(initial?.imagePath ?? "");
   const [seo, setSeo] = useState<SeoFormState>(() => ({
     ...emptySeoFormState(),
     metaTitleAr: initial?.metaTitleAr ?? "",
@@ -94,6 +98,7 @@ export function PartnerEditorForm({
       partnerScope,
       partnerDate,
       partnerEmoji,
+      imagePath: imagePath.trim() || null,
       metaTitleAr: seo.metaTitleAr,
       metaTitleEn: seo.metaTitleEn,
       metaDescriptionAr: seo.metaDescriptionAr,
@@ -257,10 +262,20 @@ export function PartnerEditorForm({
               <option value="ready">ready</option>
             </select>
           </label>
+          <MediaUploadField
+            bucket="partners"
+            publicPath={imagePath}
+            imagesOnly
+            label="Logo / image"
+            disabled={!editable}
+            onUploaded={({ publicPath }) => setImagePath(publicPath)}
+          />
           <SeoFieldsSection
             value={seo}
             onChange={setSeo}
             disabled={!editable}
+            ogBucket="partners"
+            ogFallbackHint={imagePath.trim() || "img/cms/partners/..."}
             onCopyTitleAr={() => setSeo((s) => copyMetaTitleFrom(titleAr, s))}
           />
         </AdvancedDisclosure>
@@ -328,6 +343,10 @@ export function PartnerEditorForm({
             <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-red-300 bg-crs-surface px-3 py-2 text-sm text-red-700 hover:bg-red-50" onClick={() => void run("reject", { note })}>Reject</button>
           </div>
         </div>
+      ) : null}
+
+      {mode === "edit" && initial?.id ? (
+        <PublicPreviewButton contentId={initial.id} disabled={pending} />
       ) : null}
 
       {mode === "edit" && canReview && (initial?.status === "approved" || initial?.status === "unpublished") ? (

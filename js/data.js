@@ -259,6 +259,16 @@ export function findResearchGroupByKey(key) {
  * @param {string} key slug or id
  * @returns {object|undefined}
  */
+export function findPartnerByKey(key) {
+  const k = decodeURIComponent(String(key || ''));
+  const all = [...natPartners, ...intlPartners];
+  return all.find((p) => p && (p.slug === k || p.id === k));
+}
+
+/**
+ * @param {string} key slug or id
+ * @returns {object|undefined}
+ */
 export function findNewsByKey(key) {
   const k = decodeURIComponent(String(key || ''));
   return news.find((n) => n && (n.slug === k || n.id === k));

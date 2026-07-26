@@ -19,6 +19,27 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-07-26 — CMS/SPA parity PRD **Approved**
+
+**PRD:** [prds/2026-07-26-cms-spa-parity-preview-media.md](./prds/2026-07-26-cms-spa-parity-preview-media.md)  
+**Memo lock:** Q3=B (partner + research-group SPA detail), Q1=B (preview ×4), Q2=A (emergency stays 3-type), Q4=B (buckets `partners` / `research` / `alerts`).
+
+**Impl order:** media buckets → SPA detail routes → preview extension → smoke docs. Emergency unchanged.
+
+---
+
+### 2026-07-26 — Public SPA Themes **dropped**
+
+**Decision (stakeholder):** Completely drop the Public SPA Themes product idea. No Themes PRD, no catalog, no CMS theme switcher for the public site.
+
+**Was:** Deferred after CMS Direction B (SA-only; Default+A/B/C; preview; rollback) — see cancelled §8 in Direction B PRD.
+
+**Out of scope going forward:** Runtime public theme switching, theme catalog, theme preview/live apply from CMS.
+
+**Still true:** Public SPA keeps its current single visual system; CMS stays on Direction B only.
+
+---
+
 ### 2026-07-23 — CMS Direction B **Accepted** (stakeholder) → ship then pause
 
 **Branch:** `feature/cms-direction-b-visual`  
@@ -32,7 +53,7 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 - Public SPA `PREVIEW_API_BASE` → CMS; root `npm run spa` (port 5500)
 - Ops scripts: legacy authorship reassign + publisher attribution to F. Boufatah (local DB)
 
-**Pause:** No Themes PRD until **next Sunday** session. Themes remains next product slice after this merge.
+**Pause:** Was “Themes next Sunday.” **Superseded 2026-07-26:** Public Themes **dropped** entirely (see entry above).
 
 ---
 
