@@ -1,0 +1,24 @@
+---
+description: Remind about deferred CMS enhancements — do not start without PRD lock
+alwaysApply: true
+---
+
+# CMS deferred backlog (future — not now)
+
+When discussing CMS/product/roadmap work, briefly remind the stakeholder that these are **deferred** (tracked in `docs/WORKLOG.md` § “Deferred backlog”). Do **not** implement them unless they explicitly start a PRD-first slice for that item.
+
+## Deferred (future)
+
+- Server list pagination (~200-row trigger)
+- Bulk ops / clone / import-export UI
+- Scheduled publish
+- Soft-delete recycle bin
+- Media crop / optimize / variants
+- EN editorial body parity ([docs/audits/PARITY.md](docs/audits/PARITY.md))
+- Journals in CMS (OJS remains)
+- Static institutional pages in CMS (locales only)
+- CMS UI to reassign editor / reviewer / publisher (ops scripts already exist)
+
+## Already closed (do not re-open as gaps)
+
+Feature-completeness audit critical/functional gaps closed on `main` via PR #17: SEO restore, partner JSON + narrative, research restore, media DELETE 409, comment deeplinks, preview ×7, SPA partner/group detail.

@@ -19,6 +19,32 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-07-26 — Feature-completeness audit **closed** (current scope)
+
+**Merged:** PR [#17](https://github.com/hc-medamine/CRSIC-2026/pull/17) on `main` (`b14355e`).
+
+**Closed in scope:** SEO revision restore; partner JSON cutover + detail narrative + legacy enrich; partner people attribution; research restore / media DELETE / comment deeplinks / preview ×7 (prior commits on same PR).
+
+**Local cleanup:** Restored accidental `data/{alerts,events,news,publications,research-*}.json` dirty churn; deleted merged feature branch; on `main`.
+
+#### Deferred backlog (not now — future PRDs)
+
+Remind on CMS/product sessions; do **not** start without stakeholder PRD lock:
+
+| Item | Notes |
+|------|--------|
+| Server list pagination | Trigger ~200 rows per type |
+| Bulk ops / clone / import-export UI | Classic CMS niceties |
+| Scheduled publish | `published_at` is stamp only today |
+| Soft-delete recycle bin | Hard-delete + ref scan already shipped |
+| Media crop / optimize / variants | |
+| EN editorial body parity | See [audits/PARITY.md](./audits/PARITY.md) |
+| Journals in CMS | Stay on OJS; intentional OOS |
+| Static institutional pages in CMS | Locales only |
+| CMS UI to reassign editor/reviewer/publisher | Ops scripts exist for legacy |
+
+---
+
 ### 2026-07-26 — Partner detail narrative PRD **Approved**
 
 **PRD:** [prds/2026-07-26-partner-detail-narrative.md](./prds/2026-07-26-partner-detail-narrative.md)  
