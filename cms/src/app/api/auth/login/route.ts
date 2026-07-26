@@ -62,6 +62,8 @@ export async function POST(request: NextRequest) {
       id: user.id,
       email: user.email,
       displayName: user.display_name,
+      nameAr: null,
+      nameEn: null,
       role: user.role,
     };
 
@@ -70,6 +72,8 @@ export async function POST(request: NextRequest) {
       user: {
         email: fresh.email,
         displayName: fresh.displayName,
+        nameAr: fresh.nameAr ?? null,
+        nameEn: fresh.nameEn ?? null,
         role: fresh.role,
       },
     });

@@ -6,15 +6,22 @@ import { MediaUploadField } from "@/app/dashboard/media-upload-field";
 import { MediaLightbox } from "@/app/dashboard/media-lightbox";
 import { cmsMediaSrc, isPdfPath } from "@/lib/media/cms-src";
 import type { MediaBucket } from "@/lib/media/config";
+import { formatDateTime } from "@/lib/format-datetime";
+import { t, tf, contentTypeLabel } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
-type Item = {
+export type MediaLibraryItem = {
   id: string;
   bucket: string;
-  originalFilename: string;
   mimeType: string;
-  byteSize: number;
   publicPath: string;
-  createdAt: string;
+  updatedAt: string;
+  uploaderNameAr: string | null;
+  uploaderNameEn: string | null;
+  linkedTitleAr: string | null;
+  linkedHref: string | null;
+  linkedContentType: string | null;
+  linkedCount: number;
 };
 
 type MediaRef = {
@@ -29,47 +36,53 @@ type MediaRef = {
 };
 
 type Props = {
-  initialItems: Item[];
+  initialItems: MediaLibraryItem[];
   allowedBuckets: MediaBucket[];
 };
 
-const BUCKET_LABELS: Record<MediaBucket, string> = {
-  news: "news → img/cms/news/",
-  events: "events → img/cms/events/",
-  covers: "covers → img/cms/covers/",
-  partners: "partners → img/cms/partners/",
-  research: "research → img/cms/research/",
-  alerts: "alerts → img/cms/alerts/",
+type FolderFilter = "all" | MediaBucket;
+
+const BUCKET_LABEL_KEYS: Record<MediaBucket, string> = {
+  news: "mediaBucketNews",
+  events: "mediaBucketEvents",
+  covers: "mediaBucketCovers",
+  partners: "mediaBucketPartners",
+  research: "mediaBucketResearch",
+  alerts: "mediaBucketAlerts",
 };
 
-function sourceLabel(ref: MediaRef): string {
+function sourceLabel(ref: MediaRef, lang: "en" | "ar"): string {
   if (ref.source === "revision") {
-    return ref.revisionNumber != null ? `Revision #${ref.revisionNumber}` : "Revision";
+    return ref.revisionNumber != null
+      ? tf("sourceRevisionN", lang, { n: ref.revisionNumber })
+      : t("sourceRevision", lang);
   }
-  if (ref.source === "live_payload") return "Live public copy";
-  if (ref.source === "attachments") return "Attachments";
-  if (ref.source === "og_image") return "OG image";
-  if (ref.source === "image_path") return "Primary image";
+  if (ref.source === "live_payload") return t("sourceLiveCopy", lang);
+  if (ref.source === "attachments") return t("sourceAttachments", lang);
+  if (ref.source === "og_image") return t("sourceOgImage", lang);
+  if (ref.source === "image_path") return t("sourcePrimaryImage", lang);
   return ref.source;
 }
 
 export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
+  const lang = useCmsLang();
   const buckets = useMemo(
     () => (allowedBuckets.length > 0 ? allowedBuckets : (["news"] as MediaBucket[])),
     [allowedBuckets],
   );
-  const [bucket, setBucket] = useState<MediaBucket>(buckets[0]!);
+  const [filter, setFilter] = useState<FolderFilter>("all");
+  const [uploadBucket, setUploadBucket] = useState<MediaBucket>(buckets[0]!);
   const [items, setItems] = useState(initialItems);
   const [lastPath, setLastPath] = useState("");
   const [lastId, setLastId] = useState<string | null>(null);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [blockedRefs, setBlockedRefs] = useState<MediaRef[] | null>(null);
-  const [blockedPath, setBlockedPath] = useState("");
+  const [blockedTitle, setBlockedTitle] = useState("");
   const [deleteError, setDeleteError] = useState("");
   const [deleting, setDeleting] = useState(false);
 
-  async function confirmDelete(item: Item) {
+  async function confirmDelete(item: MediaLibraryItem) {
     setDeleting(true);
     setDeleteError("");
     try {
@@ -82,13 +95,13 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
         references?: MediaRef[];
       };
       if (res.status === 409 && data.code === "MEDIA_IN_USE") {
-        setBlockedPath(data.publicPath ?? item.publicPath);
+        setBlockedTitle(item.linkedTitleAr || t("mediaUnused", lang));
         setBlockedRefs(data.references ?? []);
         setPendingDeleteId(null);
         return;
       }
       if (!res.ok || !data.ok) {
-        setDeleteError(data.error || "Delete failed");
+        setDeleteError(data.error || t("mediaDeleteFailed", lang));
         return;
       }
       setItems((prev) => prev.filter((i) => i.id !== item.id));
@@ -98,7 +111,7 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
       }
       setPendingDeleteId(null);
     } catch {
-      setDeleteError("Network error");
+      setDeleteError(t("loginNetworkError", lang));
     } finally {
       setDeleting(false);
     }
@@ -107,7 +120,7 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
   if (allowedBuckets.length === 0) {
     return (
       <p className="rounded-lg border border-dashed border-crs-border p-6 text-sm text-crs-muted">
-        No media buckets in your content scopes.
+        {t("mediaNoBuckets", lang)}
       </p>
     );
   }
@@ -116,45 +129,77 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
     ? items.find((i) => i.id === pendingDeleteId) ?? null
     : null;
 
+  const visibleItems =
+    filter === "all" ? items : items.filter((item) => item.bucket === filter);
+
+  function selectFolder(next: FolderFilter) {
+    setFilter(next);
+    setLastId(null);
+    setLastPath("");
+    if (next !== "all") setUploadBucket(next);
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div className="grid gap-3 rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm">
         <label className="text-sm">
-          <span className="font-medium">Bucket</span>
+          <span className="font-medium">{t("fieldBucket", lang)}</span>
           <select
-            value={bucket}
-            onChange={(e) => {
-              setBucket(e.target.value as MediaBucket);
-              setLastId(null);
-              setLastPath("");
-            }}
+            value={filter}
+            onChange={(e) => selectFolder(e.target.value as FolderFilter)}
             className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
           >
+            <option value="all">{t("mediaBucketAll", lang)}</option>
             {buckets.map((b) => (
               <option key={b} value={b}>
-                {BUCKET_LABELS[b]}
+                {t(BUCKET_LABEL_KEYS[b], lang)}
               </option>
             ))}
           </select>
         </label>
+        {filter === "all" ? (
+          <label className="text-sm">
+            <span className="font-medium">{t("mediaUploadTo", lang)}</span>
+            <select
+              value={uploadBucket}
+              onChange={(e) => {
+                setUploadBucket(e.target.value as MediaBucket);
+                setLastId(null);
+                setLastPath("");
+              }}
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
+            >
+              {buckets.map((b) => (
+                <option key={b} value={b}>
+                  {t(BUCKET_LABEL_KEYS[b], lang)}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-crs-muted">{t("mediaSelectFolderToUpload", lang)}</p>
+          </label>
+        ) : null}
         <MediaUploadField
-          bucket={bucket}
+          bucket={uploadBucket}
           publicPath={lastPath}
           mediaId={lastId}
           imagesOnly={false}
-          label="Upload image or PDF"
+          label={t("uploadImageOrPdf", lang)}
           onUploaded={({ publicPath, mediaId }) => {
             setLastPath(publicPath);
             setLastId(mediaId);
             setItems((prev) => [
               {
                 id: mediaId,
-                bucket,
-                originalFilename: publicPath.split("/").pop() ?? publicPath,
+                bucket: uploadBucket,
                 mimeType: publicPath.endsWith(".pdf") ? "application/pdf" : "image/*",
-                byteSize: 0,
                 publicPath,
-                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                uploaderNameAr: null,
+                uploaderNameEn: null,
+                linkedTitleAr: null,
+                linkedHref: null,
+                linkedContentType: null,
+                linkedCount: 0,
               },
               ...prev.filter((i) => i.id !== mediaId),
             ]);
@@ -168,15 +213,21 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
         </p>
       ) : null}
 
-      {items.length === 0 ? (
+      {visibleItems.length === 0 ? (
         <p className="rounded-lg border border-dashed border-crs-border p-6 text-sm text-crs-muted">
-          No uploads yet.
+          {t("mediaEmpty", lang)}
         </p>
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => {
+          {visibleItems.map((item) => {
             const src = cmsMediaSrc(item.publicPath);
             const pdf = item.mimeType.includes("pdf") || isPdfPath(item.publicPath);
+            const title = item.linkedTitleAr || t("mediaUnused", lang);
+            const typeLabel = contentTypeLabel(item.linkedContentType, lang);
+            const uploader =
+              (lang === "ar"
+                ? item.uploaderNameAr || item.uploaderNameEn
+                : item.uploaderNameEn || item.uploaderNameAr) || "—";
             return (
               <li
                 key={item.id}
@@ -191,31 +242,54 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
                     type="button"
                     className="overflow-hidden rounded-xl ring-1 ring-crs-border"
                     onClick={() => setLightboxSrc(src)}
-                    aria-label={`Preview ${item.originalFilename}`}
+                    aria-label={t("mediaPreview", lang)}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={src}
-                      alt={item.originalFilename}
-                      className="h-36 w-full object-cover"
-                    />
+                    <img src={src} alt="" className="h-36 w-full object-cover" />
                   </button>
                 )}
-                <p className="truncate text-sm font-medium text-crs-ink">{item.originalFilename}</p>
-                <p className="break-all text-[11px] text-crs-muted">
-                  {item.bucket} · <code>{item.publicPath}</code>
-                </p>
+                <div className="min-w-0">
+                  {item.linkedHref ? (
+                    <Link
+                      href={item.linkedHref}
+                      className="line-clamp-2 text-sm font-medium text-crs-ink hover:text-crs-primary hover:underline"
+                      dir="auto"
+                    >
+                      {title}
+                    </Link>
+                  ) : (
+                    <p className="line-clamp-2 text-sm font-medium text-crs-muted" dir="auto">
+                      {title}
+                    </p>
+                  )}
+                  {typeLabel ? (
+                    <p className="mt-0.5 text-xs text-crs-muted">{typeLabel}</p>
+                  ) : null}
+                  <p className="mt-1 text-xs text-crs-muted">
+                    {t("mediaUpdated", lang)}: {formatDateTime(item.updatedAt)}
+                  </p>
+                  <p className="text-xs text-crs-muted" dir="auto">
+                    {t("mediaBy", lang)}: {uploader}
+                  </p>
+                  {item.linkedCount > 1 ? (
+                    <p className="mt-0.5 text-xs text-crs-muted">
+                      {tf("mediaAlsoUsed", lang, { n: item.linkedCount - 1 })}
+                    </p>
+                  ) : null}
+                </div>
                 <div className="flex flex-wrap gap-3">
                   <button
                     type="button"
                     className="text-start text-xs text-crs-primary underline"
                     onClick={() => {
-                      setBucket(item.bucket as MediaBucket);
+                      const b = item.bucket as MediaBucket;
+                      setFilter(b);
+                      setUploadBucket(b);
                       setLastId(item.id);
                       setLastPath(item.publicPath);
                     }}
                   >
-                    Select to replace (same URL)
+                    {t("mediaSelectReplace", lang)}
                   </button>
                   <button
                     type="button"
@@ -225,7 +299,7 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
                       setPendingDeleteId(item.id);
                     }}
                   >
-                    Delete
+                    {t("mediaDelete", lang)}
                   </button>
                 </div>
               </li>
@@ -243,14 +317,14 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
         >
           <div className="w-full max-w-md rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-lg">
             <h2 id="media-delete-title" className="text-base font-semibold text-crs-ink">
-              Delete this media?
+              {t("mediaDeleteTitle", lang)}
             </h2>
-            <p className="mt-2 text-sm text-crs-muted">
-              <span className="font-medium text-crs-ink">{pendingItem.originalFilename}</span>
-              <br />
-              <code className="break-all text-[11px]">{pendingItem.publicPath}</code>
+            <p className="mt-2 text-sm text-crs-muted" dir="auto">
+              {tf("mediaDeleteLinked", lang, {
+                title: pendingItem.linkedTitleAr || t("mediaUnused", lang),
+              })}
             </p>
-            <p className="mt-2 text-sm text-crs-muted">This cannot be undone.</p>
+            <p className="mt-2 text-sm text-crs-muted">{t("mediaCannotUndo", lang)}</p>
             <div className="mt-4 flex justify-end gap-2">
               <button
                 type="button"
@@ -258,7 +332,7 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
                 disabled={deleting}
                 onClick={() => setPendingDeleteId(null)}
               >
-                Cancel
+                {t("mediaCancel", lang)}
               </button>
               <button
                 type="button"
@@ -266,7 +340,7 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
                 disabled={deleting}
                 onClick={() => void confirmDelete(pendingItem)}
               >
-                {deleting ? "Deleting…" : "Delete"}
+                {deleting ? t("mediaDeleting", lang) : t("mediaDelete", lang)}
               </button>
             </div>
           </div>
@@ -282,10 +356,10 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
         >
           <div className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-lg">
             <h2 id="media-blocked-title" className="text-base font-semibold text-crs-ink">
-              Cannot delete — still in use
+              {t("mediaBlockedTitle", lang)}
             </h2>
-            <p className="mt-2 break-all text-xs text-crs-muted">
-              <code>{blockedPath}</code>
+            <p className="mt-2 text-sm text-crs-muted" dir="auto">
+              {blockedTitle}
             </p>
             <ul className="mt-4 flex flex-col gap-2">
               {blockedRefs.map((ref) => (
@@ -296,11 +370,13 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
                   <Link
                     href={ref.dashboardPath}
                     className="font-medium text-crs-primary underline"
+                    dir="auto"
                   >
                     {ref.titleAr || ref.contentItemId}
                   </Link>
                   <p className="text-xs text-crs-muted">
-                    {ref.contentType} · {ref.status} · {sourceLabel(ref)}
+                    {contentTypeLabel(ref.contentType, lang)} · {ref.status} ·{" "}
+                    {sourceLabel(ref, lang)}
                   </p>
                 </li>
               ))}
@@ -311,10 +387,10 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
                 className="rounded-xl border border-crs-border px-3 py-2 text-sm"
                 onClick={() => {
                   setBlockedRefs(null);
-                  setBlockedPath("");
+                  setBlockedTitle("");
                 }}
               >
-                Close
+                {t("mediaClose", lang)}
               </button>
             </div>
           </div>

@@ -1,9 +1,11 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import type { ContentType, OrgUnit } from "@/lib/users";
+import { t, tf } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 const SPA_TYPES: ContentType[] = ["news", "event", "publication", "partner", "alert"];
 const RESEARCH_TYPES: ContentType[] = ["research_group", "research_project"];
@@ -12,7 +14,16 @@ type Props = {
   initialOrgUnits: OrgUnit[];
 };
 
+function kindLabel(kind: OrgUnit["kind"], lang: "en" | "ar"): string {
+  return kind === "centre_wide" ? t("orgKindCentreWide", lang) : t("orgKindResearchDept", lang);
+}
+
+function displayName(o: OrgUnit, lang: "en" | "ar"): string {
+  return lang === "ar" ? o.name_ar : o.name_en || o.name_ar;
+}
+
 export function OrgUnitsManager({ initialOrgUnits }: Props) {
+  const lang = useCmsLang();
   const router = useRouter();
   const [orgUnits, setOrgUnits] = useState(initialOrgUnits);
   const [error, setError] = useState<string | null>(null);
@@ -30,12 +41,6 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
   const [editNameEn, setEditNameEn] = useState("");
   const [editKind, setEditKind] = useState<"centre_wide" | "research_dept">("research_dept");
   const [editSort, setEditSort] = useState(0);
-
-  const catalogueSummary = useMemo(() => {
-    const cw = orgUnits.find((o) => o.kind === "centre_wide");
-    const depts = orgUnits.filter((o) => o.kind === "research_dept");
-    return { cw, depts };
-  }, [orgUnits]);
 
   async function refresh() {
     const res = await fetch("/api/org-units");
@@ -64,13 +69,13 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        const msg = data.error ?? "Create failed";
+        const msg = data.error ?? t("orgCreateFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
-      setMessage("Org unit created with the fixed type set for its kind.");
-      cmsToast.success("Org unit created with the fixed type set for its kind.");
+      setMessage(t("orgCreated", lang));
+      cmsToast.success(t("orgCreated", lang));
       setNewId("");
       setNewNameAr("");
       setNewNameEn("");
@@ -111,13 +116,13 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        const msg = data.error ?? "Update failed";
+        const msg = data.error ?? t("orgUpdateFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
-      setMessage("Org unit updated.");
-      cmsToast.success("Org unit updated.");
+      setMessage(t("orgUpdated", lang));
+      cmsToast.success(t("orgUpdated", lang));
       setEditId(null);
       await refresh();
     } finally {
@@ -135,23 +140,25 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
       error?: string;
     };
     if (!impactRes.ok || !impactData.ok || !impactData.impact) {
-      const msg = impactData.error ?? "Could not check delete impact";
+      const msg = impactData.error ?? t("orgDeleteImpactFailed", lang);
       setError(msg);
       cmsToast.error(msg);
       return;
     }
     const { contentCount, userScopeCount, reviewerClaim } = impactData.impact;
+    const name = displayName(o, lang);
     if (contentCount > 0) {
-      const msg = `Cannot delete "${o.id}": ${contentCount} content item(s) still use it. Move content first.`;
+      const msg = tf("orgDeleteBlockedContent", lang, { name, count: contentCount });
       setError(msg);
       cmsToast.error(msg);
       return;
     }
     const ok = window.confirm(
-      `Delete org unit "${o.name_en}" (${o.id})?\n` +
-        `This removes ${userScopeCount} user scope assignment(s)` +
-        (reviewerClaim ? " and the Reviewer claim" : "") +
-        ".",
+      tf("orgDeleteConfirm", lang, {
+        name,
+        users: userScopeCount,
+        reviewer: reviewerClaim ? t("orgDeleteConfirmReviewer", lang) : "",
+      }),
     );
     if (!ok) return;
 
@@ -162,14 +169,13 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        const msg = data.error ?? "Delete failed";
+        const msg = data.error ?? t("orgDeleteFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
-      const msg = `Deleted ${o.id}.`;
-      setMessage(msg);
-      cmsToast.success(msg);
+      setMessage(t("orgDeleted", lang));
+      cmsToast.success(t("orgDeleted", lang));
       if (editId === o.id) setEditId(null);
       await refresh();
     } finally {
@@ -182,38 +188,15 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {message ? <p className="text-sm text-green-700">{message}</p> : null}
 
-      <section className="rounded-lg border border-crs-border bg-crs-bg px-4 py-3 text-sm text-crs-ink/90">
-        <p className="font-medium text-crs-ink">Fixed content-type sets by org kind</p>
-        <ul className="mt-2 list-disc ps-5 text-xs">
-          <li>
-            <span className="font-medium">Centre-wide:</span> {SPA_TYPES.join(", ")} (SPA
-            sections — not shared with research depts)
-          </li>
-          <li>
-            <span className="font-medium">Research department:</span>{" "}
-            {RESEARCH_TYPES.join(", ")} — manage instances under Research groups / Projects
-          </li>
-        </ul>
-        {catalogueSummary.cw ? (
-          <p className="mt-2 text-xs">
-            Current centre-wide catalog:{" "}
-            {(catalogueSummary.cw.content_types ?? []).join(", ") || "—"}
-          </p>
-        ) : null}
-      </section>
-
       <form
         onSubmit={createOrg}
         className="grid gap-3 cms-form rounded-2xl border border-crs-border bg-crs-surface p-6 shadow-sm"
       >
-        <h2 className="text-lg font-medium text-crs-ink">Create org unit</h2>
-        <p className="text-xs text-crs-muted">
-          Type catalogs are fixed by kind. Create research groups and projects from the Research
-          nav after assigning Editors to the dept.
-        </p>
+        <h2 className="text-lg font-medium text-crs-ink">{t("orgCreateTitle", lang)}</h2>
+        <p className="text-xs text-crs-muted">{t("orgCreateHint", lang)}</p>
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="text-sm">
-            <span className="font-medium">Name (EN) *</span>
+            <span className="font-medium">{t("orgNameEn", lang)}</span>
             <input
               required
               value={newNameEn}
@@ -222,7 +205,7 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Name (AR) *</span>
+            <span className="font-medium">{t("orgNameAr", lang)}</span>
             <input
               required
               dir="rtl"
@@ -232,64 +215,58 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Kind *</span>
+            <span className="font-medium">{t("orgKind", lang)}</span>
             <select
               value={newKind}
               onChange={(e) => setNewKind(e.target.value as "centre_wide" | "research_dept")}
               className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             >
-              <option value="research_dept">Research department</option>
-              <option value="centre_wide">Centre-wide</option>
+              <option value="research_dept">{t("orgKindResearchDept", lang)}</option>
+              <option value="centre_wide">{t("orgKindCentreWide", lang)}</option>
             </select>
           </label>
           <label className="text-sm">
-            <span className="font-medium">Id (optional)</span>
+            <span className="font-medium">{t("orgIdOptional", lang)}</span>
             <input
               value={newId}
               onChange={(e) => setNewId(e.target.value)}
-              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink font-mono text-xs"
-              placeholder="auto from EN name"
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
+              placeholder={t("orgIdPlaceholder", lang)}
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Sort order (optional)</span>
+            <span className="font-medium">{t("orgSortOptional", lang)}</span>
             <input
               type="number"
               value={newSort}
               onChange={(e) => setNewSort(e.target.value)}
               className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
-              placeholder="auto"
+              placeholder={t("orgSortPlaceholder", lang)}
             />
           </label>
         </div>
-        <p className="text-xs text-crs-muted">
-          Will assign:{" "}
-          {(newKind === "centre_wide" ? SPA_TYPES : RESEARCH_TYPES).join(", ")}
-        </p>
         <button
           type="submit"
           disabled={pending}
           className="w-fit rounded-lg bg-crs-primary hover:bg-crs-secondary px-4 py-2 text-sm text-white disabled:opacity-60"
         >
-          {pending ? "Saving…" : "Create"}
+          {pending ? t("orgCreating", lang) : t("orgCreate", lang)}
         </button>
       </form>
 
       <section className="overflow-x-auto rounded-2xl border border-crs-border bg-crs-surface shadow-sm">
-        <table className="min-w-full text-left text-sm">
+        <table className="min-w-full text-start text-sm">
           <thead className="border-b bg-crs-bg text-crs-muted">
             <tr>
-              <th className="px-3 py-2">Id</th>
-              <th className="px-3 py-2">Names</th>
-              <th className="px-3 py-2">Kind / types</th>
-              <th className="px-3 py-2">Sort</th>
-              <th className="px-3 py-2">Actions</th>
+              <th className="px-3 py-2">{t("orgColName", lang)}</th>
+              <th className="px-3 py-2">{t("orgColKind", lang)}</th>
+              <th className="px-3 py-2">{t("orgColSort", lang)}</th>
+              <th className="px-3 py-2">{t("orgColActions", lang)}</th>
             </tr>
           </thead>
           <tbody>
             {orgUnits.map((o) => (
               <tr key={o.id} className="border-b last:border-0 align-top">
-                <td className="px-3 py-3 font-mono text-xs">{o.id}</td>
                 <td className="px-3 py-3">
                   {editId === o.id ? (
                     <div className="grid gap-2">
@@ -297,23 +274,18 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
                         value={editNameEn}
                         onChange={(e) => setEditNameEn(e.target.value)}
                         className="w-full rounded border px-2 py-1"
-                        placeholder="EN"
+                        placeholder={t("orgNameEn", lang)}
                       />
                       <input
                         dir="rtl"
                         value={editNameAr}
                         onChange={(e) => setEditNameAr(e.target.value)}
                         className="w-full rounded border px-2 py-1"
-                        placeholder="AR"
+                        placeholder={t("orgNameAr", lang)}
                       />
                     </div>
                   ) : (
-                    <>
-                      <div className="font-medium">{o.name_en}</div>
-                      <div dir="rtl" className="text-crs-muted">
-                        {o.name_ar}
-                      </div>
-                    </>
+                    <div className="font-medium text-crs-ink">{displayName(o, lang)}</div>
                   )}
                 </td>
                 <td className="px-3 py-3">
@@ -325,16 +297,11 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
                       }
                       className="rounded border px-2 py-1"
                     >
-                      <option value="research_dept">research_dept</option>
-                      <option value="centre_wide">centre_wide</option>
+                      <option value="research_dept">{t("orgKindResearchDept", lang)}</option>
+                      <option value="centre_wide">{t("orgKindCentreWide", lang)}</option>
                     </select>
                   ) : (
-                    <>
-                      <div>{o.kind}</div>
-                      <div className="mt-1 text-xs text-crs-muted">
-                        {(o.content_types ?? []).join(", ") || "—"}
-                      </div>
-                    </>
+                    kindLabel(o.kind, lang)
                   )}
                 </td>
                 <td className="px-3 py-3">
@@ -358,14 +325,14 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
                         className="rounded border px-2 py-1 text-xs"
                         onClick={() => void saveEdit()}
                       >
-                        Save
+                        {t("orgSave", lang)}
                       </button>
                       <button
                         type="button"
                         className="text-xs underline"
                         onClick={() => setEditId(null)}
                       >
-                        Cancel
+                        {t("orgCancel", lang)}
                       </button>
                     </div>
                   ) : (
@@ -376,7 +343,7 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
                         className="rounded border px-2 py-1 text-xs"
                         onClick={() => startEdit(o)}
                       >
-                        Edit
+                        {t("orgEdit", lang)}
                       </button>
                       <button
                         type="button"
@@ -384,7 +351,7 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
                         className="rounded border border-red-300 px-2 py-1 text-xs text-red-700"
                         onClick={() => void removeOrg(o)}
                       >
-                        Delete
+                        {t("orgDelete", lang)}
                       </button>
                     </div>
                   )}

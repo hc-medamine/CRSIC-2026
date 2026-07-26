@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { formatDateTime } from "@/lib/format-datetime";
+import { t, tf, localizedDisplayName } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 type Revision = {
   id: string;
@@ -14,6 +16,8 @@ type Revision = {
   createdAt: string;
   authorEmail: string | null;
   authorDisplayName: string | null;
+  authorNameAr: string | null;
+  authorNameEn: string | null;
 };
 
 type ContentType =
@@ -68,6 +72,7 @@ const HIGHLIGHT_KEYS = [
 ];
 
 export function RevisionHistory({ contentItemId, contentType, canRestore }: Props) {
+  const lang = useCmsLang();
   const router = useRouter();
   const [revisions, setRevisions] = useState<Revision[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -84,7 +89,7 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
       const res = await fetch(`/api/content/${contentItemId}/revisions`);
       const data = (await res.json()) as { ok: boolean; error?: string; revisions?: Revision[] };
       if (!res.ok || !data.ok || !data.revisions) {
-        const msg = data.error ?? "Failed to load revisions";
+        const msg = data.error ?? t("revisionsLoadFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
@@ -119,8 +124,8 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
         cmsToast.error(msg);
         return;
       }
-      setMessage("Revision restored onto the editable draft.");
-      cmsToast.success("Revision restored onto the editable draft.");
+      setMessage(t("revisionsRestored", lang));
+      cmsToast.success(t("revisionsRestored", lang));
       await load();
       router.refresh();
     } finally {
@@ -148,24 +153,22 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
   return (
     <section className="grid gap-3 rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm">
       <div>
-        <h2 className="text-lg font-medium text-crs-ink">Revision history</h2>
-        <p className="text-xs text-crs-muted">
-          Select a revision to inspect. Optionally compare with a prior revision (read-only).
-        </p>
+        <h2 className="text-lg font-medium text-crs-ink">{t("revisionHistory", lang)}</h2>
+        <p className="text-xs text-crs-muted">{t("revisionHistoryHint", lang)}</p>
       </div>
 
-      {loading ? <p className="text-sm text-crs-muted">Loading…</p> : null}
+      {loading ? <p className="text-sm text-crs-muted">{t("loadingEllipsis", lang)}</p> : null}
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {message ? <p className="text-sm text-green-700">{message}</p> : null}
 
       {!loading && revisions.length === 0 ? (
-        <p className="text-sm text-crs-muted">No revisions recorded yet.</p>
+        <p className="text-sm text-crs-muted">{t("noRevisions", lang)}</p>
       ) : null}
 
       {revisions.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="text-sm">
-            <span className="font-medium">View</span>
+            <span className="font-medium">{t("viewLabel", lang)}</span>
             <select
               value={selectedId ?? ""}
               onChange={(e) => setSelectedId(e.target.value || null)}
@@ -180,13 +183,13 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
             </select>
           </label>
           <label className="text-sm">
-            <span className="font-medium">Compare with (optional)</span>
+            <span className="font-medium">{t("compareWithOptional", lang)}</span>
             <select
               value={compareId ?? ""}
               onChange={(e) => setCompareId(e.target.value || null)}
               className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             >
-              <option value="">— none —</option>
+              <option value="">{t("compareNone", lang)}</option>
               {revisions.map((r) => (
                 <option key={r.id} value={r.id}>
                   #{r.revisionNumber} · {r.status}
@@ -202,7 +205,14 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-xs text-crs-muted">
               #{selected.revisionNumber} · {selected.status} ·{" "}
-              {selected.authorDisplayName ?? selected.authorEmail ?? "unknown"} ·{" "}
+              {localizedDisplayName(
+                {
+                  displayName: selected.authorDisplayName,
+                  nameAr: selected.authorNameAr,
+                  nameEn: selected.authorNameEn,
+                },
+                lang,
+              ) || selected.authorEmail || t("revisionsUnknownAuthor", lang)} ·{" "}
               {formatDateTime(selected.createdAt)}
               {selected.changeSummary ? ` · ${selected.changeSummary}` : ""}
             </p>
@@ -213,7 +223,7 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
                 onClick={() => void restore()}
                 className="rounded border border-crs-secondary/40 px-2 py-1 text-xs text-crs-primary hover:bg-crs-primary/10 disabled:opacity-60"
               >
-                {restoring ? "Restoring…" : "Restore this revision (→ draft)"}
+                {restoring ? t("restoring", lang) : t("restoreRevision", lang)}
               </button>
             ) : null}
           </div>
@@ -222,9 +232,13 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
             <table className="w-full min-w-[28rem] border-collapse text-left text-xs">
               <thead>
                 <tr className="border-b border-crs-border text-crs-muted">
-                  <th className="py-1 pr-2 font-medium">Field</th>
-                  <th className="py-1 pr-2 font-medium">Selected</th>
-                  {compare ? <th className="py-1 font-medium">Compare #{compare.revisionNumber}</th> : null}
+                  <th className="py-1 pr-2 font-medium">{t("colField", lang)}</th>
+                  <th className="py-1 pr-2 font-medium">{t("colSelected", lang)}</th>
+                  {compare ? (
+                    <th className="py-1 font-medium">
+                      {tf("revisionsCompare", lang, { n: compare.revisionNumber })}
+                    </th>
+                  ) : null}
                 </tr>
               </thead>
               <tbody>

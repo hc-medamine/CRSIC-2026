@@ -3,6 +3,8 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { formatDateTime } from "@/lib/format-datetime";
+import { t, localizedDisplayName, type CmsLang } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 type Comment = {
   id: string;
@@ -11,6 +13,8 @@ type Comment = {
   createdAt: string;
   authorEmail: string | null;
   authorDisplayName: string | null;
+  authorNameAr: string | null;
+  authorNameEn: string | null;
 };
 
 type Props = {
@@ -19,13 +23,14 @@ type Props = {
   refreshToken?: string;
 };
 
-function kindLabel(kind: Comment["kind"]): string | null {
-  if (kind === "changes_requested") return "Changes requested";
-  if (kind === "rejected") return "Rejected";
+function kindLabel(kind: Comment["kind"], lang: CmsLang): string | null {
+  if (kind === "changes_requested") return t("badgeChangesRequested", lang);
+  if (kind === "rejected") return t("badgeRejected", lang);
   return null;
 }
 
 export function CommentThread({ contentItemId, refreshToken }: Props) {
+  const lang = useCmsLang();
   const [comments, setComments] = useState<Comment[]>([]);
   const [canComment, setCanComment] = useState(false);
   const [body, setBody] = useState("");
@@ -45,7 +50,7 @@ export function CommentThread({ contentItemId, refreshToken }: Props) {
         canComment?: boolean;
       };
       if (!res.ok || !data.ok) {
-        const msg = data.error ?? "Failed to load comments";
+        const msg = data.error ?? t("commentsLoadFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
@@ -74,14 +79,14 @@ export function CommentThread({ contentItemId, refreshToken }: Props) {
       });
       const data = (await res.json()) as { ok: boolean; error?: string; comment?: Comment };
       if (!res.ok || !data.ok || !data.comment) {
-        const msg = data.error ?? "Failed to post comment";
+        const msg = data.error ?? t("commentsPostFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
       setComments((prev) => [...prev, data.comment!]);
       setBody("");
-      cmsToast.success("Comment posted.");
+      cmsToast.success(t("commentsPosted", lang));
     } finally {
       setPending(false);
     }
@@ -89,22 +94,30 @@ export function CommentThread({ contentItemId, refreshToken }: Props) {
 
   return (
     <section className="rounded border border-crs-border bg-white p-4">
-      <h2 className="mb-3 text-lg font-semibold">Comments</h2>
-      <p className="mb-4 text-xs text-crs-muted">
-        Append-only thread. Request changes / reject notes appear here automatically.
-      </p>
+      <h2 className="mb-3 text-lg font-semibold">{t("commentsTitle", lang)}</h2>
+      <p className="mb-4 text-xs text-crs-muted">{t("commentsHint", lang)}</p>
 
-      {loading ? <p className="text-sm text-crs-muted">Loading…</p> : null}
+      {loading ? <p className="text-sm text-crs-muted">{t("loadingEllipsis", lang)}</p> : null}
       {error ? <p className="mb-3 text-sm text-red-700">{error}</p> : null}
 
       {!loading && comments.length === 0 ? (
-        <p className="mb-4 text-sm text-crs-muted">No comments yet.</p>
+        <p className="mb-4 text-sm text-crs-muted">{t("noComments", lang)}</p>
       ) : null}
 
       <ul className="mb-4 flex flex-col gap-3">
         {comments.map((c) => {
-          const badge = kindLabel(c.kind);
-          const who = c.authorDisplayName || c.authorEmail || "Unknown";
+          const badge = kindLabel(c.kind, lang);
+          const who =
+            localizedDisplayName(
+              {
+                displayName: c.authorDisplayName,
+                nameAr: c.authorNameAr,
+                nameEn: c.authorNameEn,
+              },
+              lang,
+            ) ||
+            c.authorEmail ||
+            t("commentsUnknownAuthor", lang);
           const when = formatDateTime(c.createdAt);
           return (
             <li key={c.id} className="rounded border border-crs-border/70 bg-crs-bg px-3 py-2 text-sm">
@@ -127,7 +140,7 @@ export function CommentThread({ contentItemId, refreshToken }: Props) {
             value={body}
             onChange={(e) => setBody(e.target.value)}
             rows={3}
-            placeholder="Add a comment…"
+            placeholder={t("addCommentPh", lang)}
             className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             disabled={pending}
           />
@@ -136,13 +149,11 @@ export function CommentThread({ contentItemId, refreshToken }: Props) {
             disabled={pending || !body.trim()}
             className="w-fit rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white disabled:opacity-50"
           >
-            {pending ? "Posting…" : "Post comment"}
+            {pending ? t("posting", lang) : t("postComment", lang)}
           </button>
         </form>
       ) : (
-        <p className="text-xs text-crs-muted">
-          Only the author, Reviewer, or Super Admin can comment on this item.
-        </p>
+        <p className="text-xs text-crs-muted">{t("commentsOnlyAuthorReviewer", lang)}</p>
       )}
     </section>
   );

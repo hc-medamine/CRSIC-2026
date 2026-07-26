@@ -10,7 +10,7 @@ import { getItemPeopleMeta } from "@/lib/content/people";
 import { getReviewOwnerMeta } from "@/lib/content/delegation";
 import { getEmergencyMeta } from "@/lib/content/emergency";
 import { refreshUserFromDb } from "@/lib/content/ooo";
-import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
+import { CMS_LANG_COOKIE, normalizeLang, t, localizedDisplayName } from "@/lib/i18n/labels";
 import { NewsEditorForm } from "../news-form";
 import { RevisionHistory } from "@/app/dashboard/revision-history";
 import { ReassignAuthor } from "@/app/dashboard/reassign-author";
@@ -22,9 +22,23 @@ import { EditPageShell } from "@/app/dashboard/content-list-page";
 
 type Props = { params: Promise<{ id: string }> };
 
-function personProp(p: { displayName: string; email: string; role: string } | null) {
+function personProp(
+  p: {
+    displayName: string;
+    nameAr?: string | null;
+    nameEn?: string | null;
+    email: string;
+    role: string;
+  } | null,
+) {
   if (!p) return null;
-  return { displayName: p.displayName, email: p.email, role: p.role };
+  return {
+    displayName: p.displayName,
+    nameAr: p.nameAr ?? null,
+    nameEn: p.nameEn ?? null,
+    email: p.email,
+    role: p.role,
+  };
 }
 
 export default async function NewsDetailPage({ params }: Props) {
@@ -68,16 +82,15 @@ export default async function NewsDetailPage({ params }: Props) {
       breadcrumbs={[
         { href: "/dashboard", label: t("home", lang) },
         { href: "/dashboard/news", label: t("news", lang) },
-        { label: "Edit" },
+        { label: t("edit", lang) },
       ]}
-      title="Edit / review"
+      title={t("editReview", lang)}
       subtitle={item.title_ar || undefined}
       wide
     >
       {!reviewer && canReview(user) && item.created_by === user.id ? (
         <p className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          Four-eyes: you authored this item, so you cannot approve or publish it. Use a different
-          Reviewer account.
+          {t("fourEyesNotice", lang)}
         </p>
       ) : null}
 
@@ -111,13 +124,7 @@ export default async function NewsDetailPage({ params }: Props) {
           editor: personProp(people.editor),
           reviewer: personProp(people.reviewer),
           publisher: personProp(people.publisher),
-          reviewOwner: ownerMeta.reviewOwnerName
-            ? {
-                displayName: ownerMeta.reviewOwnerName,
-                email: "",
-                role: "review_owner",
-              }
-            : null,
+          reviewOwner: personProp(people.reviewOwner),
           escalatedAt: ownerMeta.escalatedAt,
           needsPostReview: emergencyMeta.needsPostReview,
           metaTitleAr: item.meta_title_ar ?? "",
@@ -136,7 +143,18 @@ export default async function NewsDetailPage({ params }: Props) {
         needsPostReview={emergencyMeta.needsPostReview}
         emergencyReason={emergencyMeta.emergencyReason}
         emergencyPublishedAt={emergencyMeta.emergencyPublishedAt}
-        emergencyPublishedByName={emergencyMeta.emergencyPublishedByName}
+        emergencyPublishedByName={
+          emergencyMeta.emergencyPublishedByName
+            ? localizedDisplayName(
+                {
+                  displayName: emergencyMeta.emergencyPublishedByName,
+                  nameAr: emergencyMeta.emergencyPublishedByNameAr,
+                  nameEn: emergencyMeta.emergencyPublishedByNameEn,
+                },
+                lang,
+              )
+            : null
+        }
       />
 
       <EscalatePanel
@@ -149,9 +167,42 @@ export default async function NewsDetailPage({ params }: Props) {
         contentItemId={item.id}
         canPropose={canProposeOwner}
         canConfirm={user.role === "super_admin"}
-        reviewOwnerName={ownerMeta.reviewOwnerName}
-        proposedOwnerName={ownerMeta.proposedOwnerName}
-        proposedByName={ownerMeta.proposedByName}
+        reviewOwnerName={
+          ownerMeta.reviewOwnerName
+            ? localizedDisplayName(
+                {
+                  displayName: ownerMeta.reviewOwnerName,
+                  nameAr: ownerMeta.reviewOwnerNameAr,
+                  nameEn: ownerMeta.reviewOwnerNameEn,
+                },
+                lang,
+              )
+            : null
+        }
+        proposedOwnerName={
+          ownerMeta.proposedOwnerName
+            ? localizedDisplayName(
+                {
+                  displayName: ownerMeta.proposedOwnerName,
+                  nameAr: ownerMeta.proposedOwnerNameAr,
+                  nameEn: ownerMeta.proposedOwnerNameEn,
+                },
+                lang,
+              )
+            : null
+        }
+        proposedByName={
+          ownerMeta.proposedByName
+            ? localizedDisplayName(
+                {
+                  displayName: ownerMeta.proposedByName,
+                  nameAr: ownerMeta.proposedByNameAr,
+                  nameEn: ownerMeta.proposedByNameEn,
+                },
+                lang,
+              )
+            : null
+        }
       />
 
       {canReassign ? (

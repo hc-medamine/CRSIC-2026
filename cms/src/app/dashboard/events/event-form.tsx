@@ -18,6 +18,7 @@ import { RichBodyEditor } from "@/app/dashboard/rich-body-editor";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { AdvancedDisclosure, FormBanner, FormSection, FormStickyActions, messageForAction } from "@/app/dashboard/form-ux";
 import { t } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 import type { PublicMediaItem } from "@/lib/publish/media";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
@@ -80,6 +81,7 @@ export function EventEditorForm({
   canDelete,
 }: Props) {
   const router = useRouter();
+  const lang = useCmsLang();
   const [orgUnitId, setOrgUnitId] = useState(initial?.orgUnitId ?? orgUnits[0]?.id ?? "");
   const [titleAr, setTitleAr] = useState(initial?.titleAr ?? "");
   const [titleEn, setTitleEn] = useState(initial?.titleEn ?? "");
@@ -172,12 +174,12 @@ export function EventEditorForm({
       });
       const data = (await res.json()) as { ok: boolean; error?: string; item?: { id: string } };
       if (!res.ok || !data.ok || !data.item) {
-        const msg = data.error ?? "Create failed";
+        const msg = data.error ?? t("createFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
-      cmsToast.success("Draft created.");
+      cmsToast.success(t("draftCreated", lang));
       router.push(`/dashboard/events/${data.item.id}`);
       router.refresh();
     } finally {
@@ -189,7 +191,7 @@ export function EventEditorForm({
     if (!initial?.id) return;
     if (action === "delete") {
       const ok = window.confirm(
-        "Permanently delete this item? This cannot be undone.",
+        t("confirmDelete", lang),
       );
       if (!ok) return;
     }
@@ -204,19 +206,19 @@ export function EventEditorForm({
       });
       const data = (await res.json()) as { ok: boolean; error?: string; deleted?: boolean };
       if (!res.ok || !data.ok) {
-        const msg = data.error ?? "Action failed";
+        const msg = data.error ?? t("actionFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
       if (data.deleted) {
-        cmsToast.success("Deleted.");
+        cmsToast.success(t("deletedShort", lang));
         router.push("/dashboard");
         router.refresh();
         return;
       }
       const key = messageForAction(action);
-      const msg = t(key || "savedStay", "en");
+      const msg = t(key || "savedStay", lang);
       setMessage(msg);
       cmsToast.success(msg);
       router.refresh();
@@ -248,9 +250,9 @@ export function EventEditorForm({
         onSubmit={mode === "create" ? create : (e) => e.preventDefault()}
         className="flex flex-col gap-1 cms-form rounded-2xl border border-crs-border bg-crs-surface p-6 shadow-sm"
       >
-        <FormSection step={1} title={t("sectionIdentity", "en")}>
+        <FormSection step={1} title={t("sectionIdentity", lang)}>
           <label className="text-sm">
-            <span className="font-medium">Organisation unit</span>
+            <span className="font-medium">{t("fieldOrgUnit", lang)}</span>
             <select
               disabled={!editable}
               value={orgUnitId}
@@ -259,7 +261,7 @@ export function EventEditorForm({
             >
               {orgUnits.map((o) => (
                 <option key={o.id} value={o.id}>
-                  {o.name_en} ({o.name_ar})
+                  {lang === "ar" ? o.name_ar : o.name_en || o.name_ar}
                 </option>
               ))}
             </select>
@@ -267,19 +269,19 @@ export function EventEditorForm({
 
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="text-sm">
-              <span className="font-medium">Scope</span>
+              <span className="font-medium">{t("fieldScope", lang)}</span>
               <select
                 disabled={!editable}
                 value={eventScope}
                 onChange={(e) => setEventScope(e.target.value as "intl" | "nat")}
                 className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
               >
-                <option value="nat">National (nat)</option>
-                <option value="intl">International (intl)</option>
+                <option value="nat">{t("fieldScopeNational", lang)}</option>
+                <option value="intl">{t("fieldScopeInternational", lang)}</option>
               </select>
             </label>
             <label className="text-sm">
-              <span className="font-medium">Display status</span>
+              <span className="font-medium">{t("fieldDisplayStatus", lang)}</span>
               <select
                 disabled={!editable}
                 value={eventDisplayStatus}
@@ -294,29 +296,29 @@ export function EventEditorForm({
 
           <div className="grid gap-3 sm:grid-cols-3">
             <label className="text-sm">
-              <span className="font-medium">Day *</span>
+              <span className="font-medium">{t("fieldDay", lang)}</span>
               <input disabled={!editable} value={eventDay} onChange={(e) => setEventDay(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" placeholder="05" />
             </label>
             <label className="text-sm">
-              <span className="font-medium">Month (AR display) *</span>
+              <span className="font-medium">{t("fieldMonthAr", lang)}</span>
               <input dir="rtl" disabled={!editable} value={eventMonth} onChange={(e) => setEventMonth(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" placeholder="ماي" />
             </label>
             <label className="text-sm">
-              <span className="font-medium">Year *</span>
+              <span className="font-medium">{t("fieldYear", lang)}</span>
               <input disabled={!editable} value={eventYear} onChange={(e) => setEventYear(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" placeholder="2026" />
             </label>
           </div>
 
           <label className="text-sm">
-            <span className="font-medium">Title (AR) *</span>
+            <span className="font-medium">{t("fieldTitleAr", lang)}</span>
             <input dir="rtl" required disabled={!editable} value={titleAr} onChange={(e) => setTitleAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Type (AR) *</span>
+            <span className="font-medium">{t("fieldTypeAr", lang)}</span>
             <input dir="rtl" disabled={!editable} value={eventTypeAr} onChange={(e) => setEventTypeAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" placeholder="ملتقى وطني" />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Summary (AR)</span>
+            <span className="font-medium">{t("fieldSummaryAr", lang)}</span>
             <textarea
               dir="rtl"
               disabled={!editable}
@@ -328,9 +330,9 @@ export function EventEditorForm({
           </label>
         </FormSection>
 
-        <FormSection step={2} title={t("sectionBody", "en")}>
+        <FormSection step={2} title={t("sectionBody", lang)}>
           <RichBodyEditor
-            label="Body (AR)"
+            label={t("fieldBodyAr", lang)}
             dir="rtl"
             disabled={!editable}
             value={bodyAr}
@@ -338,14 +340,14 @@ export function EventEditorForm({
           />
         </FormSection>
 
-        <FormSection step={3} title={t("sectionMedia", "en")}>
+        <FormSection step={3} title={t("sectionMedia", lang)}>
           <MediaUploadField
             bucket="events"
             publicPath={imagePath}
             mediaId={imageMediaId}
             disabled={!editable}
             imagesOnly
-            label="Event image (optional)"
+            label={t("fieldEventImage", lang)}
             onUploaded={({ publicPath, mediaId }) => {
               setImagePath(publicPath);
               setImageMediaId(mediaId);
@@ -363,26 +365,26 @@ export function EventEditorForm({
             }}
           />
           <label className="text-sm">
-            <span className="font-medium">Image alt (AR)</span>
+            <span className="font-medium">{t("fieldImageAltAr", lang)}</span>
             <input dir="rtl" disabled={!editable} value={imageAltAr} onChange={(e) => setImageAltAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
         </FormSection>
 
         <AdvancedDisclosure
           step={4}
-          title={t("sectionAdvanced", "en")}
-          hint={t("sectionAdvancedHint", "en")}
+          title={t("sectionAdvanced", lang)}
+          hint={t("sectionAdvancedHint", lang)}
         >
           <label className="text-sm">
-            <span className="font-medium">Title (EN)</span>
+            <span className="font-medium">{t("fieldTitleEn", lang)}</span>
             <input disabled={!editable} value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Type (EN)</span>
+            <span className="font-medium">{t("fieldTypeEn", lang)}</span>
             <input disabled={!editable} value={eventTypeEn} onChange={(e) => setEventTypeEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Summary (EN)</span>
+            <span className="font-medium">{t("fieldSummaryEn", lang)}</span>
             <textarea
               disabled={!editable}
               value={summaryEn}
@@ -392,25 +394,25 @@ export function EventEditorForm({
             />
           </label>
           <RichBodyEditor
-            label="Body (EN)"
+            label={t("fieldBodyEn", lang)}
             dir="ltr"
             disabled={!editable}
             value={bodyEn}
             onChange={setBodyEn}
           />
           <label className="text-sm">
-            <span className="font-medium">Image alt (EN)</span>
+            <span className="font-medium">{t("fieldImageAltEn", lang)}</span>
             <input disabled={!editable} value={imageAltEn} onChange={(e) => setImageAltEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Public slug (optional)</span>
+            <span className="font-medium">{t("fieldPublicSlugOptional", lang)}</span>
             <input dir="auto" disabled={!editable} value={publicSlug} onChange={(e) => setPublicSlug(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink font-mono text-xs" />
           </label>
           <label className="text-sm">
-            <span className="font-medium">EN status</span>
+            <span className="font-medium">{t("enStatus", lang)}</span>
             <select disabled={!editable} value={enStatus} onChange={(e) => setEnStatus(e.target.value as "pending" | "ready")} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink">
-              <option value="pending">pending</option>
-              <option value="ready">ready</option>
+              <option value="pending">{t("enStatusPending", lang)}</option>
+              <option value="ready">{t("enStatusReady", lang)}</option>
             </select>
           </label>
           <SeoFieldsSection
@@ -432,7 +434,7 @@ export function EventEditorForm({
                 disabled={pending}
                 className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
               >
-                {pending ? "Saving…" : "Create draft"}
+                {pending ? t("actionSaving", lang) : t("actionCreateDraft", lang)}
               </button>
             ) : null}
             {mode === "edit" && editable && isAuthor ? (
@@ -443,12 +445,12 @@ export function EventEditorForm({
                   className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60"
                   onClick={() => void run("save", { fields: fields() })}
                 >
-                  Save draft
+                  {t("actionSaveDraft", lang)}
                 </button>
                 {canSubmit ? (
                   <label className="me-auto flex items-center gap-2 text-sm text-crs-ink">
                     <input type="checkbox" checked={checklist} onChange={(e) => setChecklist(e.target.checked)} />
-                    Checklist OK
+                    {t("actionChecklistOk", lang)}
                   </label>
                 ) : null}
                 {canSubmit ? (
@@ -458,7 +460,7 @@ export function EventEditorForm({
                     className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
                     onClick={() => void run("submit", { checklistConfirmed: checklist })}
                   >
-                    Submit for review
+                    {t("actionSubmit", lang)}
                   </button>
                 ) : null}
               </>
@@ -470,7 +472,7 @@ export function EventEditorForm({
                 className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg"
                 onClick={() => void run("withdraw")}
               >
-                Withdraw
+                {t("actionWithdraw", lang)}
               </button>
             ) : null}
           </div>
@@ -479,12 +481,12 @@ export function EventEditorForm({
 
       {mode === "edit" && canReview && initial?.status === "submitted" ? (
         <div className="grid gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
-          <p className="text-sm font-medium">Reviewer actions</p>
-          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note for changes / rejection" className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" rows={2} />
+          <p className="text-sm font-medium">{t("actionReviewerActions", lang)}</p>
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("actionNotePlaceholder", lang)} className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" rows={2} />
           <div className="flex flex-wrap gap-2">
-            <button type="button" disabled={pending} className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white" onClick={() => void run("approve")}>Approve</button>
-            <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg" onClick={() => void run("request_changes", { note })}>Request changes</button>
-            <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-red-300 bg-crs-surface px-3 py-2 text-sm text-red-700 hover:bg-red-50" onClick={() => void run("reject", { note })}>Reject</button>
+            <button type="button" disabled={pending} className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white" onClick={() => void run("approve")}>{t("actionApprove", lang)}</button>
+            <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg" onClick={() => void run("request_changes", { note })}>{t("actionRequestChanges", lang)}</button>
+            <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-red-300 bg-crs-surface px-3 py-2 text-sm text-red-700 hover:bg-red-50" onClick={() => void run("reject", { note })}>{t("actionReject", lang)}</button>
           </div>
         </div>
       ) : null}
@@ -510,18 +512,17 @@ export function EventEditorForm({
 
       {mode === "edit" && canReview && (initial?.status === "approved" || initial?.status === "unpublished") ? (
         <button type="button" disabled={pending} className="w-fit rounded bg-crs-primary px-4 py-2 text-sm text-white" onClick={() => void run("publish")}>
-          Publish to public events.json
+          {t("actionPublish", lang)}
         </button>
       ) : null}
 
       {mode === "edit" && (isAuthor || canReview) && initial?.status === "published" ? (
         <div className="flex flex-wrap gap-2">
-          <button type="button" disabled={pending} className="w-fit rounded border border-crs-secondary/40 px-4 py-2 text-sm text-crs-primary" onClick={() => void run("start_revision")}>
-            Create revision (public stays live)
+          <button type="button" disabled={pending} className="w-fit rounded border border-crs-secondary/40 px-4 py-2 text-sm text-crs-primary" onClick={() => void run("start_revision")}>{t("actionStartRevision", lang)}
           </button>
           {canReview ? (
             <button type="button" disabled={pending} className="w-fit inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg" onClick={() => void run("unpublish")}>
-              Unpublish
+              {t("actionUnpublish", lang)}
             </button>
           ) : null}
         </div>
@@ -529,7 +530,7 @@ export function EventEditorForm({
 
       {mode === "edit" && isAuthor && initial?.status === "rejected" ? (
         <button type="button" disabled={pending} className="w-fit rounded border border-amber-300 px-4 py-2 text-sm text-amber-900" onClick={() => void run("reopen_rejected")}>
-          Reopen as draft
+          {t("actionReopenDraft", lang)}
         </button>
       ) : null}
 
@@ -542,7 +543,7 @@ export function EventEditorForm({
           className="w-fit rounded border border-red-300 px-4 py-2 text-sm text-red-800"
           onClick={() => void run("delete")}
         >
-          Delete permanently
+          {t("actionDelete", lang)}
         </button>
       ) : null}
     </div>

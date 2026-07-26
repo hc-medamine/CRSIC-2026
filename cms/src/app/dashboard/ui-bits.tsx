@@ -1,20 +1,25 @@
+"use client";
+
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { QueueItem } from "@/lib/content/queues";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
+import { statusLabel, t, tf, localizedDisplayName } from "@/lib/i18n/labels";
 import { IconChevron } from "./cms-icons";
 
-export function relativeShort(iso: string): string {
+export function relativeShort(iso: string, lang: "en" | "ar" = "en"): string {
   const ms = Date.now() - new Date(iso).getTime();
   const mins = Math.max(0, Math.floor(ms / 60000));
-  if (mins < 60) return `${Math.max(1, mins)}m`;
+  if (mins < 60) return tf("relativeMinutes", lang, { n: Math.max(1, mins) });
   const hours = Math.floor(mins / 60);
-  if (hours < 48) return `${hours}h`;
+  if (hours < 48) return tf("relativeHours", lang, { n: hours });
   const days = Math.floor(hours / 24);
-  if (days < 14) return `${days}d`;
+  if (days < 14) return tf("relativeDays", lang, { n: days });
   return new Date(iso).toISOString().slice(0, 10);
 }
 
 export function StatusPill({ status }: { status: string }) {
+  const lang = useCmsLang();
   const s = status.toLowerCase();
   let tone = "bg-crs-bg text-crs-muted";
   if (s === "published") tone = "bg-crs-primary/10 text-crs-primary";
@@ -26,7 +31,7 @@ export function StatusPill({ status }: { status: string }) {
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-medium ${tone}`}>
       <span className="h-1.5 w-1.5 rounded-full bg-current opacity-70" aria-hidden />
-      {status.replace(/_/g, " ")}
+      {statusLabel(status, lang)}
     </span>
   );
 }
@@ -52,6 +57,7 @@ export function QueueCard({
   showAuthor?: boolean;
   authorPrefix?: string;
 }) {
+  const lang = useCmsLang();
   const visible = items.slice(0, 5);
   return (
     <section className="flex flex-col rounded-2xl border border-crs-border bg-crs-surface shadow-[0_1px_3px_rgba(26,46,38,0.06)]">
@@ -85,12 +91,19 @@ export function QueueCard({
                     {item.title}
                   </p>
                   <p className="mt-0.5 truncate text-xs text-crs-muted">
-                    {showAuthor && item.authorName
-                      ? `${authorPrefix ?? ""} ${item.authorName}`.trim()
-                      : item.status.replace(/_/g, " ")}
+                    {showAuthor && (item.authorName || item.authorNameAr || item.authorNameEn)
+                      ? `${authorPrefix ?? ""} ${localizedDisplayName(
+                          {
+                            displayName: item.authorName,
+                            nameAr: item.authorNameAr,
+                            nameEn: item.authorNameEn,
+                          },
+                          lang,
+                        )}`.trim()
+                      : statusLabel(item.status, lang)}
                   </p>
                 </div>
-                <span className="shrink-0 text-xs text-crs-muted">{relativeShort(item.updatedAt)}</span>
+                <span className="shrink-0 text-xs text-crs-muted">{relativeShort(item.updatedAt, lang)}</span>
                 <IconChevron className="h-4 w-4 shrink-0 text-crs-muted opacity-0 transition group-hover:opacity-100" />
               </Link>
             </li>
@@ -118,13 +131,14 @@ export function PageBreadcrumb({
 }: {
   items: { href?: string; label: string }[];
 }) {
+  const lang = useCmsLang();
   return (
-    <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm text-crs-muted">
+    <nav aria-label={t("breadcrumb", lang)} className="flex flex-wrap items-center gap-2 text-sm text-crs-muted">
       {items.map((item, i) => (
         <span key={`${item.label}-${i}`} className="inline-flex items-center gap-2">
           {i > 0 ? <span aria-hidden>/</span> : null}
           {item.href ? (
-            <Link href={item.href} className="min-h-8 inline-flex items-center text-crs-primary hover:underline">
+            <Link href={item.href} className="min-h-11 inline-flex items-center text-crs-primary hover:underline">
               {item.label}
             </Link>
           ) : (

@@ -5,6 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { formatDateTime } from "@/lib/format-datetime";
+import {
+  notificationTitleLabel,
+  notificationTypeLabel,
+  t,
+} from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 type Item = {
   id: string;
@@ -22,6 +28,7 @@ type Props = {
 };
 
 export function NotificationsClient({ initialUnread, initialItems }: Props) {
+  const lang = useCmsLang();
   const router = useRouter();
   const [items, setItems] = useState(initialItems);
   const [unread, setUnread] = useState(initialUnread);
@@ -36,7 +43,7 @@ export function NotificationsClient({ initialUnread, initialItems }: Props) {
         body: JSON.stringify(body),
       });
       if (!res.ok) {
-        cmsToast.error("Could not update notification.");
+        cmsToast.error(t("notifUpdateFailed", lang));
         return false;
       }
       router.refresh();
@@ -53,7 +60,7 @@ export function NotificationsClient({ initialUnread, initialItems }: Props) {
       prev.map((n) => (n.id === id ? { ...n, readAt: new Date().toISOString() } : n)),
     );
     setUnread((u) => Math.max(0, u - 1));
-    cmsToast.success("Marked as read.");
+    cmsToast.success(t("notifMarkedRead", lang));
   }
 
   async function markAll() {
@@ -61,14 +68,15 @@ export function NotificationsClient({ initialUnread, initialItems }: Props) {
     if (!ok) return;
     setItems((prev) => prev.map((n) => ({ ...n, readAt: n.readAt ?? new Date().toISOString() })));
     setUnread(0);
-    cmsToast.success("All marked as read.");
+    cmsToast.success(t("notifAllMarkedRead", lang));
   }
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-crs-muted">
-          Unread: <span className="font-medium text-crs-ink">{unread}</span>
+          {t("notifUnreadLabel", lang)}:{" "}
+          <span className="font-medium text-crs-ink">{unread}</span>
         </p>
         <button
           type="button"
@@ -76,13 +84,13 @@ export function NotificationsClient({ initialUnread, initialItems }: Props) {
           onClick={() => void markAll()}
           className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-50"
         >
-          Mark all read
+          {t("notifMarkAllRead", lang)}
         </button>
       </div>
 
       {items.length === 0 ? (
         <p className="rounded-lg border border-dashed border-crs-border bg-white p-6 text-sm text-crs-muted">
-          No notifications yet. Submit / review / publish events will create them in later steps.
+          {t("notifEmpty", lang)}
         </p>
       ) : (
         <ul className="divide-y rounded-2xl border border-crs-border bg-crs-surface shadow-sm">
@@ -93,10 +101,16 @@ export function NotificationsClient({ initialUnread, initialItems }: Props) {
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
-                  <p className="font-medium text-crs-ink">{n.title}</p>
-                  {n.body ? <p className="mt-1 text-sm text-crs-muted">{n.body}</p> : null}
+                  <p className="font-medium text-crs-ink" dir="auto">
+                    {notificationTitleLabel(n.title, lang)}
+                  </p>
+                  {n.body ? (
+                    <p className="mt-1 text-sm text-crs-muted" dir="auto">
+                      {n.body}
+                    </p>
+                  ) : null}
                   <p className="mt-1 text-xs text-crs-muted">
-                    {n.type} · {formatDateTime(n.createdAt)}
+                    {notificationTypeLabel(n.type, lang)} · {formatDateTime(n.createdAt)}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -105,7 +119,7 @@ export function NotificationsClient({ initialUnread, initialItems }: Props) {
                       href={n.linkPath}
                       className="inline-flex min-h-11 items-center rounded-lg px-3 text-sm text-crs-primary hover:bg-crs-bg"
                     >
-                      Open
+                      {t("notifOpen", lang)}
                     </Link>
                   ) : null}
                   {!n.readAt ? (
@@ -115,7 +129,7 @@ export function NotificationsClient({ initialUnread, initialItems }: Props) {
                       className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-50"
                       onClick={() => void markRead(n.id)}
                     >
-                      Mark read
+                      {t("notifMarkRead", lang)}
                     </button>
                   ) : null}
                 </div>

@@ -11,6 +11,8 @@ export type QueueItem = {
   orgUnitId: string;
   createdBy: string;
   authorName: string | null;
+  authorNameAr: string | null;
+  authorNameEn: string | null;
   reviewNote: string | null;
   updatedAt: string;
   href: string;
@@ -37,6 +39,8 @@ type Row = {
   review_note: string | null;
   updated_at: Date;
   author_display_name: string | null;
+  author_name_ar: string | null;
+  author_name_en: string | null;
 };
 
 function toItem(row: Row): QueueItem {
@@ -48,6 +52,8 @@ function toItem(row: Row): QueueItem {
     orgUnitId: row.org_unit_id,
     createdBy: row.created_by,
     authorName: row.author_display_name,
+    authorNameAr: row.author_name_ar,
+    authorNameEn: row.author_name_en,
     reviewNote: row.review_note,
     updatedAt: row.updated_at.toISOString(),
     href: `/dashboard/${contentPathSegment(row.content_type)}/${row.id}`,
@@ -56,7 +62,8 @@ function toItem(row: Row): QueueItem {
 
 const BASE_SELECT = `
   SELECT c.id, c.content_type, c.title_ar, c.status, c.org_unit_id, c.created_by,
-         c.review_note, c.updated_at, u.display_name AS author_display_name
+         c.review_note, c.updated_at, u.display_name AS author_display_name,
+         u.name_ar AS author_name_ar, u.name_en AS author_name_en
   FROM content_items c
   LEFT JOIN users u ON u.id = c.created_by`;
 

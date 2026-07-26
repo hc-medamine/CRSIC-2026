@@ -4,8 +4,10 @@ import {
   existsSync,
   copyFileSync,
   unlinkSync,
+  readdirSync,
+  statSync,
 } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, extname } from "node:path";
 import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
@@ -47,6 +49,10 @@ export type MediaAsset = {
   replaced_at: Date | null;
   created_at: Date;
   updated_at: Date;
+  /** Present when listed with user join (library UI). */
+  uploader_display_name?: string | null;
+  uploader_name_ar?: string | null;
+  uploader_name_en?: string | null;
 };
 
 function uploadsRoot(): string {
@@ -121,24 +127,29 @@ export async function listMediaForUser(
 
   if (!isCentreWideViewer(user) && user.role !== "reviewer") {
     params.push(user.id);
-    where.push(`uploaded_by = $${params.length}`);
+    where.push(`m.uploaded_by = $${params.length}`);
   }
 
   const buckets = bucket ? [bucket] : allowedBuckets;
   params.push(buckets);
-  where.push(`bucket = ANY($${params.length}::text[])`);
+  where.push(`m.bucket = ANY($${params.length}::text[])`);
 
   if (opts?.imagesOnly) {
-    where.push(`mime_type IN ('image/jpeg', 'image/png', 'image/webp')`);
+    where.push(`m.mime_type IN ('image/jpeg', 'image/png', 'image/webp')`);
   }
 
-  where.push(`public_path LIKE 'img/cms/%'`);
+  where.push(`(m.public_path LIKE 'img/cms/%' OR m.public_path LIKE 'img/covers/%')`);
 
   params.push(limit);
   const result = await query<MediaAsset>(
-    `SELECT * FROM media_assets
+    `SELECT m.*,
+            u.display_name AS uploader_display_name,
+            u.name_ar AS uploader_name_ar,
+            u.name_en AS uploader_name_en
+     FROM media_assets m
+     LEFT JOIN users u ON u.id = m.uploaded_by
      WHERE ${where.join(" AND ")}
-     ORDER BY created_at DESC
+     ORDER BY m.updated_at DESC, m.created_at DESC
      LIMIT $${params.length}`,
     params,
   );
@@ -156,6 +167,102 @@ export async function getMediaByPublicPath(publicPath: string): Promise<MediaAss
     [publicPath],
   );
   return result.rows[0] ?? null;
+}
+
+function mimeForExtension(ext: string): string {
+  if (ext === "jpg" || ext === "jpeg") return "image/jpeg";
+  if (ext === "png") return "image/png";
+  if (ext === "webp") return "image/webp";
+  if (ext === "pdf") return "application/pdf";
+  return "application/octet-stream";
+}
+
+/**
+ * Register on-disk publication covers (`img/covers/*`) into media_assets so the
+ * media library lists every book cover, not only CMS uploads under img/cms/covers.
+ * Idempotent: skips paths already present.
+ */
+export async function registerLegacyCoverFiles(fallbackUploaderId: string): Promise<number> {
+  const coversDir = join(publicRepoRoot(), "img", "covers");
+  if (!existsSync(coversDir)) return 0;
+
+  const files = readdirSync(coversDir).filter((name) =>
+    /\.(jpe?g|png|webp|pdf)$/i.test(name),
+  );
+  if (files.length === 0) return 0;
+
+  let inserted = 0;
+  for (const name of files) {
+    const publicPath = `img/covers/${name}`;
+    const existing = await getMediaByPublicPath(publicPath);
+    if (existing) continue;
+
+    const abs = join(coversDir, name);
+    let byteSize = 0;
+    try {
+      byteSize = statSync(abs).size;
+    } catch {
+      continue;
+    }
+    if (byteSize <= 0) continue;
+
+    const rawExt = extname(name).slice(1).toLowerCase();
+    const extension = rawExt === "jpeg" ? "jpg" : rawExt;
+    const mime = mimeForExtension(extension);
+
+    const owner = await query<{ created_by: string; updated_at: Date }>(
+      `SELECT created_by, updated_at FROM content_items
+       WHERE image_path = $1
+          OR og_image = $1
+          OR live_payload->>'img' = $1
+          OR live_payload->>'cover' = $1
+          OR EXISTS (
+            SELECT 1
+            FROM jsonb_array_elements(COALESCE(attachments, '[]'::jsonb)) elem
+            WHERE elem->>'src' = $1
+          )
+          OR EXISTS (
+            SELECT 1
+            FROM jsonb_array_elements(COALESCE(live_payload->'media', '[]'::jsonb)) m
+            WHERE m->>'src' = $1
+          )
+       ORDER BY updated_at DESC
+       LIMIT 1`,
+      [publicPath],
+    );
+    const uploadedBy = owner.rows[0]?.created_by || fallbackUploaderId;
+    const updatedAt = owner.rows[0]?.updated_at ?? null;
+
+    try {
+      const result =
+        updatedAt != null
+          ? await query<{ id: string }>(
+              `INSERT INTO media_assets (
+                 bucket, original_filename, mime_type, byte_size, extension, public_path, uploaded_by,
+                 created_at, updated_at
+               ) VALUES (
+                 'covers', $1, $2, $3, $4, $5, $6, $7, $7
+               )
+               ON CONFLICT (public_path) DO NOTHING
+               RETURNING id`,
+              [name, mime, byteSize, extension, publicPath, uploadedBy, updatedAt],
+            )
+          : await query<{ id: string }>(
+              `INSERT INTO media_assets (
+                 bucket, original_filename, mime_type, byte_size, extension, public_path, uploaded_by
+               ) VALUES (
+                 'covers', $1, $2, $3, $4, $5, $6
+               )
+               ON CONFLICT (public_path) DO NOTHING
+               RETURNING id`,
+              [name, mime, byteSize, extension, publicPath, uploadedBy],
+            );
+      if (result.rows[0]?.id) inserted += 1;
+    } catch {
+      /* skip unreadable / constraint races */
+    }
+  }
+  return inserted;
 }
 
 export async function createMediaUpload(

@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { META_DESCRIPTION_MAX, META_TITLE_MAX } from "@/lib/content/seo";
 import type { MediaBucket } from "@/lib/media/config";
+import { t, tf } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 export type SeoFormState = {
   metaTitleAr: string;
@@ -63,6 +65,7 @@ export function SeoFieldsSection({
   onCopyTitleAr,
   onCopySummaryAr,
 }: Props) {
+  const lang = useCmsLang();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -93,13 +96,13 @@ export function SeoFieldsSection({
         items?: CmsImageItem[];
       };
       if (!res.ok || !data.ok) {
-        setError(data.error ?? "Could not list images");
+        setError(data.error ?? t("seoListImagesFailed", lang));
         setItems([]);
         return;
       }
       setItems(data.items ?? []);
     } catch {
-      setError("Could not list images");
+      setError(t("seoListImagesFailed", lang));
       setItems([]);
     } finally {
       setLoading(false);
@@ -119,21 +122,20 @@ export function SeoFieldsSection({
 
   return (
     <fieldset className="grid gap-3 rounded border border-crs-border bg-crs-bg/80 p-3">
-      <legend className="px-1 text-sm font-semibold text-crs-ink">SEO / share</legend>
+      <legend className="px-1 text-sm font-semibold text-crs-ink">{t("seoShare", lang)}</legend>
       <p className="text-xs text-crs-muted">
-        Optional. Empty fields fall back to title / summary / primary image on the public site. Max{" "}
-        {META_TITLE_MAX} (title) / {META_DESCRIPTION_MAX} (description).
+        {tf("seoShareHint", lang, { titleMax: META_TITLE_MAX, descMax: META_DESCRIPTION_MAX })}
       </p>
       {(onCopyTitleAr || onCopySummaryAr) && !disabled ? (
         <div className="flex flex-wrap gap-2 text-xs">
           {onCopyTitleAr ? (
             <button type="button" className="underline" onClick={onCopyTitleAr}>
-              Copy meta title from AR title
+              {t("copyMetaTitleAr", lang)}
             </button>
           ) : null}
           {onCopySummaryAr ? (
             <button type="button" className="underline" onClick={onCopySummaryAr}>
-              Copy meta description from AR summary
+              {t("copyMetaDescAr", lang)}
             </button>
           ) : null}
         </div>
@@ -141,7 +143,7 @@ export function SeoFieldsSection({
 
       <label className="text-sm">
         <span className="flex items-center justify-between font-medium">
-          Meta title (AR)
+          {t("seoMetaTitleAr", lang)}
           <Counter value={value.metaTitleAr} max={META_TITLE_MAX} />
         </span>
         <input
@@ -154,7 +156,7 @@ export function SeoFieldsSection({
       </label>
       <label className="text-sm">
         <span className="flex items-center justify-between font-medium">
-          Meta title (EN)
+          {t("seoMetaTitleEn", lang)}
           <Counter value={value.metaTitleEn} max={META_TITLE_MAX} />
         </span>
         <input
@@ -167,7 +169,7 @@ export function SeoFieldsSection({
       </label>
       <label className="text-sm">
         <span className="flex items-center justify-between font-medium">
-          Meta description (AR)
+          {t("seoMetaDescAr", lang)}
           <Counter value={value.metaDescriptionAr} max={META_DESCRIPTION_MAX} />
         </span>
         <textarea
@@ -181,7 +183,7 @@ export function SeoFieldsSection({
       </label>
       <label className="text-sm">
         <span className="flex items-center justify-between font-medium">
-          Meta description (EN)
+          {t("seoMetaDescEn", lang)}
           <Counter value={value.metaDescriptionEn} max={META_DESCRIPTION_MAX} />
         </span>
         <textarea
@@ -194,14 +196,14 @@ export function SeoFieldsSection({
         />
       </label>
       <div className="text-sm">
-        <span className="font-medium">OG image path</span>
+        <span className="font-medium">{t("ogImagePath", lang)}</span>
         <div className="mt-1 flex flex-wrap gap-2">
           <input
             disabled={disabled}
             value={value.ogImage}
             onChange={(e) => set("ogImage", e.target.value)}
-            placeholder={ogFallbackHint || "img/cms/..."}
-            className="min-h-11 min-w-0 flex-1 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 font-mono text-xs text-crs-ink"
+            placeholder={ogFallbackHint || t("seoPathHint", lang)}
+            className="min-h-11 min-w-0 flex-1 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
           />
           {canBrowse ? (
             <button
@@ -210,7 +212,7 @@ export function SeoFieldsSection({
               onClick={openPicker}
               className="rounded border border-crs-border bg-white px-3 py-2 text-xs font-medium text-crs-ink hover:bg-crs-bg disabled:opacity-50"
             >
-              Browse…
+              {t("seoBrowse", lang)}
             </button>
           ) : null}
           {value.ogImage && !disabled ? (
@@ -219,20 +221,12 @@ export function SeoFieldsSection({
               onClick={() => set("ogImage", "")}
               className="rounded border border-crs-border bg-white px-3 py-2 text-xs text-crs-muted hover:bg-crs-bg"
             >
-              Clear
+              {t("editorClear", lang)}
             </button>
           ) : null}
         </div>
         <p className="mt-1 text-xs text-crs-muted">
-          {canBrowse ? (
-            <>
-              Browse lists images in{" "}
-              <code className="text-[11px]">img/cms/{ogBucket}/</code> that you can access
-              (editors: your uploads; reviewers/SA: all in this folder).
-            </>
-          ) : (
-            <>Type a path under <code className="text-[11px]">img/cms/</code>, or leave empty for fallback.</>
-          )}
+          {canBrowse ? t("seoBrowseHint", lang) : t("seoPathHint", lang)}
         </p>
       </div>
 
@@ -244,24 +238,21 @@ export function SeoFieldsSection({
         >
           <div className="flex items-center justify-between border-b border-crs-border px-4 py-3">
             <div>
-              <p className="text-sm font-semibold text-crs-ink">Select OG image</p>
-              <p className="font-mono text-xs text-crs-muted">img/cms/{ogBucket}/</p>
+              <p className="text-sm font-semibold text-crs-ink">{t("selectOgImage", lang)}</p>
             </div>
             <button
               type="button"
               className="text-sm underline"
               onClick={() => setPickerOpen(false)}
             >
-              Close
+              {t("dismiss", lang)}
             </button>
           </div>
           <div className="max-h-[50vh] overflow-y-auto p-3">
-            {loading ? <p className="text-sm text-crs-muted">Loading…</p> : null}
+            {loading ? <p className="text-sm text-crs-muted">{t("loadingEllipsis", lang)}</p> : null}
             {error ? <p className="text-sm text-red-600">{error}</p> : null}
             {!loading && !error && items.length === 0 ? (
-              <p className="text-sm text-crs-muted">
-                No accessible images in this folder yet. Upload via the related image field first.
-              </p>
+              <p className="text-sm text-crs-muted">{t("seoNoImages", lang)}</p>
             ) : null}
             <ul className="grid gap-2">
               {items.map((item) => {

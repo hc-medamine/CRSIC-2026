@@ -29,9 +29,7 @@ export default async function EditorsPage() {
       />
       <header>
         <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">{t("editors", lang)}</h1>
-        <p className="mt-1 text-sm text-crs-muted">
-          Content types for assigned Editors (globally exclusive, org catalog constrained).
-        </p>
+        <p className="mt-1 text-sm text-crs-muted">{t("pageDescEditors", lang)}</p>
       </header>
 
       <EditorsScopeManager

@@ -1,15 +1,8 @@
-import { IconSearch } from "@/app/dashboard/cms-icons";
+"use client";
 
-const STATUS_OPTIONS = [
-  { value: "", label: "All status" },
-  { value: "draft", label: "Draft" },
-  { value: "submitted", label: "Submitted" },
-  { value: "changes_requested", label: "Changes requested" },
-  { value: "approved", label: "Approved" },
-  { value: "published", label: "Published" },
-  { value: "unpublished", label: "Unpublished" },
-  { value: "rejected", label: "Rejected" },
-] as const;
+import { IconSearch } from "@/app/dashboard/cms-icons";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
+import { statusLabel, t } from "@/lib/i18n/labels";
 
 type Props = {
   q?: string;
@@ -21,8 +14,20 @@ type Props = {
 export function ContentListFilters({
   q = "",
   status = "",
-  placeholder = "Search…",
+  placeholder,
 }: Props) {
+  const lang = useCmsLang();
+  const statusOptions: { value: string; label: string }[] = [
+    { value: "", label: t("filterAllStatus", lang) },
+    { value: "draft", label: statusLabel("draft", lang) },
+    { value: "submitted", label: statusLabel("submitted", lang) },
+    { value: "changes_requested", label: statusLabel("changes_requested", lang) },
+    { value: "approved", label: statusLabel("approved", lang) },
+    { value: "published", label: statusLabel("published", lang) },
+    { value: "unpublished", label: statusLabel("unpublished", lang) },
+    { value: "rejected", label: statusLabel("rejected", lang) },
+  ];
+
   return (
     <form className="flex flex-wrap items-center gap-3" method="get">
       <label className="relative min-w-[16rem] flex-1">
@@ -33,7 +38,7 @@ export function ContentListFilters({
           type="search"
           name="q"
           defaultValue={q}
-          placeholder={placeholder}
+          placeholder={placeholder ?? t("filterSearch", lang)}
           className="min-h-11 w-full rounded-xl border border-crs-border bg-crs-surface pe-3 ps-10 text-sm text-crs-ink"
         />
       </label>
@@ -42,7 +47,7 @@ export function ContentListFilters({
         defaultValue={status}
         className="min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 text-sm text-crs-ink"
       >
-        {STATUS_OPTIONS.map((o) => (
+        {statusOptions.map((o) => (
           <option key={o.value || "all"} value={o.value}>
             {o.label}
           </option>
@@ -52,27 +57,8 @@ export function ContentListFilters({
         type="submit"
         className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 text-sm text-crs-ink hover:bg-crs-bg"
       >
-        Filter
+        {t("filterApply", lang)}
       </button>
     </form>
   );
-}
-
-export function filterContentItems<
-  T extends { title_ar: string; title_en: string | null; status: string },
->(items: T[], q: string, statusFilter: string): T[] {
-  let next = items;
-  if (statusFilter) {
-    next = next.filter((i) => i.status === statusFilter);
-  }
-  const needle = q.trim().toLowerCase();
-  if (needle) {
-    next = next.filter(
-      (i) =>
-        i.title_ar.toLowerCase().includes(needle) ||
-        (i.title_en ?? "").toLowerCase().includes(needle) ||
-        i.status.toLowerCase().includes(needle),
-    );
-  }
-  return next;
 }

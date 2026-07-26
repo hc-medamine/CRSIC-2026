@@ -73,7 +73,7 @@
             </div>
           </a>
           <div class="mega-footer">
-            <a href="#" data-page="about" class="mega-footer-link" data-i18n="nav_about_all">← عرض كل صفحات المركز</a>
+            <a href="#" data-page="about" class="mega-footer-link" data-i18n="nav_about_all">عرض كل صفحات المركز</a>
           </div>
         </div>
       </li>
@@ -113,7 +113,7 @@
             </div>
           </a>
           <div class="mega-footer">
-            <a href="#" data-page="publications" class="mega-footer-link" data-i18n="nav_pubs_all">← عرض كل
+            <a href="#" data-page="publications" class="mega-footer-link" data-i18n="nav_pubs_all">عرض كل
               الإصدارات</a>
           </div>
         </div>
@@ -147,7 +147,7 @@
             </div>
           </a>
           <div class="mega-footer">
-            <a href="#" data-page="events" class="mega-footer-link" data-i18n="nav_events_all">← عرض كل الفعاليات</a>
+            <a href="#" data-page="events" class="mega-footer-link" data-i18n="nav_events_all">عرض كل الفعاليات</a>
           </div>
         </div>
       </li>
@@ -183,14 +183,14 @@
   <div class="lang-banner hidden" id="langBanner" role="alert">
     <span>🌐 This site is available in English.</span>
     <button type="button" class="lang-banner-switch">Switch to English</button>
-    <button type="button" class="lang-banner-dismiss" aria-label="Dismiss">✕</button>
+    <button type="button" class="lang-banner-dismiss" data-i18n-aria="aria_dismiss" aria-label="إغلاق">✕</button>
   </div>
 
   <!-- SITE ALERT BANNER (CMS-published, at most one live) -->
   <div class="site-alert-banner hidden" id="siteAlertBanner" role="status">
     <p id="siteAlertMessage"></p>
     <a id="siteAlertLink" class="site-alert-link hidden" href="#"></a>
-    <button type="button" class="site-alert-dismiss" id="siteAlertDismiss" aria-label="Dismiss">✕</button>
+    <button type="button" class="site-alert-dismiss" id="siteAlertDismiss" data-i18n-aria="aria_dismiss" aria-label="إغلاق">✕</button>
   </div>
 
   <!-- DATA LOAD ERROR BANNER (P1) -->
@@ -330,8 +330,7 @@
       <section class="publications">
         <div class="section-header">
           <h2 class="section-title" data-i18n="home_latest_pubs">آخر الإصدارات العلمية</h2>
-          <a class="section-link" href="#" data-page="publications" data-i18n="home_view_all_pubs">عرض كل الإصدارات
-            ←</a>
+          <a class="section-link" href="#" data-page="publications" data-i18n="home_view_all_pubs">عرض كل الإصدارات</a>
         </div>
         <div class="pub-grid" id="home-pub-grid" data-i18n-aria="aria_home_pubs" aria-label="آخر الإصدارات العلمية"></div>
       </section>
@@ -340,7 +339,7 @@
       <section class="events">
         <div class="section-header">
           <h2 class="section-title" data-i18n="home_events_section">الملتقيات والفعاليات</h2>
-          <a class="section-link" href="#" data-page="events" data-i18n="home_view_all_events">عرض كل الفعاليات ←</a>
+          <a class="section-link" href="#" data-page="events" data-i18n="home_view_all_events">عرض كل الفعاليات</a>
         </div>
         <div class="events-grid" id="home-events-grid"></div>
       </section>
@@ -731,7 +730,7 @@
           <p data-i18n="coop_cta_p">يرحب المركز بطلبات الشراكة من المؤسسات البحثية الوطنية والدولية في مجال العلوم
             الإسلامية والحضارية.</p>
           <a href="#" data-page="contact" class="btn-primary-cta" style="display:inline-block;"
-            data-i18n="coop_cta_btn">تقديم طلب شراكة ←</a>
+            data-i18n="coop_cta_btn">تقديم طلب شراكة</a>
         </div>
       </div>
     </section>
@@ -794,7 +793,7 @@
                   </svg></div>
                 <div>
                   <div class="contact-info-label" data-i18n="contact_email_label">البريد الإلكتروني</div>
-                  <div class="contact-info-value"><a href="mailto:contact@crsic.dz">contact@crsic.dz</a></div>
+                  <div class="contact-info-value" dir="ltr"><a href="mailto:contact@crsic.dz">contact@crsic.dz</a></div>
                 </div>
               </div>
               <div class="contact-info-item">
@@ -805,7 +804,7 @@
                   </svg></div>
                 <div>
                   <div class="contact-info-label" data-i18n="contact_phone_label">الهاتف</div>
-                  <div class="contact-info-value"><a href="tel:+21329146190">+213 29 14 61 90</a></div>
+                  <div class="contact-info-value" dir="ltr"><a href="tel:+21329146190">+213 29 14 61 90</a></div>
                 </div>
               </div>
               <div class="contact-info-item">
@@ -927,7 +926,7 @@
           </div>
           <div>
             <div class="footer-brand-name" data-i18n="footer_brand_name">مركز البحث في العلوم الإسلامية والحضارة</div>
-            <div class="footer-brand-sub">CRSIC — Laghouat, Algeria</div>
+            <div class="footer-brand-sub" data-i18n="footer_brand_sub">CRSIC — الأغواط، الجزائر</div>
           </div>
         </div>
         <p class="footer-brand-desc" data-i18n="footer_brand_desc">المركز الوطني الوحيد المتخصص في البحث في العلوم
@@ -966,7 +965,7 @@
               stroke="#C9A84C" stroke-width="1" fill="none" />
             <path d="M2 5L8 9L14 5" stroke="#C9A84C" stroke-width="1" />
           </svg>
-          <span class="footer-contact-text"><a href="mailto:contact@crsic.dz">contact@crsic.dz</a></span>
+          <span class="footer-contact-text" dir="ltr"><a href="mailto:contact@crsic.dz">contact@crsic.dz</a></span>
         </div>
         <div class="footer-contact-item">
           <svg class="footer-contact-icon" viewBox="0 0 16 16" fill="none">
@@ -974,7 +973,7 @@
               d="M3 3S2 3 2 4 2.5 9 6 12.5 13.5 14 13.5 14 14 14 14 13L12.5 10.5S12 10 11.5 10.5L10 11.5S9 12 8 11 5.5 8 5 7s0-2 0-2L6 3.5S6.5 3 6 2.5L3.5 1S3 1 3 3Z"
               stroke="#C9A84C" stroke-width="1" fill="none" />
           </svg>
-          <span class="footer-contact-text">+213 29 14 61 90</span>
+          <span class="footer-contact-text" dir="ltr">+213 29 14 61 90</span>
         </div>
       </div>
       <div>
@@ -983,7 +982,7 @@
           <div class="footer-journal-label" data-i18n="footer_journal_label">مجلة محكمة — فصل سنوية</div>
           <div class="footer-journal-name" data-i18n="footer_journal_name">مجلة العلوم الإسلامية والحضارة</div>
           <a href="https://crsic.dz/ojsre/" target="_blank" rel="noopener" class="footer-journal-btn"
-            data-i18n="footer_journal_btn">الوصول إلى المجلة ←</a>
+            data-i18n="footer_journal_btn">الوصول إلى المجلة</a>
         </div>
       </div>
     </div>
@@ -1077,7 +1076,7 @@
       <a class="drawer-item" href="#" data-page="contact" data-i18n="nav_contact_short">اتصل بنا</a>
     </nav>
     <div class="drawer-footer">
-      <a class="drawer-contact-link" href="mailto:contact@crsic.dz">
+      <a class="drawer-contact-link" href="mailto:contact@crsic.dz" dir="ltr">
         <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
           <path
             d="M2 4.5C2 3.7 2.7 3 3.5 3H12.5C13.3 3 14 3.7 14 4.5V11.5C14 12.3 13.3 13 12.5 13H3.5C2.7 13 2 12.3 2 11.5V4.5Z"
@@ -1086,7 +1085,7 @@
         </svg>
         contact@crsic.dz
       </a>
-      <a class="drawer-contact-link" href="tel:+21329146190">
+      <a class="drawer-contact-link" href="tel:+21329146190" dir="ltr">
         <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
           <path
             d="M3 3S2 3 2 4s0.5 4 4 7.5S13.5 14 13.5 14 14 14 14 13L12.5 10.5S12 10 11.5 10.5L10 11.5S9 12 8 11 5.5 8 5 7s0-2 0-2L6 3.5S6.5 3 6 2.5L3.5 1S3 1 3 3Z"

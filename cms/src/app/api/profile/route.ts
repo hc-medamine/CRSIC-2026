@@ -86,6 +86,8 @@ export async function PATCH(request: NextRequest) {
     session.user = {
       ...session.user,
       displayName,
+      nameAr,
+      nameEn,
     };
     session.lastActivityAt = Date.now();
     await session.save();

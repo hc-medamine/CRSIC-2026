@@ -26,7 +26,7 @@ export default async function NotificationsPage() {
         <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">
           {t("notifications", lang)}
         </h1>
-        <p className="mt-1 text-sm text-crs-muted">In-app only (no email).</p>
+        <p className="mt-1 text-sm text-crs-muted">{t("notificationsHint", lang)}</p>
       </header>
 
       <NotificationsClient

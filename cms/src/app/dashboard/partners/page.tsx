@@ -20,19 +20,30 @@ export default async function PartnersListPage() {
         { label: t("partners", lang) },
       ]}
       title={t("partners", lang)}
-      subtitle="Draft → review → publish"
+      subtitle={t("pageDescPartners", lang)}
       newHref="/dashboard/partners/new"
-      newLabel="New partner"
-      emptyLabel="No partners yet."
-      items={items.map((item) => ({
-        id: item.id,
-        href: `/dashboard/partners/${item.id}`,
-        title: item.title_ar || "(untitled)",
-        status: item.status,
-        enStatus: item.en_status,
-        updatedAt: item.updated_at,
-        meta: `${item.partner_scope} · ${item.label_ar ?? ""} · ${item.partner_date ?? ""}`.trim(),
-      }))}
+      newLabel={t("newPartner", lang)}
+      emptyLabel={t("emptyPartners", lang)}
+      items={items.map((item) => {
+        const scope =
+          item.partner_scope === "intl"
+            ? t("fieldScopeInternational", lang)
+            : item.partner_scope === "nat"
+              ? t("fieldScopeNational", lang)
+              : "";
+        const meta = [scope, item.label_ar ?? "", item.partner_date ?? ""]
+          .filter(Boolean)
+          .join(" · ");
+        return {
+          id: item.id,
+          href: `/dashboard/partners/${item.id}`,
+          title: item.title_ar || t("untitled", lang),
+          status: item.status,
+          enStatus: item.en_status,
+          updatedAt: item.updated_at,
+          meta: meta || undefined,
+        };
+      })}
     />
   );
 }

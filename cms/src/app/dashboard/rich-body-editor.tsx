@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, type ClipboardEvent } from "react";
 import { bodyHtmlForEditor, sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
+import { t } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 type Props = {
   label: string;
@@ -16,6 +18,7 @@ type Props = {
  * Toolbar uses document.execCommand; server sanitizes on save.
  */
 export function RichBodyEditor({ label, value, onChange, disabled, dir = "auto" }: Props) {
+  const lang = useCmsLang();
   const ref = useRef<HTMLDivElement>(null);
   const seeded = useRef(false);
   const [htmlMode, setHtmlMode] = useState(false);
@@ -93,32 +96,32 @@ export function RichBodyEditor({ label, value, onChange, disabled, dir = "auto" 
           onClick={toggleHtmlMode}
           className="text-xs underline disabled:opacity-50"
         >
-          {htmlMode ? "Visual" : "HTML"}
+          {htmlMode ? t("editorVisual", lang) : "HTML"}
         </button>
       </div>
       {!htmlMode ? (
         <div className="mt-1 overflow-hidden rounded-2xl border border-crs-border bg-crs-surface">
           <div className="flex flex-wrap gap-1 border-b border-crs-border bg-crs-bg px-2 py-1.5">
-            <ToolbarBtn disabled={disabled} onClick={() => run("bold")} label="B" title="Bold" />
-            <ToolbarBtn disabled={disabled} onClick={() => run("italic")} label="I" title="Italic" />
+            <ToolbarBtn disabled={disabled} onClick={() => run("bold")} label="B" title={t("editorBold", lang)} />
+            <ToolbarBtn disabled={disabled} onClick={() => run("italic")} label="I" title={t("editorItalic", lang)} />
             <ToolbarBtn
               disabled={disabled}
               onClick={() => run("insertUnorderedList")}
-              label="• List"
-              title="Bullet list"
+              label={t("editorBulletLabel", lang)}
+              title={t("editorBulletList", lang)}
             />
             <ToolbarBtn
               disabled={disabled}
               onClick={() => run("insertOrderedList")}
-              label="1. List"
-              title="Numbered list"
+              label={t("editorNumberLabel", lang)}
+              title={t("editorNumberedList", lang)}
             />
-            <ToolbarBtn disabled={disabled} onClick={insertLink} label="Link" title="Insert link" />
+            <ToolbarBtn disabled={disabled} onClick={insertLink} label={t("editorLink", lang)} title={t("editorInsertLink", lang)} />
             <ToolbarBtn
               disabled={disabled}
               onClick={() => run("removeFormat")}
-              label="Clear"
-              title="Clear formatting"
+              label={t("editorClear", lang)}
+              title={t("editorClearFormat", lang)}
             />
           </div>
           <div

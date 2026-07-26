@@ -7,6 +7,10 @@ export type SessionUser = {
   id: string;
   email: string;
   displayName: string;
+  /** Prefer for Arabic UI when set. */
+  nameAr?: string | null;
+  /** Prefer for English UI when set. */
+  nameEn?: string | null;
   role: "super_admin" | "editor" | "reviewer";
 };
 

@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useMemo, useState, type ReactNode } from "react";
-import { CMS_LANG_COOKIE, t, type CmsLang } from "@/lib/i18n/labels";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { CMS_LANG_COOKIE, roleLabel, t, type CmsLang } from "@/lib/i18n/labels";
+import { CmsLangProvider } from "@/lib/i18n/cms-lang";
 import type { ContentType } from "@/lib/users";
 import {
   IconBell,
@@ -81,6 +82,16 @@ export function CmsChrome({
   const dir = lang === "ar" ? "rtl" : "ltr";
   const allowed = useMemo(() => new Set(contentTypes), [contentTypes]);
 
+  /* Single source of truth for document language/direction (AT + CSS :dir). */
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = dir;
+    return () => {
+      document.documentElement.lang = "en";
+      document.documentElement.dir = "ltr";
+    };
+  }, [lang, dir]);
+
   const centreItems = useMemo(
     () => CENTRE.filter((i) => i.contentType && allowed.has(i.contentType)),
     [allowed],
@@ -93,6 +104,7 @@ export function CmsChrome({
   function toggleLang() {
     const next: CmsLang = lang === "ar" ? "en" : "ar";
     setLang(next);
+    setMenuOpen(false);
     document.cookie = `${CMS_LANG_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
     router.refresh();
   }
@@ -157,8 +169,7 @@ export function CmsChrome({
     adminItems.push({ key: "editors", href: "/dashboard/editors", icon: <IconUsers /> });
   }
 
-  const roleLabel =
-    role === "super_admin" ? "Super Admin" : role === "reviewer" ? "Reviewer" : "Editor";
+  const roleText = roleLabel(role, lang);
 
   const navBody = (
     <>
@@ -203,6 +214,7 @@ export function CmsChrome({
   );
 
   return (
+    <CmsLangProvider lang={lang}>
     <div dir={dir} lang={lang} className="min-h-full bg-[#f3f2ed]">
       <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-crs-border bg-crs-surface/95 px-4 backdrop-blur md:hidden">
         <button
@@ -214,12 +226,23 @@ export function CmsChrome({
         >
           {menuOpen ? t("menuClose", lang) : t("menuOpen", lang)}
         </button>
-        <span className="text-sm font-semibold text-crs-ink">CRSIC</span>
+        <span className="flex items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/crsic_logo.png"
+            alt=""
+            width={40}
+            height={40}
+            className="h-10 w-10 object-contain"
+            aria-hidden
+          />
+          <span className="text-sm font-semibold text-crs-ink">CRSIC</span>
+        </span>
         <button
           type="button"
           onClick={toggleLang}
           className="ms-auto min-h-11 rounded-xl border border-crs-border px-3 text-xs text-crs-ink hover:bg-crs-bg"
-          aria-label="Toggle language / direction"
+          aria-label={t("langToggleAria", lang)}
         >
           {t("langToggle", lang)}
         </button>
@@ -238,23 +261,30 @@ export function CmsChrome({
         <aside
           id="cms-sidebar"
           className={`fixed inset-y-0 start-0 z-40 flex h-dvh max-h-dvh w-[17rem] flex-col border-e border-crs-border bg-crs-surface shadow-[1px_0_0_rgba(26,46,38,0.03)] transition-transform md:sticky md:top-0 md:z-0 md:h-screen md:max-h-screen md:translate-x-0 md:self-start ${
-            menuOpen ? "translate-x-0" : "-translate-x-full rtl:translate-x-full md:translate-x-0"
+            /* Off-canvas transforms are max-md only — rtl:translate-x-full must not
+               override md:translate-x-0 or the desktop sidebar vanishes in Arabic. */
+            menuOpen
+              ? "translate-x-0"
+              : "max-md:-translate-x-full max-md:rtl:translate-x-full"
           }`}
         >
-          <div className="hidden shrink-0 items-center gap-3 px-5 py-5 md:flex">
-            <span
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-crs-primary text-sm font-bold text-white shadow-sm"
+          <div className="flex shrink-0 items-center gap-3 border-b border-crs-border/70 px-4 py-5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/crsic_logo.png"
+              alt=""
+              width={64}
+              height={64}
+              className="h-16 w-16 shrink-0 object-contain"
               aria-hidden
-            >
-              C
-            </span>
-            <div>
-              <p className="text-[15px] font-semibold tracking-tight text-crs-ink">CRSIC</p>
-              <p className="text-[11px] text-crs-muted">Content CMS</p>
+            />
+            <div className="min-w-0">
+              <p className="text-base font-semibold tracking-tight text-crs-ink">CRSIC</p>
+              <p className="text-xs text-crs-muted">{t("contentCms", lang)}</p>
             </div>
           </div>
 
-          <nav className="min-h-0 flex-1 overflow-y-auto px-3 pb-4 pt-2" aria-label="Main">
+          <nav className="min-h-0 flex-1 overflow-y-auto px-3 pb-4 pt-2" aria-label={t("mainNav", lang)}>
             {navBody}
           </nav>
 
@@ -265,7 +295,7 @@ export function CmsChrome({
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-crs-ink">{displayName}</p>
-                <p className="truncate text-[11px] text-crs-muted">{roleLabel}</p>
+                <p className="truncate text-[11px] text-crs-muted">{roleText}</p>
               </div>
             </div>
             <p className="sr-only">{email}</p>
@@ -274,7 +304,7 @@ export function CmsChrome({
                 type="button"
                 onClick={toggleLang}
                 className="hidden min-h-10 flex-1 rounded-xl border border-crs-border text-xs text-crs-ink hover:bg-crs-bg md:inline-flex md:items-center md:justify-center"
-                aria-label="Toggle language / direction"
+                aria-label={t("langToggleAria", lang)}
               >
                 {t("langToggle", lang)}
               </button>
@@ -293,5 +323,6 @@ export function CmsChrome({
         <div className="min-w-0 flex-1 bg-[#f3f2ed]">{children}</div>
       </div>
     </div>
+    </CmsLangProvider>
   );
 }

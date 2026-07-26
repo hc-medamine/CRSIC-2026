@@ -474,6 +474,8 @@ export async function getEmergencyMeta(contentItemId: string): Promise<{
   emergencyPublishedAt: string | null;
   emergencyPublishedBy: string | null;
   emergencyPublishedByName: string | null;
+  emergencyPublishedByNameAr: string | null;
+  emergencyPublishedByNameEn: string | null;
   emergencyReason: string | null;
 }> {
   const result = await query<{
@@ -481,10 +483,13 @@ export async function getEmergencyMeta(contentItemId: string): Promise<{
     emergency_published_at: Date | null;
     emergency_published_by: string | null;
     publisher_name: string | null;
+    publisher_name_ar: string | null;
+    publisher_name_en: string | null;
     emergency_reason: string | null;
   }>(
     `SELECT c.needs_post_review, c.emergency_published_at, c.emergency_published_by,
-            u.display_name AS publisher_name, c.emergency_reason
+            u.display_name AS publisher_name, u.name_ar AS publisher_name_ar,
+            u.name_en AS publisher_name_en, c.emergency_reason
      FROM content_items c
      LEFT JOIN users u ON u.id = c.emergency_published_by
      WHERE c.id = $1`,
@@ -496,6 +501,8 @@ export async function getEmergencyMeta(contentItemId: string): Promise<{
     emergencyPublishedAt: row?.emergency_published_at?.toISOString() ?? null,
     emergencyPublishedBy: row?.emergency_published_by ?? null,
     emergencyPublishedByName: row?.publisher_name ?? null,
+    emergencyPublishedByNameAr: row?.publisher_name_ar ?? null,
+    emergencyPublishedByNameEn: row?.publisher_name_en ?? null,
     emergencyReason: row?.emergency_reason ?? null,
   };
 }

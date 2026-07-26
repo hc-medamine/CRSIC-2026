@@ -321,10 +321,12 @@ export async function listEligibleReviewOwners(): Promise<
   const result = await query<{
     id: string;
     display_name: string;
+    name_ar: string | null;
+    name_en: string | null;
     email: string;
     role: string;
   }>(
-    `SELECT id, display_name, email, role FROM users
+    `SELECT id, display_name, name_ar, name_en, email, role FROM users
      WHERE is_active = TRUE AND role IN ('reviewer', 'super_admin')
      ORDER BY display_name ASC`,
   );
@@ -334,22 +336,37 @@ export async function listEligibleReviewOwners(): Promise<
 export async function getReviewOwnerMeta(contentItemId: string): Promise<{
   reviewOwnerId: string | null;
   reviewOwnerName: string | null;
+  reviewOwnerNameAr: string | null;
+  reviewOwnerNameEn: string | null;
   proposedOwnerId: string | null;
   proposedOwnerName: string | null;
+  proposedOwnerNameAr: string | null;
+  proposedOwnerNameEn: string | null;
   proposedByName: string | null;
+  proposedByNameAr: string | null;
+  proposedByNameEn: string | null;
   escalatedAt: string | null;
 }> {
   const result = await query<{
     review_owner_id: string | null;
     owner_name: string | null;
+    owner_name_ar: string | null;
+    owner_name_en: string | null;
     review_owner_proposed_id: string | null;
     proposed_name: string | null;
+    proposed_name_ar: string | null;
+    proposed_name_en: string | null;
     proposed_by_name: string | null;
+    proposed_by_name_ar: string | null;
+    proposed_by_name_en: string | null;
     escalated_at: Date | null;
   }>(
-    `SELECT c.review_owner_id, o.display_name AS owner_name,
-            c.review_owner_proposed_id, p.display_name AS proposed_name,
-            pb.display_name AS proposed_by_name, c.escalated_at
+    `SELECT c.review_owner_id,
+            o.display_name AS owner_name, o.name_ar AS owner_name_ar, o.name_en AS owner_name_en,
+            c.review_owner_proposed_id,
+            p.display_name AS proposed_name, p.name_ar AS proposed_name_ar, p.name_en AS proposed_name_en,
+            pb.display_name AS proposed_by_name, pb.name_ar AS proposed_by_name_ar, pb.name_en AS proposed_by_name_en,
+            c.escalated_at
      FROM content_items c
      LEFT JOIN users o ON o.id = c.review_owner_id
      LEFT JOIN users p ON p.id = c.review_owner_proposed_id
@@ -361,9 +378,15 @@ export async function getReviewOwnerMeta(contentItemId: string): Promise<{
   return {
     reviewOwnerId: row?.review_owner_id ?? null,
     reviewOwnerName: row?.owner_name ?? null,
+    reviewOwnerNameAr: row?.owner_name_ar ?? null,
+    reviewOwnerNameEn: row?.owner_name_en ?? null,
     proposedOwnerId: row?.review_owner_proposed_id ?? null,
     proposedOwnerName: row?.proposed_name ?? null,
+    proposedOwnerNameAr: row?.proposed_name_ar ?? null,
+    proposedOwnerNameEn: row?.proposed_name_en ?? null,
     proposedByName: row?.proposed_by_name ?? null,
+    proposedByNameAr: row?.proposed_by_name_ar ?? null,
+    proposedByNameEn: row?.proposed_by_name_en ?? null,
     escalatedAt: row?.escalated_at?.toISOString() ?? null,
   };
 }

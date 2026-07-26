@@ -4,9 +4,10 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listEventsForUser } from "@/lib/content/events";
 import { canAccessContentType } from "@/lib/content/permissions";
-import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
+import { CMS_LANG_COOKIE, normalizeLang, t, tf } from "@/lib/i18n/labels";
 import { EnStatusBadge } from "@/app/dashboard/en-status-badge";
-import { ContentListFilters, filterContentItems } from "@/app/dashboard/content-list-filters";
+import { ContentListFilters } from "@/app/dashboard/content-list-filters";
+import { filterContentItems } from "@/lib/content/filter-content-items";
 import { IconPlus } from "@/app/dashboard/cms-icons";
 import { PageBreadcrumb, StatusPill } from "@/app/dashboard/ui-bits";
 
@@ -35,32 +36,36 @@ export default async function EventsListPage({
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">{t("events", lang)}</h1>
-          <p className="mt-1 text-sm text-crs-muted">Draft → review → publish</p>
+          <p className="mt-1 text-sm text-crs-muted">{t("pageDescEvents", lang)}</p>
         </div>
         <Link
           href="/dashboard/events/new"
           className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-crs-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-crs-secondary"
         >
           <IconPlus className="h-4 w-4" />
-          New event
+          {t("newEvent", lang)}
         </Link>
       </header>
 
-      <ContentListFilters q={params.q ?? ""} status={statusFilter} placeholder="Search events…" />
+      <ContentListFilters
+        q={params.q ?? ""}
+        status={statusFilter}
+        placeholder={t("searchEvents", lang)}
+      />
 
       {items.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-crs-border bg-crs-surface p-8 text-sm text-crs-muted">
-          No events yet.
+          {t("emptyEvents", lang)}
         </p>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-crs-border bg-crs-surface shadow-[0_1px_3px_rgba(26,46,38,0.06)]">
-          <table className="w-full min-w-[640px] text-left text-sm">
+          <table className="w-full min-w-[640px] text-start text-sm">
             <thead className="border-b border-crs-border bg-crs-bg/80 text-xs uppercase tracking-wide text-crs-muted">
               <tr>
-                <th className="px-4 py-3 font-semibold">Title</th>
-                <th className="px-4 py-3 font-semibold">Status</th>
-                <th className="px-4 py-3 font-semibold">EN</th>
-                <th className="px-4 py-3 font-semibold">Updated</th>
+                <th className="px-4 py-3 font-semibold">{t("colTitle", lang)}</th>
+                <th className="px-4 py-3 font-semibold">{t("colStatus", lang)}</th>
+                <th className="px-4 py-3 font-semibold">{t("colEn", lang)}</th>
+                <th className="px-4 py-3 font-semibold">{t("colUpdated", lang)}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-crs-border/70">
@@ -72,7 +77,7 @@ export default async function EventsListPage({
                       className="font-medium text-crs-ink hover:text-crs-primary hover:underline"
                       dir="auto"
                     >
-                      {item.title_ar || "(untitled)"}
+                      {item.title_ar || t("untitled", lang)}
                     </Link>
                   </td>
                   <td className="px-4 py-3">
@@ -89,7 +94,7 @@ export default async function EventsListPage({
             </tbody>
           </table>
           <div className="border-t border-crs-border/70 px-4 py-3 text-xs text-crs-muted">
-            Showing {items.length} result{items.length === 1 ? "" : "s"}
+            {tf("showingResults", lang, { n: items.length })}
           </div>
         </div>
       )}

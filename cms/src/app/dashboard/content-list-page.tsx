@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
+import { t, tf } from "@/lib/i18n/labels";
 import { IconPlus } from "./cms-icons";
 import { PageBreadcrumb, StatusPill } from "./ui-bits";
 import { EnStatusBadge } from "./en-status-badge";
@@ -42,6 +46,7 @@ export function ContentListPage({
   items,
   toolbar,
 }: Props) {
+  const lang = useCmsLang();
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
       <PageBreadcrumb items={breadcrumbs} />
@@ -67,13 +72,13 @@ export function ContentListPage({
         </p>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-crs-border bg-crs-surface shadow-[0_1px_3px_rgba(26,46,38,0.06)]">
-          <table className="w-full min-w-[640px] text-left text-sm">
+          <table className="w-full min-w-[640px] text-start text-sm">
             <thead className="border-b border-crs-border bg-crs-bg/80 text-xs uppercase tracking-wide text-crs-muted">
               <tr>
-                <th className="px-4 py-3 font-semibold">Title</th>
-                <th className="px-4 py-3 font-semibold">Status</th>
-                <th className="px-4 py-3 font-semibold">EN</th>
-                <th className="px-4 py-3 font-semibold">Updated</th>
+                <th className="px-4 py-3 font-semibold">{t("colTitle", lang)}</th>
+                <th className="px-4 py-3 font-semibold">{t("colStatus", lang)}</th>
+                <th className="px-4 py-3 font-semibold">{t("colEn", lang)}</th>
+                <th className="px-4 py-3 font-semibold">{t("colUpdated", lang)}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-crs-border/70">
@@ -85,7 +90,7 @@ export function ContentListPage({
                       className="font-medium text-crs-ink hover:text-crs-primary hover:underline"
                       dir="auto"
                     >
-                      {item.title || "(untitled)"}
+                      {item.title || t("untitled", lang)}
                     </Link>
                     {item.meta ? (
                       <p className="mt-0.5 text-xs text-crs-muted">{item.meta}</p>
@@ -105,7 +110,7 @@ export function ContentListPage({
             </tbody>
           </table>
           <div className="border-t border-crs-border/70 px-4 py-3 text-xs text-crs-muted">
-            Showing {items.length} result{items.length === 1 ? "" : "s"}
+            {tf("showingResults", lang, { n: items.length })}
           </div>
         </div>
       )}
@@ -132,7 +137,7 @@ export function EditPageShell({ breadcrumbs, title, subtitle, children, wide }: 
       <PageBreadcrumb items={breadcrumbs} />
       <header>
         <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">{title}</h1>
-        {subtitle ? <p className="mt-1 text-sm text-crs-muted">{subtitle}</p> : null}
+        {subtitle ? <p className="mt-1 text-sm text-crs-muted" dir="auto">{subtitle}</p> : null}
       </header>
       {children}
     </main>

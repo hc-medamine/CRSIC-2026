@@ -3,6 +3,8 @@ import { query } from "@/lib/db";
 export type PersonRef = {
   id: string;
   displayName: string;
+  nameAr: string | null;
+  nameEn: string | null;
   email: string;
   role: string;
 };
@@ -17,6 +19,8 @@ export type ItemPeopleMeta = {
 type UserRow = {
   id: string;
   display_name: string;
+  name_ar: string | null;
+  name_en: string | null;
   email: string;
   role: string;
 };
@@ -26,6 +30,8 @@ function toPerson(row: UserRow | null | undefined): PersonRef | null {
   return {
     id: row.id,
     displayName: row.display_name,
+    nameAr: row.name_ar,
+    nameEn: row.name_en,
     email: row.email,
     role: row.role,
   };
@@ -34,7 +40,7 @@ function toPerson(row: UserRow | null | undefined): PersonRef | null {
 async function userById(id: string | null): Promise<PersonRef | null> {
   if (!id) return null;
   const result = await query<UserRow>(
-    `SELECT id, display_name, email, role FROM users WHERE id = $1`,
+    `SELECT id, display_name, name_ar, name_en, email, role FROM users WHERE id = $1`,
     [id],
   );
   return toPerson(result.rows[0]);
@@ -58,13 +64,15 @@ async function lastActorForActions(
   if (row.actor_user_id) return userById(row.actor_user_id);
   if (row.actor_email) {
     const byEmail = await query<UserRow>(
-      `SELECT id, display_name, email, role FROM users WHERE email = $1`,
+      `SELECT id, display_name, name_ar, name_en, email, role FROM users WHERE email = $1`,
       [row.actor_email],
     );
     if (byEmail.rows[0]) return toPerson(byEmail.rows[0]);
     return {
       id: "",
       displayName: row.actor_email,
+      nameAr: null,
+      nameEn: null,
       email: row.actor_email,
       role: "",
     };

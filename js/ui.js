@@ -72,10 +72,6 @@ const BC_MAP = {
 
 const BOTTOM_TAB_PAGES = ['home', 'publications', 'journals', 'events'];
 
-const ERROR_MSG = {
-  ar: 'تعذّر تحميل المحتوى. يرجى تحديث الصفحة.',
-  en: 'Could not load content. Please refresh the page.',
-};
 
 const SECTION_CONTAINERS = {
   publications: ['home-pub-grid', 'pub-grid'],
@@ -107,10 +103,9 @@ export function showDataLoadErrors(errors) {
     return;
   }
 
-  const lang = getLang();
-  const label = lang === 'en' ? ERROR_MSG.en : ERROR_MSG.ar;
   if (msgEl) {
-    msgEl.textContent = `${label} (${keys.join(', ')})`;
+    /* Friendly message only — do not surface raw resource filenames to visitors */
+    msgEl.textContent = t('data_load_error');
   }
   if (banner) banner.classList.remove('hidden');
 
@@ -240,7 +235,7 @@ export function applyPubFilter() {
       const grid = document.getElementById('pub-grid');
       if (grid) grid.appendChild(noRes);
     }
-    noRes.textContent = getLang() === 'en' ? 'No publications match your search.' : 'لا توجد إصدارات تطابق بحثك.';
+    noRes.textContent = t('pub_search_empty');
     noRes.style.display = '';
   } else if (noRes) {
     noRes.style.display = 'none';

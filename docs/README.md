@@ -8,6 +8,7 @@ Project docs live under `docs/`. The root [README.md](../README.md) remains the 
 | [WORKLOG.md](./WORKLOG.md) | Changelog + status snapshot (append newest at top) |
 | [qa/SMOKE.md](./qa/SMOKE.md) | Pre-merge smoke checklist (~5 min) — public SPA |
 | [qa/SMOKE-CMS.md](./qa/SMOKE-CMS.md) | CMS smoke checklist + `npm run db:smoke` |
+| [qa/RTL-LTR.md](./qa/RTL-LTR.md) | RTL/LTR BiDi QA + logical-CSS authoring rules |
 | [runbooks/CMS-OPS.md](./runbooks/CMS-OPS.md) | CMS backup/restore, password reset, offboarding |
 | [audits/AUDIT.md](./audits/AUDIT.md) | Closed architecture audit (P0–P3) |
 | [audits/UIUX.md](./audits/UIUX.md) | UI/UX audit findings + fix log |
@@ -25,7 +26,8 @@ docs/
 ├── WORKLOG.md         # Living changelog
 ├── qa/
 │   ├── SMOKE.md       # Public SPA smoke
-│   └── SMOKE-CMS.md   # CMS smoke
+│   ├── SMOKE-CMS.md   # CMS smoke
+│   └── RTL-LTR.md     # RTL/LTR BiDi QA + authoring
 ├── runbooks/
 │   └── CMS-OPS.md     # CMS operations
 ├── audits/

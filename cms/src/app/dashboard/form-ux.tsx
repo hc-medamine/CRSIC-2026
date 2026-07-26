@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { t } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 /** Visual section inside a content form (one job per block). */
 export function FormSection({
@@ -105,8 +107,9 @@ export function CmsBackLinks({
   homeLabel: string;
   listLabel: string;
 }) {
+  const lang = useCmsLang();
   return (
-    <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm text-crs-muted">
+    <nav aria-label={t("breadcrumb", lang)} className="flex flex-wrap items-center gap-2 text-sm text-crs-muted">
       <Link href="/dashboard" className="min-h-11 inline-flex items-center text-crs-primary hover:underline">
         {homeLabel}
       </Link>

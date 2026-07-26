@@ -22,9 +22,9 @@ export default async function UsersPage() {
       <header>
         <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">{t("users", lang)}</h1>
         <p className="mt-1 text-sm text-crs-muted">
-          Super Admin only. Manage organisation units on{" "}
+          {t("pageDescUsers", lang)}{" "}
           <Link href="/dashboard/org-units" className="font-medium text-crs-primary hover:underline">
-            Org scopes
+            {t("usersOrgUnitsLink", lang)}
           </Link>
           .
         </p>

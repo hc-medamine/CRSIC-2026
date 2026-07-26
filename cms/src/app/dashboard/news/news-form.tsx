@@ -18,6 +18,7 @@ import { RichBodyEditor } from "@/app/dashboard/rich-body-editor";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { AdvancedDisclosure, FormBanner, FormSection, FormStickyActions, messageForAction } from "@/app/dashboard/form-ux";
 import { t } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 import type { PublicMediaItem } from "@/lib/publish/media";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
@@ -76,6 +77,7 @@ export function NewsEditorForm({
   canDelete,
 }: Props) {
   const router = useRouter();
+  const lang = useCmsLang();
   const [orgUnitId, setOrgUnitId] = useState(initial?.orgUnitId ?? orgUnits[0]?.id ?? "");
   const [titleAr, setTitleAr] = useState(initial?.titleAr ?? "");
   const [titleEn, setTitleEn] = useState(initial?.titleEn ?? "");
@@ -174,12 +176,12 @@ export function NewsEditorForm({
       });
       const data = (await res.json()) as { ok: boolean; error?: string; item?: { id: string } };
       if (!res.ok || !data.ok || !data.item) {
-        const msg = data.error ?? "Create failed";
+        const msg = data.error ?? t("createFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
-      cmsToast.success("Draft created.");
+      cmsToast.success(t("draftCreated", lang));
       router.push(`/dashboard/news/${data.item.id}`);
       router.refresh();
     } finally {
@@ -191,7 +193,7 @@ export function NewsEditorForm({
     if (!initial?.id) return;
     if (action === "delete") {
       const ok = window.confirm(
-        "Permanently delete this item? This cannot be undone.",
+        t("confirmDelete", lang),
       );
       if (!ok) return;
     }
@@ -206,19 +208,19 @@ export function NewsEditorForm({
       });
       const data = (await res.json()) as { ok: boolean; error?: string; deleted?: boolean };
       if (!res.ok || !data.ok) {
-        const msg = data.error ?? "Action failed";
+        const msg = data.error ?? t("actionFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
       if (data.deleted) {
-        cmsToast.success("Deleted.");
+        cmsToast.success(t("deletedShort", lang));
         router.push("/dashboard");
         router.refresh();
         return;
       }
       const key = messageForAction(action);
-      const msg = key ? t(key, "en") : "Saved.";
+      const msg = key ? t(key, lang) : t("savedShort", lang);
       setMessage(msg);
       cmsToast.success(msg);
       router.refresh();
@@ -250,9 +252,9 @@ export function NewsEditorForm({
         onSubmit={mode === "create" ? create : (e) => e.preventDefault()}
         className="flex flex-col gap-1 cms-form rounded-2xl border border-crs-border bg-crs-surface p-6 shadow-sm"
       >
-        <FormSection step={1} title={t("sectionIdentity", "en")}>
+        <FormSection step={1} title={t("sectionIdentity", lang)}>
           <label className="text-sm">
-            <span className="font-medium">Organisation unit</span>
+            <span className="font-medium">{t("fieldOrgUnit", lang)}</span>
             <select
               disabled={!editable}
               value={orgUnitId}
@@ -261,14 +263,14 @@ export function NewsEditorForm({
             >
               {orgUnits.map((o) => (
                 <option key={o.id} value={o.id}>
-                  {o.name_en} ({o.name_ar})
+                  {lang === "ar" ? o.name_ar : o.name_en || o.name_ar}
                 </option>
               ))}
             </select>
           </label>
 
           <label className="text-sm">
-            <span className="font-medium">Title (AR) *</span>
+            <span className="font-medium">{t("fieldTitleAr", lang)}</span>
             <input
               dir="rtl"
               required
@@ -279,7 +281,7 @@ export function NewsEditorForm({
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Label (AR)</span>
+            <span className="font-medium">{t("fieldLabelAr", lang)}</span>
             <input
               dir="rtl"
               disabled={!editable}
@@ -289,7 +291,7 @@ export function NewsEditorForm({
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Summary (AR)</span>
+            <span className="font-medium">{t("fieldSummaryAr", lang)}</span>
             <textarea
               dir="rtl"
               disabled={!editable}
@@ -301,9 +303,9 @@ export function NewsEditorForm({
           </label>
         </FormSection>
 
-        <FormSection step={2} title={t("sectionBody", "en")}>
+        <FormSection step={2} title={t("sectionBody", lang)}>
           <RichBodyEditor
-            label="Body (AR)"
+            label={t("fieldBodyAr", lang)}
             dir="rtl"
             disabled={!editable}
             value={bodyAr}
@@ -311,14 +313,14 @@ export function NewsEditorForm({
           />
         </FormSection>
 
-        <FormSection step={3} title={t("sectionMedia", "en")}>
+        <FormSection step={3} title={t("sectionMedia", lang)}>
           <MediaUploadField
             bucket="news"
             publicPath={imagePath}
             mediaId={imageMediaId}
             disabled={!editable}
             imagesOnly
-            label="News image (primary)"
+            label={t("fieldNewsImage", lang)}
             onUploaded={({ publicPath, mediaId }) => {
               setImagePath(publicPath);
               setImageMediaId(mediaId);
@@ -339,7 +341,7 @@ export function NewsEditorForm({
             }}
           />
           <label className="text-sm">
-            <span className="font-medium">Image alt (AR)</span>
+            <span className="font-medium">{t("fieldImageAltAr", lang)}</span>
             <input
               dir="rtl"
               disabled={!editable}
@@ -352,11 +354,11 @@ export function NewsEditorForm({
 
         <AdvancedDisclosure
           step={4}
-          title={t("sectionAdvanced", "en")}
-          hint={t("sectionAdvancedHint", "en")}
+          title={t("sectionAdvanced", lang)}
+          hint={t("sectionAdvancedHint", lang)}
         >
           <label className="text-sm">
-            <span className="font-medium">Title (EN)</span>
+            <span className="font-medium">{t("fieldTitleEn", lang)}</span>
             <input
               disabled={!editable}
               value={titleEn}
@@ -365,7 +367,7 @@ export function NewsEditorForm({
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Label (EN)</span>
+            <span className="font-medium">{t("fieldLabelEn", lang)}</span>
             <input
               disabled={!editable}
               value={labelEn}
@@ -374,7 +376,7 @@ export function NewsEditorForm({
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Summary (EN)</span>
+            <span className="font-medium">{t("fieldSummaryEn", lang)}</span>
             <textarea
               disabled={!editable}
               value={summaryEn}
@@ -384,14 +386,14 @@ export function NewsEditorForm({
             />
           </label>
           <RichBodyEditor
-            label="Body (EN)"
+            label={t("fieldBodyEn", lang)}
             dir="ltr"
             disabled={!editable}
             value={bodyEn}
             onChange={setBodyEn}
           />
           <label className="text-sm">
-            <span className="font-medium">Image alt (EN)</span>
+            <span className="font-medium">{t("fieldImageAltEn", lang)}</span>
             <input
               disabled={!editable}
               value={imageAltEn}
@@ -400,26 +402,26 @@ export function NewsEditorForm({
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Public slug (optional override)</span>
+            <span className="font-medium">{t("fieldPublicSlug", lang)}</span>
             <input
               dir="auto"
               disabled={!editable}
               value={publicSlug}
               onChange={(e) => setPublicSlug(e.target.value)}
               className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink font-mono text-xs"
-              placeholder="auto from Arabic title on publish"
+              placeholder={t("fieldPublicSlugPh", lang)}
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">EN status</span>
+            <span className="font-medium">{t("enStatus", lang)}</span>
             <select
               disabled={!editable}
               value={enStatus}
               onChange={(e) => setEnStatus(e.target.value as "pending" | "ready")}
               className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             >
-              <option value="pending">pending</option>
-              <option value="ready">ready</option>
+              <option value="pending">{t("enStatusPending", lang)}</option>
+              <option value="ready">{t("enStatusReady", lang)}</option>
             </select>
           </label>
           <SeoFieldsSection
@@ -441,7 +443,7 @@ export function NewsEditorForm({
                 disabled={pending}
                 className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
               >
-                {pending ? "Saving…" : "Create draft"}
+                {pending ? t("actionSaving", lang) : t("actionCreateDraft", lang)}
               </button>
             ) : null}
 
@@ -453,7 +455,7 @@ export function NewsEditorForm({
                   className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60"
                   onClick={() => void run("save", { fields: fields() })}
                 >
-                  Save draft
+                  {t("actionSaveDraft", lang)}
                 </button>
                 {canSubmit ? (
                   <label className="me-auto flex items-center gap-2 text-sm text-crs-ink">
@@ -462,7 +464,7 @@ export function NewsEditorForm({
                       checked={checklist}
                       onChange={(e) => setChecklist(e.target.checked)}
                     />
-                    Checklist OK
+                    {t("actionChecklistOk", lang)}
                   </label>
                 ) : null}
                 {canSubmit ? (
@@ -472,7 +474,7 @@ export function NewsEditorForm({
                     className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
                     onClick={() => void run("submit", { checklistConfirmed: checklist })}
                   >
-                    Submit for review
+                    {t("actionSubmit", lang)}
                   </button>
                 ) : null}
               </>
@@ -485,7 +487,7 @@ export function NewsEditorForm({
                 className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg"
                 onClick={() => void run("withdraw")}
               >
-                Withdraw
+                {t("actionWithdraw", lang)}
               </button>
             ) : null}
           </div>
@@ -494,11 +496,11 @@ export function NewsEditorForm({
 
       {mode === "edit" && canReview && initial?.status === "submitted" ? (
         <div className="grid gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
-          <p className="text-sm font-medium">Reviewer actions</p>
+          <p className="text-sm font-medium">{t("actionReviewerActions", lang)}</p>
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Note for changes / rejection"
+            placeholder={t("actionNotePlaceholder", lang)}
             className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             rows={2}
           />
@@ -509,7 +511,7 @@ export function NewsEditorForm({
               className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white"
               onClick={() => void run("approve")}
             >
-              Approve
+              {t("actionApprove", lang)}
             </button>
             <button
               type="button"
@@ -517,7 +519,7 @@ export function NewsEditorForm({
               className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg"
               onClick={() => void run("request_changes", { note })}
             >
-              Request changes
+              {t("actionRequestChanges", lang)}
             </button>
             <button
               type="button"
@@ -525,7 +527,7 @@ export function NewsEditorForm({
               className="inline-flex min-h-11 items-center rounded-lg border border-red-300 bg-crs-surface px-3 py-2 text-sm text-red-700 hover:bg-red-50"
               onClick={() => void run("reject", { note })}
             >
-              Reject
+              {t("actionReject", lang)}
             </button>
           </div>
         </div>
@@ -553,7 +555,7 @@ export function NewsEditorForm({
           className="w-fit rounded bg-crs-primary px-4 py-2 text-sm text-white"
           onClick={() => void run("publish")}
         >
-          Publish to public news.json
+          {t("actionPublish", lang)}
         </button>
       ) : null}
 
@@ -564,8 +566,7 @@ export function NewsEditorForm({
             disabled={pending}
             className="w-fit rounded border border-crs-secondary/40 px-4 py-2 text-sm text-crs-primary"
             onClick={() => void run("start_revision")}
-          >
-            Create revision (public stays live)
+          >{t("actionStartRevision", lang)}
           </button>
           {canReview ? (
             <button
@@ -574,7 +575,7 @@ export function NewsEditorForm({
               className="w-fit inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg"
               onClick={() => void run("unpublish")}
             >
-              Unpublish
+              {t("actionUnpublish", lang)}
             </button>
           ) : null}
         </div>
@@ -587,7 +588,7 @@ export function NewsEditorForm({
           className="w-fit rounded border border-amber-300 px-4 py-2 text-sm text-amber-900"
           onClick={() => void run("reopen_rejected")}
         >
-          Reopen as draft
+          {t("actionReopenDraft", lang)}
         </button>
       ) : null}
 
@@ -600,7 +601,7 @@ export function NewsEditorForm({
           className="w-fit rounded border border-red-300 px-4 py-2 text-sm text-red-800"
           onClick={() => void run("delete")}
         >
-          Delete permanently
+          {t("actionDelete", lang)}
         </button>
       ) : null}
     </div>

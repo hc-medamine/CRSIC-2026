@@ -15,6 +15,8 @@ export type ContentRevision = {
   created_at: Date;
   author_email: string | null;
   author_display_name: string | null;
+  author_name_ar: string | null;
+  author_name_en: string | null;
 };
 
 type ContentMeta = {
@@ -53,7 +55,8 @@ export async function listRevisionsForItem(contentItemId: string): Promise<Conte
   const result = await query<ContentRevision>(
     `SELECT r.id, r.content_item_id, r.revision_number, r.status, r.snapshot,
             r.change_summary, r.created_by, r.created_at,
-            u.email AS author_email, u.display_name AS author_display_name
+            u.email AS author_email, u.display_name AS author_display_name,
+            u.name_ar AS author_name_ar, u.name_en AS author_name_en
      FROM content_revisions r
      LEFT JOIN users u ON u.id = r.created_by
      WHERE r.content_item_id = $1
@@ -70,7 +73,8 @@ export async function getRevisionById(
   const result = await query<ContentRevision>(
     `SELECT r.id, r.content_item_id, r.revision_number, r.status, r.snapshot,
             r.change_summary, r.created_by, r.created_at,
-            u.email AS author_email, u.display_name AS author_display_name
+            u.email AS author_email, u.display_name AS author_display_name,
+            u.name_ar AS author_name_ar, u.name_en AS author_name_en
      FROM content_revisions r
      LEFT JOIN users u ON u.id = r.created_by
      WHERE r.content_item_id = $1 AND r.id = $2`,

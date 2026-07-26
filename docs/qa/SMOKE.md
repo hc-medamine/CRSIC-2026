@@ -37,6 +37,7 @@ Estimated time: **~5 minutes**.
 | C1 | Toggle **EN** → UI chrome English, `dir=ltr` | ☐ |
 | C2 | Toggle **AR** → UI chrome Arabic, `dir=rtl` | ☐ |
 | C3 | Preference survives refresh (`localStorage` `crsic_lang`) | ☐ |
+| C4 | After layout/CSS/i18n changes: run [RTL-LTR.md](./RTL-LTR.md) checklist both dirs | ☐ |
 
 ## D. Features
 
