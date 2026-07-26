@@ -109,7 +109,7 @@ export function ProfileForm({ initial }: Props) {
         disabled={pending}
         className="inline-flex min-h-11 w-fit items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
       >
-        {pending ? "Saving…" : "Save profile"}
+        {pending ? t("actionSaving", lang) : "Save profile"}
       </button>
     </form>
   );

@@ -13,6 +13,7 @@ import {
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { AdvancedDisclosure, FormBanner, FormSection, FormStickyActions, messageForAction } from "@/app/dashboard/form-ux";
 import { t } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
 
@@ -57,6 +58,7 @@ export function AlertEditorForm({
   canDelete,
 }: Props) {
   const router = useRouter();
+  const lang = useCmsLang();
   const [orgUnitId, setOrgUnitId] = useState(initial?.orgUnitId ?? orgUnits[0]?.id ?? "");
   const [titleAr, setTitleAr] = useState(initial?.titleAr ?? "");
   const [titleEn, setTitleEn] = useState(initial?.titleEn ?? "");
@@ -109,7 +111,7 @@ export function AlertEditorForm({
       });
       const data = (await res.json()) as { ok: boolean; error?: string; item?: { id: string } };
       if (!res.ok || !data.ok || !data.item) {
-        const msg = data.error ?? "Create failed";
+        const msg = data.error ?? t("createFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
@@ -141,19 +143,19 @@ export function AlertEditorForm({
       });
       const data = (await res.json()) as { ok: boolean; error?: string; deleted?: boolean };
       if (!res.ok || !data.ok) {
-        const msg = data.error ?? "Action failed";
+        const msg = data.error ?? t("actionFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
       if (data.deleted) {
-        cmsToast.success("Deleted.");
+        cmsToast.success(t("deletedShort", lang));
         router.push("/dashboard");
         router.refresh();
         return;
       }
       const key = messageForAction(action);
-      const msg = t(key || "savedStay", "en");
+      const msg = t(key || "savedStay", lang);
       setMessage(msg);
       cmsToast.success(msg);
       router.refresh();
@@ -182,9 +184,9 @@ export function AlertEditorForm({
         onSubmit={mode === "create" ? create : (e) => e.preventDefault()}
         className="flex flex-col gap-1 cms-form rounded-2xl border border-crs-border bg-crs-surface p-6 shadow-sm"
       >
-        <FormSection step={1} title={t("sectionIdentity", "en")}>
+        <FormSection step={1} title={t("sectionIdentity", lang)}>
           <label className="text-sm">
-            <span className="font-medium">Organisation unit</span>
+            <span className="font-medium">{t("fieldOrgUnit", lang)}</span>
             <select
               disabled={!editable}
               value={orgUnitId}
@@ -236,8 +238,8 @@ export function AlertEditorForm({
 
         <AdvancedDisclosure
           step={2}
-          title={t("sectionAdvanced", "en")}
-          hint={t("sectionAdvancedHint", "en")}
+          title={t("sectionAdvanced", lang)}
+          hint={t("sectionAdvancedHint", lang)}
         >
           <label className="text-sm">
             <span className="font-medium">Banner message (EN)</span>
@@ -259,10 +261,10 @@ export function AlertEditorForm({
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">EN status</span>
+            <span className="font-medium">{t("enStatus", lang)}</span>
             <select disabled={!editable} value={enStatus} onChange={(e) => setEnStatus(e.target.value as "pending" | "ready")} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink">
-              <option value="pending">pending</option>
-              <option value="ready">ready</option>
+              <option value="pending">{t("enStatusPending", lang)}</option>
+              <option value="ready">{t("enStatusReady", lang)}</option>
             </select>
           </label>
           <SeoFieldsSection
@@ -283,7 +285,7 @@ export function AlertEditorForm({
                 disabled={pending}
                 className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
               >
-                {pending ? "Saving…" : "Create draft"}
+                {pending ? t("actionSaving", lang) : t("actionCreateDraft", lang)}
               </button>
             ) : null}
             {mode === "edit" && editable && isAuthor ? (
@@ -294,12 +296,12 @@ export function AlertEditorForm({
                   className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60"
                   onClick={() => void run("save", { fields: fields() })}
                 >
-                  Save draft
+                  {t("actionSaveDraft", lang)}
                 </button>
                 {canSubmit ? (
                   <label className="me-auto flex items-center gap-2 text-sm text-crs-ink">
                     <input type="checkbox" checked={checklist} onChange={(e) => setChecklist(e.target.checked)} />
-                    Checklist OK
+                    {t("actionChecklistOk", lang)}
                   </label>
                 ) : null}
                 {canSubmit ? (
@@ -309,7 +311,7 @@ export function AlertEditorForm({
                     className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
                     onClick={() => void run("submit", { checklistConfirmed: checklist })}
                   >
-                    Submit for review
+                    {t("actionSubmit", lang)}
                   </button>
                 ) : null}
               </>
@@ -321,7 +323,7 @@ export function AlertEditorForm({
                 className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg"
                 onClick={() => void run("withdraw")}
               >
-                Withdraw
+                {t("actionWithdraw", lang)}
               </button>
             ) : null}
           </div>
@@ -330,12 +332,12 @@ export function AlertEditorForm({
 
       {mode === "edit" && canReview && initial?.status === "submitted" ? (
         <div className="grid gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
-          <p className="text-sm font-medium">Reviewer actions</p>
-          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note for changes / rejection" className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" rows={2} />
+          <p className="text-sm font-medium">{t("actionReviewerActions", lang)}</p>
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder=t("actionNotePlaceholder", lang) className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" rows={2} />
           <div className="flex flex-wrap gap-2">
-            <button type="button" disabled={pending} className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white" onClick={() => void run("approve")}>Approve</button>
-            <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg" onClick={() => void run("request_changes", { note })}>Request changes</button>
-            <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-red-300 bg-crs-surface px-3 py-2 text-sm text-red-700 hover:bg-red-50" onClick={() => void run("reject", { note })}>Reject</button>
+            <button type="button" disabled={pending} className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white" onClick={() => void run("approve")}>{t("actionApprove", lang)}</button>
+            <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg" onClick={() => void run("request_changes", { note })}>{t("actionRequestChanges", lang)}</button>
+            <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-red-300 bg-crs-surface px-3 py-2 text-sm text-red-700 hover:bg-red-50" onClick={() => void run("reject", { note })}>{t("actionReject", lang)}</button>
           </div>
         </div>
       ) : null}
@@ -346,18 +348,17 @@ export function AlertEditorForm({
 
       {mode === "edit" && canReview && (initial?.status === "approved" || initial?.status === "unpublished") ? (
         <button type="button" disabled={pending} className="w-fit rounded bg-crs-primary px-4 py-2 text-sm text-white" onClick={() => void run("publish")}>
-          Publish to public alerts.json
+          {t("actionPublish", lang)}
         </button>
       ) : null}
 
       {mode === "edit" && (isAuthor || canReview) && initial?.status === "published" ? (
         <div className="flex flex-wrap gap-2">
-          <button type="button" disabled={pending} className="w-fit rounded border border-crs-secondary/40 px-4 py-2 text-sm text-crs-primary" onClick={() => void run("start_revision")}>
-            Create revision (public stays live)
+          <button type="button" disabled={pending} className="w-fit rounded border border-crs-secondary/40 px-4 py-2 text-sm text-crs-primary" onClick={() => void run("start_revision")}>{t("actionStartRevision", lang)}
           </button>
           {canReview ? (
             <button type="button" disabled={pending} className="w-fit inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg" onClick={() => void run("unpublish")}>
-              Unpublish
+              {t("actionUnpublish", lang)}
             </button>
           ) : null}
         </div>
@@ -365,7 +366,7 @@ export function AlertEditorForm({
 
       {mode === "edit" && isAuthor && initial?.status === "rejected" ? (
         <button type="button" disabled={pending} className="w-fit rounded border border-amber-300 px-4 py-2 text-sm text-amber-900" onClick={() => void run("reopen_rejected")}>
-          Reopen as draft
+          {t("actionReopenDraft", lang)}
         </button>
       ) : null}
 
@@ -378,7 +379,7 @@ export function AlertEditorForm({
           className="w-fit rounded border border-red-300 px-4 py-2 text-sm text-red-800"
           onClick={() => void run("delete")}
         >
-          Delete permanently
+          {t("actionDelete", lang)}
         </button>
       ) : null}
     </div>

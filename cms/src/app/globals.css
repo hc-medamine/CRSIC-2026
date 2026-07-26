@@ -27,12 +27,26 @@
   --color-crs-border: var(--crs-border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-arabic: var(--font-tajawal);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Arabic CMS UI — Tajawal (Geist is Latin-only) */
+html[lang="ar"] body,
+html[dir="rtl"] body,
+[lang="ar"],
+[dir="rtl"] {
+  font-family: var(--font-tajawal), "Tajawal", ui-sans-serif, system-ui, sans-serif;
+}
+
+html[lang="ar"] :where(.tracking-tight, .tracking-wide, [class*="tracking-"]),
+html[dir="rtl"] :where(.tracking-tight, .tracking-wide, [class*="tracking-"]) {
+  letter-spacing: normal;
 }
 
 /* Visible focus — WCAG */

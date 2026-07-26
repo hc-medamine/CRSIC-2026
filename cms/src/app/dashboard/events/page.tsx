@@ -6,7 +6,8 @@ import { listEventsForUser } from "@/lib/content/events";
 import { canAccessContentType } from "@/lib/content/permissions";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { EnStatusBadge } from "@/app/dashboard/en-status-badge";
-import { ContentListFilters, filterContentItems } from "@/app/dashboard/content-list-filters";
+import { ContentListFilters } from "@/app/dashboard/content-list-filters";
+import { filterContentItems } from "@/lib/content/filter-content-items";
 import { IconPlus } from "@/app/dashboard/cms-icons";
 import { PageBreadcrumb, StatusPill } from "@/app/dashboard/ui-bits";
 

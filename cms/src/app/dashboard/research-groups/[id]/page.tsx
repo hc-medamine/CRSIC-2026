@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { requireUser } from "@/lib/auth/session";
 import { getResearchGroupById } from "@/lib/content/researchGroups";
 import { normalizeResearchMembers } from "@/lib/publish/researchGroupsJson";
@@ -56,7 +58,7 @@ export default async function ResearchGroupDetailPage({ params }: Props) {
 
       {!reviewer && canReview(user) && item.created_by === user.id ? (
         <p className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          Four-eyes: you authored this item, so you cannot approve or publish it. Use a different Reviewer account.
+          {t("fourEyesNotice", lang)}
         </p>
       ) : null}
 

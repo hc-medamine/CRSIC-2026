@@ -19,6 +19,10 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-07-26 — RTL/LTR ops hardening (SPA + CMS)
+
+**Ops/hardening** (no PRD). Logical CSS sweep on public `css/style.css`; CSS-driven CTA arrows (locale strings de-arrowed); scroll progress mirrors reading direction; contact BiDi isolation; CMS Tajawal + sync `<html lang/dir>` from chrome. QA + authoring guide: [qa/RTL-LTR.md](./qa/RTL-LTR.md). Org chart: **Option A** (flip with language / natural `dir`).
+
 ### 2026-07-26 — Feature-completeness audit **closed** (current scope)
 
 **Merged:** PR [#17](https://github.com/hc-medamine/CRSIC-2026/pull/17) on `main` (`b14355e`).

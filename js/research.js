@@ -57,7 +57,7 @@ export function renderResearchGroupsForTab(tabId) {
     replaceChildren(host, [
       el('p', {
         className: 'research-groups-empty text-muted',
-        text: t('research_groups_empty') || (lang === 'en' ? 'No research groups published yet.' : 'لا توجد فرق بحثية منشورة بعد.'),
+        text: t('research_groups_empty') || t('research_groups_empty_fallback'),
       }),
     ]);
     return;

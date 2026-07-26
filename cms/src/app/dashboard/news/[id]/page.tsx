@@ -68,16 +68,15 @@ export default async function NewsDetailPage({ params }: Props) {
       breadcrumbs={[
         { href: "/dashboard", label: t("home", lang) },
         { href: "/dashboard/news", label: t("news", lang) },
-        { label: "Edit" },
+        { label: t("edit", lang) },
       ]}
-      title="Edit / review"
+      title={t("editReview", lang)}
       subtitle={item.title_ar || undefined}
       wide
     >
       {!reviewer && canReview(user) && item.created_by === user.id ? (
         <p className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          Four-eyes: you authored this item, so you cannot approve or publish it. Use a different
-          Reviewer account.
+          {t("fourEyesNotice", lang)}
         </p>
       ) : null}
 
