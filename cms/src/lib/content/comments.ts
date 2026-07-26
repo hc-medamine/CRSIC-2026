@@ -1,6 +1,7 @@
 import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import { createNotification } from "@/lib/notifications";
+import { contentPathSegment, type ContentType } from "@/lib/content/lifecycle";
 import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 
 export type CommentKind = "general" | "changes_requested" | "rejected";
@@ -16,12 +17,9 @@ export type ContentComment = {
   author_display_name: string | null;
 };
 
-function dashboardPath(contentType: string, id: string): string {
-  if (contentType === "news") return `/dashboard/news/${id}`;
-  if (contentType === "event") return `/dashboard/events/${id}`;
-  if (contentType === "partner") return `/dashboard/partners/${id}`;
-  if (contentType === "alert") return `/dashboard/alerts/${id}`;
-  return `/dashboard/publications/${id}`;
+/** Dashboard edit path for comment notification deep-links (all 7 content types). */
+export function commentDashboardPath(contentType: string, id: string): string {
+  return `/dashboard/${contentPathSegment(contentType as ContentType)}/${id}`;
 }
 
 /** Author of the item, Reviewer, or Super Admin may post (any status). */
@@ -85,7 +83,7 @@ async function notifyOnGeneralComment(
   item: { id: string; content_type: string; created_by: string; title?: string },
   body: string,
 ) {
-  const linkPath = dashboardPath(item.content_type, item.id);
+  const linkPath = commentDashboardPath(item.content_type, item.id);
   const preview = body.length > 120 ? `${body.slice(0, 117)}…` : body;
 
   if (actor.id === item.created_by) {
