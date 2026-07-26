@@ -53,6 +53,7 @@ export type ResearchGroupItem = {
   research_lead_ar: string | null;
   research_lead_en: string | null;
   research_members: PublicResearchGroupMember[] | unknown;
+  image_path: string | null;
   checklist_confirmed: boolean;
   review_note: string | null;
   public_slug: string | null;
@@ -80,6 +81,7 @@ export type ResearchGroupInput = {
   leadAr: string;
   leadEn?: string;
   members?: ResearchGroupMemberInput[];
+  imagePath?: string | null;
   enStatus?: "pending" | "ready";
 } & SeoInput;
 
@@ -108,6 +110,7 @@ function snapshotOf(row: ResearchGroupItem) {
     research_lead_ar: row.research_lead_ar,
     research_lead_en: row.research_lead_en,
     research_members: normalizeResearchMembers(row.research_members),
+    image_path: row.image_path,
     public_slug: row.public_slug,
     ...seoSnapshotFields(row),
   };
@@ -215,13 +218,13 @@ export async function createResearchGroup(
     `INSERT INTO content_items (
       content_type, status, org_unit_id, created_by, updated_by, en_status,
       title_ar, title_en, summary_ar, summary_en,
-      research_lead_ar, research_lead_en, research_members,
+      research_lead_ar, research_lead_en, research_members, image_path,
       meta_title_ar, meta_title_en, meta_description_ar, meta_description_en, og_image
     ) VALUES (
       'research_group', 'draft', $1, $2, $2, $3,
       $4, $5, $6, $7,
-      $8, $9, $10::jsonb,
-      $11, $12, $13, $14, $15
+      $8, $9, $10::jsonb, $11,
+      $12, $13, $14, $15, $16
     ) RETURNING *`,
     [
       input.orgUnitId,
@@ -234,6 +237,7 @@ export async function createResearchGroup(
       input.leadAr.trim(),
       input.leadEn?.trim() || null,
       JSON.stringify(members),
+      input.imagePath?.trim() || null,
       seo.meta_title_ar,
       seo.meta_title_en,
       seo.meta_description_ar,
@@ -272,8 +276,9 @@ export async function updateResearchGroupDraft(
       org_unit_id = $2, updated_by = $3, en_status = $4,
       title_ar = $5, title_en = $6, summary_ar = $7, summary_en = $8,
       research_lead_ar = $9, research_lead_en = $10, research_members = $11::jsonb,
-      meta_title_ar = $12, meta_title_en = $13, meta_description_ar = $14,
-      meta_description_en = $15, og_image = $16,
+      image_path = $12,
+      meta_title_ar = $13, meta_title_en = $14, meta_description_ar = $15,
+      meta_description_en = $16, og_image = $17,
       updated_at = NOW()
      WHERE id = $1 AND content_type = 'research_group'
      RETURNING *`,
@@ -289,6 +294,7 @@ export async function updateResearchGroupDraft(
       input.leadAr.trim(),
       input.leadEn?.trim() || null,
       JSON.stringify(members),
+      input.imagePath?.trim() || null,
       seo.meta_title_ar,
       seo.meta_title_en,
       seo.meta_description_ar,

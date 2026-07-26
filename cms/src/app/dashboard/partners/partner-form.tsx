@@ -3,8 +3,12 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ItemWorkflowMeta, type PersonDisplay } from "@/app/dashboard/item-workflow-meta";
+import { MediaUploadField } from "@/app/dashboard/media-upload-field";
+import { PublicPreviewButton } from "@/app/dashboard/public-preview-button";
+import { RichBodyEditor } from "@/app/dashboard/rich-body-editor";
 import {
   SeoFieldsSection,
+  copyMetaDescriptionFrom,
   copyMetaTitleFrom,
   emptySeoFormState,
   type SeoFormState,
@@ -12,6 +16,8 @@ import {
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { AdvancedDisclosure, FormBanner, FormSection, FormStickyActions, messageForAction } from "@/app/dashboard/form-ux";
 import { t } from "@/lib/i18n/labels";
+
+const SUMMARY_SOFT_MAX = 200;
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
 
@@ -22,10 +28,15 @@ type Initial = {
   titleEn: string;
   labelAr: string;
   labelEn: string;
+  summaryAr?: string;
+  summaryEn?: string;
+  bodyAr?: string;
+  bodyEn?: string;
   enStatus: "pending" | "ready";
   partnerScope: "intl" | "nat";
   partnerDate: string;
   partnerEmoji: string;
+  imagePath?: string;
   status?: string;
   reviewNote?: string | null;
   editor?: PersonDisplay;
@@ -67,6 +78,11 @@ export function PartnerEditorForm({
   const [partnerScope, setPartnerScope] = useState<"intl" | "nat">(initial?.partnerScope ?? "nat");
   const [partnerDate, setPartnerDate] = useState(initial?.partnerDate ?? "");
   const [partnerEmoji, setPartnerEmoji] = useState(initial?.partnerEmoji ?? "");
+  const [summaryAr, setSummaryAr] = useState(initial?.summaryAr ?? "");
+  const [summaryEn, setSummaryEn] = useState(initial?.summaryEn ?? "");
+  const [bodyAr, setBodyAr] = useState(initial?.bodyAr ?? "");
+  const [bodyEn, setBodyEn] = useState(initial?.bodyEn ?? "");
+  const [imagePath, setImagePath] = useState(initial?.imagePath ?? "");
   const [seo, setSeo] = useState<SeoFormState>(() => ({
     ...emptySeoFormState(),
     metaTitleAr: initial?.metaTitleAr ?? "",
@@ -82,6 +98,7 @@ export function PartnerEditorForm({
   const [pending, setPending] = useState(false);
 
   const editable = mode === "create" || initial?.status === "draft" || initial?.status === "changes_requested";
+  const summaryArLong = summaryAr.trim().length > SUMMARY_SOFT_MAX;
 
   function fields() {
     return {
@@ -90,10 +107,15 @@ export function PartnerEditorForm({
       titleEn,
       labelAr,
       labelEn,
+      summaryAr,
+      summaryEn,
+      bodyAr,
+      bodyEn,
       enStatus,
       partnerScope,
       partnerDate,
       partnerEmoji,
+      imagePath: imagePath.trim() || null,
       metaTitleAr: seo.metaTitleAr,
       metaTitleEn: seo.metaTitleEn,
       metaDescriptionAr: seo.metaDescriptionAr,
@@ -232,13 +254,50 @@ export function PartnerEditorForm({
             <input dir="rtl" disabled={!editable} value={labelAr} onChange={(e) => setLabelAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
+            <span className="font-medium">Summary (AR)</span>
+            <textarea
+              dir="rtl"
+              disabled={!editable}
+              value={summaryAr}
+              onChange={(e) => setSummaryAr(e.target.value)}
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
+              rows={2}
+            />
+            {summaryArLong ? (
+              <span className="mt-1 block text-xs text-amber-800">
+                Soft limit {SUMMARY_SOFT_MAX} characters for card teasers ({summaryAr.trim().length} now). Saving is still allowed.
+              </span>
+            ) : null}
+          </label>
+          <label className="text-sm">
             <span className="font-medium">Emoji (optional)</span>
             <input disabled={!editable} value={partnerEmoji} onChange={(e) => setPartnerEmoji(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" placeholder="🇰🇷" />
           </label>
         </FormSection>
 
+        <FormSection step={2} title={t("sectionBody", "en")}>
+          <RichBodyEditor
+            label="Body (AR)"
+            dir="rtl"
+            disabled={!editable}
+            value={bodyAr}
+            onChange={setBodyAr}
+          />
+        </FormSection>
+
+        <FormSection step={3} title={t("sectionMedia", "en")}>
+          <MediaUploadField
+            bucket="partners"
+            publicPath={imagePath}
+            imagesOnly
+            label="Logo / image"
+            disabled={!editable}
+            onUploaded={({ publicPath }) => setImagePath(publicPath)}
+          />
+        </FormSection>
+
         <AdvancedDisclosure
-          step={2}
+          step={4}
           title={t("sectionAdvanced", "en")}
           hint={t("sectionAdvancedHint", "en")}
         >
@@ -251,6 +310,23 @@ export function PartnerEditorForm({
             <input disabled={!editable} value={labelEn} onChange={(e) => setLabelEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
+            <span className="font-medium">Summary (EN)</span>
+            <textarea
+              disabled={!editable}
+              value={summaryEn}
+              onChange={(e) => setSummaryEn(e.target.value)}
+              className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
+              rows={2}
+            />
+          </label>
+          <RichBodyEditor
+            label="Body (EN)"
+            dir="ltr"
+            disabled={!editable}
+            value={bodyEn}
+            onChange={setBodyEn}
+          />
+          <label className="text-sm">
             <span className="font-medium">EN status</span>
             <select disabled={!editable} value={enStatus} onChange={(e) => setEnStatus(e.target.value as "pending" | "ready")} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink">
               <option value="pending">pending</option>
@@ -261,7 +337,10 @@ export function PartnerEditorForm({
             value={seo}
             onChange={setSeo}
             disabled={!editable}
+            ogBucket="partners"
+            ogFallbackHint={imagePath.trim() || "img/cms/partners/..."}
             onCopyTitleAr={() => setSeo((s) => copyMetaTitleFrom(titleAr, s))}
+            onCopySummaryAr={() => setSeo((s) => copyMetaDescriptionFrom(summaryAr, s))}
           />
         </AdvancedDisclosure>
 
@@ -328,6 +407,10 @@ export function PartnerEditorForm({
             <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-red-300 bg-crs-surface px-3 py-2 text-sm text-red-700 hover:bg-red-50" onClick={() => void run("reject", { note })}>Reject</button>
           </div>
         </div>
+      ) : null}
+
+      {mode === "edit" && initial?.id ? (
+        <PublicPreviewButton contentId={initial.id} disabled={pending} />
       ) : null}
 
       {mode === "edit" && canReview && (initial?.status === "approved" || initial?.status === "unpublished") ? (

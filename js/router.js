@@ -22,7 +22,21 @@ import { t } from './i18n.js';
 /** Maps child pages to their primary nav parent. */
 export const PAGE_PARENT = { org: 'about', research: 'about', cooperation: 'events', detail: 'home' };
 
-const DETAIL_TYPES = new Set(['news', 'event', 'publication', 'research-project']);
+const DETAIL_TYPES = new Set([
+  'news',
+  'event',
+  'publication',
+  'research-project',
+  'research-group',
+  'partner',
+]);
+
+/** Map CMS preview content_type (underscore) → SPA detail type (hyphen). */
+function spaDetailTypeFromPreview(type) {
+  if (type === 'research_project') return 'research-project';
+  if (type === 'research_group') return 'research-group';
+  return type;
+}
 
 /**
  * @param {string} hashRaw hash without leading #
@@ -91,12 +105,22 @@ export async function navigateToPreview(token, opts = {}) {
       renderDetailPage('news', '', { isPreview: true, previewItem: null });
       return;
     }
-    const type = data.type;
-    const slug = data.item.slug || token;
+    const type = spaDetailTypeFromPreview(data.type);
+    const slug = data.item.slug || data.item.id || token;
     renderDetailPage(type, slug, { isPreview: true, previewItem: data.item });
 
     const parentNav =
-      type === 'publication' ? 'publications' : type === 'event' ? 'events' : 'home';
+      type === 'publication'
+        ? 'publications'
+        : type === 'event'
+          ? 'events'
+          : type === 'partner'
+            ? 'cooperation'
+            : type === 'research-project' || type === 'research-group'
+              ? 'research'
+              : type === 'alert'
+                ? 'home'
+                : 'home';
     document.querySelectorAll('.nav-links a[data-page]').forEach((a) => {
       const isActive = a.dataset.page === parentNav && !a.dataset.tab;
       a.classList.toggle('active', isActive);
@@ -134,9 +158,11 @@ export function navigateTo(pageId, tab, filter, opts = {}) {
         ? 'publications'
         : detailType === 'event'
           ? 'events'
-          : detailType === 'research-project'
-            ? 'research'
-            : 'home';
+          : detailType === 'partner'
+            ? 'cooperation'
+            : detailType === 'research-project' || detailType === 'research-group'
+              ? 'research'
+              : 'home';
     document.querySelectorAll('.nav-links a[data-page]').forEach((a) => {
       const isActive = a.dataset.page === parentNav && !a.dataset.tab;
       a.classList.toggle('active', isActive);

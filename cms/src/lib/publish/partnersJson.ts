@@ -2,23 +2,38 @@ import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from "
 import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
 import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
+import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 
 export type PublicPartnerItem = {
+  id: string;
+  slug: string;
   name: string;
   country: string;
   date: string;
   emoji?: string;
+  img?: string;
+  summary_ar?: string;
+  summary_en?: string;
+  body_ar?: string;
+  body_en?: string;
 } & PublicSeoFields;
 
 /** Public item plus the scope used to bucket it into intl/nat on rebuild. */
 export type StoredPartnerPayload = PublicPartnerItem & { scope: "intl" | "nat" };
 
 type PayloadSource = {
+  id: string;
   title_ar: string;
   label_ar: string | null;
   partner_date: string | null;
   partner_emoji: string | null;
   partner_scope: "intl" | "nat" | null;
+  public_slug?: string | null;
+  image_path?: string | null;
+  summary_ar?: string | null;
+  summary_en?: string | null;
+  body_ar?: string | null;
+  body_en?: string | null;
   meta_title_ar?: string | null;
   meta_title_en?: string | null;
   meta_description_ar?: string | null;
@@ -26,13 +41,33 @@ type PayloadSource = {
   og_image?: string | null;
 };
 
+function narrativeFromRow(row: {
+  summary_ar?: string | null;
+  summary_en?: string | null;
+  body_ar?: string | null;
+  body_en?: string | null;
+}): Pick<PublicPartnerItem, "summary_ar" | "summary_en" | "body_ar" | "body_en"> {
+  const out: Pick<PublicPartnerItem, "summary_ar" | "summary_en" | "body_ar" | "body_en"> = {};
+  if (row.summary_ar?.trim()) out.summary_ar = row.summary_ar.trim();
+  if (row.summary_en?.trim()) out.summary_en = row.summary_en.trim();
+  const bodyAr = sanitizeBodyHtml(row.body_ar ?? undefined);
+  const bodyEn = sanitizeBodyHtml(row.body_en ?? undefined);
+  if (bodyAr) out.body_ar = bodyAr;
+  if (bodyEn) out.body_en = bodyEn;
+  return out;
+}
+
 /** Public object for a partner row (persisted to content_items.live_payload). */
 export function buildPartnerPayload(row: PayloadSource): StoredPartnerPayload {
+  const img = row.image_path?.trim() || row.og_image?.trim() || "";
   const publicBase = withPublicSeo(
     {
+      id: row.id,
+      slug: row.public_slug?.trim() || row.id,
       name: row.title_ar.trim(),
       country: row.label_ar?.trim() || "",
       date: row.partner_date?.trim() || "",
+      ...narrativeFromRow(row),
     },
     row,
   );
@@ -42,6 +77,7 @@ export function buildPartnerPayload(row: PayloadSource): StoredPartnerPayload {
   };
   const emoji = row.partner_emoji?.trim();
   if (emoji) item.emoji = emoji;
+  if (img) item.img = img;
   return item;
 }
 
@@ -67,12 +103,16 @@ export async function rebuildPublicPartnersJson(): Promise<{
   for (const row of result.rows) {
     const { scope, ...item } = row.live_payload;
     const publicItem: PublicPartnerItem = {
+      id: item.id || "",
+      slug: item.slug || item.id || "",
       name: (item.name ?? "").trim(),
       country: item.country?.trim() || "",
       date: item.date?.trim() || "",
       ...seoFromRow(item),
+      ...narrativeFromRow(item),
     };
     if (item.emoji?.trim()) publicItem.emoji = item.emoji.trim();
+    if (item.img?.trim()) publicItem.img = item.img.trim();
     if (scope === "nat") nat.push(publicItem);
     else intl.push(publicItem);
   }

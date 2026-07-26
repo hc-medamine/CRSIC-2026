@@ -20,6 +20,7 @@ export type PublicResearchGroup = {
   lead_ar: string;
   lead_en: string;
   members: PublicResearchGroupMember[];
+  img?: string;
 } & PublicSeoFields;
 
 export function normalizeResearchMembers(raw: unknown): PublicResearchGroupMember[] {
@@ -48,6 +49,7 @@ type PayloadSource = {
   research_lead_en: string | null;
   research_members: unknown;
   public_slug?: string | null;
+  image_path?: string | null;
   meta_title_ar?: string | null;
   meta_title_en?: string | null;
   meta_description_ar?: string | null;
@@ -57,7 +59,8 @@ type PayloadSource = {
 
 /** Public object for a research_group row (persisted to content_items.live_payload). */
 export function buildResearchGroupPayload(row: PayloadSource): PublicResearchGroup {
-  return withPublicSeo(
+  const img = row.image_path?.trim() || row.og_image?.trim() || "";
+  const base = withPublicSeo(
     {
       id: row.id,
       slug: row.public_slug?.trim() || row.id,
@@ -72,6 +75,8 @@ export function buildResearchGroupPayload(row: PayloadSource): PublicResearchGro
     },
     row,
   );
+  if (img) return { ...base, img };
+  return base;
 }
 
 function publicResearchGroupsPath(): string {

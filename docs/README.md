@@ -13,6 +13,7 @@ Project docs live under `docs/`. The root [README.md](../README.md) remains the 
 | [audits/UIUX.md](./audits/UIUX.md) | UI/UX audit findings + fix log |
 | [audits/PARITY.md](./audits/PARITY.md) | AR/EN parity matrix (partial EN) |
 | [prds/](./prds/) | Product requirement documents — see root README §5.1 (PRD-first) |
+| [designs/](./designs/) | Engineering design docs (impl gated on approval) |
 | [../data/README.md](../data/README.md) | Public JSON / locale editor guide |
 | [../data/CMS.md](../data/CMS.md) | `CONTENT_BASE_URL` publish contract |
 
@@ -31,6 +32,8 @@ docs/
 │   ├── AUDIT.md       # Closed code audit
 │   ├── UIUX.md        # UI/UX audit log
 │   └── PARITY.md      # i18n parity matrix
+├── designs/
+│   └── *.md           # Engineering designs (approve before code)
 └── prds/
     ├── README.md      # How to add PRDs
     └── TEMPLATE.md    # Concise PRD template

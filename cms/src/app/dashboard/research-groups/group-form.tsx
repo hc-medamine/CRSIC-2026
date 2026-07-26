@@ -3,6 +3,8 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ItemWorkflowMeta, type PersonDisplay } from "@/app/dashboard/item-workflow-meta";
+import { MediaUploadField } from "@/app/dashboard/media-upload-field";
+import { PublicPreviewButton } from "@/app/dashboard/public-preview-button";
 import {
   SeoFieldsSection,
   copyMetaTitleFrom,
@@ -28,6 +30,7 @@ type Initial = {
   leadAr: string;
   leadEn: string;
   members: MemberRow[];
+  imagePath?: string;
   enStatus: "pending" | "ready";
   status?: string;
   reviewNote?: string | null;
@@ -76,6 +79,7 @@ export function ResearchGroupForm({
     initial?.members && initial.members.length > 0 ? initial.members : [emptyMember()],
   );
   const [enStatus, setEnStatus] = useState<"pending" | "ready">(initial?.enStatus ?? "pending");
+  const [imagePath, setImagePath] = useState(initial?.imagePath ?? "");
   const [seo, setSeo] = useState<SeoFormState>(() => ({
     ...emptySeoFormState(),
     metaTitleAr: initial?.metaTitleAr ?? "",
@@ -116,6 +120,7 @@ export function ResearchGroupForm({
       members: members
         .filter((m) => m.nameAr.trim())
         .map((m) => ({ nameAr: m.nameAr, nameEn: m.nameEn })),
+      imagePath: imagePath.trim() || null,
       enStatus,
       metaTitleAr: seo.metaTitleAr,
       metaTitleEn: seo.metaTitleEn,
@@ -302,10 +307,20 @@ export function ResearchGroupForm({
               <option value="ready">ready</option>
             </select>
           </label>
+          <MediaUploadField
+            bucket="research"
+            publicPath={imagePath}
+            imagesOnly
+            label="Group image"
+            disabled={!editable}
+            onUploaded={({ publicPath }) => setImagePath(publicPath)}
+          />
           <SeoFieldsSection
             value={seo}
             onChange={setSeo}
             disabled={!editable}
+            ogBucket="research"
+            ogFallbackHint={imagePath.trim() || "img/cms/research/..."}
             onCopyTitleAr={() => setSeo((s) => copyMetaTitleFrom(titleAr, s))}
             onCopySummaryAr={() => setSeo((s) => copyMetaDescriptionFrom(summaryAr, s))}
           />
@@ -380,6 +395,10 @@ export function ResearchGroupForm({
         <button type="button" disabled={pending} className="w-fit rounded bg-crs-primary px-4 py-2 text-sm text-white" onClick={() => void run("publish")}>
           Publish to public research-groups.json
         </button>
+      ) : null}
+
+      {mode === "edit" && initial?.id ? (
+        <PublicPreviewButton contentId={initial.id} disabled={pending} />
       ) : null}
 
       {mode === "edit" && (isAuthor || canReview) && initial?.status === "published" ? (

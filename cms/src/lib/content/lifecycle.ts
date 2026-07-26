@@ -5,6 +5,7 @@ import { createNotification } from "@/lib/notifications";
 import { canReview } from "@/lib/content/permissions";
 import { getContentMeta, getRevisionById } from "@/lib/content/revisions";
 import { assertNotAwayFrozen } from "@/lib/content/ooo";
+import { SEO_SNAPSHOT_COLUMNS } from "@/lib/content/seo";
 
 export type ContentType =
   | "news"
@@ -31,6 +32,7 @@ const SNAPSHOT_COLUMNS = [
   "image_path",
   "image_alt_ar",
   "image_alt_en",
+  "attachments",
   "pub_kind",
   "event_scope",
   "event_day",
@@ -52,13 +54,49 @@ const SNAPSHOT_COLUMNS = [
   "research_questions_en",
   "research_duration_ar",
   "research_duration_en",
-  // Note: research_members / research_axes / research_impacts are jsonb (like
-  // publications.attachments) and are intentionally excluded here — a generic
-  // restore would need a ::jsonb cast this column-agnostic UPDATE doesn't apply.
+  "research_members",
+  "research_axes",
+  "research_impacts",
+  ...SEO_SNAPSHOT_COLUMNS,
 ] as const;
 
+/** Exported for parity-guard tests (must stay in sync with SNAPSHOT_COLUMNS). */
+export const CONTENT_SNAPSHOT_COLUMNS: readonly string[] = SNAPSHOT_COLUMNS;
+
+/** Restorable editable columns (excludes status). Exported for parity tests. */
+export const CONTENT_RESTORABLE_COLUMNS: readonly string[] = SNAPSHOT_COLUMNS.filter(
+  (c) => c !== "status",
+);
+
+/**
+ * JSONB columns on content_items that must never be overwritten by restore.
+ * - live_payload: public live copy (Gap #4 / #5 — restore leaves it untouched)
+ */
+export const JSONB_RESTORE_EXCLUDE: ReadonlySet<string> = new Set(["live_payload"]);
+
+/** Editable JSONB snapshot fields — restore UPDATE must cast these as ::jsonb. */
+const JSONB_SNAPSHOT_COLUMNS: ReadonlySet<string> = new Set([
+  "attachments",
+  "research_members",
+  "research_axes",
+  "research_impacts",
+]);
+
 /** Columns that a restore is allowed to overwrite from a prior snapshot (never status here). */
-const RESTORABLE_COLUMNS = SNAPSHOT_COLUMNS.filter((c) => c !== "status");
+const RESTORABLE_COLUMNS = CONTENT_RESTORABLE_COLUMNS;
+
+function restoreValueSql(column: string, paramIndex: number): string {
+  if (JSONB_SNAPSHOT_COLUMNS.has(column)) {
+    return `${column} = $${paramIndex}::jsonb`;
+  }
+  return `${column} = $${paramIndex}`;
+}
+
+function serializeRestoreValue(column: string, value: unknown): unknown {
+  if (!JSONB_SNAPSHOT_COLUMNS.has(column)) return value ?? null;
+  if (value == null) return "[]";
+  return typeof value === "string" ? value : JSON.stringify(value);
+}
 
 export function contentPathSegment(type: ContentType): string {
   if (type === "news") return "news";
@@ -169,11 +207,11 @@ export async function restoreRevision(
 
   const snap = revision.snapshot ?? {};
   const setKeys = RESTORABLE_COLUMNS.filter((c) => c in snap);
-  const setClauses = setKeys.map((c, i) => `${c} = $${i + 3}`);
+  const setClauses = setKeys.map((c, i) => restoreValueSql(c, i + 3));
   setClauses.push(`status = 'draft'`);
   setClauses.push(`updated_by = $2`);
   setClauses.push(`updated_at = NOW()`);
-  const values = [id, user.id, ...setKeys.map((c) => snap[c] ?? null)];
+  const values = [id, user.id, ...setKeys.map((c) => serializeRestoreValue(c, snap[c]))];
 
   await query(
     `UPDATE content_items SET ${setClauses.join(", ")} WHERE id = $1`,

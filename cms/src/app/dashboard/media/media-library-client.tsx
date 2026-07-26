@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { MediaUploadField } from "@/app/dashboard/media-upload-field";
 import { MediaLightbox } from "@/app/dashboard/media-lightbox";
 import { cmsMediaSrc, isPdfPath } from "@/lib/media/cms-src";
@@ -16,6 +17,17 @@ type Item = {
   createdAt: string;
 };
 
+type MediaRef = {
+  contentItemId: string;
+  contentType: string;
+  titleAr: string;
+  status: string;
+  source: string;
+  revisionId?: string;
+  revisionNumber?: number;
+  dashboardPath: string;
+};
+
 type Props = {
   initialItems: Item[];
   allowedBuckets: MediaBucket[];
@@ -25,7 +37,21 @@ const BUCKET_LABELS: Record<MediaBucket, string> = {
   news: "news → img/cms/news/",
   events: "events → img/cms/events/",
   covers: "covers → img/cms/covers/",
+  partners: "partners → img/cms/partners/",
+  research: "research → img/cms/research/",
+  alerts: "alerts → img/cms/alerts/",
 };
+
+function sourceLabel(ref: MediaRef): string {
+  if (ref.source === "revision") {
+    return ref.revisionNumber != null ? `Revision #${ref.revisionNumber}` : "Revision";
+  }
+  if (ref.source === "live_payload") return "Live public copy";
+  if (ref.source === "attachments") return "Attachments";
+  if (ref.source === "og_image") return "OG image";
+  if (ref.source === "image_path") return "Primary image";
+  return ref.source;
+}
 
 export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
   const buckets = useMemo(
@@ -37,6 +63,46 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
   const [lastPath, setLastPath] = useState("");
   const [lastId, setLastId] = useState<string | null>(null);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [blockedRefs, setBlockedRefs] = useState<MediaRef[] | null>(null);
+  const [blockedPath, setBlockedPath] = useState("");
+  const [deleteError, setDeleteError] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  async function confirmDelete(item: Item) {
+    setDeleting(true);
+    setDeleteError("");
+    try {
+      const res = await fetch(`/api/media/${item.id}`, { method: "DELETE" });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        error?: string;
+        code?: string;
+        publicPath?: string;
+        references?: MediaRef[];
+      };
+      if (res.status === 409 && data.code === "MEDIA_IN_USE") {
+        setBlockedPath(data.publicPath ?? item.publicPath);
+        setBlockedRefs(data.references ?? []);
+        setPendingDeleteId(null);
+        return;
+      }
+      if (!res.ok || !data.ok) {
+        setDeleteError(data.error || "Delete failed");
+        return;
+      }
+      setItems((prev) => prev.filter((i) => i.id !== item.id));
+      if (lastId === item.id) {
+        setLastId(null);
+        setLastPath("");
+      }
+      setPendingDeleteId(null);
+    } catch {
+      setDeleteError("Network error");
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   if (allowedBuckets.length === 0) {
     return (
@@ -45,6 +111,10 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
       </p>
     );
   }
+
+  const pendingItem = pendingDeleteId
+    ? items.find((i) => i.id === pendingDeleteId) ?? null
+    : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -92,6 +162,12 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
         />
       </div>
 
+      {deleteError ? (
+        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+          {deleteError}
+        </p>
+      ) : null}
+
       {items.length === 0 ? (
         <p className="rounded-lg border border-dashed border-crs-border p-6 text-sm text-crs-muted">
           No uploads yet.
@@ -129,22 +205,122 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
                 <p className="break-all text-[11px] text-crs-muted">
                   {item.bucket} · <code>{item.publicPath}</code>
                 </p>
-                <button
-                  type="button"
-                  className="text-start text-xs text-crs-primary underline"
-                  onClick={() => {
-                    setBucket(item.bucket as MediaBucket);
-                    setLastId(item.id);
-                    setLastPath(item.publicPath);
-                  }}
-                >
-                  Select to replace (same URL)
-                </button>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    className="text-start text-xs text-crs-primary underline"
+                    onClick={() => {
+                      setBucket(item.bucket as MediaBucket);
+                      setLastId(item.id);
+                      setLastPath(item.publicPath);
+                    }}
+                  >
+                    Select to replace (same URL)
+                  </button>
+                  <button
+                    type="button"
+                    className="text-start text-xs text-red-700 underline"
+                    onClick={() => {
+                      setDeleteError("");
+                      setPendingDeleteId(item.id);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
               </li>
             );
           })}
         </ul>
       )}
+
+      {pendingItem ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="media-delete-title"
+        >
+          <div className="w-full max-w-md rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-lg">
+            <h2 id="media-delete-title" className="text-base font-semibold text-crs-ink">
+              Delete this media?
+            </h2>
+            <p className="mt-2 text-sm text-crs-muted">
+              <span className="font-medium text-crs-ink">{pendingItem.originalFilename}</span>
+              <br />
+              <code className="break-all text-[11px]">{pendingItem.publicPath}</code>
+            </p>
+            <p className="mt-2 text-sm text-crs-muted">This cannot be undone.</p>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                className="rounded-xl border border-crs-border px-3 py-2 text-sm"
+                disabled={deleting}
+                onClick={() => setPendingDeleteId(null)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="rounded-xl bg-red-700 px-3 py-2 text-sm text-white disabled:opacity-60"
+                disabled={deleting}
+                onClick={() => void confirmDelete(pendingItem)}
+              >
+                {deleting ? "Deleting…" : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {blockedRefs ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="media-blocked-title"
+        >
+          <div className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-lg">
+            <h2 id="media-blocked-title" className="text-base font-semibold text-crs-ink">
+              Cannot delete — still in use
+            </h2>
+            <p className="mt-2 break-all text-xs text-crs-muted">
+              <code>{blockedPath}</code>
+            </p>
+            <ul className="mt-4 flex flex-col gap-2">
+              {blockedRefs.map((ref) => (
+                <li
+                  key={`${ref.contentItemId}-${ref.source}-${ref.revisionId ?? ""}`}
+                  className="rounded-xl border border-crs-border px-3 py-2 text-sm"
+                >
+                  <Link
+                    href={ref.dashboardPath}
+                    className="font-medium text-crs-primary underline"
+                  >
+                    {ref.titleAr || ref.contentItemId}
+                  </Link>
+                  <p className="text-xs text-crs-muted">
+                    {ref.contentType} · {ref.status} · {sourceLabel(ref)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-4 flex justify-end">
+              <button
+                type="button"
+                className="rounded-xl border border-crs-border px-3 py-2 text-sm"
+                onClick={() => {
+                  setBlockedRefs(null);
+                  setBlockedPath("");
+                }}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <MediaLightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />
     </div>
   );

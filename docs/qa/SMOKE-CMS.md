@@ -59,6 +59,17 @@ Estimated time: **~10 minutes**.
 | F1 | `/dashboard/media` upload image + PDF | ☐ |
 | F2 | Replace keeps same public path | ☐ |
 | F3 | Audit `media.upload` / `media.replace` | ☐ |
+| F4 | Delete unused upload → asset leaves library; audit `media.delete` | ☐ |
+| F5 | Delete asset still on a draft/published/revision → blocked dialog lists references (no force-delete) | ☐ |
+| F6 | Upload to buckets `partners` / `research` / `alerts` from media library | ☐ |
+
+## G. Preview parity (all 7 types)
+
+| # | Check | Pass? |
+|---|--------|-------|
+| G1 | Partner / alert / research group / research project edit pages show **Public preview** | ☐ |
+| G2 | Preview opens SPA `#preview/{token}` (alert = banner mock; others = detail) | ☐ |
+| G3 | Emergency panels remain **only** on news / events / publications (intentional) | ☐ |
 
 ## H. Revisions & ops
 
