@@ -1,4 +1,10 @@
-import { mkdirSync, writeFileSync, existsSync, copyFileSync } from "node:fs";
+import {
+  mkdirSync,
+  writeFileSync,
+  existsSync,
+  copyFileSync,
+  unlinkSync,
+} from "node:fs";
 import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
@@ -10,7 +16,24 @@ import {
   publicPathFor,
   type MediaBucket,
 } from "@/lib/media/config";
+import {
+  listMediaReferences,
+  type MediaReference,
+} from "@/lib/media/references";
 import { validateUploadFile, type ValidatedUpload } from "@/lib/media/validate";
+
+export class MediaInUseError extends Error {
+  readonly code = "MEDIA_IN_USE" as const;
+  readonly publicPath: string;
+  readonly references: MediaReference[];
+
+  constructor(publicPath: string, references: MediaReference[]) {
+    super("Media is still referenced");
+    this.name = "MediaInUseError";
+    this.publicPath = publicPath;
+    this.references = references;
+  }
+}
 
 export type MediaAsset = {
   id: string;
@@ -241,6 +264,57 @@ export function ensurePublicMediaFile(asset: MediaAsset): void {
   }
   mkdirSync(dirname(publicAbs), { recursive: true });
   copyFileSync(staging, publicAbs);
+}
+
+function unlinkIfExists(absPath: string): void {
+  try {
+    if (existsSync(absPath)) unlinkSync(absPath);
+  } catch {
+    /* best-effort; row already removed */
+  }
+}
+
+/**
+ * Hard-delete media when unreferenced (design D1/D2/D3=A).
+ * Throws MediaInUseError when durable refs remain; no SA force-delete.
+ */
+export async function deleteMediaAsset(
+  user: SessionUser,
+  mediaId: string,
+): Promise<{ id: string; publicPath: string }> {
+  const existing = await getMediaById(mediaId);
+  if (!existing) throw new Error("Media not found");
+  if (!canManageMediaAsset(user, existing)) {
+    throw new Error("No permission to delete this media");
+  }
+  if (!(await canAccessMediaBucket(user, existing.bucket))) {
+    throw new Error("No permission for this media bucket");
+  }
+
+  const references = await listMediaReferences(existing.public_path);
+  if (references.length > 0) {
+    throw new MediaInUseError(existing.public_path, references);
+  }
+
+  await query(`DELETE FROM media_assets WHERE id = $1`, [mediaId]);
+
+  unlinkIfExists(stagingPath(existing.id, existing.extension));
+  unlinkIfExists(absolutePublicPath(existing.public_path));
+
+  await writeAudit({
+    actor: user,
+    action: "media.delete",
+    entityType: "media",
+    entityId: existing.id,
+    summary: `Deleted media ${existing.public_path}`,
+    metadata: {
+      bucket: existing.bucket,
+      publicPath: existing.public_path,
+      originalFilename: existing.original_filename,
+    },
+  });
+
+  return { id: existing.id, publicPath: existing.public_path };
 }
 
 export type { ValidatedUpload };

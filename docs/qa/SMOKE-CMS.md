@@ -59,6 +59,8 @@ Estimated time: **~10 minutes**.
 | F1 | `/dashboard/media` upload image + PDF | ☐ |
 | F2 | Replace keeps same public path | ☐ |
 | F3 | Audit `media.upload` / `media.replace` | ☐ |
+| F4 | Delete unused upload → asset leaves library; audit `media.delete` | ☐ |
+| F5 | Delete asset still on a draft/published/revision → blocked dialog lists references (no force-delete) | ☐ |
 
 ## H. Revisions & ops
 

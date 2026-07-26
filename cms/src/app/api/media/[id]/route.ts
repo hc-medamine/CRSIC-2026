@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession, sessionTimeoutMs } from "@/lib/auth/session";
 import {
   canManageMediaAsset,
+  deleteMediaAsset,
   getMediaById,
+  MediaInUseError,
   replaceMediaUpload,
 } from "@/lib/media/store";
 
@@ -62,5 +64,42 @@ export async function POST(request: NextRequest, { params }: Params) {
     const status =
       message.includes("not found") || message.includes("No permission") ? 404 : 400;
     return NextResponse.json({ ok: false, error: message }, { status });
+  }
+}
+
+/** Hard-delete when unreferenced; 409 MEDIA_IN_USE with reference list when blocked. */
+export async function DELETE(_request: NextRequest, { params }: Params) {
+  const user = await requireSessionUser();
+  if (!user) return NextResponse.json({ ok: false, error: "Unauthenticated" }, { status: 401 });
+  const { id } = await params;
+
+  try {
+    const result = await deleteMediaAsset(user, id);
+    return NextResponse.json({
+      ok: true,
+      id: result.id,
+      publicPath: result.publicPath,
+    });
+  } catch (err) {
+    if (err instanceof MediaInUseError) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: err.message,
+          code: err.code,
+          publicPath: err.publicPath,
+          references: err.references,
+        },
+        { status: 409 },
+      );
+    }
+    const message = err instanceof Error ? err.message : "Delete failed";
+    if (message.includes("not found")) {
+      return NextResponse.json({ ok: false, error: message }, { status: 404 });
+    }
+    if (message.includes("No permission")) {
+      return NextResponse.json({ ok: false, error: message }, { status: 403 });
+    }
+    return NextResponse.json({ ok: false, error: message }, { status: 400 });
   }
 }

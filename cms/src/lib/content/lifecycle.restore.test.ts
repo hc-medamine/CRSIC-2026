@@ -4,7 +4,7 @@
  */
 import assert from "node:assert/strict";
 import { after, before, describe, it } from "node:test";
-import { pool, query } from "@/lib/db";
+import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import {
   CONTENT_SNAPSHOT_COLUMNS,
@@ -59,7 +59,6 @@ describe("revision restore JSONB", () => {
     for (const id of createdIds) {
       await query(`DELETE FROM content_items WHERE id = $1`, [id]);
     }
-    await pool.end();
   });
 
   it("restores research_group.research_members from a prior revision", async () => {
