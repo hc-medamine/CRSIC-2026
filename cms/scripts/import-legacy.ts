@@ -14,6 +14,8 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { query } from "../src/lib/db";
+import { buildPartnerPayload } from "../src/lib/publish/partnersJson";
+import { resolvePublicSlug } from "../src/lib/publish/resolveSlug";
 
 const SUPER_ADMIN_EMAIL = "f.chettih@crsic.dz";
 
@@ -150,19 +152,19 @@ async function insertPublishedPartner(row: {
   partnerScope: "intl" | "nat";
   partnerDate: string | null;
   partnerEmoji: string | null;
-  payload: unknown;
+  imagePath?: string | null;
   liveAt: Date;
 }) {
-  await query(
+  const inserted = await query<{ id: string }>(
     `INSERT INTO content_items (
        content_type, status, org_unit_id, created_by, updated_by, en_status,
-       title_ar, label_ar, partner_scope, partner_date, partner_emoji,
-       checklist_confirmed, published_at, live_payload, live_at
+       title_ar, label_ar, partner_scope, partner_date, partner_emoji, image_path,
+       checklist_confirmed, published_at, live_at
      ) VALUES (
        'partner', 'published', $1, $2, $2, 'pending',
-       $3, $4, $5, $6, $7,
-       TRUE, $9, $8::jsonb, $9
-     )`,
+       $3, $4, $5, $6, $7, $8,
+       TRUE, $9, $9
+     ) RETURNING id`,
     [
       row.orgUnitId,
       row.createdBy,
@@ -171,9 +173,32 @@ async function insertPublishedPartner(row: {
       row.partnerScope,
       row.partnerDate,
       row.partnerEmoji,
-      JSON.stringify(row.payload),
+      row.imagePath ?? null,
       row.liveAt,
     ],
+  );
+  const id = inserted.rows[0]?.id;
+  if (!id) throw new Error(`Failed to insert partner: ${row.titleAr}`);
+  const slug = await resolvePublicSlug({
+    itemId: id,
+    titleAr: row.titleAr,
+    existingSlug: null,
+  });
+  const payload = buildPartnerPayload({
+    id,
+    title_ar: row.titleAr,
+    label_ar: row.labelAr,
+    partner_date: row.partnerDate,
+    partner_emoji: row.partnerEmoji,
+    partner_scope: row.partnerScope,
+    public_slug: slug,
+    image_path: row.imagePath ?? null,
+  });
+  await query(
+    `UPDATE content_items
+     SET public_slug = $2, live_payload = $3::jsonb
+     WHERE id = $1`,
+    [id, slug, JSON.stringify(payload)],
   );
 }
 
@@ -323,13 +348,6 @@ async function importPartners(orgUnitId: string, createdBy: string) {
         globalIndex += 1;
         continue;
       }
-      const payload: Record<string, unknown> = {
-        name,
-        country: p.country?.trim() || "",
-        date: p.date?.trim() || "",
-        scope,
-      };
-      if (p.emoji) payload.emoji = p.emoji;
       await insertPublishedPartner({
         orgUnitId,
         createdBy,
@@ -338,7 +356,6 @@ async function importPartners(orgUnitId: string, createdBy: string) {
         partnerScope: scope,
         partnerDate: p.date?.trim() || null,
         partnerEmoji: p.emoji?.trim() || null,
-        payload,
         liveAt: liveAtForIndex(globalIndex),
       });
       inserted += 1;
@@ -349,15 +366,21 @@ async function importPartners(orgUnitId: string, createdBy: string) {
 }
 
 async function main() {
+  const partnersOnly = process.argv.includes("--partners-only");
   const orgUnitId = await getCentreWideOrgId();
   const createdBy = await getSuperAdminId();
   console.log(`Importing legacy JSON as published live items (org=${orgUnitId})…`);
   console.log("NOTE: this does NOT rewrite data/*.json — it only populates the CMS database.");
 
-  await importNews(orgUnitId, createdBy);
-  await importEvents(orgUnitId, createdBy);
-  await importPublications(orgUnitId, createdBy);
-  await importPartners(orgUnitId, createdBy);
+  if (partnersOnly) {
+    console.log("Mode: --partners-only");
+    await importPartners(orgUnitId, createdBy);
+  } else {
+    await importNews(orgUnitId, createdBy);
+    await importEvents(orgUnitId, createdBy);
+    await importPublications(orgUnitId, createdBy);
+    await importPartners(orgUnitId, createdBy);
+  }
 
   console.log("Legacy import complete. A future CMS publish will now include these live items.");
 }

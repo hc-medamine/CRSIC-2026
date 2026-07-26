@@ -240,6 +240,9 @@
   "detail_open_pdf": "Open PDF",
   "detail_not_found": "This content could not be found.",
   "detail_no_body": "No detailed text is available yet.",
+  "detail_read_more": "Read more",
+  "detail_read_less": "Hide details",
+
   "detail_preview_banner": "Preview — not live. This draft is not on the public site.",
   "detail_preview_loading": "Loading preview…",
   "detail_preview_missing": "This preview expired or could not be loaded.",

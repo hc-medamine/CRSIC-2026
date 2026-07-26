@@ -41,7 +41,7 @@ CMS navigation and authoring UX (M1–M3) improved IA, but the visual chrome rem
 
 ### Non-goals
 
-- Public SPA visual redesign (separate Themes track — see §8).
+- Public SPA visual redesign / Themes catalog (dropped 2026-07-26 — see §8).
 - New content types, RBAC changes, email/SMTP.
 - Theme marketplace or runtime theme switching **inside** the CMS chrome (CMS stays on Direction B only).
 - Pixel-perfect clone of exploratory mockup copy/labels (use real CRSIC i18n labels).
@@ -91,6 +91,7 @@ IA labels and routes stay as implemented in M1–M3.
 |------|----------|
 | 2026-07-23 | Visual direction = **B Soft modernize** for **CMS only** |
 | 2026-07-23 | Ship order = CMS B visual **first**; public Themes PRD **after** |
+| 2026-07-26 | Public SPA Themes **dropped** entirely — no Themes PRD; §8 cancelled |
 | 2026-07-23 | Rollback baseline = git tag `stable/pre-cms-b-visual` |
 | 2026-07-23 | Public SPA unchanged in this PRD |
 
@@ -105,21 +106,19 @@ IA labels and routes stay as implemented in M1–M3.
 
 ---
 
-## 8. Deferred — Public SPA Themes (next PRD)
+## 8. Cancelled — Public SPA Themes (was deferred)
 
-Locked stakeholder decisions for the **following** PRD (do not implement in this slice):
+**Status: Dropped (2026-07-26).** Stakeholder cancelled the Public SPA Themes idea. Do **not** open a Themes PRD or implement theme switching for the public site.
 
-| Topic | Decision |
-|-------|----------|
+Earlier locked sketch (kept for history only; no longer planned):
+
+| Topic | Former decision (void) |
+|-------|------------------------|
 | Who | Super Admin only |
-| Catalog | Default (current SPA) + A / B / C; upload/custom token JSON **later** |
-| Preview | Preview theme before going live |
-| Depth | Full look (layout / nav / hero composition), not tokens-only |
-| Rollback | Instant switch back to **Current** (previous live theme) |
-| Cache / CDN | Visitors see new theme **instantly or on page reload** |
-| i18n | Theme names AR/EN in CMS |
-| Depth Q1 | Full look |
-| Ship order Q2 | CMS B visual first, Themes PRD after |
+| Catalog | Default + A / B / C; custom JSON later |
+| Preview / rollback / full look / AR·EN names | As previously discussed |
+
+Public SPA remains a **single** visual system. CMS remains Direction B only.
 
 ---
 

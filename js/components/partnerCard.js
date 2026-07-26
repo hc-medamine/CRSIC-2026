@@ -21,12 +21,16 @@ export function createPartnerCard(p) {
       })
     : el('div', { className: 'partner-mark', text: p.emoji || '' });
 
+  const summary = (p.summary_ar || '').trim();
   const body = el('div', {
     children: [
       el('div', { className: 'partner-name', text: p.name || '' }),
       el('div', { className: 'partner-country', text: p.country || '' }),
       el('div', { className: 'partner-date', text: p.date || '' }),
-    ],
+      summary
+        ? el('p', { className: 'partner-summary', text: summary })
+        : null,
+    ].filter(Boolean),
   });
 
   if (slug) {

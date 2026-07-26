@@ -84,6 +84,20 @@ export function withPublicSeo<T extends object>(
   return { ...payload, ...seoFromRow(row) };
 }
 
+/**
+ * Canonical SEO column names on content_items — shared by module snapshotOf(),
+ * lifecycle SNAPSHOT_COLUMNS / restore, and parity tests.
+ */
+export const SEO_SNAPSHOT_COLUMNS = [
+  "meta_title_ar",
+  "meta_title_en",
+  "meta_description_ar",
+  "meta_description_en",
+  "og_image",
+] as const;
+
+export type SeoSnapshotColumn = (typeof SEO_SNAPSHOT_COLUMNS)[number];
+
 export function seoSnapshotFields(row: SeoColumns | Record<string, unknown>) {
   return {
     meta_title_ar: (row as SeoColumns).meta_title_ar ?? null,

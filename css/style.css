@@ -1488,6 +1488,16 @@ a.partner-card-link:hover { border-color: var(--green-deep); }
 .partner-name { font-size: 14px; font-weight: 600; color: var(--green-deep); margin-bottom: 3px; }
 .partner-country { font-size: 11px; color: var(--text-subtle); margin-bottom: 5px; }
 .partner-date { font-size: 12px; color: var(--gold); font-weight: 500; }
+.partner-summary {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-subtle);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
 
 /* ── JOURNAL CARDS ──────────────────────────────────── */
 .journal-card {
@@ -3084,6 +3094,27 @@ nav.site-nav.scrolled .nav-logo-text span {
   line-height: 1.7;
   margin: 0 0 1.25rem;
   color: var(--text-body);
+}
+.detail-body-disclosure {
+  margin: 0 0 1.5rem;
+  border-top: 0.5px solid var(--border-light, #e5e7eb);
+  padding-top: 0.75rem;
+}
+.detail-read-more {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--green-deep);
+  list-style: none;
+  margin-bottom: 0.75rem;
+}
+.detail-read-more::-webkit-details-marker { display: none; }
+.detail-body-disclosure[open] .detail-read-more {
+  margin-bottom: 1rem;
+}
+@media print {
+  .detail-body-disclosure { border-top: none; }
+  .detail-body-disclosure .detail-body { display: block !important; }
+  .detail-read-more { display: none; }
 }
 .detail-body-p {
   margin: 0 0 1rem;

@@ -21,6 +21,7 @@ Product specs for CRSIC live here. **New feature slices follow the PRD-first wor
 | [2026-07-23-cms-navigation-authoring-ux.md](./2026-07-23-cms-navigation-authoring-ux.md) | **Approved** (2026-07-23) | Role-grouped nav, Home cockpit, forms, empty/error states — phased M1–M3 |
 | [2026-07-23-cms-direction-b-visual.md](./2026-07-23-cms-direction-b-visual.md) | **Approved** (2026-07-23) | CMS Direction B; public Themes **dropped** 2026-07-26 (§8) |
 | [2026-07-26-cms-spa-parity-preview-media.md](./2026-07-26-cms-spa-parity-preview-media.md) | **Approved** (2026-07-26) | SPA partner/group detail + preview ×4 + buckets; emergency stays 3-type |
+| [2026-07-26-partner-detail-narrative.md](./2026-07-26-partner-detail-narrative.md) | **Approved** (2026-07-26) | Partner summary+body, SPA expandable detail, legacy WP enrich ×11 |
 
 ## Related
 

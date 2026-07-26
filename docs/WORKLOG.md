@@ -19,6 +19,15 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-07-26 — Partner detail narrative PRD **Approved**
+
+**PRD:** [prds/2026-07-26-partner-detail-narrative.md](./prds/2026-07-26-partner-detail-narrative.md)  
+**Locks:** A3 summary+body; B2 AR+EN; C1 legacy scrape→CMS; D3 hero+summary+expandable body; E2 card teaser; F1 enrich ×11; G1–G12.
+
+**Impl order:** CMS field wiring → publish/preview → SPA card/detail → scrape enrich → smoke.
+
+---
+
 ### 2026-07-26 — CMS/SPA parity PRD **Approved**
 
 **PRD:** [prds/2026-07-26-cms-spa-parity-preview-media.md](./prds/2026-07-26-cms-spa-parity-preview-media.md)  

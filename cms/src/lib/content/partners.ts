@@ -16,6 +16,7 @@ import {
 import { notifyOnSubmit } from "@/lib/content/delegation";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
 import { normalizeSeoInput, seoSnapshotFields, type SeoInput } from "@/lib/content/seo";
+import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 import type { ContentStatus } from "@/lib/content/news";
 
 async function auditPartner(
@@ -45,6 +46,10 @@ export type PartnerItem = {
   title_en: string | null;
   label_ar: string | null;
   label_en: string | null;
+  summary_ar: string | null;
+  summary_en: string | null;
+  body_ar: string | null;
+  body_en: string | null;
   partner_scope: "intl" | "nat" | null;
   partner_date: string | null;
   partner_emoji: string | null;
@@ -68,6 +73,10 @@ export type PartnerInput = {
   titleEn?: string;
   labelAr: string;
   labelEn?: string;
+  summaryAr?: string;
+  summaryEn?: string;
+  bodyAr?: string;
+  bodyEn?: string;
   enStatus?: "pending" | "ready";
   partnerScope: "intl" | "nat";
   partnerDate: string;
@@ -84,6 +93,10 @@ function snapshotOf(row: PartnerItem) {
     title_en: row.title_en,
     label_ar: row.label_ar,
     label_en: row.label_en,
+    summary_ar: row.summary_ar,
+    summary_en: row.summary_en,
+    body_ar: row.body_ar,
+    body_en: row.body_en,
     partner_scope: row.partner_scope,
     partner_date: row.partner_date,
     partner_emoji: row.partner_emoji,
@@ -167,13 +180,15 @@ export async function createPartner(user: SessionUser, input: PartnerInput): Pro
     `INSERT INTO content_items (
       content_type, status, org_unit_id, created_by, updated_by, en_status,
       title_ar, title_en, label_ar, label_en,
+      summary_ar, summary_en, body_ar, body_en,
       partner_scope, partner_date, partner_emoji, image_path,
       meta_title_ar, meta_title_en, meta_description_ar, meta_description_en, og_image
     ) VALUES (
       'partner', 'draft', $1, $2, $2, $3,
       $4, $5, $6, $7,
       $8, $9, $10, $11,
-      $12, $13, $14, $15, $16
+      $12, $13, $14, $15,
+      $16, $17, $18, $19, $20
     ) RETURNING *`,
     [
       input.orgUnitId,
@@ -183,6 +198,10 @@ export async function createPartner(user: SessionUser, input: PartnerInput): Pro
       input.titleEn?.trim() || null,
       input.labelAr.trim(),
       input.labelEn?.trim() || null,
+      input.summaryAr?.trim() || null,
+      input.summaryEn?.trim() || null,
+      sanitizeBodyHtml(input.bodyAr),
+      sanitizeBodyHtml(input.bodyEn),
       input.partnerScope,
       input.partnerDate.trim(),
       input.partnerEmoji?.trim() || null,
@@ -219,9 +238,10 @@ export async function updatePartnerDraft(user: SessionUser, id: string, input: P
     `UPDATE content_items SET
       org_unit_id = $2, updated_by = $3, en_status = $4,
       title_ar = $5, title_en = $6, label_ar = $7, label_en = $8,
-      partner_scope = $9, partner_date = $10, partner_emoji = $11, image_path = $12,
-      meta_title_ar = $13, meta_title_en = $14, meta_description_ar = $15,
-      meta_description_en = $16, og_image = $17,
+      summary_ar = $9, summary_en = $10, body_ar = $11, body_en = $12,
+      partner_scope = $13, partner_date = $14, partner_emoji = $15, image_path = $16,
+      meta_title_ar = $17, meta_title_en = $18, meta_description_ar = $19,
+      meta_description_en = $20, og_image = $21,
       updated_at = NOW()
      WHERE id = $1 AND content_type = 'partner'
      RETURNING *`,
@@ -234,6 +254,10 @@ export async function updatePartnerDraft(user: SessionUser, id: string, input: P
       input.titleEn?.trim() || null,
       input.labelAr.trim(),
       input.labelEn?.trim() || null,
+      input.summaryAr?.trim() || null,
+      input.summaryEn?.trim() || null,
+      sanitizeBodyHtml(input.bodyAr),
+      sanitizeBodyHtml(input.bodyEn),
       input.partnerScope,
       input.partnerDate.trim(),
       input.partnerEmoji?.trim() || null,

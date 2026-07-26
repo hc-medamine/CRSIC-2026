@@ -406,8 +406,17 @@ function renderPartnerDetail(host, slugOrId, opts = {}) {
   }
 
   applyItemSeoHead(item, 'partner');
+  const lang = getLang();
   const title = item.name || '';
   const metaLine = [item.country, item.date].filter(Boolean).join(' · ');
+  const summary =
+    lang === 'en' && item.summary_en
+      ? item.summary_en
+      : item.summary_ar || item.summary_en || '';
+  const bodyHtml =
+    lang === 'en' && item.body_en
+      ? item.body_en
+      : item.body_ar || item.body_en || '';
   const imgSrc = safeImageSrc(item.img || item.og_image || '');
   const children = [];
   if (opts.isPreview) {
@@ -450,6 +459,33 @@ function renderPartnerDetail(host, slugOrId, opts = {}) {
       ].filter(Boolean),
     }),
   );
+  if (summary) {
+    children.push(el('p', { className: 'detail-summary', text: summary }));
+  }
+  if (bodyHtml) {
+    children.push(
+      el('details', {
+        className: 'detail-body-disclosure',
+        children: [
+          el('summary', {
+            className: 'detail-read-more',
+            text: t('detail_read_more'),
+          }),
+          el('div', {
+            className: 'detail-body',
+            children: nodesFromSafeBody(bodyHtml),
+          }),
+        ],
+      }),
+    );
+  } else if (!summary) {
+    children.push(
+      el('p', {
+        className: 'detail-empty-body',
+        text: t('detail_no_body'),
+      }),
+    );
+  }
   replaceChildren(host, [el('article', { className: 'detail-article', children })]);
 }
 
