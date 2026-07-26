@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { t, type CmsLang } from "@/lib/i18n/labels";
 
 export type ToastKind = "success" | "error" | "info";
 
@@ -47,6 +48,16 @@ function subscribe(listener: Listener): () => void {
  */
 export function CmsToastHost() {
   const [items, setItems] = useState<ToastItem[]>([]);
+  const [docLang, setDocLang] = useState<CmsLang>("en");
+
+  useEffect(() => {
+    const read = () =>
+      setDocLang(document.documentElement.lang === "ar" ? "ar" : "en");
+    read();
+    const obs = new MutationObserver(read);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
+    return () => obs.disconnect();
+  }, []);
 
   useEffect(() => {
     return subscribe((item) => {
@@ -90,8 +101,8 @@ export function CmsToastHost() {
             <button
               type="button"
               className="shrink-0 rounded-lg px-2 py-0.5 text-xs opacity-80 hover:opacity-100"
-              aria-label="Dismiss"
-              onClick={() => setItems((prev) => prev.filter((t) => t.id !== item.id))}
+              aria-label={t("dismiss", docLang)}
+              onClick={() => setItems((prev) => prev.filter((toast) => toast.id !== item.id))}
             >
               ×
             </button>

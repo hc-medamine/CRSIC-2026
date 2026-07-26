@@ -149,7 +149,7 @@ export function ResearchGroupForm({
         cmsToast.error(msg);
         return;
       }
-      cmsToast.success("Draft created.");
+      cmsToast.success(t("draftCreated", lang));
       router.push(`/dashboard/research-groups/${data.item.id}`);
       router.refresh();
     } finally {
@@ -160,7 +160,7 @@ export function ResearchGroupForm({
   async function run(action: string, extra?: Record<string, unknown>) {
     if (!initial?.id) return;
     if (action === "delete") {
-      const ok = window.confirm("Permanently delete this item? This cannot be undone.");
+      const ok = window.confirm(t("confirmDelete", lang));
       if (!ok) return;
     }
     setPending(true);
@@ -226,42 +226,42 @@ export function ResearchGroupForm({
             >
               {orgUnits.map((o) => (
                 <option key={o.id} value={o.id}>
-                  {o.name_en} ({o.name_ar})
+                  {lang === "ar" ? o.name_ar : o.name_en || o.name_ar}
                 </option>
               ))}
             </select>
           </label>
 
           <label className="text-sm">
-            <span className="font-medium">Group name (AR) *</span>
+            <span className="font-medium">{t("fieldGroupNameAr", lang)}</span>
             <input dir="rtl" required disabled={!editable} value={titleAr} onChange={(e) => setTitleAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Summary (AR) *</span>
+            <span className="font-medium">{t("fieldSummaryArRequired", lang)}</span>
             <textarea dir="rtl" disabled={!editable} value={summaryAr} onChange={(e) => setSummaryAr(e.target.value)} rows={3} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Lead (AR) *</span>
+            <span className="font-medium">{t("fieldLeadArRequired", lang)}</span>
             <input dir="rtl" disabled={!editable} value={leadAr} onChange={(e) => setLeadAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
         </FormSection>
 
-        <FormSection step={2} title="Members">
+        <FormSection step={2} title={t("sectionMembers", lang)}>
           <fieldset className="grid gap-2 rounded border border-crs-border bg-crs-bg/80 p-3">
-            <legend className="px-1 text-sm font-semibold text-crs-ink">Members</legend>
+            <legend className="px-1 text-sm font-semibold text-crs-ink">{t("sectionMembers", lang)}</legend>
             {members.map((m, i) => (
               <div key={i} className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
                 <input
                   dir="rtl"
                   disabled={!editable}
-                  placeholder="Name (AR)"
+                  placeholder={t("phNameAr", lang)}
                   value={m.nameAr}
                   onChange={(e) => updateMember(i, { nameAr: e.target.value })}
                   className="min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
                 />
                 <input
                   disabled={!editable}
-                  placeholder="Name (EN)"
+                  placeholder={t("phNameEn", lang)}
                   value={m.nameEn}
                   onChange={(e) => updateMember(i, { nameEn: e.target.value })}
                   className="min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
@@ -272,14 +272,14 @@ export function ResearchGroupForm({
                     onClick={() => removeMember(i)}
                     className="rounded border border-red-300 px-3 py-2 text-xs text-red-700"
                   >
-                    Remove
+                    {t("actionRemove", lang)}
                   </button>
                 ) : null}
               </div>
             ))}
             {editable ? (
               <button type="button" onClick={addMember} className="w-fit text-xs underline">
-                + Add member
+                {t("actionAddMember", lang)}
               </button>
             ) : null}
           </fieldset>
@@ -291,7 +291,7 @@ export function ResearchGroupForm({
           hint={t("sectionAdvancedHint", lang)}
         >
           <label className="text-sm">
-            <span className="font-medium">Group name (EN)</span>
+            <span className="font-medium">{t("fieldGroupNameEn", lang)}</span>
             <input disabled={!editable} value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
@@ -299,7 +299,7 @@ export function ResearchGroupForm({
             <textarea disabled={!editable} value={summaryEn} onChange={(e) => setSummaryEn(e.target.value)} rows={3} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Lead (EN)</span>
+            <span className="font-medium">{t("fieldLeadEn", lang)}</span>
             <input disabled={!editable} value={leadEn} onChange={(e) => setLeadEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
@@ -313,7 +313,7 @@ export function ResearchGroupForm({
             bucket="research"
             publicPath={imagePath}
             imagesOnly
-            label="Group image"
+            label={t("fieldGroupImage", lang)}
             disabled={!editable}
             onUploaded={({ publicPath }) => setImagePath(publicPath)}
           />
@@ -384,7 +384,7 @@ export function ResearchGroupForm({
       {mode === "edit" && canReview && initial?.status === "submitted" ? (
         <div className="grid gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
           <p className="text-sm font-medium">{t("actionReviewerActions", lang)}</p>
-          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder=t("actionNotePlaceholder", lang) className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" rows={2} />
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("actionNotePlaceholder", lang)} className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" rows={2} />
           <div className="flex flex-wrap gap-2">
             <button type="button" disabled={pending} className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white" onClick={() => void run("approve")}>{t("actionApprove", lang)}</button>
             <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg" onClick={() => void run("request_changes", { note })}>{t("actionRequestChanges", lang)}</button>

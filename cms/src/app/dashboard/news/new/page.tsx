@@ -20,10 +20,10 @@ export default async function NewNewsPage() {
       breadcrumbs={[
         { href: "/dashboard", label: t("home", lang) },
         { href: "/dashboard/news", label: t("news", lang) },
-        { label: "New" },
+        { label: t("breadcrumbNew", lang) },
       ]}
-      title="Create news"
-      subtitle="Arabic-first draft. Submit when ready for review."
+      title={t("createNews", lang)}
+      subtitle={t("createNewsHint", lang)}
     >
       <NewsEditorForm mode="create" orgUnits={orgs} />
     </EditPageShell>

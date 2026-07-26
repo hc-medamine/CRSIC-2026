@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "Invalid path" }, { status: 400 });
   }
 
-  // CMS upload buckets keep content-type ACL; legacy img/covers etc. = any signed-in user.
+  // CMS upload buckets keep content-type ACL; tracked covers under img/covers/ too.
   if (path.startsWith("img/cms/")) {
     const bucket = path.split("/")[2];
     if (!bucket || !isMediaBucket(bucket)) {
@@ -65,9 +65,16 @@ export async function GET(request: NextRequest) {
     if (!(await canAccessMediaBucket(user, bucket))) {
       return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
     }
+  } else if (path.startsWith("img/covers/")) {
+    if (!(await canAccessMediaBucket(user, "covers"))) {
+      return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
+    }
   }
 
-  const asset = path.startsWith("img/cms/") ? await getMediaByPublicPath(path) : null;
+  const asset =
+    path.startsWith("img/cms/") || path.startsWith("img/covers/")
+      ? await getMediaByPublicPath(path)
+      : null;
   let abs: string;
   let mime = "application/octet-stream";
 

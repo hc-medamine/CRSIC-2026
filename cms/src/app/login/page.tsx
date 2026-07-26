@@ -1,6 +1,16 @@
 import { LoginForm } from "./login-form";
 import { query } from "@/lib/db";
 import type { LoginBubble } from "./login-form";
+import { cookies } from "next/headers";
+import {
+  CMS_LANG_COOKIE,
+  normalizeLang,
+  localizedDisplayName,
+  roleLabel,
+  t,
+  type CmsLang,
+} from "@/lib/i18n/labels";
+import { LoginLangToggle } from "./login-lang-toggle";
 
 function env(name: string): string {
   return (process.env[name] ?? "").trim();
@@ -40,13 +50,7 @@ function passwordForUser(email: string, role: string, sharedEditorPassword: stri
   );
 }
 
-function rolePrefix(role: string): string {
-  if (role === "super_admin") return "SA";
-  if (role === "reviewer") return "Reviewer";
-  return "Editor";
-}
-
-async function loginBubbles(): Promise<LoginBubble[]> {
+async function loginBubbles(lang: CmsLang): Promise<LoginBubble[]> {
   const gated =
     process.env.NODE_ENV !== "production" &&
     process.env.NEXT_PUBLIC_CMS_LOGIN_BUBBLES === "1";
@@ -59,9 +63,11 @@ async function loginBubbles(): Promise<LoginBubble[]> {
     const result = await query<{
       email: string;
       display_name: string;
+      name_ar: string | null;
+      name_en: string | null;
       role: "super_admin" | "reviewer";
     }>(
-      `SELECT email, display_name, role
+      `SELECT email, display_name, name_ar, name_en, role
        FROM users
        WHERE is_active = TRUE
          AND role IN ('super_admin', 'reviewer')
@@ -74,9 +80,13 @@ async function loginBubbles(): Promise<LoginBubble[]> {
     for (const row of result.rows) {
       const password = passwordForUser(row.email, row.role, sharedEditorPassword);
       if (!password) continue;
-      const name = row.display_name?.trim() || row.email;
+      const name =
+        localizedDisplayName(
+          { displayName: row.display_name, nameAr: row.name_ar, nameEn: row.name_en },
+          lang,
+        ) || row.email;
       bubbles.push({
-        label: `${rolePrefix(row.role)} · ${name}`,
+        label: `${roleLabel(row.role, lang)} · ${name}`,
         email: row.email,
         password,
       });
@@ -88,14 +98,22 @@ async function loginBubbles(): Promise<LoginBubble[]> {
       "f.chettih@crsic.dz";
     const saPass = passwordForUser(saEmail, "super_admin", sharedEditorPassword);
     if (saPass) {
-      bubbles.push({ label: "SA · F. Chettih", email: saEmail, password: saPass });
+      bubbles.push({
+        label: `${roleLabel("super_admin", lang)} · ${
+          lang === "ar" ? "فاطمة الزهرة شتيح" : "Fatima El Zahra Chettih"
+        }`,
+        email: saEmail,
+        password: saPass,
+      });
     }
     const reviewerEmail =
       env("CMS_LOGIN_BUBBLE_REVIEWER_EMAIL") || "f.boufatah@crsic.dz";
     const reviewerPass = passwordForUser(reviewerEmail, "reviewer", sharedEditorPassword);
     if (reviewerPass) {
       bubbles.push({
-        label: "Reviewer · F. Boufatah",
+        label: `${roleLabel("reviewer", lang)} · ${
+          lang === "ar" ? "ف. بوفاتح" : "F. Boufatah"
+        }`,
         email: reviewerEmail,
         password: reviewerPass,
       });
@@ -104,16 +122,28 @@ async function loginBubbles(): Promise<LoginBubble[]> {
 
   const envEditorEmails = editorEmailsFromEnv();
   if (envEditorEmails.length > 0 && sharedEditorPassword) {
-    const nameByEmail = new Map<string, string>();
+    const nameByEmail = new Map<
+      string,
+      { displayName: string; nameAr: string | null; nameEn: string | null }
+    >();
     try {
-      const eds = await query<{ email: string; display_name: string }>(
-        `SELECT email, display_name FROM users
+      const eds = await query<{
+        email: string;
+        display_name: string;
+        name_ar: string | null;
+        name_en: string | null;
+      }>(
+        `SELECT email, display_name, name_ar, name_en FROM users
          WHERE is_active = TRUE AND role = 'editor'
            AND email = ANY($1::text[])`,
         [envEditorEmails],
       );
       for (const row of eds.rows) {
-        nameByEmail.set(row.email.toLowerCase(), row.display_name?.trim() || row.email);
+        nameByEmail.set(row.email.toLowerCase(), {
+          displayName: row.display_name?.trim() || row.email,
+          nameAr: row.name_ar,
+          nameEn: row.name_en,
+        });
       }
     } catch {
       /* labels fall back to email local-part */
@@ -122,9 +152,12 @@ async function loginBubbles(): Promise<LoginBubble[]> {
     for (const email of envEditorEmails) {
       const password = passwordForUser(email, "editor", sharedEditorPassword);
       if (!password) continue;
-      const name = nameByEmail.get(email) || email.split("@")[0] || email;
+      const person = nameByEmail.get(email);
+      const name = person
+        ? localizedDisplayName(person, lang) || email.split("@")[0] || email
+        : email.split("@")[0] || email;
       bubbles.push({
-        label: `Editor · ${name}`,
+        label: `${roleLabel("editor", lang)} · ${name}`,
         email,
         password,
       });
@@ -133,16 +166,26 @@ async function loginBubbles(): Promise<LoginBubble[]> {
   }
 
   try {
-    const eds = await query<{ email: string; display_name: string }>(
-      `SELECT email, display_name FROM users
+    const eds = await query<{
+      email: string;
+      display_name: string;
+      name_ar: string | null;
+      name_en: string | null;
+    }>(
+      `SELECT email, display_name, name_ar, name_en FROM users
        WHERE is_active = TRUE AND role = 'editor' AND email NOT ILIKE 'smoke.%'
        ORDER BY display_name ASC, email ASC`,
     );
     for (const row of eds.rows) {
       const password = passwordForUser(row.email, "editor", sharedEditorPassword);
       if (!password) continue;
+      const name =
+        localizedDisplayName(
+          { displayName: row.display_name, nameAr: row.name_ar, nameEn: row.name_en },
+          lang,
+        ) || row.email;
       bubbles.push({
-        label: `Editor · ${row.display_name?.trim() || row.email}`,
+        label: `${roleLabel("editor", lang)} · ${name}`,
         email: row.email,
         password,
       });
@@ -155,10 +198,19 @@ async function loginBubbles(): Promise<LoginBubble[]> {
 }
 
 export default async function LoginPage() {
-  const bubbles = await loginBubbles();
+  const cookieStore = await cookies();
+  const lang = normalizeLang(cookieStore.get(CMS_LANG_COOKIE)?.value);
+  const dir = lang === "ar" ? "rtl" : "ltr";
+  const bubbles = await loginBubbles(lang);
 
   return (
-    <main className="relative flex min-h-screen flex-col justify-center overflow-hidden px-6 py-16 font-sans">
+    <main
+      dir={dir}
+      lang={lang}
+      className={`relative flex min-h-screen flex-col justify-center overflow-hidden px-6 py-16 ${
+        lang === "ar" ? "font-[family-name:var(--font-tajawal)]" : "font-sans"
+      }`}
+    >
       <div
         className="pointer-events-none absolute inset-0"
         style={{
@@ -167,26 +219,30 @@ export default async function LoginPage() {
         }}
         aria-hidden
       />
+      <div className="absolute end-6 top-6 z-10">
+        <LoginLangToggle lang={lang} />
+      </div>
       <div className="relative mx-auto w-full max-w-md">
         <div className="rounded-3xl border border-crs-border/80 bg-crs-surface/95 p-8 shadow-[0_20px_50px_rgba(26,46,38,0.08)] backdrop-blur">
           <div className="mb-6 flex flex-col items-center text-center">
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-crs-primary text-lg font-bold text-white shadow-sm">
-              C
-            </span>
-            <p className="mt-3 text-base font-semibold tracking-tight text-crs-ink">CRSIC</p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/crsic_logo.png"
+              alt="CRSIC"
+              width={96}
+              height={96}
+              className="h-24 w-24 object-contain"
+            />
+            <p className="mt-4 text-lg font-semibold tracking-tight text-crs-ink">CRSIC</p>
             <p className="text-[11px] uppercase tracking-[0.14em] text-crs-muted">
-              Centre CMS
+              {t("loginSubtitle", lang)}
             </p>
-            <h1 className="mt-5 text-2xl font-semibold text-crs-ink">Sign in</h1>
-            <p className="mt-1.5 text-sm text-crs-muted">
-              Welcome back. Use your institutional email.
-            </p>
+            <h1 className="mt-5 text-2xl font-semibold text-crs-ink">{t("loginSignIn", lang)}</h1>
+            <p className="mt-1.5 text-sm text-crs-muted">{t("loginWelcome", lang)}</p>
           </div>
-          <LoginForm bubbles={bubbles} />
+          <LoginForm bubbles={bubbles} initialLang={lang} />
         </div>
-        <p className="mt-6 text-center text-xs text-crs-muted">
-          No email is sent by this app. Contact your Super Admin for access.
-        </p>
+        <p className="mt-6 text-center text-xs text-crs-muted">{t("loginFooter", lang)}</p>
       </div>
     </main>
   );

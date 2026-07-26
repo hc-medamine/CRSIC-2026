@@ -20,9 +20,7 @@ export default async function OrgUnitsPage() {
       />
       <header>
         <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">{t("orgUnits", lang)}</h1>
-        <p className="mt-1 text-sm text-crs-muted">
-          Super Admin only. Type catalogs are fixed by org kind.
-        </p>
+        <p className="mt-1 text-sm text-crs-muted">{t("pageDescOrgUnits", lang)}</p>
       </header>
 
       <OrgUnitsManager initialOrgUnits={orgUnits} />

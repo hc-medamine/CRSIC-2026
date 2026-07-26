@@ -116,7 +116,7 @@ export function AlertEditorForm({
         cmsToast.error(msg);
         return;
       }
-      cmsToast.success("Draft created.");
+      cmsToast.success(t("draftCreated", lang));
       router.push(`/dashboard/alerts/${data.item.id}`);
       router.refresh();
     } finally {
@@ -128,7 +128,7 @@ export function AlertEditorForm({
     if (!initial?.id) return;
     if (action === "delete") {
       const ok = window.confirm(
-        "Permanently delete this item? This cannot be undone.",
+        t("confirmDelete", lang),
       );
       if (!ok) return;
     }
@@ -195,14 +195,14 @@ export function AlertEditorForm({
             >
               {orgUnits.map((o) => (
                 <option key={o.id} value={o.id}>
-                  {o.name_en} ({o.name_ar})
+                  {lang === "ar" ? o.name_ar : o.name_en || o.name_ar}
                 </option>
               ))}
             </select>
           </label>
 
           <label className="text-sm">
-            <span className="font-medium">Banner message (AR) *</span>
+            <span className="font-medium">{t("fieldBannerMessageAr", lang)}</span>
             <textarea
               dir="rtl"
               required
@@ -215,7 +215,7 @@ export function AlertEditorForm({
           </label>
 
           <label className="text-sm">
-            <span className="font-medium">Link URL (optional)</span>
+            <span className="font-medium">{t("fieldLinkUrlOptional", lang)}</span>
             <input
               disabled={!editable}
               value={alertLinkUrl}
@@ -225,7 +225,7 @@ export function AlertEditorForm({
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Link label (AR)</span>
+            <span className="font-medium">{t("fieldLinkLabelAr", lang)}</span>
             <input
               dir="rtl"
               disabled={!editable}
@@ -242,7 +242,7 @@ export function AlertEditorForm({
           hint={t("sectionAdvancedHint", lang)}
         >
           <label className="text-sm">
-            <span className="font-medium">Banner message (EN)</span>
+            <span className="font-medium">{t("fieldBannerMessageEn", lang)}</span>
             <textarea
               disabled={!editable}
               value={titleEn}
@@ -252,7 +252,7 @@ export function AlertEditorForm({
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Link label (EN)</span>
+            <span className="font-medium">{t("fieldLinkLabelEn", lang)}</span>
             <input
               disabled={!editable}
               value={alertLinkLabelEn}
@@ -333,7 +333,7 @@ export function AlertEditorForm({
       {mode === "edit" && canReview && initial?.status === "submitted" ? (
         <div className="grid gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
           <p className="text-sm font-medium">{t("actionReviewerActions", lang)}</p>
-          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder=t("actionNotePlaceholder", lang) className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" rows={2} />
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("actionNotePlaceholder", lang)} className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" rows={2} />
           <div className="flex flex-wrap gap-2">
             <button type="button" disabled={pending} className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white" onClick={() => void run("approve")}>{t("actionApprove", lang)}</button>
             <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg" onClick={() => void run("request_changes", { note })}>{t("actionRequestChanges", lang)}</button>

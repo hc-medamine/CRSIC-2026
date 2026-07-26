@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { formatDateTime } from "@/lib/format-datetime";
+import { t, tf } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 type Props = {
   contentItemId: string;
@@ -26,6 +28,7 @@ export function EmergencyPanel({
   emergencyPublishedAt,
   emergencyPublishedByName,
 }: Props) {
+  const lang = useCmsLang();
   const router = useRouter();
   const [reason, setReason] = useState("");
   const [note, setNote] = useState("");
@@ -45,19 +48,19 @@ export function EmergencyPanel({
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        const msg = data.error ?? "Failed";
+        const msg = data.error ?? t("actionFailedShort", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
       const msg =
         action === "publish"
-          ? "Published with post-review flag."
+          ? t("emergencyPublishedOk", lang)
           : action === "confirm"
-            ? "Post-review confirmed."
+            ? t("emergencyConfirmedOk", lang)
             : action === "unpublish"
-              ? "Unpublished."
-              : "Change request posted.";
+              ? t("emergencyUnpublishedOk", lang)
+              : t("emergencyChangesOk", lang);
       setMessage(msg);
       cmsToast.success(msg);
       setReason("");
@@ -72,22 +75,21 @@ export function EmergencyPanel({
 
   return (
     <section className="grid gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
-      <h2 className="text-lg font-medium text-red-950">Emergency publish</h2>
-      <p className="text-xs text-red-900">
-        Super Admin only: go live immediately and require post-publication review. Reason is
-        required and is recorded in the comment thread and audit log.
-      </p>
+      <h2 className="text-lg font-medium text-red-950">{t("emergencyPublish", lang)}</h2>
+      <p className="text-xs text-red-900">{t("emergencyHint", lang)}</p>
 
       {needsPostReview ? (
         <div className="rounded border border-red-300 bg-white px-3 py-2 text-sm text-red-950">
           <p>
-            <strong>Needs post-publication review</strong>
-            {emergencyPublishedByName ? ` · by ${emergencyPublishedByName}` : ""}
+            <strong>{t("needsPostPublicationReview", lang)}</strong>
+            {emergencyPublishedByName
+              ? ` · ${tf("emergencyBy", lang, { name: emergencyPublishedByName })}`
+              : ""}
             {emergencyPublishedAt ? ` · ${formatDateTime(emergencyPublishedAt)}` : ""}
           </p>
           {emergencyReason ? (
             <p className="mt-1 text-xs text-red-800" dir="auto">
-              Reason: {emergencyReason}
+              {tf("emergencyReasonLabel", lang, { reason: emergencyReason })}
             </p>
           ) : null}
         </div>
@@ -102,7 +104,7 @@ export function EmergencyPanel({
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             rows={2}
-            placeholder="Why emergency publish?"
+            placeholder={t("emergencyReasonPh", lang)}
             className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             disabled={pending}
           />
@@ -112,27 +114,23 @@ export function EmergencyPanel({
             onClick={() => void run("publish", { reason })}
             className="w-fit rounded bg-red-800 px-3 py-1.5 text-sm text-white disabled:opacity-60"
           >
-            {pending ? "Publishing…" : "Emergency publish now"}
+            {pending ? t("emergencyPublishing", lang) : t("emergencyPublishNow", lang)}
           </button>
         </>
       ) : null}
 
       {needsPostReview && canPostReview ? (
         <div className="mt-2 grid gap-2 border-t border-red-200 pt-3">
-          <p className="text-xs font-medium text-red-950">Post-publication review</p>
+          <p className="text-xs font-medium text-red-950">{t("emergencyPostReviewTitle", lang)}</p>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
               disabled={pending || !canConfirmOk}
-              title={
-                canConfirmOk
-                  ? undefined
-                  : "The Super Admin who emergency-published cannot Confirm OK"
-              }
+              title={canConfirmOk ? undefined : t("emergencyConfirmBlocked", lang)}
               onClick={() => void run("confirm")}
               className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white disabled:opacity-60"
             >
-              Confirm OK
+              {t("emergencyConfirmOk", lang)}
             </button>
             <button
               type="button"
@@ -140,14 +138,14 @@ export function EmergencyPanel({
               onClick={() => void run("unpublish")}
               className="rounded border border-red-700 px-3 py-1.5 text-sm text-red-950 disabled:opacity-60"
             >
-              Unpublish
+              {t("actionUnpublish", lang)}
             </button>
           </div>
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={2}
-            placeholder="Request changes (keeps live + flag)…"
+            placeholder={t("emergencyRequestChangesPh", lang)}
             className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             disabled={pending}
           />
@@ -157,7 +155,7 @@ export function EmergencyPanel({
             onClick={() => void run("request_changes", { note })}
             className="inline-flex min-h-11 w-fit items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60"
           >
-            Request changes
+            {t("actionRequestChanges", lang)}
           </button>
         </div>
       ) : null}

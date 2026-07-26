@@ -179,7 +179,7 @@ export function EventEditorForm({
         cmsToast.error(msg);
         return;
       }
-      cmsToast.success("Draft created.");
+      cmsToast.success(t("draftCreated", lang));
       router.push(`/dashboard/events/${data.item.id}`);
       router.refresh();
     } finally {
@@ -191,7 +191,7 @@ export function EventEditorForm({
     if (!initial?.id) return;
     if (action === "delete") {
       const ok = window.confirm(
-        "Permanently delete this item? This cannot be undone.",
+        t("confirmDelete", lang),
       );
       if (!ok) return;
     }
@@ -261,7 +261,7 @@ export function EventEditorForm({
             >
               {orgUnits.map((o) => (
                 <option key={o.id} value={o.id}>
-                  {o.name_en} ({o.name_ar})
+                  {lang === "ar" ? o.name_ar : o.name_en || o.name_ar}
                 </option>
               ))}
             </select>
@@ -269,19 +269,19 @@ export function EventEditorForm({
 
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="text-sm">
-              <span className="font-medium">Scope</span>
+              <span className="font-medium">{t("fieldScope", lang)}</span>
               <select
                 disabled={!editable}
                 value={eventScope}
                 onChange={(e) => setEventScope(e.target.value as "intl" | "nat")}
                 className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
               >
-                <option value="nat">National (nat)</option>
-                <option value="intl">International (intl)</option>
+                <option value="nat">{t("fieldScopeNational", lang)}</option>
+                <option value="intl">{t("fieldScopeInternational", lang)}</option>
               </select>
             </label>
             <label className="text-sm">
-              <span className="font-medium">Display status</span>
+              <span className="font-medium">{t("fieldDisplayStatus", lang)}</span>
               <select
                 disabled={!editable}
                 value={eventDisplayStatus}
@@ -296,15 +296,15 @@ export function EventEditorForm({
 
           <div className="grid gap-3 sm:grid-cols-3">
             <label className="text-sm">
-              <span className="font-medium">Day *</span>
+              <span className="font-medium">{t("fieldDay", lang)}</span>
               <input disabled={!editable} value={eventDay} onChange={(e) => setEventDay(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" placeholder="05" />
             </label>
             <label className="text-sm">
-              <span className="font-medium">Month (AR display) *</span>
+              <span className="font-medium">{t("fieldMonthAr", lang)}</span>
               <input dir="rtl" disabled={!editable} value={eventMonth} onChange={(e) => setEventMonth(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" placeholder="ماي" />
             </label>
             <label className="text-sm">
-              <span className="font-medium">Year *</span>
+              <span className="font-medium">{t("fieldYear", lang)}</span>
               <input disabled={!editable} value={eventYear} onChange={(e) => setEventYear(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" placeholder="2026" />
             </label>
           </div>
@@ -314,7 +314,7 @@ export function EventEditorForm({
             <input dir="rtl" required disabled={!editable} value={titleAr} onChange={(e) => setTitleAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Type (AR) *</span>
+            <span className="font-medium">{t("fieldTypeAr", lang)}</span>
             <input dir="rtl" disabled={!editable} value={eventTypeAr} onChange={(e) => setEventTypeAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" placeholder="ملتقى وطني" />
           </label>
           <label className="text-sm">
@@ -332,7 +332,7 @@ export function EventEditorForm({
 
         <FormSection step={2} title={t("sectionBody", lang)}>
           <RichBodyEditor
-            label=t("fieldBodyAr", lang)
+            label={t("fieldBodyAr", lang)}
             dir="rtl"
             disabled={!editable}
             value={bodyAr}
@@ -347,7 +347,7 @@ export function EventEditorForm({
             mediaId={imageMediaId}
             disabled={!editable}
             imagesOnly
-            label="Event image (optional)"
+            label={t("fieldEventImage", lang)}
             onUploaded={({ publicPath, mediaId }) => {
               setImagePath(publicPath);
               setImageMediaId(mediaId);
@@ -380,7 +380,7 @@ export function EventEditorForm({
             <input disabled={!editable} value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Type (EN)</span>
+            <span className="font-medium">{t("fieldTypeEn", lang)}</span>
             <input disabled={!editable} value={eventTypeEn} onChange={(e) => setEventTypeEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
@@ -394,7 +394,7 @@ export function EventEditorForm({
             />
           </label>
           <RichBodyEditor
-            label="Body (EN)"
+            label={t("fieldBodyEn", lang)}
             dir="ltr"
             disabled={!editable}
             value={bodyEn}
@@ -405,7 +405,7 @@ export function EventEditorForm({
             <input disabled={!editable} value={imageAltEn} onChange={(e) => setImageAltEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Public slug (optional)</span>
+            <span className="font-medium">{t("fieldPublicSlugOptional", lang)}</span>
             <input dir="auto" disabled={!editable} value={publicSlug} onChange={(e) => setPublicSlug(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink font-mono text-xs" />
           </label>
           <label className="text-sm">
@@ -482,7 +482,7 @@ export function EventEditorForm({
       {mode === "edit" && canReview && initial?.status === "submitted" ? (
         <div className="grid gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
           <p className="text-sm font-medium">{t("actionReviewerActions", lang)}</p>
-          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder=t("actionNotePlaceholder", lang) className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" rows={2} />
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("actionNotePlaceholder", lang)} className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" rows={2} />
           <div className="flex flex-wrap gap-2">
             <button type="button" disabled={pending} className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white" onClick={() => void run("approve")}>{t("actionApprove", lang)}</button>
             <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg" onClick={() => void run("request_changes", { note })}>{t("actionRequestChanges", lang)}</button>

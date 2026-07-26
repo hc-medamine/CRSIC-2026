@@ -6,7 +6,8 @@ import { listPendingReviewOwnerProposals } from "@/lib/content/delegation";
 import { listNeedsPostReview } from "@/lib/content/emergency";
 import { canEditAsAuthor, getNavContentTypes } from "@/lib/content/permissions";
 import { contentPathSegment } from "@/lib/content/lifecycle";
-import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
+import { refreshUserFromDb } from "@/lib/content/ooo";
+import { CMS_LANG_COOKIE, normalizeLang, t, localizedDisplayName } from "@/lib/i18n/labels";
 import type { ContentType } from "@/lib/users";
 import { HomeTipBanner } from "./home-tip-banner";
 import { CreateContentMenu } from "./create-content-menu";
@@ -24,7 +25,8 @@ const CREATE_LABEL_KEY: Record<ContentType, string> = {
 };
 
 export default async function DashboardPage() {
-  const user = await requireUser();
+  const sessionUser = await requireUser();
+  const user = (await refreshUserFromDb(sessionUser.id)) ?? sessionUser;
   const queues = await getQueues(user);
   const cookieStore = await cookies();
   const lang = normalizeLang(cookieStore.get(CMS_LANG_COOKIE)?.value);
@@ -38,7 +40,15 @@ export default async function DashboardPage() {
     label: t(CREATE_LABEL_KEY[type], lang),
   }));
 
-  const firstName = user.displayName.trim().split(/\s+/)[0] || user.displayName;
+  const fullName = localizedDisplayName(
+    {
+      displayName: user.displayName,
+      nameAr: user.nameAr,
+      nameEn: user.nameEn,
+    },
+    lang,
+  );
+  const firstName = fullName.trim().split(/\s+/)[0] || fullName;
   const primaryReview = queues.awaitingReview[0];
   const primaryDraft = queues.myDrafts[0];
   const primaryRevision = queues.needsRevision[0];
@@ -88,7 +98,7 @@ export default async function DashboardPage() {
 
       {canReview && needsPostReview.length > 0 ? (
         <section className="rounded-2xl border border-red-200 bg-crs-surface p-4 shadow-sm">
-          <h2 className="text-sm font-semibold text-red-950">Needs post-publication review</h2>
+          <h2 className="text-sm font-semibold text-red-950">{t("needsPostPublicationReview", lang)}</h2>
           <ul className="mt-3 divide-y divide-crs-border/70">
             {needsPostReview.map((p) => (
               <li key={p.id} className="py-3">
@@ -103,7 +113,7 @@ export default async function DashboardPage() {
 
       {user.role === "super_admin" && pendingOwners.length > 0 ? (
         <section className="rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm">
-          <h2 className="text-sm font-semibold text-crs-ink">Pending review-owner proposals</h2>
+          <h2 className="text-sm font-semibold text-crs-ink">{t("pendingReviewOwnerProposals", lang)}</h2>
           <ul className="mt-3 divide-y divide-crs-border/70">
             {pendingOwners.map((p) => (
               <li key={p.id} className="py-3">

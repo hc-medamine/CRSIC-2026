@@ -15,6 +15,8 @@ export type ContentComment = {
   created_at: Date;
   author_email: string | null;
   author_display_name: string | null;
+  author_name_ar: string | null;
+  author_name_en: string | null;
 };
 
 /** Dashboard edit path for comment notification deep-links (all 7 content types). */
@@ -36,7 +38,8 @@ export async function listCommentsForItem(
 ): Promise<ContentComment[]> {
   const result = await query<ContentComment>(
     `SELECT c.id, c.content_item_id, c.author_id, c.body, c.kind, c.created_at,
-            u.email AS author_email, u.display_name AS author_display_name
+            u.email AS author_email, u.display_name AS author_display_name,
+            u.name_ar AS author_name_ar, u.name_en AS author_name_en
      FROM content_comments c
      LEFT JOIN users u ON u.id = c.author_id
      WHERE c.content_item_id = $1
@@ -63,13 +66,15 @@ export async function insertComment(input: {
     `INSERT INTO content_comments (content_item_id, author_id, body, kind)
      VALUES ($1, $2, $3, $4)
      RETURNING id, content_item_id, author_id, body, kind, created_at,
-               NULL::text AS author_email, NULL::text AS author_display_name`,
+               NULL::text AS author_email, NULL::text AS author_display_name,
+               NULL::text AS author_name_ar, NULL::text AS author_name_en`,
     [input.contentItemId, input.authorId, body, input.kind],
   );
   const row = result.rows[0];
   const withAuthor = await query<ContentComment>(
     `SELECT c.id, c.content_item_id, c.author_id, c.body, c.kind, c.created_at,
-            u.email AS author_email, u.display_name AS author_display_name
+            u.email AS author_email, u.display_name AS author_display_name,
+            u.name_ar AS author_name_ar, u.name_en AS author_name_en
      FROM content_comments c
      LEFT JOIN users u ON u.id = c.author_id
      WHERE c.id = $1`,

@@ -3,10 +3,12 @@
 import { formatDateTime } from "@/lib/format-datetime";
 import { EnStatusBadge } from "@/app/dashboard/en-status-badge";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
-import { roleLabel, statusLabel, t } from "@/lib/i18n/labels";
+import { roleLabel, statusLabel, t, localizedDisplayName } from "@/lib/i18n/labels";
 
 export type PersonDisplay = {
   displayName: string;
+  nameAr?: string | null;
+  nameEn?: string | null;
   email: string;
   role?: string;
 } | null;
@@ -26,7 +28,7 @@ type Props = {
 function formatPerson(p: PersonDisplay, lang: "en" | "ar"): string {
   if (!p) return "—";
   const role = p.role ? ` (${roleLabel(p.role, lang)})` : "";
-  return `${p.displayName}${role}`;
+  return `${localizedDisplayName(p, lang)}${role}`;
 }
 
 /** Status + editor / reviewer / publisher / review owner line for Edit/review forms. */

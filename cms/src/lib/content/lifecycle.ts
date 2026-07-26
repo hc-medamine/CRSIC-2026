@@ -294,6 +294,8 @@ export async function deleteContentItem(user: SessionUser, id: string): Promise<
 export type AssignableUser = {
   id: string;
   display_name: string;
+  name_ar: string | null;
+  name_en: string | null;
   email: string;
   role: string;
 };
@@ -306,11 +308,11 @@ export async function listAssignableUsers(
 ): Promise<AssignableUser[]> {
   const result = await query<AssignableUser>(
     actor.role === "super_admin"
-      ? `SELECT id, display_name, email, role
+      ? `SELECT id, display_name, name_ar, name_en, email, role
          FROM users
          WHERE is_active = TRUE
          ORDER BY display_name ASC`
-      : `SELECT id, display_name, email, role
+      : `SELECT id, display_name, name_ar, name_en, email, role
          FROM users
          WHERE is_active = TRUE
            AND role IN ('editor', 'reviewer')

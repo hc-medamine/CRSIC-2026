@@ -3,14 +3,16 @@ import { cookies } from "next/headers";
 import { requireUser, type SessionUser } from "@/lib/auth/session";
 import { getNavContentTypes } from "@/lib/content/permissions";
 import { countUnread } from "@/lib/notifications";
-import { CMS_LANG_COOKIE, normalizeLang } from "@/lib/i18n/labels";
+import { refreshUserFromDb } from "@/lib/content/ooo";
+import { CMS_LANG_COOKIE, normalizeLang, localizedDisplayName } from "@/lib/i18n/labels";
 import { SessionTouch } from "./session-touch";
 import { CmsChrome } from "./cms-chrome";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   let user: SessionUser;
   try {
-    user = await requireUser();
+    const sessionUser = await requireUser();
+    user = (await refreshUserFromDb(sessionUser.id)) ?? sessionUser;
   } catch {
     redirect("/login");
   }
@@ -25,6 +27,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
     user.role === "super_admin" ||
     user.role === "editor" ||
     user.role === "reviewer";
+  const displayName = localizedDisplayName(
+    {
+      displayName: user.displayName,
+      nameAr: user.nameAr,
+      nameEn: user.nameEn,
+    },
+    lang,
+  );
 
   return (
     <>
@@ -35,7 +45,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         contentTypes={contentTypes}
         showMedia={showMedia}
         unread={unread}
-        displayName={user.displayName}
+        displayName={displayName}
         email={user.email}
       >
         {children}

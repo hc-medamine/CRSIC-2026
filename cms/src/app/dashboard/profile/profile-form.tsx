@@ -4,6 +4,8 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { FormBanner } from "@/app/dashboard/form-ux";
+import { t, roleLabel } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 type Props = {
   initial: {
@@ -16,6 +18,7 @@ type Props = {
 };
 
 export function ProfileForm({ initial }: Props) {
+  const lang = useCmsLang();
   const router = useRouter();
   const [displayName, setDisplayName] = useState(initial.displayName);
   const [nameAr, setNameAr] = useState(initial.nameAr);
@@ -37,17 +40,17 @@ export function ProfileForm({ initial }: Props) {
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        const msg = data.error ?? "Update failed";
+        const msg = data.error ?? t("updateFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
-      setMessage("Profile saved.");
-      cmsToast.success("Profile saved.");
+      setMessage(t("profileSaved", lang));
+      cmsToast.success(t("profileSaved", lang));
       router.refresh();
     } catch {
-      setError("Network error");
-      cmsToast.error("Network error");
+      setError(t("loginNetworkError", lang));
+      cmsToast.error(t("loginNetworkError", lang));
     } finally {
       setPending(false);
     }
@@ -59,7 +62,7 @@ export function ProfileForm({ initial }: Props) {
       className="cms-form flex flex-col gap-4 rounded-2xl border border-crs-border bg-crs-surface p-6 shadow-sm"
     >
       <label className="text-sm">
-        <span className="font-medium text-crs-ink">Email (login — read only)</span>
+        <span className="font-medium text-crs-ink">{t("profileEmailReadonly", lang)}</span>
         <input
           value={initial.email}
           readOnly
@@ -67,15 +70,15 @@ export function ProfileForm({ initial }: Props) {
         />
       </label>
       <label className="text-sm">
-        <span className="font-medium text-crs-ink">Role (read only)</span>
+        <span className="font-medium text-crs-ink">{t("profileRoleReadonly", lang)}</span>
         <input
-          value={initial.role}
+          value={roleLabel(initial.role, lang)}
           readOnly
           className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-bg px-3 py-2 text-crs-muted"
         />
       </label>
       <label className="text-sm">
-        <span className="font-medium text-crs-ink">Display name</span>
+        <span className="font-medium text-crs-ink">{t("profileDisplayName", lang)}</span>
         <input
           required
           value={displayName}
@@ -84,7 +87,7 @@ export function ProfileForm({ initial }: Props) {
         />
       </label>
       <label className="text-sm">
-        <span className="font-medium text-crs-ink">Name (AR)</span>
+        <span className="font-medium text-crs-ink">{t("profileNameAr", lang)}</span>
         <input
           dir="rtl"
           value={nameAr}
@@ -93,7 +96,7 @@ export function ProfileForm({ initial }: Props) {
         />
       </label>
       <label className="text-sm">
-        <span className="font-medium text-crs-ink">Name (EN)</span>
+        <span className="font-medium text-crs-ink">{t("profileNameEn", lang)}</span>
         <input
           value={nameEn}
           onChange={(e) => setNameEn(e.target.value)}
@@ -109,7 +112,7 @@ export function ProfileForm({ initial }: Props) {
         disabled={pending}
         className="inline-flex min-h-11 w-fit items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
       >
-        {pending ? t("actionSaving", lang) : "Save profile"}
+        {pending ? t("actionSaving", lang) : t("profileSave", lang)}
       </button>
     </form>
   );

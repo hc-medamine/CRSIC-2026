@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { QueueItem } from "@/lib/content/queues";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
-import { statusLabel, t, tf } from "@/lib/i18n/labels";
+import { statusLabel, t, tf, localizedDisplayName } from "@/lib/i18n/labels";
 import { IconChevron } from "./cms-icons";
 
 export function relativeShort(iso: string, lang: "en" | "ar" = "en"): string {
@@ -91,8 +91,15 @@ export function QueueCard({
                     {item.title}
                   </p>
                   <p className="mt-0.5 truncate text-xs text-crs-muted">
-                    {showAuthor && item.authorName
-                      ? `${authorPrefix ?? ""} ${item.authorName}`.trim()
+                    {showAuthor && (item.authorName || item.authorNameAr || item.authorNameEn)
+                      ? `${authorPrefix ?? ""} ${localizedDisplayName(
+                          {
+                            displayName: item.authorName,
+                            nameAr: item.authorNameAr,
+                            nameEn: item.authorNameEn,
+                          },
+                          lang,
+                        )}`.trim()
                       : statusLabel(item.status, lang)}
                   </p>
                 </div>

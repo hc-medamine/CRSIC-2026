@@ -168,7 +168,7 @@ export function PublicationEditorForm({
         cmsToast.error(msg);
         return;
       }
-      cmsToast.success("Draft created.");
+      cmsToast.success(t("draftCreated", lang));
       router.push(`/dashboard/publications/${data.item.id}`);
       router.refresh();
     } finally {
@@ -180,7 +180,7 @@ export function PublicationEditorForm({
     if (!initial?.id) return;
     if (action === "delete") {
       const ok = window.confirm(
-        "Permanently delete this item? This cannot be undone.",
+        t("confirmDelete", lang),
       );
       if (!ok) return;
     }
@@ -250,14 +250,14 @@ export function PublicationEditorForm({
             >
               {orgUnits.map((o) => (
                 <option key={o.id} value={o.id}>
-                  {o.name_en} ({o.name_ar})
+                  {lang === "ar" ? o.name_ar : o.name_en || o.name_ar}
                 </option>
               ))}
             </select>
           </label>
 
           <label className="text-sm">
-            <span className="font-medium">Type *</span>
+            <span className="font-medium">{t("fieldTypeRequired", lang)}</span>
             <select
               disabled={!editable}
               value={pubKind}
@@ -281,7 +281,7 @@ export function PublicationEditorForm({
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Department (AR) *</span>
+            <span className="font-medium">{t("fieldDepartmentAr", lang)}</span>
             <input
               dir="rtl"
               required
@@ -293,7 +293,7 @@ export function PublicationEditorForm({
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Description (AR) *</span>
+            <span className="font-medium">{t("fieldDescriptionAr", lang)}</span>
             <textarea
               dir="rtl"
               required
@@ -308,7 +308,7 @@ export function PublicationEditorForm({
 
         <FormSection step={2} title={t("sectionBody", lang)}>
           <RichBodyEditor
-            label=t("fieldBodyAr", lang)
+            label={t("fieldBodyAr", lang)}
             dir="rtl"
             disabled={!editable}
             value={bodyAr}
@@ -323,7 +323,7 @@ export function PublicationEditorForm({
             mediaId={coverMediaId}
             disabled={!editable}
             imagesOnly
-            label="Cover image *"
+            label={t("fieldCoverImage", lang)}
             onUploaded={({ publicPath, mediaId }) => {
               setCoverPath(publicPath);
               setCoverMediaId(mediaId);
@@ -344,7 +344,7 @@ export function PublicationEditorForm({
             }}
           />
           <label className="text-sm">
-            <span className="font-medium">Cover alt (AR) *</span>
+            <span className="font-medium">{t("fieldCoverAltAr", lang)}</span>
             <input
               dir="rtl"
               disabled={!editable}
@@ -361,7 +361,7 @@ export function PublicationEditorForm({
           hint={t("sectionAdvancedHint", lang)}
         >
           <RichBodyEditor
-            label="Body (EN)"
+            label={t("fieldBodyEn", lang)}
             dir="ltr"
             disabled={!editable}
             value={bodyEn}
@@ -377,7 +377,7 @@ export function PublicationEditorForm({
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Department (EN)</span>
+            <span className="font-medium">{t("fieldDepartmentEn", lang)}</span>
             <input
               disabled={!editable}
               value={deptEn}
@@ -386,7 +386,7 @@ export function PublicationEditorForm({
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Description (EN)</span>
+            <span className="font-medium">{t("fieldDescriptionEn", lang)}</span>
             <textarea
               disabled={!editable}
               value={descEn}
@@ -396,7 +396,7 @@ export function PublicationEditorForm({
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Cover alt (EN)</span>
+            <span className="font-medium">{t("fieldCoverAltEn", lang)}</span>
             <input
               disabled={!editable}
               value={imageAltEn}
@@ -405,7 +405,7 @@ export function PublicationEditorForm({
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Public slug (optional)</span>
+            <span className="font-medium">{t("fieldPublicSlugOptional", lang)}</span>
             <input
               dir="auto"
               disabled={!editable}
@@ -500,7 +500,7 @@ export function PublicationEditorForm({
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder=t("actionNotePlaceholder", lang)
+            placeholder={t("actionNotePlaceholder", lang)}
             className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             rows={2}
           />

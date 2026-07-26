@@ -3,8 +3,16 @@
 import { useCallback, useEffect, useState } from "react";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { useRouter } from "next/navigation";
+import { t, tf, localizedDisplayName } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
-type Editor = { id: string; display_name: string; email: string };
+type Editor = {
+  id: string;
+  display_name: string;
+  name_ar: string | null;
+  name_en: string | null;
+  email: string;
+};
 
 type Props = {
   /** When set, Super Admin manages Away for this user; otherwise self. */
@@ -13,6 +21,7 @@ type Props = {
 };
 
 export function AwayPanel({ targetUserId, canManage }: Props) {
+  const lang = useCmsLang();
   const router = useRouter();
   const [isAway, setIsAway] = useState(false);
   const [awayUntil, setAwayUntil] = useState("");
@@ -33,21 +42,34 @@ export function AwayPanel({ targetUserId, canManage }: Props) {
         isAway: boolean;
         awayUntil: string | null;
         awayDelegateName: string | null;
+        awayDelegateNameAr: string | null;
+        awayDelegateNameEn: string | null;
       };
       editors?: Editor[];
       error?: string;
     };
     if (!res.ok || !data.ok) {
-      const msg = data.error ?? "Failed to load Away state";
+      const msg = data.error ?? t("awayLoadFailed", lang);
       setError(msg);
       cmsToast.error(msg);
       return;
     }
     setIsAway(Boolean(data.away?.isAway));
     setAwayUntil(data.away?.awayUntil ? data.away.awayUntil.slice(0, 10) : "");
-    setDelegateName(data.away?.awayDelegateName ?? null);
+    setDelegateName(
+      data.away
+        ? localizedDisplayName(
+            {
+              displayName: data.away.awayDelegateName,
+              nameAr: data.away.awayDelegateNameAr,
+              nameEn: data.away.awayDelegateNameEn,
+            },
+            lang,
+          ) || null
+        : null,
+    );
     setEditors(data.editors ?? []);
-  }, [canManage, targetUserId]);
+  }, [canManage, lang, targetUserId]);
 
   useEffect(() => {
     void load();
@@ -72,12 +94,12 @@ export function AwayPanel({ targetUserId, canManage }: Props) {
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        const msg = data.error ?? "Failed";
+        const msg = data.error ?? t("actionFailedShort", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
-      const msg = action === "set" ? "Away set." : "Away cleared.";
+      const msg = action === "set" ? t("awaySetSuccess", lang) : t("awayClearedSuccess", lang);
       setMessage(msg);
       cmsToast.success(msg);
       await load();
@@ -89,19 +111,18 @@ export function AwayPanel({ targetUserId, canManage }: Props) {
 
   return (
     <section className="grid gap-2 rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm">
-      <h2 className="text-lg font-medium text-crs-ink">Out of office (Away)</h2>
-      <p className="text-xs text-crs-muted">
-        While Away, your review actions are frozen. Pick one Editor to elevate to temporary Reviewer.
-        All Editors are notified. Role reverts when you clear Away or the until-date passes.
-      </p>
+      <h2 className="text-lg font-medium text-crs-ink">{t("awayTitle", lang)}</h2>
+      <p className="text-xs text-crs-muted">{t("awayHint", lang)}</p>
       {isAway ? (
         <p className="text-sm text-amber-900">
-          Currently Away
-          {awayUntil ? ` until ${awayUntil}` : ""}
-          {delegateName ? ` · temp Reviewer: ${delegateName}` : ""}
+          {t("awayCurrently", lang)}
+          {awayUntil ? ` ${tf("awayUntil", lang, { date: awayUntil })}` : ""}
+          {delegateName
+            ? ` · ${tf("awayTempReviewer", lang, { name: delegateName })}`
+            : ""}
         </p>
       ) : (
-        <p className="text-sm text-crs-muted">Not Away.</p>
+        <p className="text-sm text-crs-muted">{t("notAway", lang)}</p>
       )}
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {message ? <p className="text-sm text-green-700">{message}</p> : null}
@@ -109,22 +130,26 @@ export function AwayPanel({ targetUserId, canManage }: Props) {
       {!isAway ? (
         <div className="flex flex-col gap-2">
           <label className="text-sm">
-            <span className="font-medium">Elevate Editor (required)</span>
+            <span className="font-medium">{t("awayElevateEditor", lang)}</span>
             <select
               value={elevateId}
               onChange={(e) => setElevateId(e.target.value)}
               className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             >
-              <option value="">— select Editor —</option>
+              <option value="">{t("awaySelectEditor", lang)}</option>
               {editors.map((e) => (
                 <option key={e.id} value={e.id}>
-                  {e.display_name} ({e.email})
+                  {localizedDisplayName(
+                    { displayName: e.display_name, nameAr: e.name_ar, nameEn: e.name_en },
+                    lang,
+                  )}{" "}
+                  ({e.email})
                 </option>
               ))}
             </select>
           </label>
           <label className="text-sm">
-            <span className="font-medium">Until date (optional)</span>
+            <span className="font-medium">{t("awayUntilDate", lang)}</span>
             <input
               type="date"
               value={awayUntil}
@@ -138,7 +163,7 @@ export function AwayPanel({ targetUserId, canManage }: Props) {
             onClick={() => void run("set")}
             className="w-fit rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-2 text-sm text-white disabled:opacity-60"
           >
-            {pending ? "Saving…" : "Set Away"}
+            {pending ? t("actionSaving", lang) : t("awaySet", lang)}
           </button>
         </div>
       ) : (
@@ -148,7 +173,7 @@ export function AwayPanel({ targetUserId, canManage }: Props) {
           onClick={() => void run("clear")}
           className="w-fit inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60"
         >
-          {pending ? "Clearing…" : "Clear Away"}
+          {pending ? t("awayClearing", lang) : t("awayClear", lang)}
         </button>
       )}
     </section>

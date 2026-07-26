@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cmsToast } from "@/app/dashboard/cms-toast";
+import { t } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 type Props = {
   contentId: string;
@@ -13,6 +15,7 @@ type Props = {
  * Creates an A1 preview token and opens the in-CMS preview page (always works).
  */
 export function PublicPreviewButton({ contentId, disabled }: Props) {
+  const lang = useCmsLang();
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,13 +31,13 @@ export function PublicPreviewButton({ contentId, disabled }: Props) {
         token?: string;
       };
       if (!res.ok || !data.ok || !data.token) {
-        throw new Error(data.error || "Preview failed");
+        throw new Error(data.error || t("previewFailed", lang));
       }
 
-      cmsToast.success("Opening preview…");
+      cmsToast.success(t("previewOpening", lang));
       router.push(`/dashboard/preview/${encodeURIComponent(data.token)}`);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Preview failed";
+      const msg = err instanceof Error ? err.message : t("previewFailed", lang);
       setError(msg);
       cmsToast.error(msg);
     } finally {
@@ -50,12 +53,9 @@ export function PublicPreviewButton({ contentId, disabled }: Props) {
         onClick={() => void openPreview()}
         className="w-fit rounded-xl border border-sky-600 bg-sky-50 px-4 py-2.5 text-sm font-medium text-sky-900 disabled:opacity-60"
       >
-        {pending ? "Creating preview…" : "Open public preview"}
+        {pending ? t("previewCreating", lang) : t("previewOpen", lang)}
       </button>
-      <p className="text-xs text-crs-muted">
-        Opens a full candidate preview in the CMS (image, title, body). From there you can also open
-        the public SPA if it is running.
-      </p>
+      <p className="text-xs text-crs-muted">{t("previewHint", lang)}</p>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
     </div>
   );

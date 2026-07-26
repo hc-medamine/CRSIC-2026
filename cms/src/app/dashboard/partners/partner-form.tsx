@@ -15,7 +15,7 @@ import {
 } from "@/app/dashboard/seo-fields";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { AdvancedDisclosure, FormBanner, FormSection, FormStickyActions, messageForAction } from "@/app/dashboard/form-ux";
-import { t } from "@/lib/i18n/labels";
+import { t, tf } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 const SUMMARY_SOFT_MAX = 200;
@@ -143,7 +143,7 @@ export function PartnerEditorForm({
         cmsToast.error(msg);
         return;
       }
-      cmsToast.success("Draft created.");
+      cmsToast.success(t("draftCreated", lang));
       router.push(`/dashboard/partners/${data.item.id}`);
       router.refresh();
     } finally {
@@ -155,7 +155,7 @@ export function PartnerEditorForm({
     if (!initial?.id) return;
     if (action === "delete") {
       const ok = window.confirm(
-        "Permanently delete this item? This cannot be undone.",
+        t("confirmDelete", lang),
       );
       if (!ok) return;
     }
@@ -222,7 +222,7 @@ export function PartnerEditorForm({
             >
               {orgUnits.map((o) => (
                 <option key={o.id} value={o.id}>
-                  {o.name_en} ({o.name_ar})
+                  {lang === "ar" ? o.name_ar : o.name_en || o.name_ar}
                 </option>
               ))}
             </select>
@@ -230,29 +230,29 @@ export function PartnerEditorForm({
 
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="text-sm">
-              <span className="font-medium">Scope</span>
+              <span className="font-medium">{t("fieldScope", lang)}</span>
               <select
                 disabled={!editable}
                 value={partnerScope}
                 onChange={(e) => setPartnerScope(e.target.value as "intl" | "nat")}
                 className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
               >
-                <option value="nat">National (nat)</option>
-                <option value="intl">International (intl)</option>
+                <option value="nat">{t("fieldScopeNational", lang)}</option>
+                <option value="intl">{t("fieldScopeInternational", lang)}</option>
               </select>
             </label>
             <label className="text-sm">
-              <span className="font-medium">Date *</span>
+              <span className="font-medium">{t("fieldDate", lang)}</span>
               <input dir="rtl" disabled={!editable} value={partnerDate} onChange={(e) => setPartnerDate(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" placeholder="يونيو 2023" />
             </label>
           </div>
 
           <label className="text-sm">
-            <span className="font-medium">Partner name (AR) *</span>
+            <span className="font-medium">{t("fieldPartnerNameAr", lang)}</span>
             <input dir="rtl" required disabled={!editable} value={titleAr} onChange={(e) => setTitleAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Country (AR) *</span>
+            <span className="font-medium">{t("fieldCountryAr", lang)}</span>
             <input dir="rtl" disabled={!editable} value={labelAr} onChange={(e) => setLabelAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
@@ -267,19 +267,22 @@ export function PartnerEditorForm({
             />
             {summaryArLong ? (
               <span className="mt-1 block text-xs text-amber-800">
-                Soft limit {SUMMARY_SOFT_MAX} characters for card teasers ({summaryAr.trim().length} now). Saving is still allowed.
+                {tf("softLimitSummary", lang, {
+                  n: SUMMARY_SOFT_MAX,
+                  current: summaryAr.trim().length,
+                })}
               </span>
             ) : null}
           </label>
           <label className="text-sm">
-            <span className="font-medium">Emoji (optional)</span>
+            <span className="font-medium">{t("fieldEmojiOptional", lang)}</span>
             <input disabled={!editable} value={partnerEmoji} onChange={(e) => setPartnerEmoji(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" placeholder="🇰🇷" />
           </label>
         </FormSection>
 
         <FormSection step={2} title={t("sectionBody", lang)}>
           <RichBodyEditor
-            label=t("fieldBodyAr", lang)
+            label={t("fieldBodyAr", lang)}
             dir="rtl"
             disabled={!editable}
             value={bodyAr}
@@ -292,7 +295,7 @@ export function PartnerEditorForm({
             bucket="partners"
             publicPath={imagePath}
             imagesOnly
-            label="Logo / image"
+            label={t("fieldLogoImage", lang)}
             disabled={!editable}
             onUploaded={({ publicPath }) => setImagePath(publicPath)}
           />
@@ -304,11 +307,11 @@ export function PartnerEditorForm({
           hint={t("sectionAdvancedHint", lang)}
         >
           <label className="text-sm">
-            <span className="font-medium">Partner name (EN)</span>
+            <span className="font-medium">{t("fieldPartnerNameEn", lang)}</span>
             <input disabled={!editable} value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Country (EN)</span>
+            <span className="font-medium">{t("fieldCountryEn", lang)}</span>
             <input disabled={!editable} value={labelEn} onChange={(e) => setLabelEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
@@ -322,7 +325,7 @@ export function PartnerEditorForm({
             />
           </label>
           <RichBodyEditor
-            label="Body (EN)"
+            label={t("fieldBodyEn", lang)}
             dir="ltr"
             disabled={!editable}
             value={bodyEn}
@@ -402,7 +405,7 @@ export function PartnerEditorForm({
       {mode === "edit" && canReview && initial?.status === "submitted" ? (
         <div className="grid gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
           <p className="text-sm font-medium">{t("actionReviewerActions", lang)}</p>
-          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder=t("actionNotePlaceholder", lang) className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" rows={2} />
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("actionNotePlaceholder", lang)} className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" rows={2} />
           <div className="flex flex-wrap gap-2">
             <button type="button" disabled={pending} className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white" onClick={() => void run("approve")}>{t("actionApprove", lang)}</button>
             <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg" onClick={() => void run("request_changes", { note })}>{t("actionRequestChanges", lang)}</button>

@@ -18,12 +18,28 @@ import { CommentThread } from "@/app/dashboard/comment-thread";
 
 type Props = { params: Promise<{ id: string }> };
 
-function personProp(p: { displayName: string; email: string; role: string } | null) {
+function personProp(
+  p: {
+    displayName: string;
+    nameAr?: string | null;
+    nameEn?: string | null;
+    email: string;
+    role: string;
+  } | null,
+) {
   if (!p) return null;
-  return { displayName: p.displayName, email: p.email, role: p.role };
+  return {
+    displayName: p.displayName,
+    nameAr: p.nameAr ?? null,
+    nameEn: p.nameEn ?? null,
+    email: p.email,
+    role: p.role,
+  };
 }
 
 export default async function ResearchProjectDetailPage({ params }: Props) {
+  const cookieStore = await cookies();
+  const lang = normalizeLang(cookieStore.get(CMS_LANG_COOKIE)?.value);
   const sessionUser = await requireUser();
   const user = (await refreshUserFromDb(sessionUser.id)) ?? sessionUser;
   if (!(await canAccessContentType(user, "research_project"))) redirect("/dashboard");
@@ -48,12 +64,10 @@ export default async function ResearchProjectDetailPage({ params }: Props) {
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
       <header className="flex items-center justify-between border-b border-crs-border pb-4">
         <div>
-          <p className="text-sm uppercase tracking-wide text-crs-muted">Research projects</p>
-          <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">Edit / review</h1>
+          <p className="text-sm uppercase tracking-wide text-crs-muted">{t("researchProjects", lang)}</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">{t("editReview", lang)}</h1>
         </div>
-        <Link href="/dashboard/research-projects" className="inline-flex min-h-11 items-center text-sm text-crs-primary hover:underline">
-          Back
-        </Link>
+        <Link href="/dashboard/research-projects" className="inline-flex min-h-11 items-center text-sm text-crs-primary hover:underline">{t("backToList", lang)}</Link>
       </header>
 
       {!reviewer && canReview(user) && item.created_by === user.id ? (

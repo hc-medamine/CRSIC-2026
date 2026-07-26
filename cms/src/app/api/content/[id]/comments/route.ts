@@ -28,6 +28,8 @@ function serialize(row: ContentComment) {
     createdAt: row.created_at.toISOString(),
     authorEmail: row.author_email,
     authorDisplayName: row.author_display_name,
+    authorNameAr: row.author_name_ar,
+    authorNameEn: row.author_name_en,
   };
 }
 

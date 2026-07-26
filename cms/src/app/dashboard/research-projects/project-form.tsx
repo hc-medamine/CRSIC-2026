@@ -192,7 +192,7 @@ export function ResearchProjectForm({
         cmsToast.error(msg);
         return;
       }
-      cmsToast.success("Draft created.");
+      cmsToast.success(t("draftCreated", lang));
       router.push(`/dashboard/research-projects/${data.item.id}`);
       router.refresh();
     } finally {
@@ -203,7 +203,7 @@ export function ResearchProjectForm({
   async function run(action: string, extra?: Record<string, unknown>) {
     if (!initial?.id) return;
     if (action === "delete") {
-      const ok = window.confirm("Permanently delete this item? This cannot be undone.");
+      const ok = window.confirm(t("confirmDelete", lang));
       if (!ok) return;
     }
     setPending(true);
@@ -272,14 +272,14 @@ export function ResearchProjectForm({
             >
               {orgUnits.map((o) => (
                 <option key={o.id} value={o.id}>
-                  {o.name_en} ({o.name_ar})
+                  {lang === "ar" ? o.name_ar : o.name_en || o.name_ar}
                 </option>
               ))}
             </select>
           </label>
 
           <label className="text-sm">
-            <span className="font-medium">Research group *</span>
+            <span className="font-medium">{t("fieldResearchGroupRequired", lang)}</span>
             <select
               disabled={!editable || groupsLoading}
               value={researchGroupId}
@@ -293,75 +293,73 @@ export function ResearchProjectForm({
                 </option>
               ))}
             </select>
-            {groupsLoading ? <p className="mt-1 text-xs text-crs-muted">Loading groups…</p> : null}
+            {groupsLoading ? <p className="mt-1 text-xs text-crs-muted">{t("loadingGroups", lang)}</p> : null}
             {!groupsLoading && groups.length === 0 ? (
-              <p className="mt-1 text-xs text-amber-700">
-                No published research groups for this org yet. Publish one first.
-              </p>
+              <p className="mt-1 text-xs text-amber-700">{t("noPublishedGroups", lang)}</p>
             ) : null}
           </label>
           <label className="text-sm">
-            <span className="font-medium">Project title (AR) *</span>
+            <span className="font-medium">{t("fieldProjectTitleAr", lang)}</span>
             <input dir="rtl" required disabled={!editable} value={titleAr} onChange={(e) => setTitleAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
 
           <label className="text-sm">
-            <span className="font-medium">Lead (AR) *</span>
+            <span className="font-medium">{t("fieldLeadArRequired", lang)}</span>
             <input dir="rtl" disabled={!editable} value={leadAr} onChange={(e) => setLeadAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
         </FormSection>
 
         <FormSection step={2} title={t("sectionBody", lang)}>
-          <RichBodyEditor label=t("fieldDibajaAr", lang) value={bodyAr} onChange={setBodyAr} disabled={!editable} dir="rtl" />
+          <RichBodyEditor label={t("fieldDibajaAr", lang)} value={bodyAr} onChange={setBodyAr} disabled={!editable} dir="rtl" />
 
           <label className="text-sm">
-            <span className="font-medium">Research questions (AR)</span>
+            <span className="font-medium">{t("fieldQuestionsAr", lang)}</span>
             <textarea dir="rtl" disabled={!editable} value={questionsAr} onChange={(e) => setQuestionsAr(e.target.value)} rows={3} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
         </FormSection>
 
-        <FormSection step={3} title="Details">
+        <FormSection step={3} title={t("sectionDetails", lang)}>
           <fieldset className="grid gap-2 rounded border border-crs-border bg-crs-bg/80 p-3">
-            <legend className="px-1 text-sm font-semibold text-crs-ink">Research axes</legend>
+            <legend className="px-1 text-sm font-semibold text-crs-ink">{t("fieldResearchAxes", lang)}</legend>
             {axes.map((row, i) => (
               <div key={i} className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
-                <input dir="rtl" disabled={!editable} placeholder="Axis (AR)" value={row.ar} onChange={(e) => updateRow(axes, setAxes, i, { ar: e.target.value })} className="min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
-                <input disabled={!editable} placeholder="Axis (EN)" value={row.en} onChange={(e) => updateRow(axes, setAxes, i, { en: e.target.value })} className="min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
+                <input dir="rtl" disabled={!editable} placeholder={t("phAxisAr", lang)} value={row.ar} onChange={(e) => updateRow(axes, setAxes, i, { ar: e.target.value })} className="min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
+                <input disabled={!editable} placeholder={t("phAxisEn", lang)} value={row.en} onChange={(e) => updateRow(axes, setAxes, i, { en: e.target.value })} className="min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
                 {editable ? (
                   <button type="button" onClick={() => setAxes((prev) => prev.filter((_, j) => j !== i))} className="rounded border border-red-300 px-3 py-2 text-xs text-red-700">
-                    Remove
+                    {t("actionRemove", lang)}
                   </button>
                 ) : null}
               </div>
             ))}
             {editable ? (
               <button type="button" onClick={() => setAxes((prev) => [...prev, emptyRow()])} className="w-fit text-xs underline">
-                + Add axis
+                {t("actionAddAxis", lang)}
               </button>
             ) : null}
           </fieldset>
 
           <label className="text-sm">
-            <span className="font-medium">Duration (AR)</span>
+            <span className="font-medium">{t("fieldDurationAr", lang)}</span>
             <input dir="rtl" disabled={!editable} value={durationAr} onChange={(e) => setDurationAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
 
           <fieldset className="grid gap-2 rounded border border-crs-border bg-crs-bg/80 p-3">
-            <legend className="px-1 text-sm font-semibold text-crs-ink">Impacts</legend>
+            <legend className="px-1 text-sm font-semibold text-crs-ink">{t("fieldImpacts", lang)}</legend>
             {impacts.map((row, i) => (
               <div key={i} className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
-                <input dir="rtl" disabled={!editable} placeholder="Impact (AR)" value={row.ar} onChange={(e) => updateRow(impacts, setImpacts, i, { ar: e.target.value })} className="min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
-                <input disabled={!editable} placeholder="Impact (EN)" value={row.en} onChange={(e) => updateRow(impacts, setImpacts, i, { en: e.target.value })} className="min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
+                <input dir="rtl" disabled={!editable} placeholder={t("phImpactAr", lang)} value={row.ar} onChange={(e) => updateRow(impacts, setImpacts, i, { ar: e.target.value })} className="min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
+                <input disabled={!editable} placeholder={t("phImpactEn", lang)} value={row.en} onChange={(e) => updateRow(impacts, setImpacts, i, { en: e.target.value })} className="min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
                 {editable ? (
                   <button type="button" onClick={() => setImpacts((prev) => prev.filter((_, j) => j !== i))} className="rounded border border-red-300 px-3 py-2 text-xs text-red-700">
-                    Remove
+                    {t("actionRemove", lang)}
                   </button>
                 ) : null}
               </div>
             ))}
             {editable ? (
               <button type="button" onClick={() => setImpacts((prev) => [...prev, emptyRow()])} className="w-fit text-xs underline">
-                + Add impact
+                {t("actionAddImpact", lang)}
               </button>
             ) : null}
           </fieldset>
@@ -373,20 +371,20 @@ export function ResearchProjectForm({
           hint={t("sectionAdvancedHint", lang)}
         >
           <label className="text-sm">
-            <span className="font-medium">Project title (EN)</span>
+            <span className="font-medium">{t("fieldProjectTitleEn", lang)}</span>
             <input disabled={!editable} value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Lead (EN)</span>
+            <span className="font-medium">{t("fieldLeadEn", lang)}</span>
             <input disabled={!editable} value={leadEn} onChange={(e) => setLeadEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
-          <RichBodyEditor label=t("fieldDibajaEn", lang) value={bodyEn} onChange={setBodyEn} disabled={!editable} dir="ltr" />
+          <RichBodyEditor label={t("fieldDibajaEn", lang)} value={bodyEn} onChange={setBodyEn} disabled={!editable} dir="ltr" />
           <label className="text-sm">
-            <span className="font-medium">Research questions (EN)</span>
+            <span className="font-medium">{t("fieldQuestionsEn", lang)}</span>
             <textarea disabled={!editable} value={questionsEn} onChange={(e) => setQuestionsEn(e.target.value)} rows={3} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Duration (EN)</span>
+            <span className="font-medium">{t("fieldDurationEn", lang)}</span>
             <input disabled={!editable} value={durationEn} onChange={(e) => setDurationEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
@@ -462,7 +460,7 @@ export function ResearchProjectForm({
       {mode === "edit" && canReview && initial?.status === "submitted" ? (
         <div className="grid gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
           <p className="text-sm font-medium">{t("actionReviewerActions", lang)}</p>
-          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder=t("actionNotePlaceholder", lang) className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" rows={2} />
+          <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("actionNotePlaceholder", lang)} className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" rows={2} />
           <div className="flex flex-wrap gap-2">
             <button type="button" disabled={pending} className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white" onClick={() => void run("approve")}>{t("actionApprove", lang)}</button>
             <button type="button" disabled={pending} className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink hover:bg-crs-bg" onClick={() => void run("request_changes", { note })}>{t("actionRequestChanges", lang)}</button>

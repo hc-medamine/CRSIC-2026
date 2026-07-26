@@ -39,9 +39,7 @@ export default async function ProfilePage() {
       />
       <header>
         <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">{t("profile", lang)}</h1>
-        <p className="mt-1 text-sm text-crs-muted">
-          You can edit your name. Role and scopes are managed by Super Admin only.
-        </p>
+        <p className="mt-1 text-sm text-crs-muted">{t("profileHint", lang)}</p>
       </header>
 
       <ProfileForm

@@ -226,7 +226,18 @@ export function CmsChrome({
         >
           {menuOpen ? t("menuClose", lang) : t("menuOpen", lang)}
         </button>
-        <span className="text-sm font-semibold text-crs-ink">CRSIC</span>
+        <span className="flex items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/crsic_logo.png"
+            alt=""
+            width={40}
+            height={40}
+            className="h-10 w-10 object-contain"
+            aria-hidden
+          />
+          <span className="text-sm font-semibold text-crs-ink">CRSIC</span>
+        </span>
         <button
           type="button"
           onClick={toggleLang}
@@ -257,16 +268,19 @@ export function CmsChrome({
               : "max-md:-translate-x-full max-md:rtl:translate-x-full"
           }`}
         >
-          <div className="hidden shrink-0 items-center gap-3 px-5 py-5 md:flex">
-            <span
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-crs-primary text-sm font-bold text-white shadow-sm"
+          <div className="flex shrink-0 items-center gap-3 border-b border-crs-border/70 px-4 py-5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/crsic_logo.png"
+              alt=""
+              width={64}
+              height={64}
+              className="h-16 w-16 shrink-0 object-contain"
               aria-hidden
-            >
-              C
-            </span>
-            <div>
-              <p className="text-[15px] font-semibold tracking-tight text-crs-ink">CRSIC</p>
-              <p className="text-[11px] text-crs-muted">{t("contentCms", lang)}</p>
+            />
+            <div className="min-w-0">
+              <p className="text-base font-semibold tracking-tight text-crs-ink">CRSIC</p>
+              <p className="text-xs text-crs-muted">{t("contentCms", lang)}</p>
             </div>
           </div>
 

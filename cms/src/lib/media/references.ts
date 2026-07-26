@@ -49,39 +49,60 @@ function toReference(row: RefRow): MediaReference {
  * On-demand scan of durable media references for a CMS public_path.
  * Ignores preview_tokens (ephemeral). Revisions block delete (design D2=A).
  */
-export async function listMediaReferences(publicPath: string): Promise<MediaReference[]> {
-  if (!publicPath.startsWith("img/cms/")) return [];
+function isTrackableMediaPath(publicPath: string): boolean {
+  return publicPath.startsWith("img/cms/") || publicPath.startsWith("img/covers/");
+}
 
-  const result = await query<RefRow>(
+export async function listMediaReferences(publicPath: string): Promise<MediaReference[]> {
+  if (!isTrackableMediaPath(publicPath)) return [];
+  const byPath = await listMediaReferencesForPaths([publicPath]);
+  return byPath.get(publicPath) ?? [];
+}
+
+/**
+ * Batch scan of durable media references for many CMS public_paths.
+ * Used by the media library cards (article title) without N+1 queries.
+ */
+export async function listMediaReferencesForPaths(
+  publicPaths: string[],
+): Promise<Map<string, MediaReference[]>> {
+  const paths = [...new Set(publicPaths.filter((p) => isTrackableMediaPath(p)))];
+  const out = new Map<string, MediaReference[]>();
+  for (const p of paths) out.set(p, []);
+  if (paths.length === 0) return out;
+
+  const result = await query<RefRow & { public_path: string }>(
     `
-    WITH path AS (SELECT $1::text AS p)
-    SELECT * FROM (
+    WITH path AS (SELECT unnest($1::text[]) AS p)
+    SELECT path.p AS public_path,
+           refs.content_item_id, refs.content_type, refs.title_ar, refs.status,
+           refs.source, refs.revision_id, refs.revision_number
+    FROM (
       SELECT ci.id AS content_item_id, ci.content_type, ci.title_ar, ci.status,
              'image_path'::text AS source,
-             NULL::uuid AS revision_id, NULL::int AS revision_number
-      FROM content_items ci, path
-      WHERE ci.image_path = path.p
+             NULL::uuid AS revision_id, NULL::int AS revision_number,
+             ci.image_path AS match_path
+      FROM content_items ci
+      WHERE ci.image_path = ANY($1::text[])
 
       UNION ALL
       SELECT ci.id, ci.content_type, ci.title_ar, ci.status,
-             'og_image', NULL, NULL
-      FROM content_items ci, path
-      WHERE ci.og_image = path.p
+             'og_image', NULL, NULL, ci.og_image
+      FROM content_items ci
+      WHERE ci.og_image = ANY($1::text[])
 
       UNION ALL
       SELECT ci.id, ci.content_type, ci.title_ar, ci.status,
-             'attachments', NULL, NULL
-      FROM content_items ci, path
-      WHERE EXISTS (
-        SELECT 1
-        FROM jsonb_array_elements(COALESCE(ci.attachments, '[]'::jsonb)) elem
-        WHERE elem->>'src' = path.p
-      )
+             'attachments', NULL, NULL, elem->>'src'
+      FROM content_items ci
+      CROSS JOIN LATERAL jsonb_array_elements(COALESCE(ci.attachments, '[]'::jsonb)) elem
+      WHERE elem->>'src' = ANY($1::text[])
 
       UNION ALL
       SELECT ci.id, ci.content_type, ci.title_ar, ci.status,
-             'live_payload', NULL, NULL
-      FROM content_items ci, path
+             'live_payload', NULL, NULL, path.p
+      FROM content_items ci
+      CROSS JOIN path
       WHERE ci.live_payload IS NOT NULL
         AND (
           ci.live_payload->>'img' = path.p
@@ -96,10 +117,10 @@ export async function listMediaReferences(publicPath: string): Promise<MediaRefe
 
       UNION ALL
       SELECT ci.id, ci.content_type, ci.title_ar, ci.status,
-             'revision', r.id, r.revision_number
+             'revision', r.id, r.revision_number, path.p
       FROM content_revisions r
       JOIN content_items ci ON ci.id = r.content_item_id
-      , path
+      CROSS JOIN path
       WHERE r.snapshot->>'image_path' = path.p
          OR r.snapshot->>'og_image' = path.p
          OR EXISTS (
@@ -108,18 +129,20 @@ export async function listMediaReferences(publicPath: string): Promise<MediaRefe
            WHERE elem->>'src' = path.p
          )
     ) refs
-    ORDER BY content_type, title_ar, source, revision_number NULLS FIRST
+    JOIN path ON path.p = refs.match_path
+    ORDER BY public_path, content_type, title_ar, source, revision_number NULLS FIRST
     `,
-    [publicPath],
+    [paths],
   );
 
   const seen = new Set<string>();
-  const out: MediaReference[] = [];
   for (const row of result.rows) {
-    const key = `${row.content_item_id}|${row.source}|${row.revision_id ?? ""}`;
+    const key = `${row.public_path}|${row.content_item_id}|${row.source}|${row.revision_id ?? ""}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    out.push(toReference(row));
+    const list = out.get(row.public_path) ?? [];
+    list.push(toReference(row));
+    out.set(row.public_path, list);
   }
   return out;
 }

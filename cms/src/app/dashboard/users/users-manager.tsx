@@ -5,6 +5,15 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import type { ContentType, ManagedUser, OrgUnit, UserRole } from "@/lib/users";
+import {
+  contentTypeLabel,
+  localizedDisplayName,
+  roleLabel,
+  statusLabel,
+  t,
+  tf,
+} from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 const CONTENT_TYPES: ContentType[] = [
   "news",
@@ -38,12 +47,17 @@ function catalogUnion(orgIds: string[], units: OrgUnit[]): Set<ContentType> {
   const set = new Set<ContentType>();
   for (const id of orgIds) {
     const o = units.find((u) => u.id === id);
-    for (const t of o?.content_types ?? []) set.add(t);
+    for (const ct of o?.content_types ?? []) set.add(ct);
   }
   return set;
 }
 
+function orgUnitName(o: OrgUnit, lang: "en" | "ar"): string {
+  return lang === "ar" ? o.name_ar : o.name_en || o.name_ar;
+}
+
 export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props) {
+  const lang = useCmsLang();
   const router = useRouter();
   const [users, setUsers] = useState(initialUsers);
   const [orgUnits, setOrgUnits] = useState(initialOrgUnits);
@@ -103,13 +117,13 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        const msg = data.error ?? "Create failed";
+        const msg = data.error ?? t("usersCreateFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
-      setMessage("User created.");
-      cmsToast.success("User created.");
+      setMessage(t("usersCreated", lang));
+      cmsToast.success(t("usersCreated", lang));
       setEmail("");
       setPassword("");
       setDisplayName("");
@@ -135,14 +149,14 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        const msg = data.error ?? "Update failed";
+        const msg = data.error ?? t("usersUpdateFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return false;
       }
       if (body.action !== "delete") {
-        setMessage("Updated.");
-        cmsToast.success("Updated.");
+        setMessage(t("usersUpdated", lang));
+        cmsToast.success(t("usersUpdated", lang));
       }
       await refresh();
       return true;
@@ -162,7 +176,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
       const res = await fetch(`/api/users/${u.id}/delete-impact`);
       const data = (await res.json()) as { ok: boolean; impact?: DeleteImpact; error?: string };
       if (!res.ok || !data.ok || !data.impact) {
-        const msg = data.error ?? "Could not load delete impact";
+        const msg = data.error ?? t("usersDeleteImpactFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         setDeleteTarget(null);
@@ -187,8 +201,8 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
       if (ok) {
         setDeleteTarget(null);
         setDeleteImpact(null);
-        setMessage("User deleted.");
-        cmsToast.success("User deleted.");
+        setMessage(t("usersDeleted", lang));
+        cmsToast.success(t("usersDeleted", lang));
       }
     } finally {
       setPending(false);
@@ -211,17 +225,19 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
   }
 
   const orgLabel = useMemo(() => {
-    const map = new Map(orgUnits.map((o) => [o.id, o.name_en]));
+    const map = new Map(
+      orgUnits.map((o) => [o.id, orgUnitName(o, lang)]),
+    );
     return (ids: string[]) => ids.map((id) => map.get(id) ?? id).join(", ") || "—";
-  }, [orgUnits]);
+  }, [orgUnits, lang]);
 
   /** Global editor content-type claims derived from current users. */
   const claimByType = useMemo(() => {
     const map = new Map<ContentType, { id: string; email: string }>();
     for (const u of users) {
       if (u.role !== "editor") continue;
-      for (const t of u.content_types) {
-        map.set(t, { id: u.id, email: u.email });
+      for (const ct of u.content_types) {
+        map.set(ct, { id: u.id, email: u.email });
       }
     }
     return map;
@@ -247,18 +263,21 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
       {message ? <p className="text-sm text-green-700">{message}</p> : null}
 
       <p className="text-sm text-crs-muted">
-        Manage organisation units on the{" "}
-        <Link href="/dashboard/org-units" className="underline">
-          Org scopes
-        </Link>{" "}
-        page.
+        {t("usersOrgUnitsHint", lang)}{" "}
+        <Link href="/dashboard/org-units" className="font-medium text-crs-primary hover:underline">
+          {t("usersOrgUnitsLink", lang)}
+        </Link>
+        .
       </p>
 
-      <form onSubmit={createUser} className="grid gap-3 cms-form rounded-2xl border border-crs-border bg-crs-surface p-6 shadow-sm">
-        <h2 className="text-lg font-medium text-crs-ink">Create user</h2>
+      <form
+        onSubmit={createUser}
+        className="grid gap-3 cms-form rounded-2xl border border-crs-border bg-crs-surface p-6 shadow-sm"
+      >
+        <h2 className="text-lg font-medium text-crs-ink">{t("usersCreateTitle", lang)}</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="text-sm">
-            <span className="font-medium">Email (login)</span>
+            <span className="font-medium">{t("usersEmail", lang)}</span>
             <input
               required
               type="email"
@@ -268,7 +287,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Temporary password</span>
+            <span className="font-medium">{t("usersTempPassword", lang)}</span>
             <input
               required
               type="text"
@@ -279,7 +298,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Display name</span>
+            <span className="font-medium">{t("usersDisplayName", lang)}</span>
             <input
               required
               value={displayName}
@@ -288,19 +307,19 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Role</span>
+            <span className="font-medium">{t("usersRole", lang)}</span>
             <select
               value={role}
               onChange={(e) => setRole(e.target.value as UserRole)}
               className="mt-1 w-full rounded border border-crs-border px-3 py-2"
             >
-              <option value="editor">Editor</option>
-              <option value="reviewer">Reviewer</option>
-              <option value="super_admin">Super Admin</option>
+              <option value="editor">{roleLabel("editor", lang)}</option>
+              <option value="reviewer">{roleLabel("reviewer", lang)}</option>
+              <option value="super_admin">{roleLabel("super_admin", lang)}</option>
             </select>
           </label>
           <label className="text-sm">
-            <span className="font-medium">Name (AR)</span>
+            <span className="font-medium">{t("profileNameAr", lang)}</span>
             <input
               dir="rtl"
               value={nameAr}
@@ -309,7 +328,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
             />
           </label>
           <label className="text-sm">
-            <span className="font-medium">Name (EN)</span>
+            <span className="font-medium">{t("profileNameEn", lang)}</span>
             <input
               value={nameEn}
               onChange={(e) => setNameEn(e.target.value)}
@@ -322,12 +341,10 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
           <div className="grid gap-4 sm:grid-cols-2">
             <fieldset className="text-sm">
               <legend className="font-medium">
-                {role === "reviewer" ? "Exclusive org scopes *" : "Org scopes *"}
+                {role === "reviewer" ? t("usersOrgsReviewer", lang) : t("usersOrgsEditor", lang)}
               </legend>
               {role === "reviewer" ? (
-                <p className="mt-1 text-xs text-crs-muted">
-                  Two reviewers cannot share the same org unit.
-                </p>
+                <p className="mt-1 text-xs text-crs-muted">{t("usersOrgsReviewerHint", lang)}</p>
               ) : null}
               <div className="mt-2 flex flex-col gap-1">
                 {orgUnits.map((o) => (
@@ -341,59 +358,47 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
                         );
                       }}
                     />
-                    <span>
-                      {o.name_en} <span className="text-crs-muted">({o.name_ar})</span>
-                    </span>
+                    <span>{orgUnitName(o, lang)}</span>
                   </label>
                 ))}
               </div>
             </fieldset>
             {showContentTypes ? (
               <fieldset className="text-sm">
-                <legend className="font-medium">Content types * (globally exclusive)</legend>
-                <p className="mt-1 text-xs text-crs-muted">
-                  Only types allowed by selected org catalogs. Two editors cannot share a type.
-                </p>
+                <legend className="font-medium">{t("usersContentTypes", lang)}</legend>
+                <p className="mt-1 text-xs text-crs-muted">{t("usersContentTypesHint", lang)}</p>
                 <div className="mt-2 flex flex-col gap-1">
-                  {CONTENT_TYPES.map((t) => {
-                    const claim = claimByType.get(t);
-                    const allowed = createAllowedTypes.has(t);
+                  {CONTENT_TYPES.map((ct) => {
+                    const claim = claimByType.get(ct);
+                    const allowed = createAllowedTypes.has(ct);
                     const blocked = Boolean(claim) || !allowed;
                     return (
                       <label
-                        key={t}
-                        className={`flex items-center gap-2 ${blocked && !contentTypes.includes(t) ? "text-crs-muted" : ""}`}
+                        key={ct}
+                        className={`flex items-center gap-2 ${blocked && !contentTypes.includes(ct) ? "text-crs-muted" : ""}`}
                       >
                         <input
                           type="checkbox"
-                          checked={contentTypes.includes(t)}
-                          disabled={pending || (blocked && !contentTypes.includes(t))}
+                          checked={contentTypes.includes(ct)}
+                          disabled={pending || (blocked && !contentTypes.includes(ct))}
                           onChange={(e) => {
                             setContentTypes((prev) =>
-                              e.target.checked ? [...prev, t] : prev.filter((x) => x !== t),
+                              e.target.checked ? [...prev, ct] : prev.filter((x) => x !== ct),
                             );
                           }}
                         />
-                        <span>
-                          {t}
-                          {!allowed ? " (not in org catalog)" : null}
-                          {claim ? ` (held by ${claim.email})` : null}
-                        </span>
+                        <span>{contentTypeLabel(ct, lang)}</span>
                       </label>
                     );
                   })}
                 </div>
               </fieldset>
             ) : (
-              <p className="text-sm text-crs-muted">
-                Reviewers review types from their org catalogs; orgs are exclusive.
-              </p>
+              <p className="text-sm text-crs-muted">{t("usersReviewerNoTypes", lang)}</p>
             )}
           </div>
         ) : (
-          <p className="text-sm text-crs-muted">
-            Super Admins automatically receive all org units and content types.
-          </p>
+          <p className="text-sm text-crs-muted">{t("usersSaAutoAccess", lang)}</p>
         )}
 
         <button
@@ -401,34 +406,43 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
           disabled={pending}
           className="w-fit rounded-lg bg-crs-primary hover:bg-crs-secondary px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
         >
-          {pending ? "Saving…" : "Create user"}
+          {pending ? t("usersCreating", lang) : t("usersCreate", lang)}
         </button>
       </form>
 
       <section className="overflow-x-auto rounded-2xl border border-crs-border bg-crs-surface shadow-sm">
-        <table className="min-w-full text-left text-sm">
+        <table className="min-w-full text-start text-sm">
           <thead className="border-b bg-crs-bg text-crs-muted">
             <tr>
-              <th className="px-3 py-2">User</th>
-              <th className="px-3 py-2">Role</th>
-              <th className="px-3 py-2">Scopes</th>
-              <th className="px-3 py-2">Status</th>
-              <th className="px-3 py-2">Actions</th>
+              <th className="px-3 py-2">{t("usersColUser", lang)}</th>
+              <th className="px-3 py-2">{t("usersColRole", lang)}</th>
+              <th className="px-3 py-2">{t("usersColAccess", lang)}</th>
+              <th className="px-3 py-2">{t("usersColStatus", lang)}</th>
+              <th className="px-3 py-2">{t("usersColActions", lang)}</th>
             </tr>
           </thead>
           <tbody>
             {users.map((u) => (
               <tr key={u.id} className="border-b last:border-0">
                 <td className="px-3 py-3 align-top">
-                  <div className="font-medium text-crs-ink">{u.display_name}</div>
+                  <div className="font-medium text-crs-ink">
+                    {localizedDisplayName(
+                      {
+                        displayName: u.display_name,
+                        nameAr: u.name_ar,
+                        nameEn: u.name_en,
+                      },
+                      lang,
+                    )}
+                  </div>
                   <div className="text-crs-muted">{u.email}</div>
                 </td>
-                <td className="px-3 py-3 align-top">{u.role}</td>
+                <td className="px-3 py-3 align-top">{roleLabel(u.role, lang)}</td>
                 <td className="px-3 py-3 align-top text-xs text-crs-muted">
                   {scopeEditId === u.id && (u.role === "editor" || u.role === "reviewer") ? (
                     <div className="grid max-w-xs gap-2">
                       <fieldset>
-                        <legend className="font-medium">Orgs</legend>
+                        <legend className="font-medium">{t("usersOrgsShort", lang)}</legend>
                         {orgUnits.map((o) => (
                           <label key={o.id} className="flex items-center gap-1">
                             <input
@@ -442,35 +456,33 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
                                 )
                               }
                             />
-                            {o.name_en}
+                            {orgUnitName(o, lang)}
                           </label>
                         ))}
                       </fieldset>
                       {u.role === "editor" ? (
                         <fieldset>
-                          <legend className="font-medium">Types (exclusive)</legend>
-                          {CONTENT_TYPES.map((t) => {
-                            const claim = claimByType.get(t);
+                          <legend className="font-medium">{t("usersTypesShort", lang)}</legend>
+                          {CONTENT_TYPES.map((ct) => {
+                            const claim = claimByType.get(ct);
                             const heldByOther = claim && claim.id !== u.id;
-                            const allowed = scopeAllowedTypes.has(t);
+                            const allowed = scopeAllowedTypes.has(ct);
                             const blocked = Boolean(heldByOther) || !allowed;
                             return (
-                              <label key={t} className="flex items-center gap-1">
+                              <label key={ct} className="flex items-center gap-1">
                                 <input
                                   type="checkbox"
-                                  checked={scopeTypes.includes(t)}
-                                  disabled={pending || (blocked && !scopeTypes.includes(t))}
+                                  checked={scopeTypes.includes(ct)}
+                                  disabled={pending || (blocked && !scopeTypes.includes(ct))}
                                   onChange={(e) =>
                                     setScopeTypes((prev) =>
                                       e.target.checked
-                                        ? [...prev, t]
-                                        : prev.filter((x) => x !== t),
+                                        ? [...prev, ct]
+                                        : prev.filter((x) => x !== ct),
                                     )
                                   }
                                 />
-                                {t}
-                                {!allowed ? " (catalog)" : null}
-                                {heldByOther ? ` (${claim.email})` : null}
+                                {contentTypeLabel(ct, lang)}
                               </label>
                             );
                           })}
@@ -483,25 +495,31 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
                           disabled={pending}
                           onClick={() => void saveScopes(u)}
                         >
-                          Save scopes
+                          {t("usersSaveAccess", lang)}
                         </button>
                         <button
                           type="button"
                           className="text-xs underline"
                           onClick={() => setScopeEditId(null)}
                         >
-                          Cancel
+                          {t("usersCancel", lang)}
                         </button>
                       </div>
                     </div>
                   ) : (
                     <>
                       <div>{orgLabel(u.org_unit_ids)}</div>
-                      <div>{u.content_types.join(", ") || "—"}</div>
+                      <div>
+                        {u.content_types.length > 0
+                          ? u.content_types.map((ct) => contentTypeLabel(ct, lang)).join(", ")
+                          : "—"}
+                      </div>
                     </>
                   )}
                 </td>
-                <td className="px-3 py-3 align-top">{u.is_active ? "Active" : "Inactive"}</td>
+                <td className="px-3 py-3 align-top">
+                  {u.is_active ? t("usersStatusActive", lang) : t("usersStatusInactive", lang)}
+                </td>
                 <td className="px-3 py-3 align-top">
                   <div className="flex flex-col gap-2">
                     <button
@@ -514,19 +532,21 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
                         })
                       }
                     >
-                      {u.is_active ? "Deactivate" : "Activate"}
+                      {u.is_active ? t("usersDeactivate", lang) : t("usersActivate", lang)}
                     </button>
                     <button
                       type="button"
                       disabled={pending}
                       className="rounded border px-2 py-1 text-xs"
                       onClick={() => {
-                        const next = window.prompt(`New password for ${u.email} (min 8 chars):`);
+                        const next = window.prompt(
+                          tf("usersResetPasswordPrompt", lang, { email: u.email }),
+                        );
                         if (!next) return;
                         void patchUser(u.id, { action: "reset_password", password: next });
                       }}
                     >
-                      Reset password
+                      {t("usersResetPassword", lang)}
                     </button>
                     {(u.role === "editor" || u.role === "reviewer") && scopeEditId !== u.id ? (
                       <button
@@ -535,7 +555,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
                         className="rounded border px-2 py-1 text-xs"
                         onClick={() => startScopeEdit(u)}
                       >
-                        Edit scopes
+                        {t("usersEditAccess", lang)}
                       </button>
                     ) : null}
                     <button
@@ -544,7 +564,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
                       className="rounded border border-red-300 px-2 py-1 text-xs text-red-700"
                       onClick={() => void openDelete(u)}
                     >
-                      Delete…
+                      {t("usersDelete", lang)}
                     </button>
                   </div>
                 </td>
@@ -557,21 +577,26 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
       {deleteTarget && deleteImpact ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg bg-white p-5 shadow-xl">
-            <h3 className="text-lg font-semibold text-crs-ink">Delete {deleteImpact.user.email}?</h3>
+            <h3 className="text-lg font-semibold text-crs-ink">
+              {tf("usersDeleteTitle", lang, { email: deleteImpact.user.email })}
+            </h3>
             <p className="mt-2 text-sm text-crs-muted">
-              Hard delete is destructive. Drafts ({deleteImpact.draftCount}) will be removed.
-              Non-draft items ({deleteImpact.nonDraftItems.length}) must be reassigned.
+              {tf("usersDeleteHint", lang, {
+                drafts: deleteImpact.draftCount,
+                items: deleteImpact.nonDraftItems.length,
+              })}
             </p>
             {deleteImpact.isLastSuperAdmin ? (
-              <p className="mt-2 text-sm text-red-600">Cannot delete the last active Super Admin.</p>
+              <p className="mt-2 text-sm text-red-600">{t("usersDeleteLastSa", lang)}</p>
             ) : null}
             {deleteImpact.nonDraftItems.length > 0 ? (
               <div className="mt-3">
-                <p className="text-sm font-medium">Reassign these items to:</p>
+                <p className="text-sm font-medium">{t("usersReassignTo", lang)}</p>
                 <ul className="mt-1 max-h-32 overflow-y-auto text-xs text-crs-muted">
                   {deleteImpact.nonDraftItems.map((i) => (
                     <li key={i.id}>
-                      [{i.status}] {i.contentType}: {i.title}
+                      [{statusLabel(i.status, lang)}] {contentTypeLabel(i.contentType, lang)}:{" "}
+                      {i.title}
                     </li>
                   ))}
                 </ul>
@@ -581,17 +606,25 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
                   onChange={(e) => setReassignTo(e.target.value)}
                   required
                 >
-                  <option value="">Select user…</option>
+                  <option value="">{t("usersSelectUser", lang)}</option>
                   {reassignCandidates.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.display_name} ({c.email}) — {c.role}
+                      {localizedDisplayName(
+                        {
+                          displayName: c.display_name,
+                          nameAr: c.name_ar,
+                          nameEn: c.name_en,
+                        },
+                        lang,
+                      )}{" "}
+                      ({c.email}) — {roleLabel(c.role, lang)}
                     </option>
                   ))}
                 </select>
               </div>
             ) : null}
             <label className="mt-3 block text-sm">
-              <span className="font-medium">Type email to confirm</span>
+              <span className="font-medium">{t("usersConfirmEmail", lang)}</span>
               <input
                 value={confirmEmail}
                 onChange={(e) => setConfirmEmail(e.target.value)}
@@ -611,7 +644,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
                 className="rounded bg-red-700 px-4 py-2 text-sm text-white disabled:opacity-50"
                 onClick={() => void confirmDelete()}
               >
-                {pending ? "Deleting…" : "Permanently delete"}
+                {pending ? t("usersDeleting", lang) : t("usersDeleteConfirm", lang)}
               </button>
               <button
                 type="button"
@@ -621,7 +654,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
                   setDeleteImpact(null);
                 }}
               >
-                Cancel
+                {t("usersCancel", lang)}
               </button>
             </div>
           </div>

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
+import { t } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 type Props = {
   src: string | null;
@@ -10,6 +12,7 @@ type Props = {
 
 /** Simple full-screen image lightbox (shadowbox). */
 export function MediaLightbox({ src, alt = "", onClose }: Props) {
+  const lang = useCmsLang();
   useEffect(() => {
     if (!src) return;
     function onKey(e: KeyboardEvent) {
@@ -30,7 +33,7 @@ export function MediaLightbox({ src, alt = "", onClose }: Props) {
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Image preview"
+      aria-label={t("imagePreview", lang)}
       className="fixed inset-0 z-[100] flex items-center justify-center bg-crs-ink/80 p-4"
       onClick={onClose}
     >

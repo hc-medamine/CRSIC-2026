@@ -9,6 +9,13 @@ import type {
   ManagedUser,
   OrgUnit,
 } from "@/lib/users";
+import {
+  contentTypeLabel,
+  localizedDisplayName,
+  t,
+  tf,
+} from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 const CONTENT_TYPES: ContentType[] = [
   "news",
@@ -31,9 +38,13 @@ function catalogUnion(orgIds: string[], units: OrgUnit[]): Set<ContentType> {
   const set = new Set<ContentType>();
   for (const id of orgIds) {
     const o = units.find((u) => u.id === id);
-    for (const t of o?.content_types ?? []) set.add(t);
+    for (const ct of o?.content_types ?? []) set.add(ct);
   }
   return set;
+}
+
+function orgUnitName(o: OrgUnit, lang: "en" | "ar"): string {
+  return lang === "ar" ? o.name_ar : o.name_en || o.name_ar;
 }
 
 export function EditorsScopeManager({
@@ -42,6 +53,7 @@ export function EditorsScopeManager({
   initialClaims,
   actorRole,
 }: Props) {
+  const lang = useCmsLang();
   const router = useRouter();
   const [editors, setEditors] = useState(initialEditors);
   const [orgUnits, setOrgUnits] = useState(initialOrgUnits);
@@ -56,9 +68,9 @@ export function EditorsScopeManager({
   });
 
   const orgName = useMemo(() => {
-    const map = new Map(orgUnits.map((o) => [o.id, o.name_en]));
+    const map = new Map(orgUnits.map((o) => [o.id, orgUnitName(o, lang)]));
     return (id: string) => map.get(id) ?? id;
-  }, [orgUnits]);
+  }, [orgUnits, lang]);
 
   const claimByType = useMemo(() => {
     const map = new Map<ContentType, EditorContentTypeClaim>();
@@ -100,13 +112,13 @@ export function EditorsScopeManager({
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        const msg = data.error ?? "Save failed";
+        const msg = data.error ?? t("editorsSaveFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
-      setMessage("Content types updated.");
-      cmsToast.success("Content types updated.");
+      setMessage(t("editorsSaved", lang));
+      cmsToast.success(t("editorsSaved", lang));
       await refresh();
     } finally {
       setPending(false);
@@ -116,16 +128,14 @@ export function EditorsScopeManager({
   return (
     <div className="flex flex-col gap-6">
       <p className="text-sm text-crs-muted">
-        {actorRole === "reviewer"
-          ? "Editors whose org scopes overlap yours. Content types are globally exclusive and must be in the org catalog."
-          : "All Editors. Prefer the full Users page for org scopes and account actions."}
+        {actorRole === "reviewer" ? t("editorsHintReviewer", lang) : t("editorsHintSa", lang)}
       </p>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       {message ? <p className="text-sm text-green-700">{message}</p> : null}
 
       {editors.length === 0 ? (
         <p className="rounded-lg border border-dashed border-crs-border p-6 text-sm text-crs-muted">
-          No assigned editors yet.
+          {t("editorsEmpty", lang)}
         </p>
       ) : (
         <ul className="grid gap-4">
@@ -137,31 +147,42 @@ export function EditorsScopeManager({
                 className="grid gap-3 rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm"
               >
                 <div>
-                  <p className="font-medium text-crs-ink">{ed.display_name}</p>
+                  <p className="font-medium text-crs-ink">
+                    {localizedDisplayName(
+                      {
+                        displayName: ed.display_name,
+                        nameAr: ed.name_ar,
+                        nameEn: ed.name_en,
+                      },
+                      lang,
+                    )}
+                  </p>
                   <p className="text-xs text-crs-muted">{ed.email}</p>
                   <p className="mt-1 text-xs text-crs-muted">
-                    Orgs:{" "}
+                    {t("editorsOrgs", lang)}:{" "}
                     {ed.org_unit_ids.map((id) => orgName(id)).join(", ") || "—"}
                   </p>
                 </div>
                 <fieldset className="text-sm">
-                  <legend className="font-medium">Content types</legend>
+                  <legend className="font-medium">{t("editorsContentTypes", lang)}</legend>
                   <div className="mt-2 flex flex-wrap gap-3">
-                    {CONTENT_TYPES.map((t) => {
-                      const checked = (draftTypes[ed.id] ?? []).includes(t);
-                      const claim = claimByType.get(t);
+                    {CONTENT_TYPES.map((ct) => {
+                      const checked = (draftTypes[ed.id] ?? []).includes(ct);
+                      const claim = claimByType.get(ct);
                       const heldByOther = claim && claim.editor_id !== ed.id;
-                      const inCatalog = allowed.has(t);
+                      const inCatalog = allowed.has(ct);
                       const blocked = Boolean(heldByOther) || !inCatalog;
                       return (
                         <label
-                          key={t}
+                          key={ct}
                           className={`flex items-center gap-1.5 ${blocked && !checked ? "text-crs-muted" : ""}`}
                           title={
                             !inCatalog
-                              ? "Not in org catalog"
+                              ? t("editorsTypeNotAvailable", lang)
                               : heldByOther
-                                ? `Held by ${claim.editor_email}`
+                                ? tf("editorsTypeHeldBy", lang, {
+                                    email: claim.editor_email,
+                                  })
                                 : undefined
                           }
                         >
@@ -175,13 +196,13 @@ export function EditorsScopeManager({
                                 return {
                                   ...prev,
                                   [ed.id]: e.target.checked
-                                    ? [...cur, t]
-                                    : cur.filter((x) => x !== t),
+                                    ? [...cur, ct]
+                                    : cur.filter((x) => x !== ct),
                                 };
                               });
                             }}
                           />
-                          <span>{t}</span>
+                          <span>{contentTypeLabel(ct, lang)}</span>
                         </label>
                       );
                     })}
@@ -193,7 +214,7 @@ export function EditorsScopeManager({
                   onClick={() => void save(ed.id)}
                   className="w-fit rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-1.5 text-sm text-white disabled:opacity-60"
                 >
-                  Save
+                  {t("editorsSave", lang)}
                 </button>
               </li>
             );

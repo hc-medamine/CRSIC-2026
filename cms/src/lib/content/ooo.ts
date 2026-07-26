@@ -78,10 +78,12 @@ export async function refreshUserFromDb(userId: string): Promise<SessionUser | n
     id: string;
     email: string;
     display_name: string;
+    name_ar: string | null;
+    name_en: string | null;
     role: "super_admin" | "editor" | "reviewer";
     is_active: boolean;
   }>(
-    `SELECT id, email, display_name, role, is_active FROM users WHERE id = $1`,
+    `SELECT id, email, display_name, name_ar, name_en, role, is_active FROM users WHERE id = $1`,
     [userId],
   );
   const row = result.rows[0];
@@ -90,6 +92,8 @@ export async function refreshUserFromDb(userId: string): Promise<SessionUser | n
     id: row.id,
     email: row.email,
     displayName: row.display_name,
+    nameAr: row.name_ar,
+    nameEn: row.name_en,
     role: row.role,
   };
 }
@@ -113,10 +117,16 @@ export async function assertNotAwayFrozen(user: SessionUser): Promise<void> {
 }
 
 export async function listActiveEditors(): Promise<
-  { id: string; display_name: string; email: string }[]
+  { id: string; display_name: string; name_ar: string | null; name_en: string | null; email: string }[]
 > {
-  const result = await query<{ id: string; display_name: string; email: string }>(
-    `SELECT id, display_name, email FROM users
+  const result = await query<{
+    id: string;
+    display_name: string;
+    name_ar: string | null;
+    name_en: string | null;
+    email: string;
+  }>(
+    `SELECT id, display_name, name_ar, name_en, email FROM users
      WHERE is_active = TRUE AND role = 'editor'
      ORDER BY display_name ASC`,
   );
@@ -236,6 +246,8 @@ export async function getAwayState(userId: string): Promise<{
   awayUntil: string | null;
   awayDelegateUserId: string | null;
   awayDelegateName: string | null;
+  awayDelegateNameAr: string | null;
+  awayDelegateNameEn: string | null;
 }> {
   await clearAwayIfExpired(userId);
   const result = await query<{
@@ -243,8 +255,13 @@ export async function getAwayState(userId: string): Promise<{
     away_until: Date | null;
     away_delegate_user_id: string | null;
     delegate_name: string | null;
+    delegate_name_ar: string | null;
+    delegate_name_en: string | null;
   }>(
-    `SELECT u.is_away, u.away_until, u.away_delegate_user_id, d.display_name AS delegate_name
+    `SELECT u.is_away, u.away_until, u.away_delegate_user_id,
+            d.display_name AS delegate_name,
+            d.name_ar AS delegate_name_ar,
+            d.name_en AS delegate_name_en
      FROM users u
      LEFT JOIN users d ON d.id = u.away_delegate_user_id
      WHERE u.id = $1`,
@@ -256,6 +273,8 @@ export async function getAwayState(userId: string): Promise<{
     awayUntil: row?.away_until?.toISOString() ?? null,
     awayDelegateUserId: row?.away_delegate_user_id ?? null,
     awayDelegateName: row?.delegate_name ?? null,
+    awayDelegateNameAr: row?.delegate_name_ar ?? null,
+    awayDelegateNameEn: row?.delegate_name_en ?? null,
   };
 }
 

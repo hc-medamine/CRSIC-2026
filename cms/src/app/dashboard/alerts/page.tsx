@@ -20,14 +20,14 @@ export default async function AlertsListPage() {
         { label: t("alerts", lang) },
       ]}
       title={t("alerts", lang)}
-      subtitle="At most one alert is live at a time"
+      subtitle={t("pageDescAlerts", lang)}
       newHref="/dashboard/alerts/new"
-      newLabel="New alert"
-      emptyLabel="No alerts yet."
+      newLabel={t("newAlert", lang)}
+      emptyLabel={t("emptyAlerts", lang)}
       items={items.map((item) => ({
         id: item.id,
         href: `/dashboard/alerts/${item.id}`,
-        title: item.title_ar || "(untitled)",
+        title: item.title_ar || t("untitled", lang),
         status: item.status,
         enStatus: item.en_status,
         updatedAt: item.updated_at,

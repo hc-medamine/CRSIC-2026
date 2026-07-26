@@ -6,6 +6,8 @@ import { cmsMediaSrc, isPdfPath } from "@/lib/media/cms-src";
 import type { PublicMediaItem } from "@/lib/publish/media";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { MediaLightbox } from "./media-lightbox";
+import { t } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 type Props = {
   bucket: MediaBucket;
@@ -15,6 +17,7 @@ type Props = {
 };
 
 export function MediaAttachmentsField({ bucket, items, disabled, onChange }: Props) {
+  const lang = useCmsLang();
   const inputRef = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +40,7 @@ export function MediaAttachmentsField({ bucket, items, disabled, onChange }: Pro
           asset?: { publicPath: string; mimeType?: string };
         };
         if (!res.ok || !data.ok || !data.asset) {
-          const msg = data.error ?? "Upload failed";
+          const msg = data.error ?? t("uploadFailed", lang);
           setError(msg);
           cmsToast.error(msg);
           return;
@@ -47,13 +50,13 @@ export function MediaAttachmentsField({ bucket, items, disabled, onChange }: Pro
             ? "pdf"
             : "image";
         onChange([...items, { kind, src: data.asset.publicPath }]);
-        cmsToast.success("Uploaded.");
+        cmsToast.success(t("uploadedShort", lang));
       } finally {
         setPending(false);
         if (inputRef.current) inputRef.current.value = "";
       }
     },
-    [bucket, disabled, items, onChange],
+    [bucket, disabled, items, lang, onChange],
   );
 
   function removeAt(index: number) {
@@ -77,10 +80,8 @@ export function MediaAttachmentsField({ bucket, items, disabled, onChange }: Pro
 
   return (
     <div className="grid gap-3 text-sm">
-      <p className="font-medium text-crs-ink">Attachments (images + PDFs)</p>
-      <p className="text-xs text-crs-muted">
-        First image is the public card cover. Max 5 MB each · JPEG / PNG / WebP / PDF.
-      </p>
+      <p className="font-medium text-crs-ink">{t("attachmentsTitle", lang)}</p>
+      <p className="text-xs text-crs-muted">{t("attachmentsHint", lang)}</p>
 
       <div
         onDragOver={(e) => {
@@ -94,10 +95,10 @@ export function MediaAttachmentsField({ bucket, items, disabled, onChange }: Pro
         } ${disabled ? "opacity-60" : ""}`}
       >
         <p className="text-sm font-medium text-crs-ink">
-          {pending ? "Uploading…" : "Drag & drop a file here"}
+          {pending ? t("uploading", lang) : t("dragDropFile", lang)}
         </p>
         <p className="text-xs text-crs-muted">
-          Max 5 MB · JPEG / PNG / WebP / PDF ·{" "}
+          {t("attachmentsFormatsHint", lang)}{" "}
           <code className="text-[11px]">img/cms/{bucket}/…</code>
         </p>
         <button
@@ -106,7 +107,7 @@ export function MediaAttachmentsField({ bucket, items, disabled, onChange }: Pro
           onClick={() => inputRef.current?.click()}
           className="mt-1 inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 text-sm font-medium text-crs-ink hover:bg-crs-bg disabled:opacity-60"
         >
-          Browse files
+          {t("browseFiles", lang)}
         </button>
         <input
           ref={inputRef}
@@ -119,7 +120,7 @@ export function MediaAttachmentsField({ bucket, items, disabled, onChange }: Pro
       </div>
 
       {items.length === 0 ? (
-        <p className="text-xs text-crs-muted">No attachments yet.</p>
+        <p className="text-xs text-crs-muted">{t("noAttachments", lang)}</p>
       ) : (
         <ul className="grid gap-2">
           {items.map((item, i) => {
@@ -139,7 +140,7 @@ export function MediaAttachmentsField({ bucket, items, disabled, onChange }: Pro
                     type="button"
                     className="shrink-0 overflow-hidden rounded-lg ring-1 ring-crs-border"
                     onClick={() => setLightboxSrc(src)}
-                    aria-label="Open image preview"
+                    aria-label={t("openImagePreview", lang)}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt="" className="h-16 w-16 object-cover" />
@@ -148,7 +149,7 @@ export function MediaAttachmentsField({ bucket, items, disabled, onChange }: Pro
                 <div className="min-w-0 flex-1">
                   <p className="text-[11px] uppercase text-crs-muted">
                     {item.kind}
-                    {i === 0 && item.kind === "image" ? " · card cover" : ""}
+                    {i === 0 && item.kind === "image" ? t("cardCoverSuffix", lang) : ""}
                   </p>
                   <p className="break-all text-xs text-crs-ink">{item.src}</p>
                 </div>
@@ -175,7 +176,7 @@ export function MediaAttachmentsField({ bucket, items, disabled, onChange }: Pro
                     className="min-h-9 rounded-lg border border-red-200 px-2 text-xs text-red-700"
                     onClick={() => removeAt(i)}
                   >
-                    Remove
+                    {t("actionRemove", lang)}
                   </button>
                 </span>
               </li>

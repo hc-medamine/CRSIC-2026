@@ -5,6 +5,8 @@ import type { MediaBucket } from "@/lib/media/config";
 import { cmsMediaSrc } from "@/lib/media/cms-src";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { MediaLightbox } from "./media-lightbox";
+import { t } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 type Props = {
   bucket: MediaBucket;
@@ -22,9 +24,11 @@ export function MediaUploadField({
   mediaId,
   disabled,
   imagesOnly = true,
-  label = "Image",
+  label,
   onUploaded,
 }: Props) {
+  const lang = useCmsLang();
+  const resolvedLabel = label ?? t("fieldImage", lang);
   const inputRef = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,19 +61,19 @@ export function MediaUploadField({
           asset?: { id: string; publicPath: string };
         };
         if (!res.ok || !data.ok || !data.asset) {
-          const msg = data.error ?? "Upload failed";
+          const msg = data.error ?? t("uploadFailed", lang);
           setError(msg);
           cmsToast.error(msg);
           return;
         }
         onUploaded({ publicPath: data.asset.publicPath, mediaId: data.asset.id });
-        cmsToast.success("Uploaded.");
+        cmsToast.success(t("uploadedShort", lang));
       } finally {
         setPending(false);
         if (inputRef.current) inputRef.current.value = "";
       }
     },
-    [bucket, disabled, imagesOnly, mediaId, onUploaded],
+    [bucket, disabled, imagesOnly, lang, mediaId, onUploaded],
   );
 
   function onDrop(e: DragEvent) {
@@ -81,7 +85,7 @@ export function MediaUploadField({
 
   return (
     <div className="grid gap-3 text-sm">
-      <p className="font-medium text-crs-ink">{label}</p>
+      <p className="font-medium text-crs-ink">{resolvedLabel}</p>
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -94,10 +98,11 @@ export function MediaUploadField({
         } ${disabled ? "opacity-60" : ""}`}
       >
         <p className="text-sm font-medium text-crs-ink">
-          {pending ? "Uploading…" : "Drag & drop a file here"}
+          {pending ? t("uploading", lang) : t("dragDropFile", lang)}
         </p>
         <p className="text-xs text-crs-muted">
-          Max 5 MB · {imagesOnly ? "JPEG / PNG / WebP" : "JPEG / PNG / WebP / PDF"} ·{" "}
+          {t("max5mbPrefix", lang)}{" "}
+          {imagesOnly ? t("imagesOnlyFormats", lang) : t("imagesPdfFormats", lang)} ·{" "}
           <code className="text-[11px]">img/cms/{bucket}/…</code>
         </p>
         <button
@@ -106,7 +111,7 @@ export function MediaUploadField({
           onClick={() => inputRef.current?.click()}
           className="mt-1 inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 text-sm font-medium text-crs-ink hover:bg-crs-bg disabled:opacity-60"
         >
-          Browse files
+          {t("browseFiles", lang)}
         </button>
         <input
           ref={inputRef}
@@ -128,7 +133,7 @@ export function MediaUploadField({
               type="button"
               className="overflow-hidden rounded-xl ring-1 ring-crs-border"
               onClick={() => setLightboxSrc(previewSrc)}
-              aria-label="Open image preview"
+              aria-label={t("openImagePreview", lang)}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={previewSrc} alt="" className="h-20 w-20 object-cover" />

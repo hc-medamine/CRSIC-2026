@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { formatDateTime } from "@/lib/format-datetime";
+import { t, tf } from "@/lib/i18n/labels";
+import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 type Props = {
   contentItemId: string;
@@ -12,6 +14,7 @@ type Props = {
 };
 
 export function EscalatePanel({ contentItemId, canEscalate, escalatedAt }: Props) {
+  const lang = useCmsLang();
   const router = useRouter();
   const [note, setNote] = useState("");
   const [pending, setPending] = useState(false);
@@ -21,7 +24,7 @@ export function EscalatePanel({ contentItemId, canEscalate, escalatedAt }: Props
   if (!canEscalate) {
     return escalatedAt ? (
       <p className="text-xs text-amber-800">
-        Escalated at {formatDateTime(escalatedAt)}
+        {tf("escalateAt", lang, { when: formatDateTime(escalatedAt) })}
       </p>
     ) : null;
   }
@@ -38,13 +41,13 @@ export function EscalatePanel({ contentItemId, canEscalate, escalatedAt }: Props
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!res.ok || !data.ok) {
-        const msg = data.error ?? "Escalate failed";
+        const msg = data.error ?? t("escalateFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
-      setMessage("Escalated to Super Admin.");
-      cmsToast.success("Escalated to Super Admin.");
+      setMessage(t("escalateSuccess", lang));
+      cmsToast.success(t("escalateSuccess", lang));
       setNote("");
       router.refresh();
     } finally {
@@ -54,13 +57,11 @@ export function EscalatePanel({ contentItemId, canEscalate, escalatedAt }: Props
 
   return (
     <section className="grid gap-2 rounded-lg border border-amber-200 bg-amber-50 p-4">
-      <h2 className="text-lg font-medium text-amber-950">Escalate</h2>
-      <p className="text-xs text-amber-900">
-        Notify Super Admin and add a note to the comment thread. Note is required.
-      </p>
+      <h2 className="text-lg font-medium text-amber-950">{t("escalateTitle", lang)}</h2>
+      <p className="text-xs text-amber-900">{t("escalateHint", lang)}</p>
       {escalatedAt ? (
         <p className="text-xs text-amber-800">
-          Last escalated: {formatDateTime(escalatedAt)}
+          {tf("escalateLastAt", lang, { when: formatDateTime(escalatedAt) })}
         </p>
       ) : null}
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
@@ -69,7 +70,7 @@ export function EscalatePanel({ contentItemId, canEscalate, escalatedAt }: Props
         value={note}
         onChange={(e) => setNote(e.target.value)}
         rows={2}
-        placeholder="Why escalate?"
+        placeholder={t("escalatePlaceholder", lang)}
         className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
         disabled={pending}
       />
@@ -79,7 +80,7 @@ export function EscalatePanel({ contentItemId, canEscalate, escalatedAt }: Props
         onClick={() => void escalate()}
         className="w-fit rounded border border-amber-700 px-3 py-1.5 text-sm text-amber-950 disabled:opacity-60"
       >
-        {pending ? "Escalating…" : "Escalate to Super Admin"}
+        {pending ? t("escalatePending", lang) : t("escalateAction", lang)}
       </button>
     </section>
   );

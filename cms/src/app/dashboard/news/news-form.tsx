@@ -181,7 +181,7 @@ export function NewsEditorForm({
         cmsToast.error(msg);
         return;
       }
-      cmsToast.success("Draft created.");
+      cmsToast.success(t("draftCreated", lang));
       router.push(`/dashboard/news/${data.item.id}`);
       router.refresh();
     } finally {
@@ -193,7 +193,7 @@ export function NewsEditorForm({
     if (!initial?.id) return;
     if (action === "delete") {
       const ok = window.confirm(
-        "Permanently delete this item? This cannot be undone.",
+        t("confirmDelete", lang),
       );
       if (!ok) return;
     }
@@ -263,7 +263,7 @@ export function NewsEditorForm({
             >
               {orgUnits.map((o) => (
                 <option key={o.id} value={o.id}>
-                  {o.name_en} ({o.name_ar})
+                  {lang === "ar" ? o.name_ar : o.name_en || o.name_ar}
                 </option>
               ))}
             </select>
@@ -305,7 +305,7 @@ export function NewsEditorForm({
 
         <FormSection step={2} title={t("sectionBody", lang)}>
           <RichBodyEditor
-            label=t("fieldBodyAr", lang)
+            label={t("fieldBodyAr", lang)}
             dir="rtl"
             disabled={!editable}
             value={bodyAr}
@@ -320,7 +320,7 @@ export function NewsEditorForm({
             mediaId={imageMediaId}
             disabled={!editable}
             imagesOnly
-            label="News image (primary)"
+            label={t("fieldNewsImage", lang)}
             onUploaded={({ publicPath, mediaId }) => {
               setImagePath(publicPath);
               setImageMediaId(mediaId);
@@ -386,7 +386,7 @@ export function NewsEditorForm({
             />
           </label>
           <RichBodyEditor
-            label="Body (EN)"
+            label={t("fieldBodyEn", lang)}
             dir="ltr"
             disabled={!editable}
             value={bodyEn}
@@ -409,7 +409,7 @@ export function NewsEditorForm({
               value={publicSlug}
               onChange={(e) => setPublicSlug(e.target.value)}
               className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink font-mono text-xs"
-              placeholder=t("fieldPublicSlugPh", lang)
+              placeholder={t("fieldPublicSlugPh", lang)}
             />
           </label>
           <label className="text-sm">
@@ -500,7 +500,7 @@ export function NewsEditorForm({
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder=t("actionNotePlaceholder", lang)
+            placeholder={t("actionNotePlaceholder", lang)}
             className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             rows={2}
           />
