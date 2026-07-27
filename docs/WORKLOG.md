@@ -19,6 +19,14 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-07-27 — README stack drift fix (docs)
+
+**Done:** Corrected root README to describe the dual product (public SPA + `cms/`), root `package.json` / `npm run spa`, `PREVIEW_API_BASE`, ports 5500 vs 5501, SPA unit tests, and CMS Node/Postgres setup pointers. Removed outdated claims (no `package.json`, Git not initialised, SPA “no tests”).
+
+**Files:** `README.md`, `docs/WORKLOG.md`
+
+**Next:** (none)
+
 ### 2026-07-26 — RTL/LTR ops hardening (SPA + CMS)
 
 **Ops/hardening** (no PRD). Logical CSS sweep on public `css/style.css`; CSS-driven CTA arrows (locale strings de-arrowed); scroll progress mirrors reading direction; contact BiDi isolation; CMS Tajawal + sync `<html lang/dir>` from chrome. QA + authoring guide: [qa/RTL-LTR.md](./qa/RTL-LTR.md). Org chart: **Option A** (flip with language / natural `dir`).
