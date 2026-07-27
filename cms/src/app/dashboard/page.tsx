@@ -22,6 +22,8 @@ const CREATE_LABEL_KEY: Record<ContentType, string> = {
   alert: "alerts",
   research_group: "researchGroups",
   research_project: "researchProjects",
+  law: "laws",
+  platform: "platforms",
 };
 
 export default async function DashboardPage() {

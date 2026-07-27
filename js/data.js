@@ -25,6 +25,12 @@ let news = [];
 let researchGroups = [];
 /** @type {object[]} */
 let researchProjects = [];
+/** @type {object[]} */
+let laws = [];
+/** @type {object[]} */
+let platforms = [];
+/** @type {object | null} */
+let director = null;
 
 /** @type {Record<string, string>} resource key → error message */
 const loadErrors = {};
@@ -100,6 +106,18 @@ export function loadData() {
       }),
       loadResource('researchProjects', 'research-projects.json', (data) => {
         researchProjects = Array.isArray(data.items) ? data.items : [];
+      }),
+      loadResource('laws', 'laws.json', (data) => {
+        laws = Array.isArray(data.laws) ? data.laws : [];
+      }),
+      loadResource('platforms', 'platforms.json', (data) => {
+        platforms = Array.isArray(data.platforms) ? data.platforms : [];
+      }),
+      loadResource('director', 'director.json', (data) => {
+        director =
+          data && typeof data === 'object' && typeof data.quote_ar === 'string'
+            ? data
+            : null;
       }),
     ]);
 
@@ -297,4 +315,29 @@ export function findPublicationByKey(key) {
 /** @param {number} i */
 export function getCoverForPub(i) {
   return covers[i] || '';
+}
+
+
+export function getLaws() {
+  return laws;
+}
+
+export function getPlatforms() {
+  return platforms;
+}
+
+/** @returns {object | null} */
+export function getDirector() {
+  return director;
+}
+
+export function findPlatformByKey(key) {
+  const k = String(key || '');
+  return platforms.find((p) => p && (p.slug === k || p.id === k)) || null;
+}
+
+/** @param {string} key slug or id */
+export function findLawByKey(key) {
+  const k = decodeURIComponent(String(key || ''));
+  return laws.find((p) => p && (p.slug === k || p.id === k)) || null;
 }

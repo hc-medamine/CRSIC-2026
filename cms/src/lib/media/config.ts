@@ -6,7 +6,10 @@ export type MediaBucket =
   | "covers"
   | "partners"
   | "research"
-  | "alerts";
+  | "alerts"
+  | "laws"
+  | "platforms"
+  | "site";
 
 export const MEDIA_BUCKETS: MediaBucket[] = [
   "news",
@@ -15,6 +18,9 @@ export const MEDIA_BUCKETS: MediaBucket[] = [
   "partners",
   "research",
   "alerts",
+  "laws",
+  "platforms",
+  "site",
 ];
 
 /** MIME → canonical extension (allowlist) */

@@ -14,6 +14,7 @@
     href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/motion.css">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Organization","name":"مركز البحث في العلوم الإسلامية والحضارة","url":"https://crsic.dz","logo":"img/crsic_logo.png","email":"contact@crsic.dz","telephone":"+21329146190","address":{"@type":"PostalAddress","addressLocality":"الأغواط","addressCountry":"DZ"}}
   </script>
@@ -152,8 +153,27 @@
         </div>
       </li>
 
-      <li>
-        <a href="#" data-page="journals" data-i18n="nav_journals">المجلات العلمية</a>
+      <!-- الموارد — Laws & Platforms -->
+      <li class="has-mega" id="ddResources">
+        <a href="#" data-page="laws" aria-haspopup="true" aria-expanded="false" data-i18n="nav_resources">
+          الموارد <span class="drop-arrow" aria-hidden="true">▾</span>
+        </a>
+        <div class="mega-panel mega-panel--single" role="region">
+          <a href="#" data-page="laws" class="mega-link">
+            <div class="mega-icon" aria-hidden="true">📜</div>
+            <div>
+              <div class="mega-text-label" data-i18n="nav_laws">القوانين والمراسيم</div>
+              <div class="mega-text-sub" data-i18n="nav_laws_sub">النصوص التنظيمية للمركز</div>
+            </div>
+          </a>
+          <a href="#" data-page="platforms" class="mega-link">
+            <div class="mega-icon" aria-hidden="true">📡</div>
+            <div>
+              <div class="mega-text-label" data-i18n="nav_platforms">المنصات</div>
+              <div class="mega-text-sub" data-i18n="nav_platforms_sub">مرئية · إذاعية · تنقل</div>
+            </div>
+          </a>
+        </div>
       </li>
     </ul>
 
@@ -228,7 +248,7 @@
         >
           <source src="img/Hero/hero-bg.mp4" type="video/mp4" />
         </video>
-        <div class="hero-inner">
+        <div class="hero-inner section-shell section-shell--flush">
           <div class="hero-eyebrow">
             <div class="hero-eyebrow-dot"></div>
             <span data-i18n="hero_eyebrow">مؤسسة عمومية ذات طابع علمي وتكنولوجي · وزارة التعليم العالي والبحث
@@ -248,93 +268,88 @@
           preserveAspectRatio="none" aria-hidden="true">
           <path
             d="M0 48C300 48 300 14 600 14C900 14 900 48 1200 48V48H0Z"
-            fill="#FAF8F3" />
+            fill="var(--cream)" />
         </svg>
       </section>
 
-      <!-- STATS -->
-      <div class="stats-bar">
-        <a class="stat" href="#" data-page="about" style="text-decoration:none;">
-          <span class="stat-num">2015</span>
-          <span class="stat-label" data-i18n-html="stat1_label">سنة التأسيس بموجب<br>المرسوم التنفيذي 15-136</span>
-          <span class="stat-accent"></span>
-        </a>
-        <a class="stat" href="#" data-page="research" style="text-decoration:none;">
-          <span class="stat-num">+40</span>
-          <span class="stat-label" data-i18n-html="stat2_label">باحثاً دائماً في<br>تخصصات متعددة</span>
-          <span class="stat-accent"></span>
-        </a>
-        <a class="stat" href="#" data-page="research" style="text-decoration:none;">
-          <span class="stat-num">4</span>
-          <span class="stat-label" data-i18n-html="stat3_label">أقسام بحثية<br>و8 فرق بحثية</span>
-          <span class="stat-accent"></span>
-        </a>
-        <a class="stat" href="#" data-page="publications" style="text-decoration:none;">
-          <span class="stat-num">+45</span>
-          <span class="stat-label" data-i18n-html="stat4_label">إصداراً علمياً<br>و4 مجلات محكمة</span>
-          <span class="stat-accent"></span>
-        </a>
+      <!-- STATS (classic placement under hero) -->
+      <div class="stats-bar stats-bar--soft">
+        <div class="section-shell stats-bar-inner">
+          <a class="stat" href="#" data-page="about">
+            <span class="stat-num">2015</span>
+            <span class="stat-label" data-i18n-html="stat1_label">سنة التأسيس بموجب<br>المرسوم التنفيذي 15-136</span>
+          </a>
+          <a class="stat" href="#" data-page="research">
+            <span class="stat-num">+40</span>
+            <span class="stat-label" data-i18n-html="stat2_label">باحثاً دائماً في<br>تخصصات متعددة</span>
+          </a>
+          <a class="stat" href="#" data-page="research">
+            <span class="stat-num">4</span>
+            <span class="stat-label" data-i18n-html="stat3_label">أقسام بحثية<br>و8 فرق بحثية</span>
+          </a>
+          <a class="stat" href="#" data-page="publications">
+            <span class="stat-num">+45</span>
+            <span class="stat-label" data-i18n-html="stat4_label">إصداراً علمياً<br>و4 مجلات محكمة</span>
+          </a>
+        </div>
       </div>
 
       <!-- DEPARTMENTS -->
       <section class="departments">
-        <div class="section-label" aria-hidden="true" data-i18n="dept_section_title">أقسام البحث العلمي</div>
-        <h2 class="section-title mb3" data-i18n="dept_section_h2">أقسام البحث العلمي</h2>
-        <div class="dept-grid">
-          <div class="dept-card" data-page="research" data-tab="r1"
-            role="button" tabindex="0">
-            <div class="dept-icon">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path d="M9 1L17 5V13L9 17L1 13V5L9 1Z" stroke="#1B4332" stroke-width="1.2" fill="none" />
-                <circle cx="9" cy="9" r="2.5" fill="#C9A84C" />
-              </svg>
+        <div class="section-shell">
+          <h2 class="section-title mb3" data-i18n="dept_section_h2">أقسام البحث العلمي</h2>
+          <div class="dept-grid">
+            <div class="dept-card" data-page="research" data-tab="r1" role="button" tabindex="0">
+              <div class="dept-icon">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M9 1L17 5V13L9 17L1 13V5L9 1Z" stroke="#1B4332" stroke-width="1.2" fill="none" />
+                  <circle cx="9" cy="9" r="2.5" fill="#C9A84C" />
+                </svg>
+              </div>
+              <div>
+                <div class="dept-name" data-i18n="dept1_name">الدراسات القرآنية والفقهية</div>
+                <div class="dept-desc" data-i18n="dept1_desc">التأصيل العلمي والاجتهاد القضائي والفقه الإسلامي</div>
+              </div>
             </div>
-            <div>
-              <div class="dept-name" data-i18n="dept1_name">الدراسات القرآنية والفقهية</div>
-              <div class="dept-desc" data-i18n="dept1_desc">التأصيل العلمي والاجتهاد القضائي والفقه الإسلامي</div>
+            <div class="dept-card" data-page="research" data-tab="r2" role="button" tabindex="0">
+              <div class="dept-icon">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <rect x="2" y="3" width="14" height="12" rx="1.5" stroke="#1B4332" stroke-width="1.2" fill="none" />
+                  <line x1="5" y1="8" x2="13" y2="8" stroke="#C9A84C" stroke-width="1.2" />
+                  <line x1="5" y1="11" x2="10" y2="11" stroke="#C9A84C" stroke-width="1" />
+                </svg>
+              </div>
+              <div>
+                <div class="dept-name" data-i18n="dept2_name">الفكر والعقيدة والحوار مع الغير</div>
+                <div class="dept-desc" data-i18n="dept2_desc">الأمن الفكري وقضايا التسامح والتعايش السلمي</div>
+              </div>
             </div>
-          </div>
-          <div class="dept-card" data-page="research" data-tab="r2"
-            role="button" tabindex="0">
-            <div class="dept-icon">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <rect x="2" y="3" width="14" height="12" rx="1.5" stroke="#1B4332" stroke-width="1.2" fill="none" />
-                <line x1="5" y1="8" x2="13" y2="8" stroke="#C9A84C" stroke-width="1.2" />
-                <line x1="5" y1="11" x2="10" y2="11" stroke="#C9A84C" stroke-width="1" />
-              </svg>
+            <div class="dept-card" data-page="research" data-tab="r3" role="button" tabindex="0">
+              <div class="dept-icon">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <circle cx="9" cy="9" r="7" stroke="#1B4332" stroke-width="1.2" fill="none" />
+                  <path d="M9 2C6.5 5 6.5 13 9 16" stroke="#C9A84C" stroke-width="1" fill="none" />
+                  <line x1="2" y1="9" x2="16" y2="9" stroke="#1B4332" stroke-width="0.8" />
+                </svg>
+              </div>
+              <div>
+                <div class="dept-name" data-i18n="dept3_name">التاريخ الثقافي للجزائر</div>
+                <div class="dept-desc" data-i18n="dept3_desc">المخطوطات والتراث الوطني لفترة الاحتلال الفرنسي</div>
+              </div>
             </div>
-            <div>
-              <div class="dept-name" data-i18n="dept2_name">الفكر والعقيدة والحوار مع الغير</div>
-              <div class="dept-desc" data-i18n="dept2_desc">الأمن الفكري وقضايا التسامح والتعايش السلمي</div>
-            </div>
-          </div>
-          <div class="dept-card" data-page="research" data-tab="r3"
-            role="button" tabindex="0">
-            <div class="dept-icon">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <circle cx="9" cy="9" r="7" stroke="#1B4332" stroke-width="1.2" fill="none" />
-                <path d="M9 2C6.5 5 6.5 13 9 16" stroke="#C9A84C" stroke-width="1" fill="none" />
-                <line x1="2" y1="9" x2="16" y2="9" stroke="#1B4332" stroke-width="0.8" />
-              </svg>
-            </div>
-            <div>
-              <div class="dept-name" data-i18n="dept3_name">التاريخ الثقافي للجزائر</div>
-              <div class="dept-desc" data-i18n="dept3_desc">المخطوطات والتراث الوطني لفترة الاحتلال الفرنسي</div>
-            </div>
-          </div>
-          <div class="dept-card" data-page="research" data-tab="r4"
-            role="button" tabindex="0">
-            <div class="dept-icon">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path d="M9 1L11 6.5L17 7.4L13 11.3L14.1 17L9 14.2L3.9 17L5 11.3L1 7.4L7 6.5L9 1Z" stroke="#1B4332"
-                  stroke-width="1.2" fill="none" />
-                <path d="M9 4.5L10.3 8L14 8.5L11.5 10.9L12.2 14.5L9 12.8L5.8 14.5L6.5 10.9L4 8.5L7.7 8L9 4.5Z"
-                  fill="#C9A84C" opacity="0.35" />
-              </svg>
-            </div>
-            <div>
-              <div class="dept-name" data-i18n="dept4_name">الحضارة الإسلامية</div>
-              <div class="dept-desc" data-i18n="dept4_desc">إبراز خصائص الحضارة العربية الإسلامية</div>
+            <div class="dept-card" data-page="research" data-tab="r4" role="button" tabindex="0">
+              <div class="dept-icon">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M9 1L11 6.5L17 7.4L13 11.3L14.1 17L9 14.2L3.9 17L5 11.3L1 7.4L7 6.5L9 1Z" stroke="#1B4332"
+                    stroke-width="1.2" fill="none" />
+                  <path d="M9 4.5L10.3 8L14 8.5L11.5 10.9L12.2 14.5L9 12.8L5.8 14.5L6.5 10.9L4 8.5L7.7 8L9 4.5Z"
+                    fill="#C9A84C" opacity="0.35" />
+                </svg>
+              </div>
+              <div>
+                <div class="dept-name" data-i18n="dept4_name">الحضارة الإسلامية</div>
+                <div class="dept-desc" data-i18n="dept4_desc">إبراز خصائص الحضارة العربية الإسلامية</div>
+              </div>
             </div>
           </div>
         </div>
@@ -342,28 +357,43 @@
 
       <!-- LATEST PUBLICATIONS (home) -->
       <section class="publications">
-        <div class="section-header">
-          <h2 class="section-title" data-i18n="home_latest_pubs">آخر الإصدارات العلمية</h2>
-          <a class="section-link" href="#" data-page="publications" data-i18n="home_view_all_pubs">عرض كل الإصدارات</a>
+        <div class="section-shell">
+          <div class="section-header">
+            <h2 class="section-title" data-i18n="home_latest_pubs">آخر الإصدارات العلمية</h2>
+            <a class="section-link" href="#" data-page="publications" data-i18n="home_view_all_pubs">عرض كل الإصدارات</a>
+          </div>
+          <div class="pub-grid pub-grid--compact" id="home-pub-grid" data-i18n-aria="aria_home_pubs" aria-label="آخر الإصدارات العلمية"></div>
         </div>
-        <div class="pub-grid" id="home-pub-grid" data-i18n-aria="aria_home_pubs" aria-label="آخر الإصدارات العلمية"></div>
       </section>
 
-      <!-- LATEST EVENTS (home) -->
-      <section class="events">
+      <!-- FEATURED / UPDATES CAROUSEL -->
+      <div class="section-shell feat-carousel-shell">
         <div class="section-header">
-          <h2 class="section-title" data-i18n="home_events_section">الملتقيات والفعاليات</h2>
-          <a class="section-link" href="#" data-page="events" data-i18n="home_view_all_events">عرض كل الفعاليات</a>
+          <h2 class="section-title" data-i18n="feat_carousel_section">مستجدات المركز</h2>
         </div>
-        <div class="events-grid" id="home-events-grid"></div>
-      </section>
+        <section class="feat-carousel feat-carousel--wide" id="home-feat-carousel" data-i18n-aria="aria_feat_carousel" aria-label="مستجدات المركز"></section>
+      </div>
 
       <!-- NEWS (home) -->
       <section class="news-section">
-        <div class="section-header">
-          <h2 class="section-title" data-i18n="home_news_section">أخبار المركز</h2>
+        <div class="section-shell">
+          <div class="section-header">
+            <h2 class="section-title" data-i18n="home_news_section">أخبار المركز</h2>
+            <a class="section-link" href="#home-news-grid" data-i18n="home_view_all_news">عرض الكل</a>
+          </div>
+          <div class="g3 news-grid" id="home-news-grid"></div>
         </div>
-        <div class="g3" id="home-news-grid"></div>
+      </section>
+
+      <!-- UPCOMING EVENTS (dense date-badge list, under news) -->
+      <section class="events events--home-teaser">
+        <div class="section-shell">
+          <div class="section-header">
+            <h2 class="section-title" data-i18n="home_events_upcoming">الفعاليات القادمة</h2>
+            <a class="section-link" href="#" data-page="events" data-i18n="home_view_all_events">عرض كل الفعاليات</a>
+          </div>
+          <div class="events-grid events-grid--list" id="home-events-grid"></div>
+        </div>
       </section>
 
     </section><!-- /page-home -->
@@ -399,6 +429,25 @@
       </div>
       <div class="page-body">
         <div style="max-width:900px;margin:0 auto;">
+
+          <!-- director word -->
+          <div class="director-word mb5" data-director-motion>
+            <div class="director-word-media">
+              <div class="director-word-frame">
+                <img src="img/Holders/0.jpg" alt="" loading="lazy">
+                <span class="director-word-glow" aria-hidden="true"></span>
+              </div>
+            </div>
+            <blockquote class="director-word-quote">
+              <span class="director-word-mark" aria-hidden="true">”</span>
+              <p data-i18n="director_quote" data-director="quote">نعمل معًا على تعزيز البحث العلمي الأصيل في العلوم الإسلامية والحضارة، خدمةً للمعرفة وللمجتمع.</p>
+              <span class="director-word-rule" aria-hidden="true"></span>
+              <footer>
+                <strong data-i18n="director_name" data-director="name">اسم المدير (placeholder)</strong>
+                <span data-i18n="director_role" data-director="role">مدير المركز</span>
+              </footer>
+            </blockquote>
+          </div>
 
           <!-- nature -->
           <div class="mb5">
@@ -684,27 +733,29 @@
         </div>
       </div>
       <div class="page-body">
-        <div class="pub-toolbar">
-          <div class="pub-search-wrap">
-            <span class="pub-search-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16"
-                fill="none">
-                <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.3" />
-                <path d="M10 10L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
-              </svg></span>
-            <input class="pub-search-input" type="search" id="pub-search" data-i18n-placeholder="pub_search_ph"
-              placeholder="ابحث في الإصدارات..." data-i18n-aria="aria_pub_search" aria-label="بحث في الإصدارات"
-              autocomplete="off">
+        <div class="section-shell">
+          <div class="pub-toolbar">
+            <div class="pub-search-wrap">
+              <span class="pub-search-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16"
+                  fill="none">
+                  <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.3" />
+                  <path d="M10 10L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+                </svg></span>
+              <input class="pub-search-input" type="search" id="pub-search" data-i18n-placeholder="pub_search_ph"
+                placeholder="ابحث في الإصدارات..." data-i18n-aria="aria_pub_search" aria-label="بحث في الإصدارات"
+                autocomplete="off">
+            </div>
+            <div class="dept-tabs" id="pub-filter">
+              <button type="button" class="dept-tab active" data-pub-type="all" data-i18n="filter_all">الكل</button>
+              <button type="button" class="dept-tab" data-pub-type="collective" data-i18n="filter_collective">مؤلفات
+                جماعية</button>
+              <button type="button" class="dept-tab" data-pub-type="individual" data-i18n="filter_individual">مؤلفات
+                فردية</button>
+            </div>
           </div>
-          <div class="dept-tabs" id="pub-filter">
-            <button type="button" class="dept-tab active" data-pub-type="all" data-i18n="filter_all">الكل</button>
-            <button type="button" class="dept-tab" data-pub-type="collective" data-i18n="filter_collective">مؤلفات
-              جماعية</button>
-            <button type="button" class="dept-tab" data-pub-type="individual" data-i18n="filter_individual">مؤلفات
-              فردية</button>
-          </div>
+          <div class="pub-count" id="pub-count"></div>
+          <div class="pub-grid pub-grid--compact" id="pub-grid"></div>
         </div>
-        <div class="pub-count" id="pub-count"></div>
-        <div class="pub-grid" id="pub-grid"></div>
       </div>
     </section>
 
@@ -784,6 +835,52 @@
     </section>
 
 
+
+    <!-- ▌ PAGE: LAWS ▐ -->
+    <section class="page" id="page-laws">
+      <div class="page-hero">
+        <div class="page-hero-inner">
+          <div class="page-hero-tag" data-i18n="laws_hero_tag">النصوص التنظيمية للمركز</div>
+          <h1 data-i18n="laws_hero_h1">القوانين والمراسيم</h1>
+          <p data-i18n="laws_hero_p">مجموعة من المراسيم والقرارات المتعلقة بمركز البحث في العلوم الإسلامية والحضارة.</p>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="section-shell">
+          <div class="content-grid g5" id="laws-grid"></div>
+          <div class="empty-state catalog-empty hidden" id="laws-empty">
+            <p data-i18n="laws_empty">لا توجد نصوص منشورة بعد.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ▌ PAGE: PLATFORMS ▐ -->
+    <section class="page" id="page-platforms">
+      <div class="page-hero">
+        <div class="page-hero-inner">
+          <div class="page-hero-tag" data-i18n="platforms_hero_tag">منصات المركز الرقمية</div>
+          <h1 data-i18n="platforms_hero_h1">المنصات</h1>
+          <p data-i18n="platforms_hero_p">المحاضرات المرئية والإذاعية وبرامج التنقل قصير المدى.</p>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="section-shell">
+          <div class="filter-chips" id="platforms-kind-filter" role="group" data-i18n-aria="aria_platform_filters" aria-label="تصفية المنصات">
+            <button type="button" class="filter-chip is-active" data-kind="all" data-i18n="platform_filter_all">الكل</button>
+            <button type="button" class="filter-chip" data-kind="visual" data-i18n="platform_kind_visual">محاضرات مرئية</button>
+            <button type="button" class="filter-chip" data-kind="radio" data-i18n="platform_kind_radio">محاضرات إذاعية</button>
+            <button type="button" class="filter-chip" data-kind="mobility" data-i18n="platform_kind_mobility">تنقل قصير المدى</button>
+          </div>
+          <div class="content-grid g5" id="platforms-grid"></div>
+          <div class="empty-state catalog-empty hidden" id="platforms-empty">
+            <p data-i18n="platforms_empty">لا توجد منصات منشورة بعد.</p>
+            <button type="button" class="btn-ghost-cta" id="platforms-clear-filters" data-i18n="platform_clear_filters">مسح التصفية</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ▌ PAGE: CONTACT ▐ -->
     <section class="page" id="page-contact">
       <div class="page-hero">
@@ -857,7 +954,7 @@
             </div>
 
             <!-- Social -->
-            <h3 style="font-family:'Amiri',serif;font-size:18px;color:var(--green-deep);margin-bottom:1rem;"
+            <h3 style="font-family:inherit;font-size:18px;color:var(--green-deep);margin-bottom:1rem;"
               data-i18n="contact_social_h">تابعونا على مواقع التواصل</h3>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
               <a href="https://www.facebook.com/crsiclagh03/" target="_blank" rel="noopener"
@@ -1098,6 +1195,17 @@
       <div class="drawer-section-label" data-i18n="drawer_output">البحث والإصدارات</div>
       <a class="drawer-item sub" href="#" data-page="publications" data-i18n="nav_publications">الإصدارات العلمية</a>
       <a class="drawer-item sub" href="#" data-page="journals" data-i18n="nav_journals">المجلات العلمية</a>
+      <div class="drawer-divider"></div>
+      <div class="drawer-accordion" data-accordion>
+        <button type="button" class="drawer-accordion-trigger" aria-expanded="false" data-i18n="drawer_resources" id="drawerResourcesBtn">
+          النصوص والمنصات
+          <span class="drawer-accordion-chevron" aria-hidden="true">▾</span>
+        </button>
+        <div class="drawer-accordion-panel" id="drawerResourcesPanel" hidden>
+          <a class="drawer-item sub" href="#" data-page="laws" data-i18n="nav_laws">القوانين والمراسيم</a>
+          <a class="drawer-item sub" href="#" data-page="platforms" data-i18n="nav_platforms">المنصات</a>
+        </div>
+      </div>
       <div class="drawer-divider"></div>
       <div class="drawer-section-label" data-i18n="drawer_events">الفعاليات والتعاون</div>
       <a class="drawer-item sub" href="#" data-page="events" data-tab="intl" data-i18n="nav_events_intl">ملتقيات

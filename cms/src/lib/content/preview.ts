@@ -10,6 +10,8 @@ import { getPartnerById } from "@/lib/content/partners";
 import { getAlertById } from "@/lib/content/alerts";
 import { getResearchGroupById } from "@/lib/content/researchGroups";
 import { getResearchProjectById } from "@/lib/content/researchProjects";
+import { getLawById } from "@/lib/content/laws";
+import { getPlatformById } from "@/lib/content/platforms";
 import { buildNewsPayload } from "@/lib/publish/newsJson";
 import { buildEventPayload } from "@/lib/publish/eventsJson";
 import { buildPublicationPayload } from "@/lib/publish/publicationsJson";
@@ -17,6 +19,8 @@ import { buildPartnerPayload } from "@/lib/publish/partnersJson";
 import { buildAlertPayload } from "@/lib/publish/alertsJson";
 import { buildResearchGroupPayload } from "@/lib/publish/researchGroupsJson";
 import { buildResearchProjectPayload } from "@/lib/publish/researchProjectsJson";
+import { buildLawPayload } from "@/lib/publish/lawsJson";
+import { buildPlatformPayload } from "@/lib/publish/platformsJson";
 
 export const PREVIEW_TTL_MS = 30 * 60 * 1000;
 
@@ -27,7 +31,9 @@ export type PreviewContentType =
   | "partner"
   | "alert"
   | "research_group"
-  | "research_project";
+  | "research_project"
+  | "law"
+  | "platform";
 
 const PREVIEW_TYPES = new Set<PreviewContentType>([
   "news",
@@ -37,6 +43,8 @@ const PREVIEW_TYPES = new Set<PreviewContentType>([
   "alert",
   "research_group",
   "research_project",
+  "law",
+  "platform",
 ]);
 
 export type PreviewRecord = {
@@ -110,9 +118,22 @@ async function buildCandidatePayload(
     if (!row) return null;
     return buildResearchGroupPayload(row) as unknown as Record<string, unknown>;
   }
-  const row = await getResearchProjectById(id);
-  if (!row) return null;
-  return buildResearchProjectPayload(row) as unknown as Record<string, unknown>;
+  if (contentType === "research_project") {
+    const row = await getResearchProjectById(id);
+    if (!row) return null;
+    return buildResearchProjectPayload(row) as unknown as Record<string, unknown>;
+  }
+  if (contentType === "law") {
+    const row = await getLawById(id);
+    if (!row) return null;
+    return buildLawPayload(row) as unknown as Record<string, unknown>;
+  }
+  if (contentType === "platform") {
+    const row = await getPlatformById(id);
+    if (!row) return null;
+    return buildPlatformPayload(row) as unknown as Record<string, unknown>;
+  }
+  return null;
 }
 
 /**

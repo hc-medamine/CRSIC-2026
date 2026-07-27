@@ -29,6 +29,8 @@ const DETAIL_TYPES = new Set([
   'research-project',
   'research-group',
   'partner',
+  'platform',
+  'law',
 ]);
 
 /** Map CMS preview content_type (underscore) → SPA detail type (hyphen). */
@@ -118,9 +120,11 @@ export async function navigateToPreview(token, opts = {}) {
             ? 'cooperation'
             : type === 'research-project' || type === 'research-group'
               ? 'research'
-              : type === 'alert'
-                ? 'home'
-                : 'home';
+              : type === 'law'
+                ? 'laws'
+                : type === 'platform'
+                  ? 'platforms'
+                  : 'home';
     document.querySelectorAll('.nav-links a[data-page]').forEach((a) => {
       const isActive = a.dataset.page === parentNav && !a.dataset.tab;
       a.classList.toggle('active', isActive);
@@ -162,7 +166,11 @@ export function navigateTo(pageId, tab, filter, opts = {}) {
             ? 'cooperation'
             : detailType === 'research-project' || detailType === 'research-group'
               ? 'research'
-              : 'home';
+              : detailType === 'law'
+                ? 'laws'
+                : detailType === 'platform'
+                  ? 'platforms'
+                  : 'home';
     document.querySelectorAll('.nav-links a[data-page]').forEach((a) => {
       const isActive = a.dataset.page === parentNav && !a.dataset.tab;
       a.classList.toggle('active', isActive);

@@ -30,6 +30,7 @@ type Props = {
   role: "super_admin" | "editor" | "reviewer";
   contentTypes: ContentType[];
   showMedia: boolean;
+  showDirector: boolean;
   unread: number;
   displayName: string;
   email: string;
@@ -41,6 +42,8 @@ const CENTRE: NavItem[] = [
   { key: "events", href: "/dashboard/events", contentType: "event", icon: <IconGlobe /> },
   { key: "publications", href: "/dashboard/publications", contentType: "publication", icon: <IconDoc /> },
   { key: "partners", href: "/dashboard/partners", contentType: "partner", icon: <IconUsers /> },
+  { key: "laws", href: "/dashboard/laws", contentType: "law", icon: <IconDoc /> },
+  { key: "platforms", href: "/dashboard/platforms", contentType: "platform", icon: <IconGlobe /> },
   { key: "alerts", href: "/dashboard/alerts", contentType: "alert", icon: <IconBell /> },
 ];
 
@@ -69,6 +72,7 @@ export function CmsChrome({
   role,
   contentTypes,
   showMedia,
+  showDirector,
   unread,
   displayName,
   email,
@@ -158,6 +162,9 @@ export function CmsChrome({
   );
 
   const adminItems: NavItem[] = [];
+  if (showDirector) {
+    adminItems.push({ key: "directorWord", href: "/dashboard/director", icon: <IconUser /> });
+  }
   if (role === "super_admin") {
     adminItems.push(
       { key: "users", href: "/dashboard/users", icon: <IconUsers /> },
@@ -226,7 +233,12 @@ export function CmsChrome({
         >
           {menuOpen ? t("menuClose", lang) : t("menuOpen", lang)}
         </button>
-        <span className="flex items-center gap-2">
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-crs-primary/40"
+          onClick={() => setMenuOpen(false)}
+          aria-label={t("home", lang)}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/crsic_logo.png"
@@ -237,7 +249,7 @@ export function CmsChrome({
             aria-hidden
           />
           <span className="text-sm font-semibold text-crs-ink">CRSIC</span>
-        </span>
+        </Link>
         <button
           type="button"
           onClick={toggleLang}
@@ -268,7 +280,12 @@ export function CmsChrome({
               : "max-md:-translate-x-full max-md:rtl:translate-x-full"
           }`}
         >
-          <div className="flex shrink-0 items-center gap-3 border-b border-crs-border/70 px-4 py-5">
+          <Link
+            href="/dashboard"
+            className="flex shrink-0 items-center gap-3 border-b border-crs-border/70 px-4 py-5 outline-none transition-colors hover:bg-crs-bg/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-crs-primary/40"
+            onClick={() => setMenuOpen(false)}
+            aria-label={t("home", lang)}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/crsic_logo.png"
@@ -282,7 +299,7 @@ export function CmsChrome({
               <p className="text-base font-semibold tracking-tight text-crs-ink">CRSIC</p>
               <p className="text-xs text-crs-muted">{t("contentCms", lang)}</p>
             </div>
-          </div>
+          </Link>
 
           <nav className="min-h-0 flex-1 overflow-y-auto px-3 pb-4 pt-2" aria-label={t("mainNav", lang)}>
             {navBody}

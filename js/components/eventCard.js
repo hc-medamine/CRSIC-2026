@@ -2,7 +2,7 @@
  * Event list / year-group / home teaser — safe DOM builders (no innerHTML).
  */
 import { t } from '../i18n.js';
-import { el, safeImageSrc } from '../utils.js';
+import { el } from '../utils.js';
 
 /** Short month labels in events.json → longer Arabic display for home cards. */
 const MONTH_DISPLAY_AR = {
@@ -20,16 +20,6 @@ const MONTH_DISPLAY_AR = {
   ديس: 'ديسمبر',
 };
 
-const THUMB_BG = ['event-thumb-bg1', 'event-thumb-bg2', 'event-thumb-bg3'];
-const HOLDER_FALLBACK = [
-  'img/Holders/0.jpg',
-  'img/Holders/1.jpg',
-  'img/Holders/2.jpg',
-  'img/Holders/3.jpg',
-  'img/Holders/4.jpg',
-  'img/Holders/5.jpg',
-];
-
 /**
  * @param {object} e
  * @returns {string}
@@ -44,8 +34,8 @@ function formatHomeEventDate(e) {
 }
 
 /**
- * Home-page event teaser card (photo thumb + meta).
- * Optional `e.img`; otherwise cycles Holders photos.
+ * Home-page upcoming event row — date badge on inline-start, text on inline-end.
+ * Distinct from news photo cards and from the featured carousel.
  * @param {object} e
  * @param {number} [i=0]
  * @returns {HTMLElement}
@@ -53,25 +43,22 @@ function formatHomeEventDate(e) {
 export function createHomeEventCard(e, i = 0) {
   const title = (e && e.title) || '';
   const type = (e && e.type) || '';
-  const done = !e || e.status !== 'upcoming';
-  const imgSrc = safeImageSrc((e && e.img) || HOLDER_FALLBACK[i % HOLDER_FALLBACK.length] || '');
-
-  const thumbChildren = [];
-  if (imgSrc) {
-    thumbChildren.push(el('img', {
-      attrs: { src: imgSrc, alt: title, loading: 'lazy' },
-    }));
-  }
-  thumbChildren.push(
-    el('span', {
-      className: done ? 'event-badge event-badge-past' : 'event-badge event-badge-upcoming',
-      text: done ? t('ev_badge_done') : t('ev_badge_upcoming'),
-    }),
-    el('div', { className: 'event-thumb-label', text: type ? `${type}: ${title}` : title }),
-  );
+  const status = (e && e.status) || 'upcoming';
+  const badgeClass =
+    status === 'ongoing'
+      ? 'event-badge event-badge-ongoing'
+      : status === 'upcoming'
+        ? 'event-badge event-badge-upcoming'
+        : 'event-badge event-badge-past';
+  const badgeText =
+    status === 'ongoing'
+      ? t('ev_badge_ongoing')
+      : status === 'upcoming'
+        ? t('ev_badge_upcoming')
+        : t('ev_badge_done');
 
   return el('article', {
-    className: 'event-card event-card--link',
+    className: 'event-row event-card--link',
     attrs: (e && (e.slug || e.id))
       ? {
           role: 'button',
@@ -82,16 +69,22 @@ export function createHomeEventCard(e, i = 0) {
       : {},
     children: [
       el('div', {
-        className: `event-thumb ${THUMB_BG[i % THUMB_BG.length]}`,
-        children: thumbChildren,
+        className: 'event-row-date',
+        attrs: { 'aria-hidden': 'true' },
+        children: [
+          el('span', { className: 'event-row-day', text: (e && e.day) || '—' }),
+          el('span', { className: 'event-row-month', text: (e && e.month) || '' }),
+          el('span', { className: 'event-row-year', text: (e && e.year) || '' }),
+        ],
       }),
       el('div', {
-        className: 'event-info',
+        className: 'event-row-body',
         children: [
-          el('div', { className: 'event-type', text: type }),
-          el('div', { className: 'event-title', text: title }),
+          el('span', { className: badgeClass, text: badgeText }),
+          el('div', { className: 'event-row-type', text: type }),
+          el('div', { className: 'event-row-title', text: title }),
           el('div', {
-            className: 'event-footer-row',
+            className: 'event-row-meta',
             children: [
               el('span', { className: 'event-date', text: formatHomeEventDate(e) }),
               el('span', {
@@ -114,9 +107,20 @@ export function createHomeEventCard(e, i = 0) {
  * @returns {HTMLElement}
  */
 export function createEvCard(e) {
+  const status = (e && e.status) || 'upcoming';
   const pill = el('span', {
-    className: e.status === 'done' ? 'ev-pill ev-pill-done' : 'ev-pill ev-pill-upcoming',
-    text: e.status === 'done' ? t('ev_done_pill') : t('ev_upcoming_pill'),
+    className:
+      status === 'done'
+        ? 'ev-pill ev-pill-done'
+        : status === 'ongoing'
+          ? 'ev-pill ev-pill-ongoing'
+          : 'ev-pill ev-pill-upcoming',
+    text:
+      status === 'done'
+        ? t('ev_done_pill')
+        : status === 'ongoing'
+          ? t('ev_badge_ongoing')
+          : t('ev_upcoming_pill'),
   });
 
   const slug = e.slug || e.id || '';

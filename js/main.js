@@ -19,7 +19,7 @@ import {
 } from './ui.js';
 import { bindRouter, initRoute, parseHash } from './router.js';
 import { renderDetailPage } from './components/detailPage.js';
-import { initAnimations } from './animations.js';
+import { initAnimations, refreshMotionReveals } from './animations.js';
 
 async function boot() {
   setOnAfterTranslate(() => {
@@ -31,6 +31,7 @@ async function boot() {
     if (parsed.detailType && parsed.detailSlug) {
       renderDetailPage(parsed.detailType, parsed.detailSlug);
     }
+    requestAnimationFrame(() => refreshMotionReveals());
   });
 
   bindLangUI();

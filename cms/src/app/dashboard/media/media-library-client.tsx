@@ -49,6 +49,9 @@ const BUCKET_LABEL_KEYS: Record<MediaBucket, string> = {
   partners: "mediaBucketPartners",
   research: "mediaBucketResearch",
   alerts: "mediaBucketAlerts",
+  laws: "mediaBucketLaws",
+  platforms: "mediaBucketPlatforms",
+  site: "mediaBucketSite",
 };
 
 function sourceLabel(ref: MediaRef, lang: "en" | "ar"): string {

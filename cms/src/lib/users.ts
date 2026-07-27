@@ -4,41 +4,25 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { getUserOrgIds } from "@/lib/content/permissions";
 import { writeAudit } from "@/lib/audit";
+import {
+  ALL_CONTENT_TYPES,
+  RESEARCH_CONTENT_TYPES,
+  SPA_CONTENT_TYPES,
+  isResearchContentType,
+  isSpaContentType,
+  type ContentType,
+} from "@/lib/content-types";
+
+export type { ContentType } from "@/lib/content-types";
+export {
+  ALL_CONTENT_TYPES,
+  RESEARCH_CONTENT_TYPES,
+  SPA_CONTENT_TYPES,
+  isResearchContentType,
+  isSpaContentType,
+};
 
 export type UserRole = "super_admin" | "editor" | "reviewer";
-export type ContentType =
-  | "news"
-  | "event"
-  | "publication"
-  | "partner"
-  | "alert"
-  | "research_group"
-  | "research_project";
-
-/** Centre-wide SPA section types — globally exclusive across orgs and editors. */
-export const SPA_CONTENT_TYPES: ContentType[] = [
-  "news",
-  "event",
-  "publication",
-  "partner",
-  "alert",
-];
-
-/** Research-dept types — exclusive per org among editors; allowed on every research_dept. */
-export const RESEARCH_CONTENT_TYPES: ContentType[] = ["research_group", "research_project"];
-
-export const ALL_CONTENT_TYPES: ContentType[] = [
-  ...SPA_CONTENT_TYPES,
-  ...RESEARCH_CONTENT_TYPES,
-];
-
-export function isSpaContentType(t: ContentType): boolean {
-  return (SPA_CONTENT_TYPES as string[]).includes(t);
-}
-
-export function isResearchContentType(t: ContentType): boolean {
-  return (RESEARCH_CONTENT_TYPES as string[]).includes(t);
-}
 
 export type OrgUnit = {
   id: string;
@@ -185,7 +169,7 @@ export async function setOrgUnitContentTypes(
     const bad = types.filter((t) => !isSpaContentType(t));
     if (bad.length > 0) {
       throw new Error(
-        `Centre-wide may only hold SPA types (news, event, publication, partner, alert). Invalid: ${bad.join(", ")}`,
+        `Centre-wide may only hold SPA types (news, event, publication, partner, alert, law, platform). Invalid: ${bad.join(", ")}`,
       );
     }
   } else {

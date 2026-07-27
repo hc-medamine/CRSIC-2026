@@ -4,11 +4,12 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import type { ContentType, OrgUnit } from "@/lib/users";
+import { RESEARCH_CONTENT_TYPES, SPA_CONTENT_TYPES } from "@/lib/content-types";
 import { t, tf } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 
-const SPA_TYPES: ContentType[] = ["news", "event", "publication", "partner", "alert"];
-const RESEARCH_TYPES: ContentType[] = ["research_group", "research_project"];
+const SPA_TYPES: ContentType[] = SPA_CONTENT_TYPES;
+const RESEARCH_TYPES: ContentType[] = RESEARCH_CONTENT_TYPES;
 
 type Props = {
   initialOrgUnits: OrgUnit[];

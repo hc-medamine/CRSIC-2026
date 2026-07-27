@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import type { ContentType, ManagedUser, OrgUnit, UserRole } from "@/lib/users";
+import { ALL_CONTENT_TYPES } from "@/lib/content-types";
 import {
   contentTypeLabel,
   localizedDisplayName,
@@ -15,15 +16,7 @@ import {
 } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 
-const CONTENT_TYPES: ContentType[] = [
-  "news",
-  "event",
-  "publication",
-  "partner",
-  "alert",
-  "research_group",
-  "research_project",
-];
+const CONTENT_TYPES: ContentType[] = ALL_CONTENT_TYPES;
 
 type DeleteImpact = {
   user: { id: string; email: string; role: UserRole; displayName: string };

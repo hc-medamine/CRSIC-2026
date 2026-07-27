@@ -13,7 +13,9 @@ type ContentType =
   | "partner"
   | "alert"
   | "research_group"
-  | "research_project";
+  | "research_project"
+  | "law"
+  | "platform";
 
 type AssignableUser = {
   id: string;
