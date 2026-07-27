@@ -17,6 +17,9 @@ import {
   findEventByKey,
   findPublicationByKey,
   getCoverForPub,
+  getLaws,
+  getPlatforms,
+  getDirector,
 } from './data.js';
 import { t, getLang } from './i18n.js';
 import {
@@ -31,6 +34,8 @@ import { createEventYearGroups, createHomeEventCard } from './components/eventCa
 import { createPartnerCard } from './components/partnerCard.js';
 import { createJournalCard } from './components/journalCard.js';
 import { createNewsCard } from './components/newsCard.js';
+import { createLawCard, createPlatformCard } from './components/catalogCard.js';
+import { mountFeaturedCarousel } from './components/featuredCarousel.js';
 
 /** @type {null|(() => void)} */
 let releaseDrawerTrap = null;
@@ -67,6 +72,8 @@ const BC_MAP = {
   events: [{ key: 'bc_events', page: 'events' }, { key: 'bc_events_label', page: 'events' }],
   cooperation: [{ key: 'bc_events', page: 'events' }, { key: 'bc_cooperation', page: 'cooperation' }],
   contact: [{ key: 'bc_contact', page: 'contact' }],
+  laws: [{ key: 'bc_laws', page: 'laws' }],
+  platforms: [{ key: 'bc_platforms', page: 'platforms' }],
   detail: [{ key: 'bc_detail', page: 'home' }],
 };
 
@@ -79,6 +86,8 @@ const SECTION_CONTAINERS = {
   journals: ['journals-grid'],
   events: ['home-events-grid', 'ev-intl-list', 'ev-nat-list'],
   partners: ['nat-partners', 'intl-partners'],
+  laws: ['laws-grid'],
+  platforms: ['platforms-grid'],
 };
 
 /** Show loading skeletons before async data arrives. */
@@ -121,30 +130,167 @@ export function showDataLoadErrors(errors) {
   });
 }
 
+/** @type {string} */
+let platformKindFilter = 'all';
+
+/**
+ * Toggle catalog grid vs centered empty state.
+ * @param {HTMLElement|null} grid
+ * @param {HTMLElement|null} empty
+ * @param {boolean} hasItems
+ */
+function setCatalogEmptyState(grid, empty, hasItems) {
+  if (grid) {
+    grid.hidden = !hasItems;
+    grid.classList.toggle('hidden', !hasItems);
+  }
+  if (empty) empty.classList.toggle('hidden', hasItems);
+}
+
+/**
+ * Render platforms grid using the active kind filter chip.
+ * Keeps cards in DOM; fades/scales out filtered items then removes from flow.
+ */
+export function renderPlatformsGrid() {
+  const plg = document.getElementById('platforms-grid');
+  const empty = document.getElementById('platforms-empty');
+  if (!plg) return;
+  const platforms = getPlatforms();
+  const reduce = prefersReducedMotion();
+
+  const needsPaint = plg.dataset.cardsReady !== '1' || plg.childElementCount === 0;
+  if (needsPaint) {
+    replaceChildren(plg, platforms.map(createPlatformCard));
+    plg.dataset.cardsReady = '1';
+  }
+
+  let visible = 0;
+  plg.querySelectorAll('.catalog-card').forEach((card) => {
+    const kind = card.getAttribute('data-kind') || 'visual';
+    const show = platformKindFilter === 'all' || kind === platformKindFilter;
+    if (show) {
+      card.classList.remove('is-filtered-out', 'is-filtered-gone');
+      card.hidden = false;
+      card.setAttribute('aria-hidden', 'false');
+      visible += 1;
+    } else {
+      card.setAttribute('aria-hidden', 'true');
+      if (reduce) {
+        card.classList.add('is-filtered-out', 'is-filtered-gone');
+        card.hidden = true;
+      } else {
+        card.classList.remove('is-filtered-gone');
+        card.hidden = false;
+        card.classList.add('is-filtered-out');
+        window.setTimeout(() => {
+          if (card.classList.contains('is-filtered-out')) {
+            card.classList.add('is-filtered-gone');
+            card.hidden = true;
+          }
+        }, 550);
+      }
+    }
+  });
+
+  setCatalogEmptyState(plg, empty, visible > 0);
+  if (empty) {
+    const msg = empty.querySelector('p');
+    if (msg) {
+      msg.textContent = platforms.length && visible === 0
+        ? t('platforms_filter_empty')
+        : t('platforms_empty');
+    }
+    const clearBtn = document.getElementById('platforms-clear-filters');
+    if (clearBtn) {
+      clearBtn.hidden = !(platforms.length && visible === 0);
+    }
+  }
+  plg.hidden = visible === 0 && platforms.length > 0 ? true : false;
+  if (visible > 0) plg.hidden = false;
+  plg.dataset.loaded = '1';
+}
+
+/**
+ * Sync filter chip active state with platformKindFilter.
+ */
+function syncPlatformFilterChips() {
+  const bar = document.getElementById('platforms-kind-filter');
+  if (!bar) return;
+  bar.querySelectorAll('.filter-chip').forEach((chip) => {
+    chip.classList.toggle('is-active', chip.getAttribute('data-kind') === platformKindFilter);
+  });
+}
+
+/**
+ * Reset platforms kind filter to All and re-render.
+ */
+export function clearPlatformFilters() {
+  platformKindFilter = 'all';
+  syncPlatformFilterChips();
+  renderPlatformsGrid();
+}
+
 /* ── INITIAL RENDER ──────────────────────────────────── */
+
+/** Apply published director.json over About placeholders when available. */
+export function applyDirectorWord() {
+  const d = getDirector();
+  const root = document.querySelector('.director-word');
+  if (!root || !d) return;
+  const lang = getLang();
+  const quoteEl = root.querySelector('[data-director="quote"]');
+  const nameEl = root.querySelector('[data-director="name"]');
+  const roleEl = root.querySelector('[data-director="role"]');
+  const imgEl = root.querySelector('.director-word-media img');
+  const quote = lang === 'en' ? d.quote_en : d.quote_ar;
+  const name = lang === 'en' ? (d.name_en || d.name_ar) : d.name_ar;
+  const role = lang === 'en' ? (d.role_en || d.role_ar) : d.role_ar;
+  if (quoteEl && quote) quoteEl.textContent = quote;
+  if (nameEl && name) nameEl.textContent = name;
+  if (roleEl && role) roleEl.textContent = role;
+  if (imgEl && d.portrait) {
+    imgEl.setAttribute('src', d.portrait);
+    const alt =
+      lang === 'en'
+        ? d.portrait_alt_en || d.portrait_alt_ar || name || ''
+        : d.portrait_alt_ar || d.portrait_alt_en || name || '';
+    imgEl.setAttribute('alt', alt);
+  }
+}
+
 export function renderAll() {
+  applyDirectorWord();
   const hpg = document.getElementById('home-pub-grid');
   const hng = document.getElementById('home-news-grid');
   const heg = document.getElementById('home-events-grid');
   const pg = document.getElementById('pub-grid');
   const jg = document.getElementById('journals-grid');
+  const lg = document.getElementById('laws-grid');
+  const plg = document.getElementById('platforms-grid');
+  const feat = document.getElementById('home-feat-carousel');
 
   fillSkeletons(hpg, 'skeleton-pub', 4);
   fillSkeletons(hng, 'skeleton-news', 6);
   fillSkeletons(heg, 'skeleton-event', 3);
   fillSkeletons(pg, 'skeleton-pub', 8);
   fillSkeletons(jg, 'skeleton-journal', 4);
+  fillSkeletons(lg, 'skeleton-news', 5);
+  fillSkeletons(plg, 'skeleton-news', 3);
+  if (plg) delete plg.dataset.cardsReady;
 
   requestAnimationFrame(() => {
     const pubs = getPubs();
     const news = getNews();
     const journals = getJournals();
     const homeEvents = getHomeEvents(3);
+    const laws = getLaws();
     const evIntl = document.getElementById('ev-intl-list');
     const evNat = document.getElementById('ev-nat-list');
     const natP = document.getElementById('nat-partners');
     const intlP = document.getElementById('intl-partners');
+    const lawsEmpty = document.getElementById('laws-empty');
 
+    if (feat) mountFeaturedCarousel(feat);
     if (hpg) {
       replaceChildren(hpg, pubs.slice(0, 4).map(createPubCard));
       hpg.dataset.loaded = '1';
@@ -165,6 +311,16 @@ export function renderAll() {
       replaceChildren(jg, journals.map(createJournalCard));
       jg.dataset.loaded = '1';
     }
+    if (lg) {
+      if (laws.length) {
+        replaceChildren(lg, laws.map(createLawCard));
+      } else {
+        replaceChildren(lg, []);
+      }
+      setCatalogEmptyState(lg, lawsEmpty, laws.length > 0);
+      lg.dataset.loaded = '1';
+    }
+    renderPlatformsGrid();
     if (evIntl) replaceChildren(evIntl, createEventYearGroups(getIntlEvents()));
     if (evNat) replaceChildren(evNat, createEventYearGroups(getNatEvents()));
     if (natP) replaceChildren(natP, getNatPartners().map(createPartnerCard));
@@ -310,6 +466,8 @@ export function updateContentLocaleNotices() {
     'journals-grid',
     'nat-partners',
     'intl-partners',
+    'laws-grid',
+    'platforms-grid',
   ];
   const show = getLang() === 'en';
   hosts.forEach((id) => {
@@ -745,6 +903,31 @@ export function bindUIEvents() {
   if (navOverlay) navOverlay.addEventListener('click', closeDrawer);
   if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
   if (moreTabBtn) moreTabBtn.addEventListener('click', openDrawer);
+
+  const drawerResourcesBtn = document.getElementById('drawerResourcesBtn');
+  const drawerResourcesPanel = document.getElementById('drawerResourcesPanel');
+  if (drawerResourcesBtn && drawerResourcesPanel) {
+    drawerResourcesBtn.addEventListener('click', () => {
+      const open = drawerResourcesBtn.getAttribute('aria-expanded') === 'true';
+      drawerResourcesBtn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      drawerResourcesPanel.hidden = open;
+    });
+  }
+
+  const platformsFilter = document.getElementById('platforms-kind-filter');
+  if (platformsFilter) {
+    platformsFilter.addEventListener('click', (e) => {
+      const chip = e.target.closest('.filter-chip[data-kind]');
+      if (!chip || !platformsFilter.contains(chip)) return;
+      platformKindFilter = chip.getAttribute('data-kind') || 'all';
+      syncPlatformFilterChips();
+      renderPlatformsGrid();
+    });
+  }
+  const platformsClear = document.getElementById('platforms-clear-filters');
+  if (platformsClear) {
+    platformsClear.addEventListener('click', clearPlatformFilters);
+  }
 
   document.addEventListener('keydown', (e) => {
     handleEscapeStack(e, [

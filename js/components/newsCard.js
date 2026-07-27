@@ -45,10 +45,10 @@ function createPlaceholderSvg() {
  * @returns {HTMLElement}
  */
 export function createNewsCard(n, i) {
-  let thumb;
+  let mediaChild;
   const src = n.img ? safeImageSrc(n.img) : '';
   if (src) {
-    thumb = el('img', {
+    mediaChild = el('img', {
       className: 'news-thumb',
       attrs: {
         src,
@@ -57,7 +57,7 @@ export function createNewsCard(n, i) {
       },
     });
   } else {
-    thumb = el('div', {
+    mediaChild = el('div', {
       className: 'news-thumb-placeholder',
       style: { background: GRADIENTS[i % 3] },
       children: [createPlaceholderSvg()],
@@ -76,12 +76,12 @@ export function createNewsCard(n, i) {
         }
       : {},
     children: [
-      thumb,
+      el('div', { className: 'card-media', children: [mediaChild] }),
       el('div', {
         className: 'news-body',
         children: [
           el('div', { className: 'news-label', text: n.label || '' }),
-          el('div', { className: 'news-title', text: n.title || '' }),
+          el('div', { className: 'news-title card-title', text: n.title || '' }),
         ],
       }),
     ],

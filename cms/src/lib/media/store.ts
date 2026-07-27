@@ -11,7 +11,7 @@ import { dirname, join, extname } from "node:path";
 import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
-import { canAccessContentType, isCentreWideViewer } from "@/lib/content/permissions";
+import { canAccessContentType, getUserOrgIds, isCentreWideViewer } from "@/lib/content/permissions";
 import {
   isMediaBucket,
   MEDIA_BUCKETS,
@@ -91,6 +91,16 @@ export async function canAccessMediaBucket(
   if (bucket === "covers") return canAccessContentType(user, "publication");
   if (bucket === "partners") return canAccessContentType(user, "partner");
   if (bucket === "alerts") return canAccessContentType(user, "alert");
+  if (bucket === "laws") return canAccessContentType(user, "law");
+  if (bucket === "platforms") return canAccessContentType(user, "platform");
+  if (bucket === "site") {
+    if (user.role === "super_admin") return true;
+    if (user.role === "reviewer") {
+      const orgs = await getUserOrgIds(user.id);
+      return orgs.includes("centre_wide");
+    }
+    return false;
+  }
   if (bucket === "research") {
     return (
       (await canAccessContentType(user, "research_group")) ||

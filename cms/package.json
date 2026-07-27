@@ -26,6 +26,7 @@
     "db:import-legacy": "node --env-file=.env.local --import tsx scripts/import-legacy.ts",
     "db:import-legacy:partners": "node --env-file=.env.local --import tsx scripts/import-legacy.ts -- --partners-only",
 
+    "db:import:laws-platforms": "node --env-file=.env.local --import tsx scripts/import-laws-platforms.ts",
     "db:reassign-legacy-authorship": "node --env-file=.env.local --import tsx scripts/reassign-legacy-authorship.ts",
     "db:set-legacy-publisher-boufatah": "node --env-file=.env.local --import tsx scripts/set-legacy-publisher-boufatah.ts",
     "db:reassign:partners-people": "node --env-file=.env.local --import tsx scripts/reassign-partners-people.ts"

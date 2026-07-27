@@ -19,6 +19,32 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-07-27 — Laws/Platforms parity + Director CMS PRD **Approved**
+
+**PRD:** [prds/2026-07-27-laws-platforms-parity-director-cms.md](./prds/2026-07-27-laws-platforms-parity-director-cms.md)
+
+**Locked:** Attachments UI; SPA secondary `externalUrl` (More information / المصدر); seed cutover published+live_payload; Director CMS (SA + centre-wide Reviewer); journals/About body pages OOS.
+
+**Branch:** `feature/laws-platforms-parity-director-cms`
+
+**Implemented:** attachments on law/platform forms; SPA secondary link + parent nav; `028_site_director` + `/dashboard/director` + `data/director.json`; `npm run db:import:laws-platforms` (seed catalog imported).
+
+### 2026-07-27 — Laws/Platforms **native SPA** amendment (Approved)
+
+**PRD:** [prds/2026-07-27-spa-laws-platforms-home.md](./prds/2026-07-27-spa-laws-platforms-home.md)
+
+**Locked correction:** Cards open `#law/{slug}` / `#platform/{slug}` with extracted body (no primary legacy CTA). Layout: restore news/pub/event cover thumbs; drop global 5-up; carousel gutters; catalog ~3–4 cols.
+
+**Branch:** `feature/spa-laws-platforms-home`
+
+### 2026-07-27 — SPA Laws/Platforms/Home PRD **Approved**
+
+**PRD:** [prds/2026-07-27-spa-laws-platforms-home.md](./prds/2026-07-27-spa-laws-platforms-home.md)
+
+**Locked:** Laws & Platforms SPA+CMS; Home carousel (3 events) + reorder; About director placeholder; event `ongoing` badge; 5-up cards + contain; Bahij font.
+
+**Branch:** `feature/spa-laws-platforms-home`
+
 ### 2026-07-27 — README stack drift fix (docs)
 
 **Done:** Corrected root README to describe the dual product (public SPA + `cms/`), root `package.json` / `npm run spa`, `PREVIEW_API_BASE`, ports 5500 vs 5501, SPA unit tests, and CMS Node/Postgres setup pointers. Removed outdated claims (no `package.json`, Git not initialised, SPA “no tests”).

@@ -14,7 +14,9 @@ export type ContentType =
   | "partner"
   | "alert"
   | "research_group"
-  | "research_project";
+  | "research_project"
+  | "law"
+  | "platform";
 
 /** Columns that make up an editable content snapshot (superset across content types). */
 const SNAPSHOT_COLUMNS = [
@@ -47,6 +49,8 @@ const SNAPSHOT_COLUMNS = [
   "alert_link_url",
   "alert_link_label_ar",
   "alert_link_label_en",
+  "external_url",
+  "platform_kind",
   "research_group_id",
   "research_lead_ar",
   "research_lead_en",
@@ -105,6 +109,8 @@ export function contentPathSegment(type: ContentType): string {
   if (type === "partner") return "partners";
   if (type === "research_group") return "research-groups";
   if (type === "research_project") return "research-projects";
+  if (type === "law") return "laws";
+  if (type === "platform") return "platforms";
   return "alerts";
 }
 

@@ -22,6 +22,8 @@ Product specs for CRSIC live here. **New feature slices follow the PRD-first wor
 | [2026-07-23-cms-direction-b-visual.md](./2026-07-23-cms-direction-b-visual.md) | **Approved** (2026-07-23) | CMS Direction B; public Themes **dropped** 2026-07-26 (§8) |
 | [2026-07-26-cms-spa-parity-preview-media.md](./2026-07-26-cms-spa-parity-preview-media.md) | **Approved** (2026-07-26) | SPA partner/group detail + preview ×4 + buckets; emergency stays 3-type |
 | [2026-07-26-partner-detail-narrative.md](./2026-07-26-partner-detail-narrative.md) | **Approved** (2026-07-26) | Partner summary+body, SPA expandable detail, legacy WP enrich ×11 |
+| [2026-07-27-spa-laws-platforms-home.md](./2026-07-27-spa-laws-platforms-home.md) | **Approved** (2026-07-27) | Laws & Platforms SPA+CMS, Home carousel/reorder, director placeholder, ongoing badge, 5-up cards, Bahij |
+| [2026-07-27-laws-platforms-parity-director-cms.md](./2026-07-27-laws-platforms-parity-director-cms.md) | **Approved** (2026-07-27) | Attachments + SPA externalUrl + seed cutover; Director CMS (SA + centre-wide Reviewer); journals/About pages OOS |
 
 ## Related
 

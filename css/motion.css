@@ -1,0 +1,482 @@
+/**
+ * Bi-Directional Motion Design System — CRSIC SPA
+ * Tokens, scroll reveals, micro-interactions, drawer/mega, filters, hero.
+ * Relies on transform + opacity only; respects prefers-reduced-motion and html[dir].
+ */
+
+:root {
+  --duration-fast: 280ms;
+  --duration-base: 550ms;
+  --duration-slow: 900ms;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-soft: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --motion-lift: 4px;
+  --motion-reveal-y: 36px;
+  --stagger-step: 140ms;
+}
+
+/* ── Reduced motion: final state, no transitions ─────── */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal,
+  .reveal-section,
+  .reveal-stagger > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .hero-bg-video,
+  .hero-eyebrow,
+  .hero-main h1,
+  .hero-desc,
+  .hero-cta {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .catalog-card.is-filtered-out {
+    display: none !important;
+    opacity: 0 !important;
+    transform: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLL REVEALS
+═══════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal-section {
+    opacity: 0;
+    transform: translateY(var(--motion-reveal-y));
+    transition:
+      opacity var(--duration-slow) var(--ease-out-expo),
+      transform var(--duration-slow) var(--ease-out-expo);
+    will-change: opacity, transform;
+  }
+  .reveal-section.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+    will-change: auto;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity var(--duration-slow) var(--ease-out-expo),
+      transform var(--duration-slow) var(--ease-out-expo);
+    transition-delay: calc(var(--reveal-index, 0) * var(--stagger-step, 140ms));
+    will-change: opacity, transform;
+  }
+  .reveal.visible,
+  .reveal.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+    will-change: auto;
+  }
+
+  /* Grid stagger — DOM order + reading direction = natural RTL/LTR flow */
+  .reveal-stagger > .reveal {
+    transition-delay: calc(var(--reveal-index, 0) * var(--stagger-step, 140ms));
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   CARD MICRO-INTERACTIONS
+═══════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: no-preference) {
+  @media (hover: hover) and (pointer: fine) {
+    .news-card,
+    .event-card,
+    .event-row,
+    .catalog-card,
+    .dept-card,
+    .partner-card,
+    .c-card,
+    .c-card-accent {
+      transition:
+        transform var(--duration-base) var(--ease-out-expo),
+        box-shadow var(--duration-base) var(--ease-out-soft);
+    }
+    .news-card:hover,
+    .event-card:hover,
+    .event-row:hover,
+    .catalog-card:hover,
+    .dept-card:hover,
+    .partner-card:hover,
+    .c-card:hover,
+    .c-card-accent:hover {
+      transform: translateY(calc(var(--motion-lift) * -1));
+      box-shadow: 0 12px 32px rgba(27, 67, 50, 0.14);
+    }
+
+    .news-card .card-media,
+    .event-card .event-thumb,
+    .catalog-card-media,
+    .pub-cover {
+      overflow: hidden;
+    }
+    .news-card .card-media img,
+    .news-card .card-media .news-thumb,
+    .event-card .event-thumb img,
+    .catalog-card-media img,
+    .pub-cover img {
+      transition: transform var(--duration-slow) var(--ease-out-expo);
+    }
+    .news-card:hover .card-media img,
+    .news-card:hover .card-media .news-thumb,
+    .event-card:hover .event-thumb img,
+    .catalog-card:hover .catalog-card-media img,
+    .pub-card:hover .pub-cover img {
+      transform: scale(1.05);
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   PRIMARY CTA — inline-start → inline-end sweep
+═══════════════════════════════════════════════════════ */
+.btn-primary-cta {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  z-index: 0;
+  transition:
+    color var(--duration-fast) var(--ease-out-soft),
+    opacity var(--duration-fast) var(--ease-out-soft),
+    transform var(--duration-fast) var(--ease-out-soft);
+}
+.btn-primary-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(27, 67, 50, 0.14);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--duration-base) var(--ease-out-expo);
+  pointer-events: none;
+}
+html[dir="rtl"] .btn-primary-cta::before {
+  transform-origin: right center;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .btn-primary-cta:hover::before,
+  .btn-primary-cta:focus-visible::before {
+    transform: scaleX(1);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   SECTION LINKS — underline grows from inline-start
+═══════════════════════════════════════════════════════ */
+.section-link {
+  position: relative;
+  border-bottom: none !important;
+  padding-bottom: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15em;
+}
+.section-link::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--duration-base) var(--ease-out-expo);
+  pointer-events: none;
+}
+html[dir="rtl"] .section-link::before {
+  transform-origin: right center;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .section-link:hover::before,
+  .section-link:focus-visible::before {
+    transform: scaleX(1);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   MEGA MENU — fade + slide, anchored inline-start
+═══════════════════════════════════════════════════════ */
+.mega-panel {
+  inset-inline-start: 0;
+  inset-inline-end: auto;
+  display: grid;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-10px);
+  transition:
+    opacity var(--duration-base) var(--ease-out-expo),
+    transform var(--duration-base) var(--ease-out-expo),
+    visibility var(--duration-base);
+  animation: none;
+}
+.has-mega:hover .mega-panel,
+.has-mega.open .mega-panel {
+  display: grid;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mega-panel {
+    transition: none;
+    transform: none;
+  }
+  .has-mega:hover .mega-panel,
+  .has-mega.open .mega-panel {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   MOBILE DRAWER — slides from inline-end
+   LTR: from right | RTL: from left
+═══════════════════════════════════════════════════════ */
+.nav-overlay {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: opacity var(--duration-base) var(--ease-out-soft);
+}
+.nav-drawer {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+  transform: translateX(105%);
+  transition: transform var(--duration-base) var(--ease-out-expo);
+}
+html[dir="rtl"] .nav-drawer {
+  transform: translateX(-105%);
+}
+.nav-drawer.open,
+html[dir="rtl"] .nav-drawer.open {
+  transform: translateX(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-drawer,
+  html[dir="rtl"] .nav-drawer {
+    transition: none;
+  }
+  .nav-overlay {
+    transition: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   FILTER CHIPS + GRID REFLOW
+═══════════════════════════════════════════════════════ */
+.filter-chip {
+  transition:
+    background var(--duration-fast) var(--ease-out-soft),
+    color var(--duration-fast) var(--ease-out-soft),
+    border-color var(--duration-fast) var(--ease-out-soft),
+    transform var(--duration-fast) var(--ease-out-soft);
+}
+.filter-chip:active {
+  transform: scale(0.96);
+}
+.catalog-card {
+  transition:
+    opacity var(--duration-base) var(--ease-out-expo),
+    transform var(--duration-base) var(--ease-out-expo),
+    box-shadow var(--duration-base) var(--ease-out-soft);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .catalog-card.is-filtered-out {
+    opacity: 0;
+    transform: scale(0.9);
+    pointer-events: none;
+  }
+  .catalog-card.is-filtered-gone {
+    display: none !important;
+  }
+}
+#platforms-grid {
+  transition: opacity var(--duration-fast) var(--ease-out-soft);
+}
+
+/* ═══════════════════════════════════════════════════════
+   HERO LOAD SEQUENCE
+═══════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes heroMediaSettle {
+    from { transform: scale(1.1); }
+    to { transform: scale(1); }
+  }
+  @keyframes heroFadeUpMotion {
+    from { opacity: 0; transform: translateY(22px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-bg-video {
+    transform-origin: center center;
+    animation: heroMediaSettle 2.8s var(--ease-out-expo) both;
+  }
+  .hero-eyebrow {
+    animation: heroFadeUpMotion var(--duration-slow) var(--ease-out-expo) 0.15s both;
+  }
+  .hero-main h1 {
+    animation: heroFadeUpMotion 1s var(--ease-out-expo) 0.35s both;
+    text-align: start;
+  }
+  .hero-desc {
+    animation: heroFadeUpMotion 1s var(--ease-out-expo) 0.55s both;
+    text-align: start;
+  }
+  .hero-cta {
+    animation: heroFadeUpMotion var(--duration-slow) var(--ease-out-expo) 0.75s both;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   DIRECTOR WORD (About) — staged entrance + soft presence
+═══════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes directorPortraitIn {
+    from {
+      opacity: 0;
+      transform: translateX(calc(var(--director-from, -1) * 28px)) scale(0.94);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+  @keyframes directorMarkIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.85);
+    }
+    to {
+      opacity: 0.55;
+      transform: translateY(0) scale(1);
+    }
+  }
+  @keyframes directorQuoteIn {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes directorRuleDraw {
+    from {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    to {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+  }
+  @keyframes directorFooterIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes directorGlowDrift {
+    0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.9; }
+    50% { transform: translate(4%, -3%) scale(1.05); opacity: 1; }
+  }
+
+  html[dir="rtl"] .director-word {
+    --director-from: -1;
+  }
+  html[dir="ltr"] .director-word {
+    --director-from: 1;
+  }
+
+  .director-word[data-director-motion]:not(.is-director-in) .director-word-frame,
+  .director-word[data-director-motion]:not(.is-director-in) .director-word-mark,
+  .director-word[data-director-motion]:not(.is-director-in) .director-word-quote p,
+  .director-word[data-director-motion]:not(.is-director-in) .director-word-rule,
+  .director-word[data-director-motion]:not(.is-director-in) .director-word-quote footer {
+    opacity: 0;
+  }
+
+  .director-word.is-director-in .director-word-frame {
+    animation: directorPortraitIn 0.95s var(--ease-out-expo) both;
+  }
+  .director-word.is-director-in .director-word-glow {
+    animation: directorGlowDrift 7s var(--ease-out-soft) 0.8s infinite;
+  }
+  .director-word.is-director-in .director-word-mark {
+    animation: directorMarkIn 0.7s var(--ease-out-expo) 0.28s both;
+  }
+  .director-word.is-director-in .director-word-quote p {
+    animation: directorQuoteIn 0.9s var(--ease-out-expo) 0.42s both;
+  }
+  .director-word.is-director-in .director-word-rule {
+    animation: directorRuleDraw 0.75s var(--ease-out-expo) 0.7s both;
+  }
+  .director-word.is-director-in .director-word-quote footer {
+    animation: directorFooterIn 0.7s var(--ease-out-expo) 0.88s both;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .director-word-frame {
+      transition:
+        transform var(--duration-base) var(--ease-out-expo),
+        box-shadow var(--duration-base) var(--ease-out-soft);
+    }
+    .director-word:hover .director-word-frame {
+      transform: translateY(-4px);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.7) inset,
+        0 22px 48px -26px rgba(27, 67, 50, 0.4);
+    }
+    .director-word-frame img {
+      transition: transform 1.1s var(--ease-out-expo);
+    }
+    .director-word:hover .director-word-frame img {
+      transform: scale(1.03);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .director-word-frame,
+  .director-word-mark,
+  .director-word-quote p,
+  .director-word-rule,
+  .director-word-quote footer,
+  .director-word-glow {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   STATS COUNT-UP READY STATE
+═══════════════════════════════════════════════════════ */
+.stats-bar .stat-num {
+  font-variant-numeric: tabular-nums;
+  unicode-bidi: isolate;
+}

@@ -12,6 +12,8 @@ import {
   findResearchProjectByKey,
   findResearchGroupByKey,
   findPartnerByKey,
+  findPlatformByKey,
+  findLawByKey,
   getCoverForPub,
   getResearchProjectsForGroup,
 } from '../data.js';
@@ -134,6 +136,14 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
   }
   if (type === 'partner') {
     renderPartnerDetail(host, slugOrId, opts);
+    return;
+  }
+  if (type === 'platform') {
+    renderPlatformDetail(host, slugOrId, opts);
+    return;
+  }
+  if (type === 'law') {
+    renderLawDetail(host, slugOrId, opts);
     return;
   }
 
@@ -494,6 +504,200 @@ function renderPartnerDetail(host, slugOrId, opts = {}) {
  * @param {string} slugOrId
  * @param {{ previewItem?: object, isPreview?: boolean }} [opts]
  */
+function renderPlatformDetail(host, slugOrId, opts = {}) {
+  const item = opts.previewItem || findPlatformByKey(slugOrId);
+  const backPage = 'platforms';
+  if (!item) {
+    restoreSiteSeoHead();
+    replaceChildren(host, [
+      el('div', {
+        className: 'detail-not-found',
+        children: [
+          el('p', {
+            text: opts.isPreview ? t('detail_preview_missing') : t('detail_not_found'),
+          }),
+          el('a', {
+            className: 'detail-back',
+            attrs: { href: `#${backPage}`, 'data-page': backPage },
+            text: t('detail_back'),
+          }),
+        ],
+      }),
+    ]);
+    return;
+  }
+
+  applyItemSeoHead(item, 'platform');
+  const lang = getLang();
+  const title = lang === 'en' && item.titleEn ? item.titleEn : (item.title || '');
+  const summary = lang === 'en' && item.summaryEn ? item.summaryEn : (item.summary || '');
+  const bodyHtml = lang === 'en' && item.bodyEn ? item.bodyEn : (item.body || '');
+  const kindKey = item.kind === 'radio'
+    ? 'platform_kind_radio'
+    : item.kind === 'mobility'
+      ? 'platform_kind_mobility'
+      : 'platform_kind_visual';
+  const media = item.media && item.media.length
+    ? item.media
+    : (item.img ? [{ kind: 'image', src: item.img }] : []);
+  const mediaEl = buildMediaStage(media, title);
+  const children = [];
+  if (opts.isPreview) {
+    children.push(
+      el('div', {
+        className: 'detail-preview-banner',
+        attrs: { role: 'status' },
+        text: t('detail_preview_banner'),
+      }),
+    );
+  }
+  children.push(
+    el('a', {
+      className: 'detail-back',
+      attrs: { href: `#${backPage}`, 'data-page': backPage },
+      text: t('detail_back'),
+    }),
+  );
+  if (mediaEl) children.push(mediaEl);
+  children.push(
+    el('header', {
+      className: 'detail-header',
+      children: [
+        el('p', { className: 'detail-meta', text: t(kindKey) }),
+        el('h1', { className: 'detail-title section-title', text: title }),
+      ],
+    }),
+  );
+  if (summary) children.push(el('p', { className: 'detail-summary', text: summary }));
+  if (bodyHtml) {
+    children.push(
+      el('div', {
+        className: 'detail-body',
+        children: nodesFromSafeBody(bodyHtml),
+      }),
+    );
+  }
+  if (item.externalUrl) {
+    children.push(
+      el('p', {
+        className: 'detail-external-link',
+        children: [
+          el('a', {
+            attrs: {
+              href: item.externalUrl,
+              target: '_blank',
+              rel: 'noopener noreferrer',
+            },
+            text: t('detail_more_info'),
+          }),
+        ],
+      }),
+    );
+  }
+  replaceChildren(host, [el('article', { className: 'detail-article', children })]);
+}
+
+/**
+ * @param {HTMLElement} host
+ * @param {string} slugOrId
+ * @param {{ previewItem?: object, isPreview?: boolean }} [opts]
+ */
+function renderLawDetail(host, slugOrId, opts = {}) {
+  const item = opts.previewItem || findLawByKey(slugOrId);
+  const backPage = 'laws';
+  if (!item) {
+    restoreSiteSeoHead();
+    replaceChildren(host, [
+      el('div', {
+        className: 'detail-not-found',
+        children: [
+          el('p', {
+            text: opts.isPreview ? t('detail_preview_missing') : t('detail_not_found'),
+          }),
+          el('a', {
+            className: 'detail-back',
+            attrs: { href: `#${backPage}`, 'data-page': backPage },
+            text: t('detail_back'),
+          }),
+        ],
+      }),
+    ]);
+    return;
+  }
+
+  applyItemSeoHead(item, 'law');
+  const lang = getLang();
+  const title = lang === 'en' && item.titleEn ? item.titleEn : (item.title || '');
+  const summary = lang === 'en' && item.summaryEn ? item.summaryEn : (item.summary || '');
+  const bodyHtml = lang === 'en' && item.bodyEn ? item.bodyEn : (item.body || '');
+  const media = item.media && item.media.length
+    ? item.media
+    : (item.img ? [{ kind: 'image', src: item.img }] : []);
+  const mediaEl = buildMediaStage(media, title);
+  const children = [];
+  if (opts.isPreview) {
+    children.push(
+      el('div', {
+        className: 'detail-preview-banner',
+        attrs: { role: 'status' },
+        text: t('detail_preview_banner'),
+      }),
+    );
+  }
+  children.push(
+    el('a', {
+      className: 'detail-back',
+      attrs: { href: `#${backPage}`, 'data-page': backPage },
+      text: t('detail_back'),
+    }),
+  );
+  if (mediaEl) children.push(mediaEl);
+  children.push(
+    el('header', {
+      className: 'detail-header',
+      children: [
+        el('p', { className: 'detail-meta', text: t('bc_laws') }),
+        el('h1', { className: 'detail-title section-title', text: title }),
+      ],
+    }),
+  );
+  if (summary) children.push(el('p', { className: 'detail-summary', text: summary }));
+  if (bodyHtml) {
+    children.push(
+      el('div', {
+        className: 'detail-body',
+        children: nodesFromSafeBody(bodyHtml),
+      }),
+    );
+  } else if (!summary) {
+    children.push(
+      el('p', {
+        className: 'detail-empty-body',
+        text: t('detail_no_body'),
+      }),
+    );
+  }
+  if (item.externalUrl) {
+    children.push(
+      el('p', {
+        className: 'detail-external-link',
+        children: [
+          el('a', {
+            attrs: {
+              href: item.externalUrl,
+              target: '_blank',
+              rel: 'noopener noreferrer',
+            },
+            text: t('detail_more_info'),
+          }),
+        ],
+      }),
+    );
+  }
+  replaceChildren(host, [el('article', { className: 'detail-article', children })]);
+}
+
+
 function renderResearchGroupDetail(host, slugOrId, opts = {}) {
   const lang = getLang();
   const item = opts.previewItem || findResearchGroupByKey(slugOrId);

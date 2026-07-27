@@ -43,7 +43,7 @@ type Initial = {
   eventYear: string;
   eventTypeAr: string;
   eventTypeEn: string;
-  eventDisplayStatus: "upcoming" | "done";
+  eventDisplayStatus: "upcoming" | "ongoing" | "done";
   attachments?: PublicMediaItem[];
   publicSlug?: string | null;
   status?: string;
@@ -100,7 +100,7 @@ export function EventEditorForm({
   const [eventYear, setEventYear] = useState(initial?.eventYear ?? "");
   const [eventTypeAr, setEventTypeAr] = useState(initial?.eventTypeAr ?? "");
   const [eventTypeEn, setEventTypeEn] = useState(initial?.eventTypeEn ?? "");
-  const [eventDisplayStatus, setEventDisplayStatus] = useState<"upcoming" | "done">(
+  const [eventDisplayStatus, setEventDisplayStatus] = useState<"upcoming" | "ongoing" | "done">(
     initial?.eventDisplayStatus ?? "upcoming",
   );
   const [attachments, setAttachments] = useState<PublicMediaItem[]>(() => {
@@ -285,10 +285,11 @@ export function EventEditorForm({
               <select
                 disabled={!editable}
                 value={eventDisplayStatus}
-                onChange={(e) => setEventDisplayStatus(e.target.value as "upcoming" | "done")}
+                onChange={(e) => setEventDisplayStatus(e.target.value as "upcoming" | "ongoing" | "done")}
                 className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
               >
                 <option value="upcoming">upcoming</option>
+                <option value="ongoing">ongoing</option>
                 <option value="done">done</option>
               </select>
             </label>

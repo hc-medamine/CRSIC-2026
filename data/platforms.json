@@ -1,0 +1,58 @@
+{
+    "platforms": [
+        {
+            "id": "44794dee-103e-4a26-af68-2d9bfd99a3d1",
+            "img": "img/Holders/5.jpg",
+            "body": "<p>يشرف المركز على برامج <strong>التنقل قصير المدى</strong> لفائدة الباحثين والشركاء الوطنيين والدوليين.</p><p>تهدف هذه البرامج إلى تبادل الخبرات، والمشاركة في أنشطة بحثية مشتركة، ودعم الإقامة العلمية القصيرة داخل المركز أو لدى مؤسسات شريكة.</p><p>تُنشر شروط الترشح والمواعيد والمستندات المطلوبة عبر قنوات المركز الرسمية عند فتح كل دورة.</p>",
+            "kind": "mobility",
+            "slug": "التنقل-قصير-المدى",
+            "media": [
+                {
+                    "src": "img/Holders/5.jpg",
+                    "kind": "image"
+                }
+            ],
+            "title": "التنقل قصير المدى",
+            "bodyEn": "<p>The Centre runs <strong>short-term mobility</strong> programmes for researchers and national and international partners.</p><p>These programmes support exchange of expertise, joint research activities, and short scientific stays at the Centre or with partner institutions.</p><p>Eligibility rules, deadlines and required documents are announced through the Centre’s official channels when each call opens.</p>",
+            "summary": "برامج تنقل قصير المدى للباحثين والشركاء لتعزيز التعاون العلمي.",
+            "titleEn": "Short-term mobility",
+            "summaryEn": "Short-term mobility programmes for researchers and partners to strengthen scientific cooperation."
+        },
+        {
+            "id": "5defcf0d-3298-4269-820d-4c9fd84556f0",
+            "img": "img/Holders/4.jpg",
+            "body": "<p>تقدّم منصة المحاضرات الإذاعية محتوى صوتياً علمياً من إنتاج المركز، يشمل حلقات ومحاضرات في العلوم الإسلامية والحضارة.</p><p>يُنشر البث عبر قناة المركز على منصة ساوند كلاود، بما يتيح الاستماع المباشر وأرشفة الحلقات للمستمعين والباحثين.</p><p>تهدف المنصة إلى توسيع الوصول إلى المعرفة العلمية للمركز خارج الإطار الحضوري للملتقيات.</p>",
+            "kind": "radio",
+            "slug": "منصة-المحاضرات-الإذاعية",
+            "media": [
+                {
+                    "src": "img/Holders/4.jpg",
+                    "kind": "image"
+                }
+            ],
+            "title": "منصة المحاضرات الإذاعية",
+            "bodyEn": "<p>The radio lecture platform offers scientific audio content produced by the Centre, including episodes and talks in Islamic sciences and civilisation.</p><p>Broadcasts are published on the Centre’s SoundCloud channel, enabling live listening and an archive for listeners and researchers.</p><p>The platform widens access to the Centre’s knowledge beyond in-person conferences.</p>",
+            "summary": "بث إذاعي ومحاضرات صوتية يقدّمها المركز عبر قناته على ساوند كلاود.",
+            "titleEn": "Radio lecture platform",
+            "summaryEn": "Radio broadcasts and audio lectures via the Centre’s SoundCloud channel."
+        },
+        {
+            "id": "70418527-0702-4988-a9cd-828f211d2262",
+            "img": "img/Holders/3.jpg",
+            "body": "<p>تتيح منصة المحاضرات المرئية للمركز عرض تسجيلات ودروس ومحاضرات علمية مرتبطة بأنشطة البحث والتكوين.</p><p>تتناول المحتوى موضوعات في الدراسات القرآنية والفقهية، والفكر والعقيدة، والتاريخ الثقافي، والحضارة الإسلامية، بمشاركة باحثي المركز وضيوف أكاديميين.</p><p>يمكن متابعة المحاضرات المنشورة عبر صفحة المنصة في الموقع، ضمن أجندة الفعاليات العلمية للمركز.</p>",
+            "kind": "visual",
+            "slug": "منصة-المحاضرات-المرئية",
+            "media": [
+                {
+                    "src": "img/Holders/3.jpg",
+                    "kind": "image"
+                }
+            ],
+            "title": "منصة المحاضرات المرئية",
+            "bodyEn": "<p>The Centre’s visual lecture platform hosts recordings, lessons and scientific talks linked to research and training activities.</p><p>Topics cover Qur’anic and fiqh studies, thought and creed, cultural history, and Islamic civilisation, with contributions from Centre researchers and academic guests.</p><p>Published lectures can be followed through the platform page as part of the Centre’s scientific programme.</p>",
+            "summary": "محاضرات مرئية علمية يقدّمها باحثو المركز وضيوفه في العلوم الإسلامية والحضارة.",
+            "titleEn": "Visual lecture platform",
+            "summaryEn": "Scientific video lectures by Centre researchers and guests in Islamic sciences and civilisation."
+        }
+    ]
+}

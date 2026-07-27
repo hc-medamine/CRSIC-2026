@@ -18,7 +18,7 @@ export type PublicEventItem = {
   year: string;
   title: string;
   type: string;
-  status: "done" | "upcoming";
+  status: "done" | "upcoming" | "ongoing";
   img?: string;
   summary: string;
   body: string;
@@ -37,7 +37,7 @@ type PayloadSource = {
   event_month: string | null;
   event_year: string | null;
   event_type_ar: string | null;
-  event_display_status: "upcoming" | "done" | null;
+  event_display_status: "upcoming" | "ongoing" | "done" | null;
   event_scope: "intl" | "nat" | null;
   image_path: string | null;
   image_alt_ar: string | null;
@@ -69,7 +69,12 @@ export function buildEventPayload(
       year: row.event_year?.trim() || "",
       title: row.title_ar.trim(),
       type: row.event_type_ar?.trim() || "فعالية",
-      status: row.event_display_status === "done" ? ("done" as const) : ("upcoming" as const),
+      status:
+        row.event_display_status === "done"
+          ? ("done" as const)
+          : row.event_display_status === "ongoing"
+            ? ("ongoing" as const)
+            : ("upcoming" as const),
       summary: row.summary_ar?.trim() || "",
       body: sanitizeBodyHtml(row.body_ar) || "",
       media,
@@ -114,7 +119,12 @@ export async function rebuildPublicEventsJson(): Promise<{
       year: item.year?.trim() || "",
       title: (item.title ?? "").trim(),
       type: item.type?.trim() || "فعالية",
-      status: item.status === "done" ? "done" : "upcoming",
+      status:
+        item.status === "done"
+          ? "done"
+          : item.status === "ongoing"
+            ? "ongoing"
+            : "upcoming",
       summary: item.summary?.trim() || "",
       body: item.body?.trim() || "",
       media,

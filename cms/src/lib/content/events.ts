@@ -59,7 +59,7 @@ export type EventItem = {
   event_year: string | null;
   event_type_ar: string | null;
   event_type_en: string | null;
-  event_display_status: "upcoming" | "done" | null;
+  event_display_status: "upcoming" | "ongoing" | "done" | null;
   checklist_confirmed: boolean;
   review_note: string | null;
   public_slug: string | null;
@@ -93,7 +93,7 @@ export type EventInput = {
   eventYear: string;
   eventTypeAr: string;
   eventTypeEn?: string;
-  eventDisplayStatus: "upcoming" | "done";
+  eventDisplayStatus: "upcoming" | "ongoing" | "done";
 } & SeoInput;
 
 function snapshotOf(row: EventItem) {
@@ -146,7 +146,7 @@ function validateEventFields(input: EventInput) {
   }
   if (!input.eventTypeAr.trim()) throw new Error("Event type (AR) is required");
   if (!["intl", "nat"].includes(input.eventScope)) throw new Error("Invalid event scope");
-  if (!["upcoming", "done"].includes(input.eventDisplayStatus)) {
+  if (!["upcoming", "ongoing", "done"].includes(input.eventDisplayStatus)) {
     throw new Error("Invalid display status");
   }
 }
