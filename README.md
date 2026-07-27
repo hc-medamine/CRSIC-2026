@@ -20,7 +20,14 @@ Living single source of truth for the public site of **مركز البحث في 
 
 This repository is the **official public website** for CRSIC, a public scientific and technological research centre under Algeria’s Ministry of Higher Education and Scientific Research. The centre was founded by executive decree **15-136** (23 May 2015) and opened in January 2016. The site presents the institution, research departments, publications, journals, events, partnerships, news, and contact channels to researchers, partners, and the general public.
 
-The product is a **zero-dependency static SPA**: Arabic-first (RTL) with English UI chrome, hash-based client routing, and content loaded from UTF-8 JSON files. There is no application backend, database, or package manager today.
+This repository holds **two products**:
+
+| Product | Location | Runtime |
+|---------|----------|---------|
+| **Public SPA** | Repo root (`index.html`, `js/`, `css/`, `data/`) | Zero-build static site: Arabic-first (RTL), English UI chrome, hash routing, UTF-8 JSON. No bundler; browser loads ES modules directly. |
+| **Internal CMS** | [`cms/`](./cms/) | Next.js App Router + PostgreSQL — authoring, workflow, and publish into `data/*.json`. See [`cms/README.md`](./cms/README.md). |
+
+The public SPA has no application backend of its own; contact uses `mailto:`. Optional Node at the repo root is only for a convenience static server (`npm run spa`).
 
 | Link                                    | URL / location                                                                                                                |
 | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
@@ -34,14 +41,16 @@ The product is a **zero-dependency static SPA**: Arabic-first (RTL) with English
 
 ## 2. Technology stack
 
+### 2.1 Public SPA (repo root)
+
 | Layer                        | Choice                                                           | Notes                                                   |
 | ---------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------- |
 | Languages                    | HTML5, CSS3, JavaScript (ES modules)                             | No TypeScript                                           |
-| Package manager / runtime    | **None**                                                         | No `package.json`, no lockfile, no Node build           |
+| Root `package.json`          | Convenience only                                                 | `npm run spa` → `npx serve -l 5500 .` (no lockfile, no SPA build) |
 | Front-end framework          | **None (vanilla)**                                               | Custom SPA                                              |
 | State management             | Module-scoped vars + `localStorage`                              | Language + banner dismiss                               |
 | Back-end / API / ORM         | **None**                                                         | Contact uses `mailto:`                                  |
-| Database / cache / search    | **None**                                                         | Static JSON on disk or CDN                              |
+| Database / cache / search    | **None** (public site)                                           | Static JSON on disk or CDN                              |
 | Fonts                        | Google Fonts: **Amiri** (400/700), **Tajawal** (300/400/500/700) | CDN in `index.html`                                     |
 | Routing                      | Custom hash router                                               | `js/router.js` — `#home`, `#about`, …                   |
 | i18n                         | Custom AR/EN dictionaries                                        | `data/locales/*.json`                                   |
@@ -49,12 +58,27 @@ The product is a **zero-dependency static SPA**: Arabic-first (RTL) with English
 | CI/CD                        | **None**                                                         | No GitHub Actions or similar                            |
 | Auth / payments / email SaaS | **None**                                                         | Form opens the user’s mail client to `contact@crsic.dz` |
 | Monitoring                   | **None**                                                         | —                                                       |
-| Linters / formatters         | **None**                                                         | No ESLint, Prettier, or EditorConfig                    |
+| Linters / formatters         | **None** (SPA)                                                   | No ESLint / Prettier at repo root                       |
 | Unit tests                   | Node built-in (`node --test`)                                    | `tests/*.test.mjs` (a11y Escape stack + `?lang=`); no CI |
 | Bundler                      | **None**                                                         | Browser loads ES modules directly                       |
-| IDE helper                   | VS Code Live Server                                              | Port **5501** (`.vscode/settings.json`)                 |
+| Local serve                  | Live Server **5501** or `npm run spa` **5500**                   | `.vscode/settings.json` / root `package.json`           |
 
-**App config (not** `.env`**):** `CONTENT_BASE_URL` in `js/config.js` — empty string = local `/data`.
+**App config (not** `.env`**):** in `js/config.js` —
+
+- `CONTENT_BASE_URL` — empty string = local `/data`
+- `PREVIEW_API_BASE` — CMS origin for A1 public preview (local default `http://localhost:3000`)
+
+### 2.2 Internal CMS (`cms/`)
+
+| Layer | Choice | Notes |
+|-------|--------|--------|
+| Framework | Next.js 16 (App Router) + React 19 | See [`cms/package.json`](./cms/package.json) |
+| Database | PostgreSQL | Migrations via `npm run db:migrate` (auto on `dev` / `build`) |
+| Auth | `iron-session` cookie | Roles: super_admin / editor / reviewer |
+| UI | Tailwind CSS 4 | Direction B visual tokens (`crs-*`) |
+| Package manager | npm (`cms/package.json`) | Install inside `cms/`; secrets in `.env.local` (never commit) |
+
+Full setup: [`cms/README.md`](./cms/README.md). Ops: [`docs/runbooks/CMS-OPS.md`](./docs/runbooks/CMS-OPS.md).
 
 ---
 
@@ -65,17 +89,18 @@ Annotated tree of the important layout (binary assets under `img/` summarised):
 ```text
 CRSIC 2026/
 ├── .gitignore                 # OS / IDE / secrets / Node / Next ignores
+├── package.json               # Root convenience: `npm run spa` (static serve :5500)
 ├── index.html                 # Single HTML shell: all page sections, nav, footer, schema.org
-├── cms/                       # Step 4 internal CMS (Next.js + PostgreSQL) — feature/step4-internal-cms
+├── cms/                       # Internal CMS (Next.js + PostgreSQL)
 │   ├── README.md              # Local CMS setup
-│   ├── package.json
+│   ├── package.json           # Next app deps + db:* scripts
 │   ├── .env.example           # Template only (no secrets)
-│   └── src/                   # App Router (auth/workflow TBD)
+│   └── src/                   # App Router (dashboard + API)
 ├── css/
 │   └── style.css              # Design system, layout, animations (CSS variables in :root)
 ├── js/
 │   ├── main.js                # ENTRY POINT — boot order, wires modules
-│   ├── config.js              # CONTENT_BASE_URL + contentUrl()
+│   ├── config.js              # CONTENT_BASE_URL, PREVIEW_API_BASE, contentUrl()
 │   ├── data.js                # fetch JSON, soft-fail, sync getters
 │   ├── i18n.js                # locales, RTL/LTR, localStorage, banner
 │   ├── router.js              # hash navigation, PAGE_PARENT, deep links
@@ -89,7 +114,7 @@ CRSIC 2026/
 │       ├── newsCard.js
 │       ├── journalCard.js
 │       └── partnerCard.js
-├── data/                      # Runtime content (edit without touching JS)
+├── data/                      # Runtime content (edit without touching JS; CMS publish target)
 │   ├── README.md              # Editor guide
 │   ├── CMS.md                 # CDN / remote JSON publish contract
 │   ├── publications.json
@@ -143,9 +168,12 @@ CRSIC 2026/
 
 | Path                                      | Role                                                                       |
 | ----------------------------------------- | -------------------------------------------------------------------------- |
-| `index.html` → `js/main.js`               | Runtime entry                                                              |
+| `index.html` → `js/main.js`               | Public SPA runtime entry                                                   |
+| `cms/` → `npm run dev`                    | Internal CMS (Next); see [`cms/README.md`](./cms/README.md)                |
+| `package.json` (`npm run spa`)            | Optional static serve of the public SPA on port **5500**                   |
 | `.claude/`                                | Claude tool permissions only — **not part of the app**                     |
-| No `node_modules/`, no `dist/`, no `.git` | Nothing generated by a build; Git is **not initialised** in this workspace |
+| `node_modules/` (if present)              | Gitignored — appears after `npm install` inside `cms/` (or root `npx`)     |
+| No SPA `dist/` / bundler output           | Public site ships source as static files; GitHub remote is configured      |
 
 ### Boot sequence
 
@@ -165,7 +193,9 @@ flowchart TD
 
 ## 4. Data architecture & current data state
 
-There is **no relational database**, migrations framework, ORM, or seed runner. Content is static JSON fetched at runtime.
+**Public SPA:** no relational database — content is static JSON fetched at runtime (local `/data` or `CONTENT_BASE_URL`).
+
+**Internal CMS:** PostgreSQL holds drafts/workflow; **publish** rebuilds the same JSON filenames the SPA reads. See [`data/CMS.md`](./data/CMS.md) and [`cms/README.md`](./cms/README.md).
 
 ### 4.1 Content “schema” (JSON files)
 
@@ -233,12 +263,15 @@ Flat maps `key → string` in `data/locales/ar.json` and `en.json`. Keys must st
 
 ### 4.2 Migrations & seed data
 
-| Item                            | Status                                                                                         |
-| ------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Migrations                      | **N/A** — edit JSON files directly                                                             |
-| Seed scripts                    | **N/A**                                                                                        |
-| Fixtures                        | The JSON files themselves are the fixtures                                                     |
-| How to “seed” a new environment | Copy `/data` (and referenced `img/` paths) or point `CONTENT_BASE_URL` at a published snapshot |
+| Surface | Migrations / seed |
+|---------|-------------------|
+| Public SPA `/data` | **N/A** — edit JSON files directly (or let CMS publish overwrite them) |
+| CMS (`cms/`) | SQL migrations + `npm run db:seed:*` / `db:import-legacy` — see [`cms/README.md`](./cms/README.md) |
+
+| Item                            | Status (public JSON)                                                                               |
+| ------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Fixtures                        | The JSON files themselves are the fixtures                                                         |
+| How to “seed” a new environment | Copy `/data` (and referenced `img/` paths) or point `CONTENT_BASE_URL` at a published snapshot     |
 
 See [data/README.md](./data/README.md) for add-publication / add-event recipes.
 
@@ -518,61 +551,71 @@ Deep links may pass `data-tab` / `data-filter` on navigable elements.
 | Tool               | Requirement                                            |
 | ------------------ | ------------------------------------------------------ |
 | Browser            | Modern evergreen with ES module + `fetch` support      |
-| Static HTTP server | **Required** — `file://` breaks modules and JSON fetch |
-| Node.js            | Optional; only if using `npx serve` or similar         |
+| Static HTTP server | **Required** for the public SPA — `file://` breaks modules and JSON fetch |
+| Node.js            | Optional for SPA (`npm run spa` / `npx serve`); **required** for CMS (`cms/`) |
 | Docker             | Not required                                           |
-| Database           | Not required                                           |
+| Database           | Not required for SPA; **PostgreSQL 18** required for CMS |
 
-Exact Node version: **not pinned** (no project Node dependency). VS Code Live Server is configured for port **5501**.
+SPA Node version: **not pinned** (root script only shells out to `npx serve`). CMS uses whatever Node satisfies Next 16 — see [`cms/package.json`](./cms/package.json). VS Code Live Server is configured for port **5501**.
 
 ### 7.2 Environment / configuration variables
 
-No `.env` file. Single app config:
+**Public SPA** — no `.env` file. Config in `js/config.js`:
 
 | Variable           | Location       | Required          | Example                                  | Description                                                                                                                    |
 | ------------------ | -------------- | ----------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `CONTENT_BASE_URL` | `js/config.js` | No (default `''`) | `''` or `https://cdn.example.com/crsic/` | Empty = local `../data/…`. Non-empty = fetch same JSON filenames from that base. Trailing slash optional (normalised in code). |
+| `PREVIEW_API_BASE` | `js/config.js` | No                | `http://localhost:3000`                  | CMS origin for `#preview/{token}` (must match where `GET /api/public/preview/…` lives).                                        |
 
-### 7.3 Step-by-step local run
+**CMS** — copy `cms/.env.example` → `cms/.env.local` (`DATABASE_URL`, `SESSION_SECRET`, etc.). Never commit secrets.
+
+### 7.3 Step-by-step local run (public SPA)
 
 1. Obtain the project folder (clone or copy).
 2. Serve the **project root** over HTTP (pick one):
 
 ```bash
+# Convenience script (port 5500):
+npm run spa
+
 # VS Code: Live Server → opens on port 5501
 
 # Or with Node (one-shot):
-npx --yes serve "c:\Users\H Med Amine\Desktop\CRSIC 2026"
+npx --yes serve -l 5500 .
 ```
 
-1. Open the served URL and load `index.html` (root).
-2. Optional: set `CONTENT_BASE_URL` in `js/config.js` for remote JSON.
-3. Edit content under `/data` and refresh.
+3. Open the served URL and load `index.html` (root).
+4. Optional: set `CONTENT_BASE_URL` / `PREVIEW_API_BASE` in `js/config.js`.
+5. Edit content under `/data` and refresh (or publish from the CMS).
 
-There is **no** install, migrate, or seed step.
+Public SPA: **no** install, migrate, or seed step.
 
-### 7.4 Tests, lint, build
+### 7.4 Internal CMS (optional)
 
-| Command                        | Status                                          |
-| ------------------------------ | ----------------------------------------------- |
-| Unit / integration / e2e tests | **Not present**                                 |
-| Lint / format                  | **Not present**                                 |
-| Production build               | **Not present** — deploy source as static files |
+```bash
+cd cms
+npm install
+# configure .env.local — see cms/README.md
+npm run db:seed:super-admin
+npm run dev   # http://localhost:3000
+```
 
-Manual smoke checklist:
+### 7.5 Tests, lint, build
 
-- [ ] Home loads without data-error banner
-- [ ] Language toggle flips RTL/LTR and chrome strings
-- [ ] Publications filter + lightbox
-- [ ] Events tabs
-- [ ] Contact form validation + mailto
-- [ ] `#about` deep link and legacy `/about` redirect on target host
+| Surface | Command | Status |
+|---------|---------|--------|
+| Public SPA unit tests | `node --test tests/*.test.mjs` | Present (small); no CI |
+| Public SPA lint / build | — | **Not present** — deploy static source |
+| CMS | `cd cms && npm test` / `npm run lint` / `npm run build` | See [`cms/package.json`](./cms/package.json) |
+| CMS smoke | `cd cms && npm run db:smoke` | See [`docs/qa/SMOKE-CMS.md`](./docs/qa/SMOKE-CMS.md) |
+
+Manual smoke checklist (public): use **[docs/qa/SMOKE.md](./docs/qa/SMOKE.md)** (~5 minutes) before merging to `main`.
 
 ---
 
 ## 8. API documentation
 
-The public SPA exposes **no HTTP API**.
+The public SPA exposes **no HTTP API**. Staff/admin APIs live under `cms/src/app/api/` (session-authenticated); see [`cms/README.md`](./cms/README.md).
 
 | Concern       | Behaviour                                                                                                                  |
 | ------------- | -------------------------------------------------------------------------------------------------------------------------- |
@@ -620,8 +663,8 @@ Deploy the **project root as a static site** (no build step). Document root must
 
 | Environment          | How to differentiate                                                                                                          |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Local                | `CONTENT_BASE_URL = ''`, Live Server / `serve`                                                                                |
-| Staging / production | Same static files; optionally set `CONTENT_BASE_URL` to a published content snapshot so code and content deploy independently |
+| Local                | `CONTENT_BASE_URL = ''`, Live Server (**5501**) or `npm run spa` (**5500**); CMS optional on **:3000** |
+| Staging / production | Same static files; optionally set `CONTENT_BASE_URL` to a published content snapshot so code and content deploy independently; set `PREVIEW_API_BASE` / CMS `PUBLIC_SITE_URL` when preview is used |
 
 No separate staging config files exist in-repo.
 
