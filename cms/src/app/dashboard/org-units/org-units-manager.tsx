@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import type { ContentType, OrgUnit } from "@/lib/users";
@@ -266,8 +266,12 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
             </tr>
           </thead>
           <tbody>
-            {orgUnits.map((o) => (
-              <tr key={o.id} className="border-b last:border-0 align-top">
+            {orgUnits.map((o, i) => (
+              <tr
+                key={o.id}
+                className="cms-row-enter border-b last:border-0 align-top"
+                style={{ "--row-delay": `${Math.min(i, 11) * 45}ms` } as CSSProperties}
+              >
                 <td className="px-3 py-3">
                   {editId === o.id ? (
                     <div className="grid gap-2">

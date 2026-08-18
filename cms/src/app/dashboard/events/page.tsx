@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
@@ -69,8 +70,12 @@ export default async function EventsListPage({
               </tr>
             </thead>
             <tbody className="divide-y divide-crs-border/70">
-              {items.map((item) => (
-                <tr key={item.id} className="hover:bg-crs-bg/50">
+              {items.map((item, i) => (
+                <tr
+                  key={item.id}
+                  className="cms-row-enter hover:bg-crs-bg/50"
+                  style={{ "--row-delay": `${Math.min(i, 11) * 45}ms` } as CSSProperties}
+                >
                   <td className="px-4 py-3">
                     <Link
                       href={`/dashboard/events/${item.id}`}
