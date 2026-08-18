@@ -19,6 +19,22 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-18 — Motion M2: SPA navigation cohesion
+
+**PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md) (Approved — docs branch PR #23)
+
+**Branch:** `feature/motion-m2` (PR #25)
+
+**Done:**
+- **View transitions:** `js/router.js` wraps the section swap in `withPageTransition` — `document.startViewTransition` when available, `page-fade-in` class fallback otherwise (skipped entirely under reduced-motion). `css/motion.css` M2 section: `::view-transition-old/new(root)` crossfade + vertical slide (RTL-safe, no mirroring needed), `vtPageOut`/`vtPageIn` keyframes; detail shell gets fade-only (content fills async).
+- **Lightbox spring + frosted backdrop:** `backdrop-filter: blur(6px)` on `.lightbox-overlay`, panel entrance `scale(0.92) → 1` with springy `cubic-bezier(0.16,1,0.3,1)` (motion-only).
+- **Tab indicator morph:** `.tab-bar::after` upgraded to rounded 3px gold pill + soft glow + springy easing (extends existing `--ind-x`/`--ind-sx` slide).
+- **Home pub carousel progress track:** `initPubCarouselTrack()` in `js/animations.js` injects a thin gold thumb track under `#home-pub-grid` (≤768px). Direction-agnostic — active card via centre proximity, thumb mirrored in RTL; click/tap the track to jump pages; re-queries cards so it survives language re-renders; usable (snap-only) under reduced-motion.
+
+**Also fixed this phase:** `cms/src/app/dashboard/director/director-form.tsx` last-published timestamp used locale-dependent `toLocaleString()` → SSR (en-GB) vs browser (en-US) hydration mismatch; now deterministic `YYYY-MM-DD HH:MM` matching other CMS lists.
+
+**Files:** `js/router.js`, `js/animations.js`, `css/motion.css`, `docs/WORKLOG.md`, `cms/src/app/dashboard/director/director-form.tsx`
+
 ### 2026-08-18 — Tooling + docs hygiene (no runtime change)
 
 **Done:**
