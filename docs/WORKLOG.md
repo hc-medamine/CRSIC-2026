@@ -27,11 +27,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 **Done:**
 - **FLIP publications filter:** `js/ui.js` `applyPubFilter` now keeps already-visible cards in place (only newly-shown cards fade/scale in) and runs `flipPubCards()` after the hide collapse — surviving cards animate `translate(dx,dy)` from their old grid slot to the new one (transform-only, reduced-motion skipped).
-- **Hero floaters:** three gold orbs (`.hero-float--a/b/c`) drift behind the home headline — vertical drift + scale + opacity, direction-agnostic, hidden ≤768px, `aria-hidden`.
-- **Headline word reveal:** `initHeroWordReveal()` wraps the hero h1 first phrase in masked `.wr-word`/`.wr-inner` spans with a per-word stagger (`--wr-d`); re-wraps idempotently after lang toggles via `refreshMotionReveals`. Reduced-motion = plain text.
-- **Heading gradient pan:** slow gold sheen sweeping the hero `<em>` (`background-clip:text`, `@supports`-guarded so it falls back to plain gold); plus a one-shot gold sheen across `.section-title.drawn` underlines (transform-only, `--sheen-from/to` mirrored for RTL).
+- **Hero floaters:** three gold orbs (`.hero-float--a/b/c`) drift behind the home headline — vertical drift + scale + opacity (floor 0.12, never fully hidden), direction-agnostic, `aria-hidden`. ID-scoped (`#page-home .hero-floaters`) to beat the `style.css` A5 rule (`.hero-main > *` → `position:relative`), and deliberately **no width breakpoint** — the original `≤768px` `display:none` hid them in any narrow/zoomed window.
+- **Headline word reveal:** `initHeroWordReveal()` wraps the home h1 phrase + gold `<em>` **and the About page-hero h1** in masked `.wr-word`/`.wr-inner` spans with a per-word stagger (`--wr-d`); re-wraps idempotently after lang toggles via `refreshMotionReveals` and replays the reveal. Reduced-motion = plain text.
+- **Heading gradient pan:** delivered as a transform-only one-shot gold sheen across `.section-title.drawn` underlines (`--sheen-from/to` mirrored for RTL). A `background-clip:text` gradient on the hero `<em>` was tried and **dropped** — text-clip breaks when descendants are composited (opacity/transform), rendering the gold text invisible during the word reveal.
+- **Hero video startup:** both hero videos (`hero-bg.mp4`, `about-hero-bg.mp4`) were `preload="metadata"` **and** non-faststart (260/331 MB with the `moov` metadata atom at the file tail), so playback lagged ~1s behind load, coinciding with the word reveal. Fixed with `preload="auto"` and an ffmpeg `-movflags +faststart -c copy` remux (metadata to front, no re-encode; files are git-ignored so this is a local asset swap). Video now fetches at ~270ms, independent of the reveal.
 
-**Files:** `js/ui.js`, `js/animations.js`, `css/motion.css`, `index.html`, `docs/WORKLOG.md`
+**Files:** `js/ui.js`, `js/animations.js`, `css/motion.css`, `index.html`, `img/Hero/*.mp4` (local, git-ignored), `docs/WORKLOG.md`
 
 ### 2026-08-18 — Motion M2: SPA navigation cohesion
 
