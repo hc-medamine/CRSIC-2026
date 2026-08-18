@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Draft** |
+| Status | **Approved** |
 | Date | 2026-08-18 |
 | Author | OpenCode session (with stakeholder) |
 | Owners | Stakeholder + OpenCode agent |
@@ -150,6 +150,7 @@
 | 2026-08-18 | Stakeholder requested all suggested effects in one slice. PRD drafted as **Draft**. No code until **Approved**. |
 | 2026-08-18 | Q&A locked 10 decisions (above) folded into Draft v2. Status remains **Draft** until stakeholder's final approval. |
 | 2026-08-18 | **Branch-only rule (mandatory):** never commit to `main` directly — merge only after stakeholder validation (recorded in `AGENTS.md` + README §5.3). |
+| 2026-08-18 | Stakeholder **approved Draft v2** → status **Approved**. Implementation may begin (M1 first, on `feature/motion-*` branches, phase-by-phase validated merges). |
 
 ## 12. Item backlog (source of truth for implementation)
 

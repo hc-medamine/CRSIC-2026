@@ -707,6 +707,7 @@ No separate staging config files exist in-repo.
 | — | Docs layout under `docs/` (+ PRD scaffold) | **Done** — [docs/README.md](./docs/README.md) |
 | — | Root Markdown stubs removed (README only at root) | **Done** |
 | 4 | Internal web app + database (users, roles, publish news/events/publications) — **no external CMS**, **no email features** | **On `main`** — core CMS + research groups/projects + authoring pack. Next: [CMS navigation & authoring UX](./docs/prds/2026-07-23-cms-navigation-authoring-ux.md) (**Approved** — implement M1→M3). |
+| 5 | Motion & interactivity polish (SPA + CMS) | [PRD](./docs/prds/2026-08-18-motion-interactivity-polish.md) (**Approved** 2026-08-18) — M1 both apps → M2 SPA nav → M3 SPA content → M4 CMS flows; phase-by-phase validated merges. |
 
 ### Known issues / gaps
 
