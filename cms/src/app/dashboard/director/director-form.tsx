@@ -101,7 +101,8 @@ export function DirectorEditorForm({ initial }: { initial: Initial }) {
       {message ? <FormBanner kind="success">{message}</FormBanner> : null}
       {initial.publishedAt ? (
         <p className="text-sm text-crs-muted">
-          {t("directorLastPublished", lang)}: {new Date(initial.publishedAt).toLocaleString()}
+          {t("directorLastPublished", lang)}:{" "}
+          {initial.publishedAt.slice(0, 16).replace("T", " ")}
         </p>
       ) : (
         <p className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
