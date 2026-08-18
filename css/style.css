@@ -1257,12 +1257,15 @@ footer.site-footer { background: var(--green-deep); }
 }
 /* Staggered reveals for internal page elements when the page becomes active */
 @media (prefers-reduced-motion: no-preference) {
+  /* Hero containers fade only — no translateY. A fractional-pixel slide on
+     the container re-rasterizes the text every frame (subpixel jitter /
+     "shaking"), especially on scaled Windows displays. */
   .page.active .page-hero {
-    animation: pageStagger 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: pageFadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   /* Home hero already has its own entrance — skip pageStagger double-motion */
   .page.active:not(#page-home) .hero-main {
-    animation: pageStagger 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: pageFadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   .page.active .page-body,
   .page.active .page-body-alt,
@@ -1277,6 +1280,10 @@ footer.site-footer { background: var(--green-deep); }
   @keyframes pageStagger {
     from { opacity: 0; transform: translateY(16px); }
     to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pageFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
   }
 }
 

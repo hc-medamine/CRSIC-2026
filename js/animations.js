@@ -345,10 +345,11 @@ function initTitleUnderline() {
 }
 
 /* ── HERO HEADLINE WORD REVEAL ───────────────────────── */
-function initHeroWordReveal() {
+export function initHeroWordReveal() {
   if (prefersReducedMotion()) return;
-  // Home: the phrase span + gold <em>. About: the page-hero h1 itself.
+  // Home: the phrase span + gold <em>. Other pages: their page-hero h1.
   document.querySelectorAll('.hero-main h1, .page-hero h1').forEach((h1) => {
+    const inActive = !!h1.closest('.page.active');
     const targets = [];
     h1.querySelectorAll('span[data-i18n], em[data-i18n]').forEach((n) => targets.push(n));
     if (h1.hasAttribute('data-i18n')) targets.push(h1);
@@ -369,14 +370,37 @@ function initHeroWordReveal() {
       node.replaceChildren(frag);
       rewrapped = true;
     });
-    if (!rewrapped) return;
+    if (!rewrapped && !inActive) return;
     h1.classList.add('wr-active');
-    if (h1.classList.contains('wr-in')) {
-      // Language switch wiped the word spans — restart the reveal.
-      h1.classList.remove('wr-in');
-      void h1.offsetWidth;
-    }
+    // Words stay masked (translateY 112%) until this page is active — the
+    // router replays the reveal on every navigation to the page.
+    if (!inActive) return;
+    if (h1.classList.contains('wr-in')) return; // already revealed
     requestAnimationFrame(() => requestAnimationFrame(() => h1.classList.add('wr-in')));
+  });
+}
+
+/** Replay the active page's hero headline reveal (called by the router). */
+export function replayActiveHeroWords() {
+  if (prefersReducedMotion()) return;
+  document.querySelectorAll('.page.active .hero-main h1, .page.active .page-hero h1').forEach((h1) => {
+    h1.classList.remove('wr-in');
+    // Snap words back under the mask instantly (no transition), so the
+    // reveal re-plays even for pages already shown — removing/re-adding
+    // wr-in alone would transition 0 -> 0 (no-op) inside the delay window.
+    const inners = h1.querySelectorAll('.wr-inner');
+    inners.forEach((inner) => {
+      inner.style.transition = 'none';
+      inner.style.transform = 'translateY(112%)';
+    });
+    void h1.offsetWidth;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      inners.forEach((inner) => {
+        inner.style.transition = '';
+        inner.style.transform = '';
+      });
+      h1.classList.add('wr-in');
+    }));
   });
 }
 
