@@ -703,14 +703,15 @@ html[dir="rtl"] .nav-drawer.open {
 ═══════════════════════════════════════════════════════ */
 
 /* Hero floaters — soft gold orbs drifting behind the headline.
-   Vertical drift + scale only → direction-agnostic (no RTL mirroring). */
+   Vertical drift + scale only → direction-agnostic (no RTL mirroring).
+   z-index 2: above the dark scrim (::after z1) but below content (z3). */
 @media (prefers-reduced-motion: no-preference) {
   .hero-floaters {
     position: absolute;
     inset: 0;
     overflow: hidden;
     pointer-events: none;
-    z-index: 1;
+    z-index: 2;
   }
   .hero-float {
     position: absolute;
@@ -765,9 +766,9 @@ html[dir="rtl"] .nav-drawer.open {
 }
 
 /* Headline word reveal — words rise from a masked line, staggered.
-   The hero h1's first phrase (span[data-i18n]) gets wrapped in
-   .wr-word/.wr-inner by JS; the gold <em> is left untouched so the
-   gradient pan below never overlaps a transformed child. */
+   The hero h1 phrase + gold <em> get wrapped in .wr-word/.wr-inner by JS.
+   The <em> uses fade-only reveal (no transform/mask) so the
+   background-clip:text gradient pan below never overlaps a moved glyph. */
 .wr-word {
   display: inline-block;
   overflow: hidden;
@@ -782,6 +783,18 @@ html[dir="rtl"] .nav-drawer.open {
   }
   .wr-active.wr-in .wr-inner {
     transform: translateY(0);
+  }
+  .hero-main h1 em .wr-word {
+    overflow: visible;
+  }
+  .hero-main h1 em .wr-inner {
+    transform: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    transition-delay: calc(0.45s + var(--wr-d, 0s));
+  }
+  .wr-active.wr-in .hero-main h1 em .wr-inner {
+    opacity: 1;
   }
 }
 

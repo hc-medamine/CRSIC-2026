@@ -348,9 +348,10 @@ function initTitleUnderline() {
 function initHeroWordReveal() {
   const h1 = document.querySelector('.hero-main h1');
   if (!h1 || prefersReducedMotion()) return;
-  // Only the first phrase (span[data-i18n]); the gold <em> stays plain so the
-  // gradient pan never overlaps a transformed child.
-  h1.querySelectorAll('span[data-i18n]').forEach((node) => {
+  // Wrap the first phrase AND the gold <em>; the <em> reveals via opacity
+  // only (CSS) so its background-clip:text gradient stays intact.
+  let rewrapped = false;
+  h1.querySelectorAll('span[data-i18n], em[data-i18n]').forEach((node) => {
     if (node.querySelector('.wr-word')) return; // idempotent across lang toggles
     const words = node.textContent.trim().split(/\s+/).filter(Boolean);
     if (words.length < 2) return;
@@ -364,10 +365,19 @@ function initHeroWordReveal() {
       frag.appendChild(document.createTextNode(' '));
     });
     node.replaceChildren(frag);
+    rewrapped = true;
   });
   h1.classList.add('wr-active');
-  if (!h1.classList.contains('wr-in')) {
+  const kick = () => {
     requestAnimationFrame(() => requestAnimationFrame(() => h1.classList.add('wr-in')));
+  };
+  if (rewrapped) {
+    // Language switch wiped the word spans — restart the reveal.
+    h1.classList.remove('wr-in');
+    void h1.offsetWidth;
+    kick();
+  } else if (!h1.classList.contains('wr-in')) {
+    kick();
   }
 }
 
