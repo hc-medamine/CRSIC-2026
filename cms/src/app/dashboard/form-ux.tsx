@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { t } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 
@@ -136,4 +136,62 @@ export function messageForAction(action: string): string | null {
     default:
       return "savedStay";
   }
+}
+
+/** Publish button state machine: idle → spinner → gold checkmark pop. */
+export function PublishButton({
+  pending,
+  onClick,
+  children,
+  className = "w-fit rounded bg-crs-primary px-4 py-2 text-sm text-white hover:bg-crs-secondary disabled:opacity-60",
+  disabled = false,
+}: {
+  pending: boolean;
+  onClick: () => void;
+  children: ReactNode;
+  className?: string;
+  disabled?: boolean;
+}) {
+  const [phase, setPhase] = useState<"idle" | "pending" | "done">("idle");
+  const [prevPending, setPrevPending] = useState(pending);
+
+  if (pending !== prevPending) {
+    setPrevPending(pending);
+    if (pending) {
+      setPhase("pending");
+    } else if (phase === "pending") {
+      setPhase("done");
+    }
+  }
+
+  useEffect(() => {
+    if (phase !== "done") return;
+    const id = setTimeout(() => setPhase("idle"), 1600);
+    return () => clearTimeout(id);
+  }, [phase]);
+
+  return (
+    <button
+      type="button"
+      disabled={pending || disabled}
+      onClick={onClick}
+      className={`inline-flex min-h-11 items-center justify-center gap-2 ${className}`}
+      aria-live="polite"
+    >
+      {phase === "pending" ? (
+        <span
+          className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
+          aria-hidden
+        />
+      ) : null}
+      {phase === "done" ? (
+        <span className="cms-check-pop text-crs-accent" aria-hidden>
+          <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
+            <path d="m5 13 4.5 4.5L19 8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+      ) : null}
+      <span>{children}</span>
+    </button>
+  );
 }

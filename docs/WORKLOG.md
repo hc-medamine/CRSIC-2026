@@ -19,6 +19,20 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-18 — Motion M4: CMS daily-flow polish
+
+**PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md) (Approved)
+
+**Branch:** `feature/motion-m4` — **not merged until M1–M4 all pass** (hard rule)
+
+**Done:**
+- **Publish button state machine (M4.1):** new `PublishButton` in `cms/src/app/dashboard/form-ux.tsx` — idle → spinner (border-rotating ring) → gold `cms-check-pop` (spring scale-in, 420ms, auto-resets after 1.6s). Swapped into all 10 publish buttons (alert/event/law/news/platform/group/partner/publication/project/director forms). Uses the React-sanctioned "adjust state when props change" render pattern (no setState in effect).
+- **Sidebar active pill + collapsible groups (M4.2):** `cms-chrome.tsx` — active nav link gets `cms-nav-active` springy pill pop; `GroupLabel` replaced with `NavGroup` (Centre content / Research / Admin) — chevron toggles a `grid-template-rows 1fr↔0fr` height transition (RTL-aware rotation). `NavLink` hoisted out of render (fixes `react-hooks/static-components`).
+- **Modal spring-in + backdrop blur (M4.3):** `cms-modal-backdrop` (fade + blur(4px)) and `cms-modal-panel` (translateY 14px + scale 0.96 → spring-in 320ms) applied to media lightbox + media delete/blocked dialogs.
+- **List skeletons (M4.4):** shared `ListSkeleton` (`cms/src/app/dashboard/list-skeleton.tsx`) + `loading.tsx` added to all 10 content-list routes (news/publications/events/partners/laws/platforms/alerts/research-groups/research-projects/media) — shimmer mirrors the SPA `.skeleton` pattern (`.cms-skeleton`, gold-green gradient sweep).
+- **CSS:** keyframes/classes appended to `cms/src/app/globals.css` under the M4 banner; all collapse under the existing `prefers-reduced-motion` guard.
+- **Verification:** `cms npm test` 18/18 pass; `npx eslint` clean on all touched files (remaining repo errors are pre-existing on base — `away-panel`, `comment-thread`, `home-tip-banner`, `spa-preview-link`, `review-owner-panel`, `revision-history`, `slug.ts`); `/login` 200, `/dashboard` 307 (auth) on :3000.
+
 ### 2026-08-18 — Motion M3: SPA exploration & micro-interactions
 
 **PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md) (Approved — docs branch PR #23)
