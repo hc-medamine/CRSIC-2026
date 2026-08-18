@@ -19,6 +19,15 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-18 — Tooling + docs hygiene (no runtime change)
+
+**Done:**
+- Root `package.json` gains `test` script (`node --test tests/*.test.mjs`); `npm test` now works at root.
+- `.gitignore` ignores `data/*.json.tmp` (alongside `.bak`/`.smoke-snap`); fixed stale "no root package.json" comment; removed untracked junk (`data/alerts.json.tmp`, `data/news.json.tmp`, unreferenced `img/covers/fa99c136…png`).
+- `README.md` §3 tree + §4.3 inventory refreshed for Phase 3 surface (`alerts/laws/platforms/research-groups/research-projects/director.json`, new `js/` modules, `scripts/`), locale keys ~333.
+
+**Files:** `package.json`, `.gitignore`, `README.md`, `docs/WORKLOG.md`
+
 ### 2026-07-27 — Laws/Platforms parity + Director CMS PRD **Approved**
 
 **PRD:** [prds/2026-07-27-laws-platforms-parity-director-cms.md](./prds/2026-07-27-laws-platforms-parity-director-cms.md)

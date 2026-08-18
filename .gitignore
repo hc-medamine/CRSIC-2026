@@ -19,9 +19,10 @@ ehthumbs.db
 .env.*
 !.env.example
 
-# CMS publish backups of public JSON
+# CMS publish backups / temp artifacts of public JSON
 data/*.json.bak
 data/*.json.smoke-snap
+data/*.json.tmp
 
 # CMS local uploads + published CMS media (binary; regenerated via upload)
 cms/uploads/**
@@ -36,7 +37,7 @@ img/cms/**
 tmp/
 temp/
 
-# Optional Node tooling (project has no root package.json; cms/ has its own)
+# Optional Node tooling (root package.json is convenience-only; cms/ has its own deps)
 node_modules/
 dist/
 build/

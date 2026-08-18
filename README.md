@@ -100,13 +100,17 @@ CRSIC 2026/
 │   └── style.css              # Design system, layout, animations (CSS variables in :root)
 ├── js/
 │   ├── main.js                # ENTRY POINT — boot order, wires modules
+│   ├── a11y.js                # focus trap, Escape topmost dialog
+│   ├── alerts.js              # site-wide alert from alerts.json
+│   ├── animations.js          # scroll/tilt/counters; respects prefers-reduced-motion
 │   ├── config.js              # CONTENT_BASE_URL, PREVIEW_API_BASE, contentUrl()
 │   ├── data.js                # fetch JSON, soft-fail, sync getters
 │   ├── i18n.js                # locales, RTL/LTR, localStorage, banner
+│   ├── research.js            # research groups / projects hub + detail
 │   ├── router.js              # hash navigation, PAGE_PARENT, deep links
+│   ├── safeBody.js            # sanitized rich-text body renderer (allowlist)
+│   ├── seoHead.js             # per-item title / meta / OG for detail pages
 │   ├── ui.js                  # render, filters, lightbox, contact form, drawer
-│   ├── a11y.js                # focus trap, Escape topmost dialog
-│   ├── animations.js          # scroll/tilt/counters; respects prefers-reduced-motion
 │   ├── utils.js               # DOM helpers, sanitizers, throttle/debounce
 │   └── components/            # Safe DOM card builders (no string innerHTML)
 │       ├── pubCard.js
@@ -117,13 +121,19 @@ CRSIC 2026/
 ├── data/                      # Runtime content (edit without touching JS; CMS publish target)
 │   ├── README.md              # Editor guide
 │   ├── CMS.md                 # CDN / remote JSON publish contract
-│   ├── publications.json
+│   ├── alerts.json            # Site-wide alert (CMS-published)
+│   ├── director.json          # About director block (CMS-published)
 │   ├── events.json
-│   ├── partners.json
 │   ├── journals.json
+│   ├── laws.json              # Laws hub + detail (CMS-published)
 │   ├── news.json
+│   ├── partners.json
+│   ├── platforms.json         # Platforms hub + detail (CMS-published)
+│   ├── publications.json
+│   ├── research-groups.json   # Research teams (CMS-published)
+│   ├── research-projects.json # Research projects (CMS-published)
 │   └── locales/
-│       ├── ar.json            # Arabic UI chrome (~235 keys)
+│       ├── ar.json            # Arabic UI chrome (~333 keys)
 │       └── en.json            # English UI chrome (same keys)
 ├── img/
 │   ├── crsic_logo.png         # Brand / OG image
@@ -131,6 +141,7 @@ CRSIC 2026/
 │   ├── crsic_flags.jpg        # Hero background (CSS)
 │   ├── covers/                # Publication covers c00–c27, i00–i07
 │   └── Holders/               # News photos 0.jpg–5.jpg
+├── scripts/                   # One-off content / data scripts (backfill, smoke helpers)
 ├── vercel.json                # Vercel 301s for legacy /about
 ├── _redirects                 # Netlify 301s
 ├── .htaccess                  # Apache 301s (NE preserves #)
@@ -286,7 +297,10 @@ Approximate inventory of shipped content:
 | Partners           | **11** — 3 international + 8 national                                                 |
 | Journals           | **4** — all link to `https://crsic.dz/ojsre/`                                         |
 | News               | **9** items (6 with `img/Holders/*.jpg`, 3 with `img: null`)                          |
-| Locale keys | **~262** per language (AR/EN key sets match) |
+| Locale keys | **~333** per language (AR/EN key sets match) |
+| Alerts | `alerts.json` — 0 live items currently (schema: `items[]`, at most one live) |
+| Laws / Platforms | `laws.json` (3), `platforms.json` (3) — hubs + detail routes |
+| Research | `research-groups.json` (8 items), `research-projects.json` (1 item), `director.json` (singleton) |
 | Locale preference | `localStorage` `crsic_lang` + URL `?lang=ar\|en` |
 | Admin accounts     | **None** — no auth                                                                    |
 | Sample credentials | **None**                                                                              |

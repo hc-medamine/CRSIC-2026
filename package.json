@@ -2,6 +2,7 @@
   "name": "crsic-2026",
   "private": true,
   "scripts": {
-    "spa": "npx --yes serve -l 5500 ."
+    "spa": "npx --yes serve -l 5500 .",
+    "test": "node --test tests/*.test.mjs"
   }
 }
