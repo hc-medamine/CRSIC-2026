@@ -10,6 +10,8 @@
 | Supersedes | — |
 
 > One slice, two surfaces: the public SPA already carries a motion system (`js/animations.js` + `css/style.css`); the CMS is essentially motion-free. This PRD adds a curated, brand-consistent motion layer to both. **Scope is strictly visual/interactive polish — no new content types, no routing changes, no schema changes.**
+>
+> **Draft v2 (2026-08-18)** — stakeholder Q&A decisions folded in: *showy everywhere*, M1 ships first, View Transitions API + fade fallback, all nice-to-haves kept, CMS stagger capped at 12 rows, OS-only motion gate, explicit performance budget, phase-by-phase validated merges.
 
 ## 1. Problem
 
@@ -22,7 +24,8 @@
 - Make SPA page navigation and content exploration feel continuous and cohesive (view transitions, animated filters, card micro-interactions).
 - Give the CMS's core daily flows tactile feedback: list enters, toasts, publish success, validation, modal/drawer, sidebar, skeletons.
 - Ship in small phases, each independently smokeable, with zero regression to the ~5-min smoke checklist and RTL/LTR guide.
-- Keep motion subtle, on-brand (green/gold, Islamic geometry), and 60 fps (IntersectionObserver-driven, rAF-throttled, compositor-only properties).
+- **Showy but tasteful, everywhere** (stakeholder decision): hero runs full-strength effects (floaters, word reveal, gradient pan); cards/buttons get stronger lift, reveals, and hover glows — while content stays readable and fast.
+- Meet an explicit performance budget (see §9) that gates every phase merge.
 
 **Non-goals**
 
@@ -55,11 +58,12 @@
 **SPA — card & micro-interactions (M1)**
 7. Card cover zoom on hover + one-pass gold shine sweep (pub/journal/news cards).
 8. Touch press-scale (`scale(0.98)`) on cards and CTA rows for mobile tactility.
-9. Hero headline word-by-word reveal (same pattern as the About director block).
-10. Scroll-driven gold gradient pan on section headings (subtle).
+9. Hero headline word-by-word reveal (same pattern as the About director block) — full-strength per showy-everywhere.
+10. Scroll-driven gold gradient pan on section headings (full-strength sweep on reveal, then settles).
+11. Stronger card/button motion everywhere: deeper hover lift + shadow + glow ring on pub/journal/news/partner cards and primary CTAs (extends existing tilt/magnetic effects).
 
 **CMS — daily flows (M1–M4)**
-11. List/table rows enter with a subtle fade+slide stagger on dashboard queues.
+11. List/table rows enter with a subtle fade+slide stagger — **capped at 12 rows** (long queues fade in without per-row stagger).
 12. Toasts slide in/out with an auto-dismiss progress bar (toasts exist — add motion).
 13. Publish button state machine: idle → spinner → gold checkmark pop.
 14. Sidebar active pill + collapsible group transitions.
@@ -82,11 +86,11 @@
 ## 5. Content / data impact
 
 - **None.** No `data/*.json` field changes, no locale key changes, no `CONTENT_BASE_URL` change.
-- One possible locale addition (see Open questions) only if the stakeholder wants a visible "motion" mention in the reduced-motion notice — otherwise zero i18n churn.
+- **Zero i18n churn confirmed** — OS `prefers-reduced-motion` is the only off-switch (no in-site motion toggle, no new AR/EN keys).
 
 ## 6. UX notes
 
-- Public site branding: keep CSS variables (`--green-deep #1B4332`, `--green-mid #2D6A4F`, `--gold #C9A84C`) and Amiri/Tajawal rhythm; motion must not slow content load or reading.
+- **Showy everywhere** (stakeholder): hero + cards + buttons get full-strength effects; lists/tables stay restrained. Public site branding keeps CSS variables (`--green-deep #1B4332`, `--green-mid #2D6A4F`, `--gold #C9A84C`) and Amiri/Tajawal rhythm; motion must not slow content load or reading.
 - Direction awareness: all X-translations mirror in RTL (`translateX` sign flips; scroll-snap and progress bars already handle `dir`).
 - Every animated element must be fully static when `prefers-reduced-motion: reduce` — verified per element in the smoke checklist (both apps already ship the guard).
 - CMS: respect `crs-*` tokens; keep WCAG focus ring (`--crs-accent`) untouched by effects.
@@ -102,34 +106,52 @@
 
 | Phase | Surface | Contents | Exit gate |
 |-------|---------|----------|-----------|
-| M1 | Both | Zero-risk CSS polish: card hover zoom+shine, touch press-scale, CMS row enter stagger, toast motion, sticky-action shadow, form focus glow/shake | SMOKE A–D + RTL-LTR pass |
-| M2 | SPA | View transitions, drawer/lightbox spring + blur, tab morph, carousel paging dots | SMOKE A–D + RTL-LTR pass |
-| M3 | SPA | FLIP publications filter, hero floaters, headline word reveal, heading gradient pan | SMOKE A–D + RTL-LTR pass |
-| M4 | CMS | Publish checkmark pop, sidebar pill/collapse, modal spring, list skeletons | SMOKE-CMS §A–I pass |
+| M1 | Both | Zero-risk CSS polish: card hover zoom+shine, deeper card/CTA hover lift + glow, touch press-scale, CMS row enter stagger (cap 12), toast motion, sticky-action shadow, form focus glow/shake | SMOKE A–D + RTL-LTR + `npm test` + **stakeholder local approval** |
+| M2 | SPA | View transitions, drawer/lightbox spring + blur, tab morph, carousel paging dots | SMOKE A–D + RTL-LTR + `npm test` + **stakeholder local approval** |
+| M3 | SPA | FLIP publications filter, hero floaters, headline word reveal, heading gradient pan | SMOKE A–D + RTL-LTR + `npm test` + **stakeholder local approval** |
+| M4 | CMS | Publish checkmark pop, sidebar pill/collapse, modal spring, list skeletons | SMOKE-CMS §A–I + `cms npm test` + **stakeholder local approval** |
 
-## 8. Success metrics
+**Merge gate (mandatory):** each phase lands on its own `feature/motion-*` branch. Merge to `main` only after the stakeholder validates it on a local serve — SPA via `npm run spa` (:5500), CMS via `npm run dev` (:3000) — and the phase budget below is met. Phase-by-phase, never batched, never direct-to-`main`.
 
+## 9. Success metrics & performance budget
+
+**Functional**
 - Full smoke checklist (`docs/qa/SMOKE.md`) and CMS smoke (`docs/qa/SMOKE-CMS.md`) pass per phase — no regressions.
 - `prefers-reduced-motion: reduce` renders all new surfaces static (verified in QA).
-- No layout shift/CLS regression; animations compositor-only.
 - SPA unit tests still green (`npm test`, 7/7).
 - RTL-LTR guide (`docs/qa/RTL-LTR.md`) re-verified after each SPA phase.
 
-## 9. Open questions
+**Performance budget (gates every phase merge, measured on local serve)**
+- No CLS regression: no layout-shift caused by animation start/end (transform/opacity only).
+- Smoothness: 60 fps — no sustained dropped frames while animations run (rAF-throttled; IO-driven).
+- Payload: **+0 JS bytes** from new libraries (none added); CSS additions measured but small.
+- Lighthouse (desktop, local serve) ≥ **90 Performance** per phase; do not regress baseline.
+- `will-change` used sparingly and removed once the animation settles.
 
-- **Intensity:** subtle by default (recommended) or more showy hero? Affects M3 hero items.
-- **View Transitions API coverage:** acceptable for 2026 evergreen browsers with a fade fallback — confirm.
-- **Reduced-motion notice:** should the AR/EN locale gain a "reduced motion detected" note anywhere? (default: no, keep i18n untouched).
-- **Order:** start M1 (both) first, or SPA navigation (M2) first?
-- **CMS enter-stagger amount:** subtle (≤60 ms per row) or none on long lists?
+## 10. Open questions — resolved (2026-08-18 Q&A)
 
-## 10. Decision log
+| # | Question | Decision |
+|---|----------|----------|
+| 1 | Intensity | **Showy / impressive** — showy everywhere (hero full-strength; cards/buttons stronger) |
+| 2 | Phase order | **M1 first** (both apps), then M2 → M3 → M4 |
+| 3 | View Transitions API | **Yes** — API + plain-fade fallback for older browsers |
+| 4 | Nice-to-haves | **Keep all three** (lightbox swipe, portrait float, empty-state pulse) |
+| 5 | CMS row stagger on long lists | **Subtle stagger, capped at 12 rows** |
+| 6 | Motion off-switch | **OS `prefers-reduced-motion` only** — no in-site toggle, no new i18n keys |
+| 7 | Where "showy" applies | **Everywhere** (not just hero) |
+| 8 | Performance budget | **Explicit** (see §9) — gates each merge |
+| 9 | Merge cadence | **Phase-by-phase, validated merges** via feature branches + PR |
+| 10 | Validation method | **Local serve** — stakeholder clicks through SPA :5500 / CMS :3000 and approves |
+
+## 11. Decision log
 
 | Date | Decision |
 |------|----------|
 | 2026-08-18 | Stakeholder requested all suggested effects in one slice. PRD drafted as **Draft**. No code until **Approved**. |
+| 2026-08-18 | Q&A locked 10 decisions (above) folded into Draft v2. Status remains **Draft** until stakeholder's final approval. |
+| 2026-08-18 | **Branch-only rule (mandatory):** never commit to `main` directly — merge only after stakeholder validation (recorded in `AGENTS.md` + README §5.3). |
 
-## 11. Item backlog (source of truth for implementation)
+## 12. Item backlog (source of truth for implementation)
 
 ### SPA
 - [ ] View transitions between hash pages (crossfade + directional slide; fade fallback)
@@ -139,12 +161,14 @@
 - [ ] Home pub carousel paging dots + drag cue (RTL-aware)
 - [ ] Hero ambient gold geometric floaters
 - [ ] Card cover zoom + gold shine sweep
+- [ ] Deeper card/CTA hover lift + glow ring (extends tilt/magnetic)
 - [ ] Touch press-scale on cards/CTAs
 - [ ] Hero headline word-by-word reveal
 - [ ] Section heading gold gradient pan
+- [ ] Lightbox swipe between images (touch)
 
 ### CMS
-- [ ] Dashboard list/table row enter stagger
+- [ ] Dashboard list/table row enter stagger (cap 12 rows)
 - [ ] Toast slide-in/out + auto-dismiss progress bar
 - [ ] Publish button spinner → gold checkmark pop
 - [ ] Sidebar active pill + collapsible groups
@@ -152,3 +176,7 @@
 - [ ] Form validation shake + focus-ring glow
 - [ ] List skeletons while loading
 - [ ] Sticky action-bar scroll shadow
+- [ ] Empty-state illustration pulse
+
+### Cross-app
+- [ ] Partner/director portrait gentle float
