@@ -346,38 +346,38 @@ function initTitleUnderline() {
 
 /* ── HERO HEADLINE WORD REVEAL ───────────────────────── */
 function initHeroWordReveal() {
-  const h1 = document.querySelector('.hero-main h1');
-  if (!h1 || prefersReducedMotion()) return;
-  // Wrap the first phrase AND the gold <em>; both use the same masked rise.
-  let rewrapped = false;
-  h1.querySelectorAll('span[data-i18n], em[data-i18n]').forEach((node) => {
-    if (node.querySelector('.wr-word')) return; // idempotent across lang toggles
-    const words = node.textContent.trim().split(/\s+/).filter(Boolean);
-    if (words.length < 2) return;
-    const frag = document.createDocumentFragment();
-    words.forEach((w, i) => {
-      const wrapper = el('span', { className: 'wr-word' });
-      const inner = el('span', { className: 'wr-inner', text: w });
-      inner.style.setProperty('--wr-d', `${i * 0.07}s`);
-      wrapper.appendChild(inner);
-      frag.appendChild(wrapper);
-      frag.appendChild(document.createTextNode(' '));
+  if (prefersReducedMotion()) return;
+  // Home: the phrase span + gold <em>. About: the page-hero h1 itself.
+  document.querySelectorAll('.hero-main h1, .page-hero h1').forEach((h1) => {
+    const targets = [];
+    h1.querySelectorAll('span[data-i18n], em[data-i18n]').forEach((n) => targets.push(n));
+    if (h1.hasAttribute('data-i18n')) targets.push(h1);
+    let rewrapped = false;
+    targets.forEach((node) => {
+      if (node.querySelector('.wr-word')) return; // idempotent across lang toggles
+      const words = node.textContent.trim().split(/\s+/).filter(Boolean);
+      if (words.length < 2) return;
+      const frag = document.createDocumentFragment();
+      words.forEach((w, i) => {
+        const wrapper = el('span', { className: 'wr-word' });
+        const inner = el('span', { className: 'wr-inner', text: w });
+        inner.style.setProperty('--wr-d', `${i * 0.07}s`);
+        wrapper.appendChild(inner);
+        frag.appendChild(wrapper);
+        frag.appendChild(document.createTextNode(' '));
+      });
+      node.replaceChildren(frag);
+      rewrapped = true;
     });
-    node.replaceChildren(frag);
-    rewrapped = true;
-  });
-  h1.classList.add('wr-active');
-  const kick = () => {
+    if (!rewrapped) return;
+    h1.classList.add('wr-active');
+    if (h1.classList.contains('wr-in')) {
+      // Language switch wiped the word spans — restart the reveal.
+      h1.classList.remove('wr-in');
+      void h1.offsetWidth;
+    }
     requestAnimationFrame(() => requestAnimationFrame(() => h1.classList.add('wr-in')));
-  };
-  if (rewrapped) {
-    // Language switch wiped the word spans — restart the reveal.
-    h1.classList.remove('wr-in');
-    void h1.offsetWidth;
-    kick();
-  } else if (!h1.classList.contains('wr-in')) {
-    kick();
-  }
+  });
 }
 
 /* ── PAGE-HERO PARALLAX ──────────────────────────────── */

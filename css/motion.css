@@ -706,7 +706,9 @@ html[dir="rtl"] .nav-drawer.open {
    Vertical drift + scale only → direction-agnostic (no RTL mirroring).
    z-index 2: above the dark scrim (::after z1) but below content (z3).
    ID-scoped to beat style.css A5 (.hero-main > * { position: relative; z-index: 3 })
-   which would otherwise collapse the container to zero height. */
+   which would otherwise collapse the container to zero height.
+   No width breakpoint: a 768px cutoff would hide them in zoomed/narrow
+   windows; three radial-gradient orbs are cheap on every screen. */
 @media (prefers-reduced-motion: no-preference) {
   #page-home .hero-floaters {
     position: absolute;
@@ -720,7 +722,7 @@ html[dir="rtl"] .nav-drawer.open {
     display: block;
     border-radius: 50%;
     background: radial-gradient(circle, rgba(201, 168, 76, 0.5) 0%, rgba(201, 168, 76, 0) 70%);
-    opacity: 0;
+    opacity: 0.12;
     animation: heroFloatDrift 9s var(--ease-out-soft) infinite;
   }
   .hero-float--a {
@@ -749,21 +751,16 @@ html[dir="rtl"] .nav-drawer.open {
   @keyframes heroFloatDrift {
     0%,
     100% {
-      opacity: 0;
+      opacity: 0.12;
       transform: translateY(20px) scale(0.7);
     }
     25% {
-      opacity: 0.5;
+      opacity: 0.6;
     }
     60% {
-      opacity: 0.28;
+      opacity: 0.34;
       transform: translateY(-18px) scale(1);
     }
-  }
-}
-@media (max-width: 768px) {
-  .hero-floaters {
-    display: none;
   }
 }
 
