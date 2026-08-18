@@ -71,7 +71,7 @@ export function AdvancedDisclosure({
 /** Sticky bottom action bar (Save / Submit) — Direction B edit mockup. */
 export function FormStickyActions({ children }: { children: ReactNode }) {
   return (
-    <div className="sticky bottom-0 z-10 mt-6 border-t border-crs-border bg-crs-surface/95 py-4 backdrop-blur">
+    <div className="sticky bottom-0 z-10 mt-6 border-t border-crs-border bg-crs-surface/95 py-4 shadow-[0_-8px_20px_-14px_rgba(26,46,38,0.25)] backdrop-blur">
       <div className="flex flex-wrap items-center justify-end gap-2">{children}</div>
     </div>
   );

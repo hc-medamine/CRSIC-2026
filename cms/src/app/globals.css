@@ -108,3 +108,77 @@ html[dir="rtl"] :where(.tracking-tight, .tracking-wide, [class*="tracking-"]) {
   font-size: 0.875rem;
 }
 
+/* ═══ Motion & interactivity polish (PRD 2026-08-18) ═══ */
+:root {
+  --cms-dur-fast: 180ms;
+  --cms-dur-base: 320ms;
+  --cms-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Dashboard list/table row enter stagger (cap ~12 rows via --row-delay) */
+@keyframes cmsRowEnter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.cms-row-enter {
+  animation: cmsRowEnter var(--cms-dur-base) var(--cms-ease-out) both;
+  animation-delay: var(--row-delay, 0ms);
+}
+
+/* Toast slide-in/out + auto-dismiss progress */
+@keyframes cmsToastIn {
+  from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes cmsToastOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(-10px) scale(0.97); }
+}
+.cms-toast-enter { animation: cmsToastIn 240ms var(--cms-ease-out) both; }
+.cms-toast-leave { animation: cmsToastOut 240ms var(--cms-ease-out) both; }
+
+@keyframes cmsToastProgress {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
+.cms-toast-progress {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.55;
+  transform-origin: left center;
+  animation: cmsToastProgress 3.8s linear forwards;
+}
+html[dir="rtl"] .cms-toast-progress {
+  transform-origin: right center;
+}
+
+/* Form focus glow + native-required validation shake (:user-invalid) */
+.cms-form input:focus-visible,
+.cms-form select:focus-visible,
+.cms-form textarea:focus-visible {
+  border-color: var(--crs-accent);
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.28);
+}
+@keyframes cmsFieldShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(calc(var(--cms-shake-dir) * 4px)); }
+  40% { transform: translateX(calc(var(--cms-shake-dir) * -4px)); }
+  60% { transform: translateX(calc(var(--cms-shake-dir) * 3px)); }
+  80% { transform: translateX(calc(var(--cms-shake-dir) * -3px)); }
+}
+.cms-form input:user-invalid,
+.cms-form select:user-invalid,
+.cms-form textarea:user-invalid {
+  --cms-shake-dir: -1;
+  border-color: #dc2626;
+  animation: cmsFieldShake 0.35s ease;
+}
+html[dir="rtl"] .cms-form input:user-invalid,
+html[dir="rtl"] .cms-form select:user-invalid,
+html[dir="rtl"] .cms-form textarea:user-invalid {
+  --cms-shake-dir: 1;
+}
+
