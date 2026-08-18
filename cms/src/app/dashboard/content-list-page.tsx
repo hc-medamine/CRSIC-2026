@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 import { t, tf } from "@/lib/i18n/labels";
 import { IconPlus } from "./cms-icons";
@@ -82,8 +82,12 @@ export function ContentListPage({
               </tr>
             </thead>
             <tbody className="divide-y divide-crs-border/70">
-              {items.map((item) => (
-                <tr key={item.id} className="hover:bg-crs-bg/50">
+              {items.map((item, i) => (
+                <tr
+                  key={item.id}
+                  className="cms-row-enter hover:bg-crs-bg/50"
+                  style={{ "--row-delay": `${Math.min(i, 11) * 45}ms` } as CSSProperties}
+                >
                   <td className="px-4 py-3">
                     <Link
                       href={item.href}

@@ -12,7 +12,10 @@ export type ToastItem = {
 };
 
 const AUTO_DISMISS_MS = 3800;
+const EXIT_MS = 260;
 const MAX_VISIBLE = 4;
+
+type ToastState = { item: ToastItem; leaving: boolean };
 
 type Listener = (item: ToastItem) => void;
 const listeners = new Set<Listener>();
@@ -47,7 +50,7 @@ function subscribe(listener: Listener): () => void {
  * Toasts auto-dismiss; Escape dismisses the newest.
  */
 export function CmsToastHost() {
-  const [items, setItems] = useState<ToastItem[]>([]);
+  const [toasts, setToasts] = useState<ToastState[]>([]);
   const [docLang, setDocLang] = useState<CmsLang>("en");
 
   useEffect(() => {
@@ -59,24 +62,37 @@ export function CmsToastHost() {
     return () => obs.disconnect();
   }, []);
 
+  const dismiss = (id: string) => {
+    setToasts((prev) => prev.map((s) => (s.item.id === id ? { ...s, leaving: true } : s)));
+    window.setTimeout(() => {
+      setToasts((prev) => prev.filter((s) => s.item.id !== id));
+    }, EXIT_MS);
+  };
+
   useEffect(() => {
     return subscribe((item) => {
-      setItems((prev) => [item, ...prev].slice(0, MAX_VISIBLE));
-      window.setTimeout(() => {
-        setItems((prev) => prev.filter((t) => t.id !== item.id));
-      }, AUTO_DISMISS_MS);
+      setToasts((prev) => [{ item, leaving: false }, ...prev].slice(0, MAX_VISIBLE));
+      window.setTimeout(() => dismiss(item.id), AUTO_DISMISS_MS);
     });
   }, []);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setItems((prev) => prev.slice(1));
+      if (e.key === "Escape") {
+        setToasts((prev) => {
+          const newest = prev[0];
+          if (newest && !newest.leaving) {
+            dismiss(newest.item.id);
+          }
+          return prev;
+        });
+      }
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, []);
 
-  if (items.length === 0) return null;
+  if (toasts.length === 0) return null;
 
   return (
     <div
@@ -84,7 +100,7 @@ export function CmsToastHost() {
       aria-live="polite"
       aria-relevant="additions"
     >
-      {items.map((item) => {
+      {toasts.map(({ item, leaving }) => {
         const tone =
           item.kind === "success"
             ? "border-crs-secondary/40 bg-crs-primary text-white"
@@ -95,17 +111,26 @@ export function CmsToastHost() {
           <div
             key={item.id}
             role="status"
-            className={`pointer-events-auto flex w-full max-w-md items-start gap-3 rounded-xl border px-4 py-3 text-sm shadow-lg ${tone}`}
+            className={`pointer-events-auto relative flex w-full max-w-md items-start gap-3 overflow-hidden rounded-xl border px-4 py-3 text-sm shadow-lg ${
+              leaving ? "cms-toast-leave" : "cms-toast-enter"
+            } ${tone}`}
           >
             <p className="min-w-0 flex-1 font-medium leading-snug">{item.message}</p>
             <button
               type="button"
               className="shrink-0 rounded-lg px-2 py-0.5 text-xs opacity-80 hover:opacity-100"
               aria-label={t("dismiss", docLang)}
-              onClick={() => setItems((prev) => prev.filter((toast) => toast.id !== item.id))}
+              onClick={() => dismiss(item.id)}
             >
               ×
             </button>
+            {!leaving ? (
+              <span
+                className="cms-toast-progress"
+                style={{ animationDuration: `${AUTO_DISMISS_MS}ms` }}
+                aria-hidden
+              />
+            ) : null}
           </div>
         );
       })}
