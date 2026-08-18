@@ -364,7 +364,7 @@ function initHeroWordReveal() {
         inner.style.setProperty('--wr-d', `${i * 0.07}s`);
         wrapper.appendChild(inner);
         frag.appendChild(wrapper);
-        frag.appendChild(document.createTextNode(' '));
+        if (i < words.length - 1) frag.appendChild(document.createTextNode(' '));
       });
       node.replaceChildren(frag);
       rewrapped = true;

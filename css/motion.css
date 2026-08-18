@@ -319,22 +319,28 @@ html[dir="rtl"] .nav-drawer.open {
 ═══════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: no-preference) {
   @keyframes heroMediaSettle {
-    from { transform: scale(1.1); }
+    from { transform: scale(1.06); }
     to { transform: scale(1); }
   }
   @keyframes heroFadeUpMotion {
     from { opacity: 0; transform: translateY(22px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  @keyframes heroFadeInMotion {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
   .hero-bg-video {
     transform-origin: center center;
-    animation: heroMediaSettle 2.8s var(--ease-out-expo) both;
+    animation: heroMediaSettle 1.5s var(--ease-out-expo) both;
   }
   .hero-eyebrow {
     animation: heroFadeUpMotion var(--duration-slow) var(--ease-out-expo) 0.15s both;
   }
   .hero-main h1 {
-    animation: heroFadeUpMotion 1s var(--ease-out-expo) 0.35s both;
+    /* Opacity-only entrance: the word reveal owns the vertical motion,
+       so the h1 never slides while its words are rising (jitter/shake). */
+    animation: heroFadeInMotion 0.6s var(--ease-out-expo) 0.2s both;
     text-align: start;
   }
   .hero-desc {
