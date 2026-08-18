@@ -19,6 +19,20 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-18 — Motion M3: SPA exploration & micro-interactions
+
+**PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md) (Approved — docs branch PR #23)
+
+**Branch:** `feature/motion-m3` (PR #26) — **not merged until M1–M4 all pass** (hard rule)
+
+**Done:**
+- **FLIP publications filter:** `js/ui.js` `applyPubFilter` now keeps already-visible cards in place (only newly-shown cards fade/scale in) and runs `flipPubCards()` after the hide collapse — surviving cards animate `translate(dx,dy)` from their old grid slot to the new one (transform-only, reduced-motion skipped).
+- **Hero floaters:** three gold orbs (`.hero-float--a/b/c`) drift behind the home headline — vertical drift + scale + opacity, direction-agnostic, hidden ≤768px, `aria-hidden`.
+- **Headline word reveal:** `initHeroWordReveal()` wraps the hero h1 first phrase in masked `.wr-word`/`.wr-inner` spans with a per-word stagger (`--wr-d`); re-wraps idempotently after lang toggles via `refreshMotionReveals`. Reduced-motion = plain text.
+- **Heading gradient pan:** slow gold sheen sweeping the hero `<em>` (`background-clip:text`, `@supports`-guarded so it falls back to plain gold); plus a one-shot gold sheen across `.section-title.drawn` underlines (transform-only, `--sheen-from/to` mirrored for RTL).
+
+**Files:** `js/ui.js`, `js/animations.js`, `css/motion.css`, `index.html`, `docs/WORKLOG.md`
+
 ### 2026-08-18 — Motion M2: SPA navigation cohesion
 
 **PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md) (Approved — docs branch PR #23)

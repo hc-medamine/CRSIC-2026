@@ -134,6 +134,7 @@ function initScrollReveal() {
 export function refreshMotionReveals() {
   initScrollReveal();
   initDirectorWordMotion();
+  initHeroWordReveal();
 }
 
 /* ── DIRECTOR WORD (About) staged entrance ───────────── */
@@ -343,6 +344,33 @@ function initTitleUnderline() {
   titles.forEach((titleEl) => titleObserver.observe(titleEl));
 }
 
+/* ── HERO HEADLINE WORD REVEAL ───────────────────────── */
+function initHeroWordReveal() {
+  const h1 = document.querySelector('.hero-main h1');
+  if (!h1 || prefersReducedMotion()) return;
+  // Only the first phrase (span[data-i18n]); the gold <em> stays plain so the
+  // gradient pan never overlaps a transformed child.
+  h1.querySelectorAll('span[data-i18n]').forEach((node) => {
+    if (node.querySelector('.wr-word')) return; // idempotent across lang toggles
+    const words = node.textContent.trim().split(/\s+/).filter(Boolean);
+    if (words.length < 2) return;
+    const frag = document.createDocumentFragment();
+    words.forEach((w, i) => {
+      const wrapper = el('span', { className: 'wr-word' });
+      const inner = el('span', { className: 'wr-inner', text: w });
+      inner.style.setProperty('--wr-d', `${i * 0.07}s`);
+      wrapper.appendChild(inner);
+      frag.appendChild(wrapper);
+      frag.appendChild(document.createTextNode(' '));
+    });
+    node.replaceChildren(frag);
+  });
+  h1.classList.add('wr-active');
+  if (!h1.classList.contains('wr-in')) {
+    requestAnimationFrame(() => requestAnimationFrame(() => h1.classList.add('wr-in')));
+  }
+}
+
 /* ── PAGE-HERO PARALLAX ──────────────────────────────── */
 function initParallaxHero() {
   if (prefersReducedMotion()) return;
@@ -538,6 +566,7 @@ function initRound2Animations() {
   initRippleEffect();
   initBackToTop();
   initTitleUnderline();
+  initHeroWordReveal();
   initParallaxHero();
   initStatShimmer();
   initPubCarouselTrack();
