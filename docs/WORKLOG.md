@@ -19,6 +19,7 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+<<<<<<< HEAD
 ### 2026-08-19 — Motion M4: deviation fixes + PRD nice-to-haves
 
 **PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md) (Approved) — **stakeholder validated M1–M4**
@@ -79,6 +80,14 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 **Also fixed this phase:** `cms/src/app/dashboard/director/director-form.tsx` last-published timestamp used locale-dependent `toLocaleString()` → SSR (en-GB) vs browser (en-US) hydration mismatch; now deterministic `YYYY-MM-DD HH:MM` matching other CMS lists.
 
 **Files:** `js/router.js`, `js/animations.js`, `css/motion.css`, `docs/WORKLOG.md`, `cms/src/app/dashboard/director/director-form.tsx`
+
+### 2026-08-18 — Motion & interactivity polish PRD **Draft**
+
+**PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md)
+
+**Scope:** SPA + CMS motion layer — view transitions, FLIP filter reflow, card micro-interactions, hero floaters/word reveal, CMS list/toast/publish/modal/sidebar/skeleton feedback. No schema/locale/layout changes; transform+opacity only; `prefers-reduced-motion` gate; zero new deps. Delivery M1–M4, each phase independently smokeable.
+
+**Next:** stakeholder Approve → implement per phase on feature branches.
 
 ### 2026-08-18 — Tooling + docs hygiene (no runtime change)
 
