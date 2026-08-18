@@ -348,8 +348,7 @@ function initTitleUnderline() {
 function initHeroWordReveal() {
   const h1 = document.querySelector('.hero-main h1');
   if (!h1 || prefersReducedMotion()) return;
-  // Wrap the first phrase AND the gold <em>; the <em> reveals via opacity
-  // only (CSS) so its background-clip:text gradient stays intact.
+  // Wrap the first phrase AND the gold <em>; both use the same masked rise.
   let rewrapped = false;
   h1.querySelectorAll('span[data-i18n], em[data-i18n]').forEach((node) => {
     if (node.querySelector('.wr-word')) return; // idempotent across lang toggles

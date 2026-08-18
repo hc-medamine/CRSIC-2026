@@ -704,9 +704,11 @@ html[dir="rtl"] .nav-drawer.open {
 
 /* Hero floaters — soft gold orbs drifting behind the headline.
    Vertical drift + scale only → direction-agnostic (no RTL mirroring).
-   z-index 2: above the dark scrim (::after z1) but below content (z3). */
+   z-index 2: above the dark scrim (::after z1) but below content (z3).
+   ID-scoped to beat style.css A5 (.hero-main > * { position: relative; z-index: 3 })
+   which would otherwise collapse the container to zero height. */
 @media (prefers-reduced-motion: no-preference) {
-  .hero-floaters {
+  #page-home .hero-floaters {
     position: absolute;
     inset: 0;
     overflow: hidden;
@@ -766,9 +768,10 @@ html[dir="rtl"] .nav-drawer.open {
 }
 
 /* Headline word reveal — words rise from a masked line, staggered.
-   The hero h1 phrase + gold <em> get wrapped in .wr-word/.wr-inner by JS.
-   The <em> uses fade-only reveal (no transform/mask) so the
-   background-clip:text gradient pan below never overlaps a moved glyph. */
+   Both the hero h1 phrase and the gold <em> get wrapped in .wr-word/.wr-inner.
+   No background-clip:text here: it breaks when descendants are composited
+   (opacity/transform), which would hide the gold text. The gradient-pan M3
+   item is delivered by the section-title sheen below instead. */
 .wr-word {
   display: inline-block;
   overflow: hidden;
@@ -783,48 +786,6 @@ html[dir="rtl"] .nav-drawer.open {
   }
   .wr-active.wr-in .wr-inner {
     transform: translateY(0);
-  }
-  .hero-main h1 em .wr-word {
-    overflow: visible;
-  }
-  .hero-main h1 em .wr-inner {
-    transform: none;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    transition-delay: calc(0.45s + var(--wr-d, 0s));
-  }
-  .wr-active.wr-in .hero-main h1 em .wr-inner {
-    opacity: 1;
-  }
-}
-
-/* Heading gradient pan — slow gold sheen sweeping the hero <em>.
-   background-position paint on a single line; small surface, 60fps-safe.
-   @supports-guarded so the gold text stays visible (plain color fallback). */
-@supports (background-clip: text) or (-webkit-background-clip: text) {
-  @media (prefers-reduced-motion: no-preference) {
-    .hero-main h1 em {
-      background: linear-gradient(
-        110deg,
-        var(--gold) 15%,
-        #f3d37c 50%,
-        var(--gold) 85%
-      );
-      background-size: 220% auto;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: transparent;
-      animation: heroGradPan 5s linear infinite;
-    }
-    @keyframes heroGradPan {
-      from {
-        background-position: 120% center;
-      }
-      to {
-        background-position: -120% center;
-      }
-    }
   }
 }
 
