@@ -80,6 +80,24 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 **Files:** `js/router.js`, `js/animations.js`, `css/motion.css`, `docs/WORKLOG.md`, `cms/src/app/dashboard/director/director-form.tsx`
 
+### 2026-08-18 — Motion & interactivity polish PRD **Approved**
+
+**PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md)
+
+**Locked (10 Q&A decisions):** showy everywhere; M1 both apps first → M2 → M3 → M4; View Transitions API + fade fallback; all nice-to-haves kept; CMS stagger capped at 12 rows; OS `prefers-reduced-motion` only gate (zero i18n churn); explicit performance budget (§9) gates each merge; phase-by-phase validated merges on local serve (:5500 / :3000).
+
+**Branch-only rule (mandatory, all future work):** never commit to `main` directly; merge only after stakeholder validation — recorded in `AGENTS.md` + README §5.3.
+
+**Next:** implement M1 on a `feature/motion-*` branch → stakeholder local validation → merge.
+
+### 2026-08-18 — Motion & interactivity polish PRD **Draft**
+
+**PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md)
+
+**Scope:** SPA + CMS motion layer — view transitions, FLIP filter reflow, card micro-interactions, hero floaters/word reveal, CMS list/toast/publish/modal/sidebar/skeleton feedback. No schema/locale/layout changes; transform+opacity only; `prefers-reduced-motion` gate; zero new deps. Delivery M1–M4, each phase independently smokeable.
+
+**Next:** stakeholder Approve → implement per phase on feature branches.
+
 ### 2026-08-18 — Tooling + docs hygiene (no runtime change)
 
 **Done:**
