@@ -319,22 +319,28 @@ html[dir="rtl"] .nav-drawer.open {
 ═══════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: no-preference) {
   @keyframes heroMediaSettle {
-    from { transform: scale(1.1); }
+    from { transform: scale(1.06); }
     to { transform: scale(1); }
   }
   @keyframes heroFadeUpMotion {
     from { opacity: 0; transform: translateY(22px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  @keyframes heroFadeInMotion {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
   .hero-bg-video {
     transform-origin: center center;
-    animation: heroMediaSettle 2.8s var(--ease-out-expo) both;
+    animation: heroMediaSettle 1.5s var(--ease-out-expo) both;
   }
   .hero-eyebrow {
     animation: heroFadeUpMotion var(--duration-slow) var(--ease-out-expo) 0.15s both;
   }
   .hero-main h1 {
-    animation: heroFadeUpMotion 1s var(--ease-out-expo) 0.35s both;
+    /* Opacity-only entrance: the word reveal owns the vertical motion,
+       so the h1 never slides while its words are rising (jitter/shake). */
+    animation: heroFadeInMotion 0.6s var(--ease-out-expo) 0.2s both;
     text-align: start;
   }
   .hero-desc {
@@ -692,5 +698,135 @@ html[dir="rtl"] .nav-drawer.open {
 @media (prefers-reduced-motion: no-preference) {
   .pub-carousel-track-thumb {
     transition: transform 0.18s var(--ease-out-soft);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   M3 — HERO FLOATERS + HEADLINE WORD REVEAL + GRADIENT PAN
+   (PRD 2026-08-18-motion-interactivity-polish)
+   transform/opacity preferred; everything gated by
+   prefers-reduced-motion so it collapses to static content.
+═══════════════════════════════════════════════════════ */
+
+/* Hero floaters — soft gold orbs drifting behind the headline.
+   Vertical drift + scale only → direction-agnostic (no RTL mirroring).
+   z-index 2: above the dark scrim (::after z1) but below content (z3).
+   ID-scoped to beat style.css A5 (.hero-main > * { position: relative; z-index: 3 })
+   which would otherwise collapse the container to zero height.
+   No width breakpoint: a 768px cutoff would hide them in zoomed/narrow
+   windows; three radial-gradient orbs are cheap on every screen. */
+@media (prefers-reduced-motion: no-preference) {
+  #page-home .hero-floaters {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .hero-float {
+    position: absolute;
+    display: block;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201, 168, 76, 0.5) 0%, rgba(201, 168, 76, 0) 70%);
+    opacity: 0.12;
+    animation: heroFloatDrift 9s var(--ease-out-soft) infinite;
+  }
+  .hero-float--a {
+    width: 110px;
+    height: 110px;
+    top: 16%;
+    inset-inline-end: 12%;
+    animation-delay: 0s;
+  }
+  .hero-float--b {
+    width: 58px;
+    height: 58px;
+    top: 60%;
+    inset-inline-end: 32%;
+    animation-delay: 2.4s;
+    animation-duration: 11s;
+  }
+  .hero-float--c {
+    width: 40px;
+    height: 40px;
+    top: 40%;
+    inset-inline-end: 4%;
+    animation-delay: 4.2s;
+    animation-duration: 8s;
+  }
+  @keyframes heroFloatDrift {
+    0%,
+    100% {
+      opacity: 0.12;
+      transform: translateY(20px) scale(0.7);
+    }
+    25% {
+      opacity: 0.6;
+    }
+    60% {
+      opacity: 0.34;
+      transform: translateY(-18px) scale(1);
+    }
+  }
+}
+
+/* Headline word reveal — words rise from a masked line, staggered.
+   Both the hero h1 phrase and the gold <em> get wrapped in .wr-word/.wr-inner.
+   No background-clip:text here: it breaks when descendants are composited
+   (opacity/transform), which would hide the gold text. The gradient-pan M3
+   item is delivered by the section-title sheen below instead. */
+.wr-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .wr-inner {
+    display: inline-block;
+    transform: translateY(112%);
+    transition: transform 0.6s var(--ease-out-expo);
+    transition-delay: calc(0.45s + var(--wr-d, 0s));
+  }
+  .wr-active.wr-in .wr-inner {
+    transform: translateY(0);
+  }
+}
+
+/* Section-title gold sheen — a gradient band sweeps the drawn underline
+   once. Transform-only; sweep direction mirrors with the document dir. */
+:root {
+  --sheen-from: -120%;
+  --sheen-to: 120%;
+}
+html[dir="rtl"] {
+  --sheen-from: 120%;
+  --sheen-to: -120%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .section-title::before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    inset-inline: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .section-title.drawn::before {
+    animation: titleSheen 1.1s var(--ease-out-expo) 0.5s both;
+  }
+  @keyframes titleSheen {
+    0% {
+      opacity: 0;
+      transform: translateX(var(--sheen-from, -120%));
+    }
+    40% {
+      opacity: 0.85;
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(var(--sheen-to, 120%));
+    }
   }
 }

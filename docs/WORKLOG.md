@@ -19,6 +19,22 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-18 — Motion M3: SPA exploration & micro-interactions
+
+**PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md) (Approved — docs branch PR #23)
+
+**Branch:** `feature/motion-m3` (PR #26) — **not merged until M1–M4 all pass** (hard rule)
+
+**Done:**
+- **FLIP publications filter:** `js/ui.js` `applyPubFilter` now keeps already-visible cards in place (only newly-shown cards fade/scale in) and runs `flipPubCards()` after the hide collapse — surviving cards animate `translate(dx,dy)` from their old grid slot to the new one (transform-only, reduced-motion skipped).
+- **Hero floaters:** three gold orbs (`.hero-float--a/b/c`) drift behind the home headline — vertical drift + scale + opacity (floor 0.12, never fully hidden), direction-agnostic, `aria-hidden`. ID-scoped (`#page-home .hero-floaters`) to beat the `style.css` A5 rule (`.hero-main > *` → `position:relative`), and deliberately **no width breakpoint** — the original `≤768px` `display:none` hid them in any narrow/zoomed window.
+- **Headline word reveal:** `initHeroWordReveal()` wraps the home h1 phrase + gold `<em>` **and the About page-hero h1** in masked `.wr-word`/`.wr-inner` spans with a per-word stagger (`--wr-d`); **only the active page's h1 is revealed, and the router replays the reveal on every navigation** (`replayActiveHeroWords()` runs inside the view-transition swap callback, snapping words under the mask first so re-visits replay instead of no-op). Re-wraps idempotently after lang toggles via `refreshMotionReveals`. Reduced-motion = plain text.
+- **Page-hero entrance (shake fix):** `.page.active .page-hero` and non-home `.hero-main` now fade in **opacity-only** instead of `pageStagger`'s translateY slide — a fractional-pixel container slide re-rasterizes text every frame (subpixel jitter/"shaking" on scaled Windows displays), while home (whose hero children animate, not the container) never shook.
+- **Heading gradient pan:** delivered as a transform-only one-shot gold sheen across `.section-title.drawn` underlines (`--sheen-from/to` mirrored for RTL). A `background-clip:text` gradient on the hero `<em>` was tried and **dropped** — text-clip breaks when descendants are composited (opacity/transform), rendering the gold text invisible during the word reveal.
+- **Hero video startup:** both hero videos (`hero-bg.mp4`, `about-hero-bg.mp4`) were `preload="metadata"` **and** non-faststart (260/331 MB with the `moov` metadata atom at the file tail), so playback lagged ~1s behind load, coinciding with the word reveal. Fixed with `preload="auto"` and an ffmpeg `-movflags +faststart -c copy` remux (metadata to front, no re-encode; files are git-ignored so this is a local asset swap). Video now fetches at ~270ms, independent of the reveal.
+
+**Files:** `js/ui.js`, `js/animations.js`, `css/motion.css`, `index.html`, `img/Hero/*.mp4` (local, git-ignored), `docs/WORKLOG.md`
+
 ### 2026-08-18 — Motion M2: SPA navigation cohesion
 
 **PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md) (Approved — docs branch PR #23)

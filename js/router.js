@@ -12,7 +12,7 @@ import {
   closeDrawer,
   closeLightbox,
 } from './ui.js';
-import { getTitleObserver } from './animations.js';
+import { getTitleObserver, replayActiveHeroWords } from './animations.js';
 import { renderDetailPage } from './components/detailPage.js';
 import { restoreSiteSeoHead } from './seoHead.js';
 import { PREVIEW_API_BASE } from './config.js';
@@ -237,6 +237,9 @@ export function navigateTo(pageId, tab, filter, opts = {}) {
       target.classList.add('active');
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
+    // Replay the headline word reveal for the page that just became active.
+    // Must run inside the swap (startViewTransition defers its callback).
+    replayActiveHeroWords();
   });
   if (target && !supportsViewTransition()) {
     // Fallback: gentle fade-in when the View Transitions API is unavailable

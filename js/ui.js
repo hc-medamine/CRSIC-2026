@@ -340,9 +340,15 @@ export function setPubType(type, btn) {
 export function applyPubFilter() {
   const searchEl = document.getElementById('pub-search');
   const q = ((searchEl && searchEl.value) || '').trim().toLowerCase();
-  const cards = document.querySelectorAll('#pub-grid .pub-card');
+  const cards = Array.from(document.querySelectorAll('#pub-grid .pub-card'));
   const reduced = prefersReducedMotion();
+  const grid = document.getElementById('pub-grid');
   let visible = 0;
+
+  // FLIP prep — remember which cards are currently displayed and their positions
+  const wasShown = new Set(cards.filter((c) => c.style.display !== 'none'));
+  const firstRects = new Map();
+  if (!reduced) cards.forEach((c) => firstRects.set(c, c.getBoundingClientRect()));
 
   cards.forEach(card => {
     const typeMatch = currentPubType === 'all' || card.dataset.type === currentPubType;
@@ -354,13 +360,16 @@ export function applyPubFilter() {
     const show = typeMatch && textMatch;
 
     if (show) {
+      card.classList.add('visible');
       if (reduced) {
         card.style.display = '';
         card.style.opacity = '';
         card.style.transform = '';
+      } else if (wasShown.has(card)) {
+        // Already visible — stay in place; FLIP animates any reflow after collapse
+        card.style.display = '';
       } else {
         if (card._hideTimer) { clearTimeout(card._hideTimer); card._hideTimer = null; }
-        card.classList.add('visible');
         card.style.display = '';
         card.style.transition = 'none';
         card.style.opacity = '0';
@@ -388,7 +397,6 @@ export function applyPubFilter() {
   if (!visible) {
     if (!noRes) {
       noRes = el('div', { className: 'pub-no-results', attrs: { id: 'pub-no-results' } });
-      const grid = document.getElementById('pub-grid');
       if (grid) grid.appendChild(noRes);
     }
     noRes.textContent = t('pub_search_empty');
@@ -396,6 +404,56 @@ export function applyPubFilter() {
   } else if (noRes) {
     noRes.style.display = 'none';
   }
+
+  if (!reduced) flipPubCards(firstRects, wasShown, 220);
+}
+
+/**
+ * FLIP: once hidden cards collapse to display:none, animate surviving cards
+ * from their previous grid position to the new one (transform/opacity only).
+ * @param {Map<HTMLElement, DOMRect>} firstRects
+ * @param {Set<HTMLElement>} wasShown
+ * @param {number} delay ms to wait for the hide transition before collapsing
+ */
+function flipPubCards(firstRects, wasShown, delay) {
+  setTimeout(() => {
+    const grid = document.getElementById('pub-grid');
+    if (!grid) return;
+    const moving = Array.from(grid.querySelectorAll('.pub-card')).filter(
+      (c) => wasShown.has(c) && c.style.display !== 'none',
+    );
+    let moved = 0;
+    moving.forEach((c) => {
+      const from = firstRects.get(c);
+      if (!from) return;
+      const to = c.getBoundingClientRect();
+      const dx = from.left - to.left;
+      const dy = from.top - to.top;
+      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+        moved++;
+        c.style.transition = 'none';
+        c.style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)`;
+      }
+    });
+    if (!moved) return;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        moving.forEach((c) => {
+          const from = firstRects.get(c);
+          if (!from) return;
+          const to = c.getBoundingClientRect();
+          const dx = from.left - to.left;
+          const dy = from.top - to.top;
+          if (Math.abs(dx) <= 0.5 && Math.abs(dy) <= 0.5) return;
+          c.style.transition = 'transform 0.32s cubic-bezier(0.16,1,0.3,1)';
+          c.style.transform = '';
+        });
+        setTimeout(() => {
+          moving.forEach((c) => { c.style.transition = ''; });
+        }, 380);
+      });
+    });
+  }, delay);
 }
 
 /* ── TABS ────────────────────────────────────────────── */

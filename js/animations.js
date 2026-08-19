@@ -134,6 +134,7 @@ function initScrollReveal() {
 export function refreshMotionReveals() {
   initScrollReveal();
   initDirectorWordMotion();
+  initHeroWordReveal();
 }
 
 /* ── DIRECTOR WORD (About) staged entrance ───────────── */
@@ -343,6 +344,66 @@ function initTitleUnderline() {
   titles.forEach((titleEl) => titleObserver.observe(titleEl));
 }
 
+/* ── HERO HEADLINE WORD REVEAL ───────────────────────── */
+export function initHeroWordReveal() {
+  if (prefersReducedMotion()) return;
+  // Home: the phrase span + gold <em>. Other pages: their page-hero h1.
+  document.querySelectorAll('.hero-main h1, .page-hero h1').forEach((h1) => {
+    const inActive = !!h1.closest('.page.active');
+    const targets = [];
+    h1.querySelectorAll('span[data-i18n], em[data-i18n]').forEach((n) => targets.push(n));
+    if (h1.hasAttribute('data-i18n')) targets.push(h1);
+    let rewrapped = false;
+    targets.forEach((node) => {
+      if (node.querySelector('.wr-word')) return; // idempotent across lang toggles
+      const words = node.textContent.trim().split(/\s+/).filter(Boolean);
+      if (words.length < 2) return;
+      const frag = document.createDocumentFragment();
+      words.forEach((w, i) => {
+        const wrapper = el('span', { className: 'wr-word' });
+        const inner = el('span', { className: 'wr-inner', text: w });
+        inner.style.setProperty('--wr-d', `${i * 0.07}s`);
+        wrapper.appendChild(inner);
+        frag.appendChild(wrapper);
+        if (i < words.length - 1) frag.appendChild(document.createTextNode(' '));
+      });
+      node.replaceChildren(frag);
+      rewrapped = true;
+    });
+    if (!rewrapped && !inActive) return;
+    h1.classList.add('wr-active');
+    // Words stay masked (translateY 112%) until this page is active — the
+    // router replays the reveal on every navigation to the page.
+    if (!inActive) return;
+    if (h1.classList.contains('wr-in')) return; // already revealed
+    requestAnimationFrame(() => requestAnimationFrame(() => h1.classList.add('wr-in')));
+  });
+}
+
+/** Replay the active page's hero headline reveal (called by the router). */
+export function replayActiveHeroWords() {
+  if (prefersReducedMotion()) return;
+  document.querySelectorAll('.page.active .hero-main h1, .page.active .page-hero h1').forEach((h1) => {
+    h1.classList.remove('wr-in');
+    // Snap words back under the mask instantly (no transition), so the
+    // reveal re-plays even for pages already shown — removing/re-adding
+    // wr-in alone would transition 0 -> 0 (no-op) inside the delay window.
+    const inners = h1.querySelectorAll('.wr-inner');
+    inners.forEach((inner) => {
+      inner.style.transition = 'none';
+      inner.style.transform = 'translateY(112%)';
+    });
+    void h1.offsetWidth;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      inners.forEach((inner) => {
+        inner.style.transition = '';
+        inner.style.transform = '';
+      });
+      h1.classList.add('wr-in');
+    }));
+  });
+}
+
 /* ── PAGE-HERO PARALLAX ──────────────────────────────── */
 function initParallaxHero() {
   if (prefersReducedMotion()) return;
@@ -538,6 +599,7 @@ function initRound2Animations() {
   initRippleEffect();
   initBackToTop();
   initTitleUnderline();
+  initHeroWordReveal();
   initParallaxHero();
   initStatShimmer();
   initPubCarouselTrack();
