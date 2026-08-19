@@ -97,7 +97,8 @@ CRSIC 2026/
 │   ├── .env.example           # Template only (no secrets)
 │   └── src/                   # App Router (dashboard + API)
 ├── css/
-│   └── style.css              # Design system, layout, animations (CSS variables in :root)
+│   ├── style.css              # Design system, layout, animations (CSS variables in :root)
+│   └── motion.css             # Motion/interactivity layer (view transitions, FLIP, floats, reveals; reduced-motion gated)
 ├── js/
 │   ├── main.js                # ENTRY POINT — boot order, wires modules
 │   ├── a11y.js                # focus trap, Escape topmost dialog
@@ -139,6 +140,9 @@ CRSIC 2026/
 │   ├── crsic_logo.png         # Brand / OG image
 │   ├── nav-crsic-logo.png     # Navbar logo
 │   ├── crsic_flags.jpg        # Hero background (CSS)
+│   ├── Hero/                  # Hero background videos (MP4, git-lfs)
+│   │   ├── hero-bg.mp4
+│   │   └── about-hero-bg.mp4
 │   ├── covers/                # Publication covers c00–c27, i00–i07
 │   └── Holders/               # News photos 0.jpg–5.jpg
 ├── scripts/                   # One-off content / data scripts (backfill, smoke helpers)
@@ -530,6 +534,7 @@ Deep links may pass `data-tab` / `data-filter` on navigable elements.
 - **Language:** AR (RTL) ↔ EN (LTR); `?lang=` + `localStorage`; optional banner for `en*`/`fr*` browsers
 - **Contact:** client-side required-field shake; success message; opens mail client
 - **A11y:** skip link, ARIA on nav/drawer/lightbox (focus trap), `prefers-reduced-motion` respected; touch devices skip decorative card tilt
+- **Motion layer:** `css/motion.css` + `js/animations.js` — view transitions (with fade fallback), FLIP filter reflow, card hover zoom/shine + lift/glow, hero floaters + word reveal, drawer/lightbox spring + blur, tab morph, carousel paging track, lightbox touch swipe, CMS row-enter stagger / toast / publish check-pop / sidebar pill+collapse / modal spring / skeletons / empty-state pulse. All gated by OS `prefers-reduced-motion`; transform/opacity only (no CLS).
 
 ### 6.4 Internationalisation
 
@@ -548,7 +553,8 @@ Deep links may pass `data-tab` / `data-filter` on navigable elements.
 | ------------------------ | -------------------------------------------- |
 | `img/crsic_logo.png`     | Brand / Open Graph                           |
 | `img/nav-crsic-logo.png` | Navbar                                       |
-| `img/crsic_flags.jpg`    | Hero background                              |
+| `img/crsic_flags.jpg`    | Hero background (fallback)                   |
+| `img/Hero/*.mp4`         | Hero background videos (home + about; git-lfs) |
 | `img/covers/*`           | Publication covers (lazy-loaded)             |
 | `img/Holders/*`          | News (and related) photography               |
 | Fonts                    | Google Fonts CDN (Amiri display, Tajawal UI) |
@@ -707,8 +713,8 @@ No separate staging config files exist in-repo.
 | — | Home pubs mobile horizontal carousel | **Done** on `main` |
 | — | Docs layout under `docs/` (+ PRD scaffold) | **Done** — [docs/README.md](./docs/README.md) |
 | — | Root Markdown stubs removed (README only at root) | **Done** |
-| 4 | Internal web app + database (users, roles, publish news/events/publications) — **no external CMS**, **no email features** | **On `main`** — core CMS + research groups/projects + authoring pack. Next: [CMS navigation & authoring UX](./docs/prds/2026-07-23-cms-navigation-authoring-ux.md) (**Approved** — implement M1→M3). |
-| 5 | Motion & interactivity polish (SPA + CMS) | [PRD](./docs/prds/2026-08-18-motion-interactivity-polish.md) (**Approved** 2026-08-18) — M1 both apps → M2 SPA nav → M3 SPA content → M4 CMS flows; phase-by-phase validated merges. |
+| 4 | Internal web app + database (users, roles, publish news/events/publications) — **no external CMS**, **no email features** | **On `main`** — core CMS + research groups/projects + authoring pack + [navigation & authoring UX](./docs/prds/2026-07-23-cms-navigation-authoring-ux.md) (M1–M3, PR #14). |
+| 5 | Motion & interactivity polish (SPA + CMS) | **Done on `main`** — [PRD](./docs/prds/2026-08-18-motion-interactivity-polish.md) M1–M4 merged phase-by-phase (PRs #24–#27) + docs PRs #22/#23; reduced-motion gated, zero new deps. |
 
 ### Known issues / gaps
 
@@ -720,7 +726,6 @@ No separate staging config files exist in-repo.
 
 | Priority | Item |
 |----------|------|
-| High | CMS navigation & authoring UX — **Approved** PRD; implement M1→M3 ([PRD](./docs/prds/2026-07-23-cms-navigation-authoring-ux.md)) |
 | Medium | Dual-field or locale-keyed content if EN parity is required |
 | Medium | Further image compression / WebP for covers and Holders |
 | Low | Introduce linting/formatting once the team grows |
@@ -737,7 +742,7 @@ Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Product spec:
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-07-20** (Step 4: `cms/` Next.js scaffold + local `crsic_db`) |
+| Last updated     | **2026-08-19** (Motion & interactivity polish merged to `main` — PRs #22–#27) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes
