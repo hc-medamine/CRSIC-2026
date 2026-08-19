@@ -2,7 +2,7 @@
  * Bi-directional motion controllers: scroll reveal, stagger, counters,
  * hero/nav polish. Transform + opacity only; respects prefers-reduced-motion.
  */
-import { prefersReducedMotion } from './utils.js';
+import { el, prefersReducedMotion } from './utils.js';
 import { updateTabIndicator } from './ui.js';
 
 let titleObserver = null;
@@ -422,6 +422,111 @@ function watchForNewCards() {
   document.querySelectorAll(tiltSelector).forEach(armTilt);
 }
 
+/**
+ * Home pub carousel — thin progress track under the scroll-snap strip.
+ * Mirrors horizontal position (direction-agnostic: active card found by
+ * centre proximity; thumb mirrors physically in RTL) and lets users jump
+ * pages by tapping the track. Usable under reduced-motion (snaps, no anim).
+ */
+function initPubCarouselTrack() {
+  const grid = document.getElementById('home-pub-grid');
+  if (!grid) return;
+  const mq = window.matchMedia('(max-width: 768px)');
+  let track = null;
+
+  const getCards = () => Array.from(grid.querySelectorAll('.pub-card'));
+
+  const build = () => {
+    const existing = grid.parentElement && grid.parentElement.querySelector('.pub-carousel-track');
+    if (existing) existing.remove();
+    track = null;
+    if (!mq.matches) return;
+
+    const cards = getCards();
+    if (cards.length < 2) return;
+
+    track = el('div', {
+      className: 'pub-carousel-track',
+      attrs: { 'aria-hidden': 'true' },
+    });
+    const fill = el('div', { className: 'pub-carousel-track-fill' });
+    const thumb = el('div', { className: 'pub-carousel-track-thumb' });
+    fill.appendChild(thumb);
+    track.appendChild(fill);
+    grid.insertAdjacentElement('afterend', track);
+
+    const perPage = Math.max(
+      1,
+      Math.round(grid.clientWidth / (cards[0].getBoundingClientRect().width + 12)),
+    );
+    const maxIdx = Math.max(1, cards.length - perPage);
+    const thumbW = (perPage / cards.length) * 100;
+
+    const paint = (activeIdx) => {
+      const frac = Math.min(1, activeIdx / maxIdx);
+      const travel = track.clientWidth - (thumbW / 100) * track.clientWidth;
+      thumb.style.width = thumbW + '%';
+      thumb.style.transform =
+        'translateX(' + (docDir() === 'rtl' ? 1 - frac : frac) * travel + 'px)';
+    };
+
+    const sync = () => {
+      const gridRect = grid.getBoundingClientRect();
+      if (gridRect.width === 0) return;
+      const center = gridRect.left + gridRect.width / 2;
+      let idx = 0;
+      let best = Infinity;
+      getCards().forEach((c, i) => {
+        const r = c.getBoundingClientRect();
+        const d = Math.abs(r.left + r.width / 2 - center);
+        if (d < best) {
+          best = d;
+          idx = i;
+        }
+      });
+      paint(Math.min(maxIdx, idx));
+    };
+
+    let ticking = false;
+    grid.addEventListener(
+      'scroll',
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          sync();
+        });
+      },
+      { passive: true },
+    );
+
+    track.addEventListener('click', (e) => {
+      const r = track.getBoundingClientRect();
+      if (r.width === 0) return;
+      let frac = (e.clientX - r.left) / r.width;
+      if (docDir() === 'rtl') frac = 1 - frac;
+      frac = Math.min(1, Math.max(0, frac));
+      const idx = Math.min(getCards().length - 1, Math.round(frac * maxIdx));
+      getCards()[idx].scrollIntoView({
+        behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+        inline: 'start',
+        block: 'nearest',
+      });
+    });
+
+    sync();
+  };
+
+  build();
+  mq.addEventListener('change', build);
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(build, 150);
+  });
+}
+
 function initRound2Animations() {
   const reduced = prefersReducedMotion();
   initScrollProgress();
@@ -435,6 +540,7 @@ function initRound2Animations() {
   initTitleUnderline();
   initParallaxHero();
   initStatShimmer();
+  initPubCarouselTrack();
 }
 
 /**

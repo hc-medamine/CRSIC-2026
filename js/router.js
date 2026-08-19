@@ -16,11 +16,28 @@ import { getTitleObserver } from './animations.js';
 import { renderDetailPage } from './components/detailPage.js';
 import { restoreSiteSeoHead } from './seoHead.js';
 import { PREVIEW_API_BASE } from './config.js';
-import { el, replaceChildren } from './utils.js';
+import { el, replaceChildren, prefersReducedMotion } from './utils.js';
 import { t } from './i18n.js';
 
 /** Maps child pages to their primary nav parent. */
 export const PAGE_PARENT = { org: 'about', research: 'about', cooperation: 'events', detail: 'home' };
+
+/**
+ * View Transitions API available and motion allowed?
+ * @returns {boolean}
+ */
+function supportsViewTransition() {
+  return !prefersReducedMotion() && typeof document.startViewTransition === 'function';
+}
+
+/** Wrap a synchronous DOM swap in a View Transition (plain fade fallback otherwise). */
+function withPageTransition(swap) {
+  if (supportsViewTransition()) {
+    document.startViewTransition(swap);
+  } else {
+    swap();
+  }
+}
 
 const DETAIL_TYPES = new Set([
   'news',
@@ -71,6 +88,12 @@ function showDetailShell() {
   if (target) {
     target.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'instant' });
+    // Detail content renders async, so fade-in only (no View Transition snapshot).
+    if (!supportsViewTransition()) {
+      target.classList.remove('page-fade-in');
+      void target.offsetWidth;
+      target.classList.add('page-fade-in');
+    }
   }
 }
 
@@ -205,12 +228,21 @@ export function navigateTo(pageId, tab, filter, opts = {}) {
 
   const resolvedId = parsed.pageId;
   restoreSiteSeoHead();
-  const pages = document.querySelectorAll('.page');
-  pages.forEach((p) => p.classList.remove('active'));
-  const target = document.getElementById('page-' + resolvedId);
-  if (target) {
-    target.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'instant' });
+  let target = null;
+  withPageTransition(() => {
+    const pages = document.querySelectorAll('.page');
+    pages.forEach((p) => p.classList.remove('active'));
+    target = document.getElementById('page-' + resolvedId);
+    if (target) {
+      target.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  });
+  if (target && !supportsViewTransition()) {
+    // Fallback: gentle fade-in when the View Transitions API is unavailable
+    target.classList.remove('page-fade-in');
+    void target.offsetWidth;
+    target.classList.add('page-fade-in');
   }
 
   const navPageId = PAGE_PARENT[resolvedId] || resolvedId;
