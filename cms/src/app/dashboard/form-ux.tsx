@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { t } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 
@@ -70,10 +70,46 @@ export function AdvancedDisclosure({
 
 /** Sticky bottom action bar (Save / Submit) — Direction B edit mockup. */
 export function FormStickyActions({ children }: { children: ReactNode }) {
+  const [castShadow, setCastShadow] = useState(false);
+  const barRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const bar = barRef.current;
+    const sentinel = sentinelRef.current;
+    if (!bar || !sentinel) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const barTop = bar.getBoundingClientRect().top;
+      const sentinelBottom = sentinel.getBoundingClientRect().bottom;
+      setCastShadow(sentinelBottom > barTop + 4);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
-    <div className="sticky bottom-0 z-10 mt-6 border-t border-crs-border bg-crs-surface/95 py-4 shadow-[0_-8px_20px_-14px_rgba(26,46,38,0.25)] backdrop-blur">
-      <div className="flex flex-wrap items-center justify-end gap-2">{children}</div>
-    </div>
+    <>
+      <div ref={sentinelRef} className="h-px" aria-hidden="true" />
+      <div
+        ref={barRef}
+        className={`sticky bottom-0 z-10 mt-6 border-t border-crs-border bg-crs-surface/95 py-4 backdrop-blur transition-[box-shadow] duration-200 ${
+          castShadow ? "shadow-[0_-8px_20px_-14px_rgba(26,46,38,0.35)]" : ""
+        }`}
+      >
+        <div className="flex flex-wrap items-center justify-end gap-2">{children}</div>
+      </div>
+    </>
   );
 }
 
