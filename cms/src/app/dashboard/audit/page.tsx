@@ -208,7 +208,7 @@ export default async function AuditLogPage({ searchParams }: Props) {
       </form>
 
       {rows.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-crs-border p-6 text-sm text-crs-muted">
+        <p className="cms-empty-state rounded-lg border border-dashed border-crs-border p-6 text-sm text-crs-muted">
           {t("auditEmpty", lang)}
         </p>
       ) : (

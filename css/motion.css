@@ -410,6 +410,10 @@ html[dir="rtl"] .nav-drawer.open {
     0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.9; }
     50% { transform: translate(4%, -3%) scale(1.05); opacity: 1; }
   }
+  @keyframes directorFloat {
+    from { transform: translateY(0); }
+    to { transform: translateY(-7px); }
+  }
 
   html[dir="rtl"] .director-word {
     --director-from: -1;
@@ -427,7 +431,9 @@ html[dir="rtl"] .nav-drawer.open {
   }
 
   .director-word.is-director-in .director-word-frame {
-    animation: directorPortraitIn 0.95s var(--ease-out-expo) both;
+    animation:
+      directorPortraitIn 0.95s var(--ease-out-expo) both,
+      directorFloat 7s var(--ease-out-soft) 1.4s infinite alternate;
   }
   .director-word.is-director-in .director-word-glow {
     animation: directorGlowDrift 7s var(--ease-out-soft) 0.8s infinite;
@@ -828,5 +834,17 @@ html[dir="rtl"] {
       opacity: 0;
       transform: translateX(var(--sheen-to, 120%));
     }
+  }
+}
+
+/* Nice-to-have: gentle float on partner marks (logo medallions).
+   Transform-only (vertical), 6s loop, fully collapsed by the reduced-motion guard. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes partnerMarkFloat {
+    from { transform: translateY(0); }
+    to { transform: translateY(-4px); }
+  }
+  .partner-mark-img {
+    animation: partnerMarkFloat 6s var(--ease-out-soft) infinite alternate;
   }
 }

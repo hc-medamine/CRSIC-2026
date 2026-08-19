@@ -89,7 +89,7 @@ export function NotificationsClient({ initialUnread, initialItems }: Props) {
       </div>
 
       {items.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-crs-border bg-white p-6 text-sm text-crs-muted">
+        <p className="cms-empty-state rounded-lg border border-dashed border-crs-border bg-white p-6 text-sm text-crs-muted">
           {t("notifEmpty", lang)}
         </p>
       ) : (

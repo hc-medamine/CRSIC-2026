@@ -183,6 +183,13 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
 }
 
 /* ═══ M4 — publish state machine, sidebar, modal spring, skeletons ═══ */
+@keyframes cmsEmptyPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+.cms-empty-state {
+  animation: cmsEmptyPulse 3.2s ease-in-out infinite;
+}
 @keyframes cmsCheckPop {
   0%   { transform: scale(0.3); opacity: 0; }
   60%  { transform: scale(1.2); opacity: 1; }

@@ -67,7 +67,7 @@ export function ContentListPage({
       {toolbar}
 
       {items.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-crs-border bg-crs-surface p-8 text-sm text-crs-muted">
+        <p className="cms-empty-state rounded-2xl border border-dashed border-crs-border bg-crs-surface p-8 text-sm text-crs-muted">
           {emptyLabel}
         </p>
       ) : (
