@@ -19,6 +19,23 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-19 — Server execution analysis + lint fixes
+
+**Servers run:** SPA :5500 (`npx serve`) + CMS :3000 (`next dev`, Turbopack) — both detached, logs captured, both serving cleanly.
+
+**Runtime probe results (no regressions):**
+- SPA — all assets 200 (`/`, css, motion.css, js modules, JSON, img); hero videos `preload="auto"`; all relative JS imports resolve; all referenced covers/Holders/event imgs exist on disk; locale keys 333/333 in sync; 244 `data-i18n` keys used in HTML all present; router page ids all present in HTML (`page-fade-in` is a CSS class, not a route); `covers.length === pubs.length` (36/36); all `data/*.json` valid.
+- CMS — migrations all applied (28/28 skip), Ready in 502ms, **no** "Slow filesystem" warning; `/api/health/db` 200 `{ok:true}`; auth flow correct (`/`→307 `/login`, `/dashboard`→307, `/api/auth/me` 401, content APIs 401, audit/org-units 403 role-gated, invalid preview token 404); Turbopack hot-reload clean after edits.
+- Tests: SPA 7/7, CMS 18/18. No stray `console.log` in either codebase.
+
+**Fixed (PR #29, `85ba19a`):**
+- `cms/src/app/api/org-units/route.ts` — 3 unused imports (`deleteOrgUnit`, `getOrgUnitDeleteImpact`, `updateOrgUnit`) removed.
+- `cms/src/lib/publish/slug.ts` — `prefer-const` in `uniqueSlug`.
+
+**Tracked (pre-existing, not regressions):** 8 lint problems remain — 6 `react-hooks/set-state-in-effect` errors + 2 `exhaustive-deps` warnings in `away-panel`, `comment-thread`, `home-tip-banner`, `spa-preview-link`, `review-owner-panel`, `revision-history` (async data-fetch `load()` patterns; setState occurs after `await`, not synchronously — rule flags the call itself). One dev-log noise item: `UNAUTHENTICATED` throw in `session.ts:79` prints a stack trace per unauthenticated dashboard hit, though the layout catches it and 307-redirects correctly (cosmetic, dev-only).
+
+---
+
 ### 2026-08-19 — Motion & interactivity polish: **all merged** + environment cleanup + docs refresh
 
 **PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md) — status **Delivered**
