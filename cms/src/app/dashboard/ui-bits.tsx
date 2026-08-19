@@ -42,6 +42,8 @@ export function QueueCard({
   icon,
   items,
   emptyLabel,
+  emptyHint,
+  emptyCta,
   footerHref,
   footerLabel,
   showAuthor,
@@ -52,6 +54,8 @@ export function QueueCard({
   icon: ReactNode;
   items: QueueItem[];
   emptyLabel: string;
+  emptyHint?: string;
+  emptyCta?: { href: string; label: string };
   footerHref?: string;
   footerLabel?: string;
   showAuthor?: boolean;
@@ -60,7 +64,7 @@ export function QueueCard({
   const lang = useCmsLang();
   const visible = items.slice(0, 5);
   return (
-    <section className="flex flex-col rounded-2xl border border-crs-border bg-crs-surface shadow-[0_1px_3px_rgba(26,46,38,0.06)]">
+    <section className="cms-card-lift flex flex-col rounded-2xl border border-crs-border bg-crs-surface shadow-[0_1px_3px_rgba(26,46,38,0.06)]">
       <div className="flex items-start gap-3 border-b border-crs-border/70 px-4 py-4">
         <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-crs-primary/10 text-crs-primary">
           {icon}
@@ -68,7 +72,7 @@ export function QueueCard({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <h2 className="text-sm font-semibold text-crs-ink">{title}</h2>
-            <span className="rounded-full bg-crs-primary/10 px-2 py-0.5 text-[11px] font-semibold text-crs-primary">
+            <span className="cms-count-pop rounded-full bg-crs-primary/10 px-2 py-0.5 text-[11px] font-semibold text-crs-primary">
               {items.length}
             </span>
           </div>
@@ -77,7 +81,23 @@ export function QueueCard({
       </div>
 
       {visible.length === 0 ? (
-        <p className="cms-empty-state px-4 py-6 text-sm text-crs-muted">{emptyLabel}</p>
+        <div className="flex flex-col items-start gap-3 px-4 py-6">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-crs-bg text-crs-muted">
+            {icon}
+          </span>
+          <div>
+            <p className="text-sm font-medium text-crs-ink">{emptyLabel}</p>
+            {emptyHint ? <p className="mt-1 text-xs text-crs-muted">{emptyHint}</p> : null}
+          </div>
+          {emptyCta ? (
+            <Link
+              href={emptyCta.href}
+              className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-crs-primary px-3 py-2 text-xs font-medium text-white hover:bg-crs-secondary"
+            >
+              {emptyCta.label}
+            </Link>
+          ) : null}
+        </div>
       ) : (
         <ul className="divide-y divide-crs-border/60">
           {visible.map((item) => (
@@ -123,6 +143,39 @@ export function QueueCard({
         </div>
       ) : null}
     </section>
+  );
+}
+
+export function StatCard({
+  label,
+  value,
+  icon,
+  href,
+  detail,
+}: {
+  label: string;
+  value: number;
+  icon: ReactNode;
+  href?: string;
+  detail?: string;
+}) {
+  const body = (
+    <div className="cms-card-lift flex items-center gap-3 rounded-2xl border border-crs-border bg-crs-surface px-4 py-3.5 shadow-[0_1px_3px_rgba(26,46,38,0.06)]">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-crs-accent/15 text-crs-primary">
+        {icon}
+      </span>
+      <div className="min-w-0">
+        <p className="cms-count-pop text-xl font-semibold tracking-tight text-crs-ink">{value}</p>
+        <p className="truncate text-xs text-crs-muted">{label}</p>
+        {detail ? <p className="truncate text-[11px] text-crs-muted/80">{detail}</p> : null}
+      </div>
+    </div>
+  );
+  if (!href) return body;
+  return (
+    <Link href={href} className="block outline-none focus-visible:ring-2 focus-visible:ring-crs-accent">
+      {body}
+    </Link>
   );
 }
 

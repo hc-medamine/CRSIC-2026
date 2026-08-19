@@ -25,6 +25,7 @@ Product specs for CRSIC live here. **New feature slices follow the PRD-first wor
 | [2026-07-27-spa-laws-platforms-home.md](./2026-07-27-spa-laws-platforms-home.md) | **Approved** (2026-07-27) | Laws & Platforms SPA+CMS, Home carousel/reorder, director placeholder, ongoing badge, 5-up cards, Bahij |
 | [2026-07-27-laws-platforms-parity-director-cms.md](./2026-07-27-laws-platforms-parity-director-cms.md) | **Approved** (2026-07-27) | Attachments + SPA externalUrl + seed cutover; Director CMS (SA + centre-wide Reviewer); journals/About pages OOS |
 | [2026-08-18-motion-interactivity-polish.md](./2026-08-18-motion-interactivity-polish.md) | **Delivered** (2026-08-19) | Motion/interactivity polish SPA + CMS — M1–M4, showy everywhere, OS-only motion gate, explicit perf budget; all merged to `main` (PRs #24–#27) |
+| [2026-08-19-cms-desk-design.md](./2026-08-19-cms-desk-design.md) | **Approved** (2026-08-19) | CMS Desk — shell + dashboard redesign; novice-first; OS-only motion gate; SaaS-dashboard reference |
 
 ## Related
 

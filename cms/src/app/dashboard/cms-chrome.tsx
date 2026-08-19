@@ -13,6 +13,7 @@ import {
   IconGlobe,
   IconHome,
   IconMedia,
+  IconSearch,
   IconShield,
   IconUser,
   IconUsers,
@@ -149,6 +150,7 @@ export function CmsChrome({
   const [lang, setLang] = useState<CmsLang>(initialLang);
   const [pending, setPending] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [navQuery, setNavQuery] = useState("");
   const router = useRouter();
   const pathname = usePathname();
   const dir = lang === "ar" ? "rtl" : "ltr";
@@ -217,7 +219,57 @@ export function CmsChrome({
 
   const roleText = roleLabel(role, lang);
 
-  const navBody = (
+  const navSections: { label?: string; items: NavItem[]; renderLabel?: string }[] = [];
+  navSections.push({
+    items: [{ key: "home", href: "/dashboard", icon: <IconHome /> }],
+    renderLabel: t("home", lang),
+  });
+  if (centreItems.length > 0) {
+    navSections.push({ label: t("centreContent", lang), items: centreItems });
+  }
+  if (researchItems.length > 0) {
+    navSections.push({ label: t("research", lang), items: researchItems });
+  }
+  if (utility.length > 0) {
+    navSections.push({ items: utility });
+  }
+  if (adminItems.length > 0) {
+    navSections.push({ label: t("admin", lang), items: adminItems });
+  }
+
+  const query = navQuery.trim().toLowerCase();
+  const searchResults = query
+    ? navSections
+        .flatMap((s) =>
+          s.items
+            .filter((i) => t(i.key, lang).toLowerCase().includes(query))
+            .map((i) => ({ ...i, renderLabel: t(i.key, lang) })),
+        )
+        .slice(0, 12)
+    : [];
+
+  const navBody = query ? (
+    <div className="cms-nav-search-in">
+      {searchResults.length > 0 ? (
+        <ul className="flex flex-col gap-0.5">
+          {searchResults.map((item) => (
+            <NavLink
+              key={item.key}
+              item={item}
+              active={isActive(item.href)}
+              label={item.renderLabel ?? t(item.key, lang)}
+              onNavigate={() => {
+                setMenuOpen(false);
+                setNavQuery("");
+              }}
+            />
+          ))}
+        </ul>
+      ) : (
+        <p className="px-3 py-6 text-sm text-crs-muted">{t("navNoResults", lang)}</p>
+      )}
+    </div>
+  ) : (
     <>
       <NavLink
         item={{ key: "home", href: "/dashboard", icon: <IconHome /> }}
@@ -226,68 +278,44 @@ export function CmsChrome({
         onNavigate={() => setMenuOpen(false)}
       />
 
-      {centreItems.length > 0 ? (
-        <NavGroup label={t("centreContent", lang)}>
-          {centreItems.map((item) => (
-            <NavLink
-              key={item.key}
-              item={item}
-              active={isActive(item.href)}
-              label={t(item.key, lang)}
-              onNavigate={() => setMenuOpen(false)}
-            />
-          ))}
-        </NavGroup>
-      ) : null}
+      {navSections
+        .filter((s) => s.label)
+        .map((s) => (
+          <NavGroup key={s.label} label={s.label!}>
+            {s.items.map((item) => (
+              <NavLink
+                key={item.key}
+                item={item}
+                active={isActive(item.href)}
+                label={t(item.key, lang)}
+                onNavigate={() => setMenuOpen(false)}
+              />
+            ))}
+          </NavGroup>
+        ))}
 
-      {researchItems.length > 0 ? (
-        <NavGroup label={t("research", lang)}>
-          {researchItems.map((item) => (
-            <NavLink
-              key={item.key}
-              item={item}
-              active={isActive(item.href)}
-              label={t(item.key, lang)}
-              onNavigate={() => setMenuOpen(false)}
-            />
-          ))}
-        </NavGroup>
-      ) : null}
-
-      {utility.length > 0 ? (
-        <>
-          <div className="mx-3 my-3 border-t border-crs-border" />
-          {utility.map((item) => (
-            <NavLink
-              key={item.key}
-              item={item}
-              active={isActive(item.href)}
-              label={t(item.key, lang)}
-              onNavigate={() => setMenuOpen(false)}
-            />
-          ))}
-        </>
-      ) : null}
-
-      {adminItems.length > 0 ? (
-        <NavGroup label={t("admin", lang)}>
-          {adminItems.map((item) => (
-            <NavLink
-              key={item.key}
-              item={item}
-              active={isActive(item.href)}
-              label={t(item.key, lang)}
-              onNavigate={() => setMenuOpen(false)}
-            />
-          ))}
-        </NavGroup>
-      ) : null}
+      {navSections
+        .filter((s) => !s.label && s.items.length > 0)
+        .map((s) => (
+          <div key={`utility-${s.items[0]!.key}`}>
+            <div className="mx-3 my-3 border-t border-crs-border" />
+            {s.items.map((item) => (
+              <NavLink
+                key={item.key}
+                item={item}
+                active={isActive(item.href)}
+                label={t(item.key, lang)}
+                onNavigate={() => setMenuOpen(false)}
+              />
+            ))}
+          </div>
+        ))}
     </>
   );
 
   return (
     <CmsLangProvider lang={lang}>
-    <div dir={dir} lang={lang} className="min-h-full bg-[#f3f2ed]">
+    <div dir={dir} lang={lang} className="min-h-full cms-desk-bg">
       <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-crs-border bg-crs-surface/95 px-4 backdrop-blur md:hidden">
         <button
           type="button"
@@ -347,7 +375,7 @@ export function CmsChrome({
         >
           <Link
             href="/dashboard"
-            className="flex shrink-0 items-center gap-3 border-b border-crs-border/70 px-4 py-5 outline-none transition-colors hover:bg-crs-bg/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-crs-primary/40"
+            className="flex shrink-0 items-center gap-3 border-b border-crs-border/70 bg-gradient-to-r from-crs-primary/5 via-transparent to-transparent px-4 py-5 outline-none transition-colors hover:bg-crs-bg/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-crs-primary/40"
             onClick={() => setMenuOpen(false)}
             aria-label={t("home", lang)}
           >
@@ -365,6 +393,20 @@ export function CmsChrome({
               <p className="text-xs text-crs-muted">{t("contentCms", lang)}</p>
             </div>
           </Link>
+
+          <div className="shrink-0 px-3 pb-1 pt-3">
+            <div className="relative">
+              <IconSearch className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-crs-muted" />
+              <input
+                type="search"
+                value={navQuery}
+                onChange={(e) => setNavQuery(e.target.value)}
+                placeholder={t("navSearch", lang)}
+                aria-label={t("navSearch", lang)}
+                className="min-h-10 w-full rounded-xl border border-crs-border bg-crs-surface ps-9 pe-3 text-sm text-crs-ink placeholder:text-crs-muted focus-visible:border-crs-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-crs-accent/25"
+              />
+            </div>
+          </div>
 
           <nav className="min-h-0 flex-1 overflow-y-auto px-3 pb-4 pt-2" aria-label={t("mainNav", lang)}>
             {navBody}
@@ -402,7 +444,11 @@ export function CmsChrome({
           </div>
         </aside>
 
-        <div className="min-w-0 flex-1 bg-[#f3f2ed]">{children}</div>
+        <div className="min-w-0 flex-1 cms-desk-bg">
+          <div key={pathname} className="cms-page-enter">
+            {children}
+          </div>
+        </div>
       </div>
     </div>
     </CmsLangProvider>

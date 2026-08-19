@@ -12,7 +12,7 @@ Public website for the Center for Research in Islamic Sciences and Civilization 
 ```bash
 npm run spa                  # serve SPA on :5500 (root; convenience only)
 # or VS Code Live Server :5501  — file:// BREAKS the SPA (ES modules + fetch)
-node --test tests/*.test.mjs # SPA unit tests (no CI)
+npm test                     # SPA unit tests (node --test tests/*.test.mjs); no CI
 
 cd cms
 npm install                  # must be run inside cms/
@@ -23,9 +23,11 @@ npm run db:smoke             # CMS smoke (needs .env.local + Postgres)
 npm run db:seed:super-admin  # first-time login setup
 ```
 
+Every `cms/` `npm test` and `db:*` script loads `.env.local` via `--env-file` — a missing `.env.local` fails immediately (hard error, not a prompt).
+
 ## Hard workflow rules
 
-- **PRD-first** (see `.cursor/rules/prd-first-workflow.mdc`): do **not** code a product/feature slice until its PRD under `docs/prds/` is **Approved**. Small bugfixes/ops chores may skip this.
+- **PRD-first** (see `.cursor/rules/prd-first-workflow.mdc`): do **not** code a product/feature slice until its PRD under `docs/prds/` is **Approved**. Small bugfixes/ops chores may skip this. When the stakeholder raises a new idea, start at workflow step 1 — don't jump to design or a todo list.
 - **CMS deferred backlog** (`.cursor/rules/cms-deferred-backlog.mdc`): do not implement deferred items (pagination, bulk ops, scheduled publish, media crop, EN body parity, …) unless a new PRD slice is explicitly started.
 - `cms/AGENTS.md`: the installed Next.js version has breaking changes vs training data — read `cms/node_modules/next/dist/docs/` before writing CMS code.
 
@@ -45,6 +47,7 @@ npm run db:seed:super-admin  # first-time login setup
 ## Git & docs
 
 - **Mandatory — never commit directly to `main`.** All work happens on `feature/` | `fix/` | `content/` | `docs/` branches. Merge to `main` only when the work is complete, verified, and **validated by the stakeholder**. Never force-push `main`.
+- Before merging, run the smoke checklist in `docs/qa/SMOKE.md` (~5 min; no merge without sections A–D).
 - Conventional Commits: `feat:` `fix:` `content:` (data) `style:` `refactor:` `docs:` `chore:`.
 - `docs/WORKLOG.md`: append new entries **at the top** after meaningful changes.
 - Windows PATH note: git may live at `C:\Program Files\Git\cmd\git.exe`.
