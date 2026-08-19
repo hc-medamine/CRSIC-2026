@@ -15,7 +15,7 @@ import {
   type SeoFormState,
 } from "@/app/dashboard/seo-fields";
 import { cmsToast } from "@/app/dashboard/cms-toast";
-import { AdvancedDisclosure, FormBanner, FormSection, FormStickyActions, messageForAction } from "@/app/dashboard/form-ux";
+import { AdvancedDisclosure, FormBanner, FormSection, FormStickyActions, PublishButton, messageForAction } from "@/app/dashboard/form-ux";
 import { t } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 import type { PublicMediaItem } from "@/lib/publish/media";
@@ -371,7 +371,7 @@ export function PlatformEditorForm({
 
       {mode === "edit" && initial?.id ? <PublicPreviewButton contentId={initial.id} disabled={pending} /> : null}
       {mode === "edit" && canReview && (initial?.status === "approved" || initial?.status === "unpublished") ? (
-        <button type="button" disabled={pending} className="w-fit rounded bg-crs-primary px-4 py-2 text-sm text-white" onClick={() => void run("publish")}>{t("actionPublish", lang)}</button>
+        <PublishButton pending={pending} onClick={() => void run("publish")}>{t("actionPublish", lang)}</PublishButton>
       ) : null}
       {mode === "edit" && (isAuthor || canReview) && initial?.status === "published" ? (
         <div className="flex flex-wrap gap-2">

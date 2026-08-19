@@ -34,23 +34,25 @@ export function MediaLightbox({ src, alt = "", onClose }: Props) {
       role="dialog"
       aria-modal="true"
       aria-label={t("imagePreview", lang)}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-crs-ink/80 p-4"
+      className="cms-modal-backdrop fixed inset-0 z-[100] flex items-center justify-center bg-crs-ink/80 p-4"
       onClick={onClose}
     >
-      <button
-        type="button"
-        className="absolute end-4 top-4 min-h-11 rounded-xl border border-white/30 bg-white/10 px-4 text-sm text-white hover:bg-white/20"
-        onClick={onClose}
-      >
-        Close
-      </button>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt={alt}
-        className="max-h-[90vh] max-w-[95vw] rounded-lg object-contain shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      />
+      <div className="cms-modal-panel relative">
+        <button
+          type="button"
+          className="absolute end-4 top-4 min-h-11 rounded-xl border border-white/30 bg-white/10 px-4 text-sm text-white hover:bg-white/20"
+          onClick={onClose}
+        >
+          Close
+        </button>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt={alt}
+          className="max-h-[90vh] max-w-[95vw] rounded-lg object-contain shadow-2xl"
+          onClick={(e) => e.stopPropagation()}
+        />
+      </div>
     </div>
   );
 }

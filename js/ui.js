@@ -43,6 +43,8 @@ let releaseDrawerTrap = null;
 let releaseLightboxTrap = null;
 /** @type {HTMLElement|null} */
 let lightboxTrigger = null;
+/** @type {{ type: string, index: number|null }|null} */
+let lightboxNav = null;
 
 /* ── SKELETON HELPERS ────────────────────────────────── */
 function skelNodes(className, n) {
@@ -661,6 +663,13 @@ export function openLightbox(optsOrIndex, triggerEl) {
   const overlay = document.getElementById('lightbox');
   if (!overlay) return;
 
+  let navIndex = typeof index === 'number' && !Number.isNaN(index) ? index : null;
+  if (navIndex == null && content.slug) {
+    const found = findPublicationByKey(content.slug);
+    if (found) navIndex = found.index;
+  }
+  lightboxNav = { type: content.type, index: navIndex };
+
   lightboxTarget = content.slug ? { type: content.type, slug: content.slug } : null;
   lightboxTrigger =
     triggerEl ||
@@ -751,6 +760,7 @@ export function closeLightbox() {
   lb.classList.remove('open');
   lb.setAttribute('aria-hidden', 'true');
   lightboxTarget = null;
+  lightboxNav = null;
   if (releaseLightboxTrap) {
     releaseLightboxTrap();
     releaseLightboxTrap = null;
@@ -760,6 +770,87 @@ export function closeLightbox() {
 
 export function closeLightboxOutside(e) {
   if (e.target === document.getElementById('lightbox')) closeLightbox();
+}
+
+/**
+ * Navigate the lightbox to an adjacent publication (prev/next).
+ * Only publications carry a grid index, so nav is restricted to them.
+ * @param {number} delta +1 next, -1 prev
+ */
+function navigateLightbox(delta) {
+  if (!lightboxNav || lightboxNav.type !== 'publication' || lightboxNav.index == null) return;
+  const pubs = getPubs();
+  if (!pubs.length) return;
+  const next = (lightboxNav.index + delta + pubs.length) % pubs.length;
+  if (next === lightboxNav.index) return;
+  const pub = pubs[next];
+  if (!pub) return;
+  openLightbox(
+    {
+      type: 'publication',
+      slug: pub.slug || pub.id || '',
+      index: next,
+      triggerEl: lightboxTrigger || undefined,
+    },
+    lightboxTrigger || undefined,
+  );
+}
+
+/**
+ * Touch swipe navigation for the lightbox (nice-to-have backlog item).
+ * Horizontal drag follows the finger; past threshold it snaps to the
+ * adjacent publication. RTL flips the swipe direction. Reduced-motion
+ * keeps navigation but skips the drag-follow transform.
+ * @param {HTMLElement} overlay
+ */
+function initLightboxSwipe(overlay) {
+  const panel = overlay.querySelector('.lightbox-panel');
+  if (!panel) return;
+  let startX = 0;
+  let startY = 0;
+  let active = false;
+  const threshold = 50;
+  const reduced = prefersReducedMotion();
+
+  panel.addEventListener(
+    'touchstart',
+    (e) => {
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0];
+      startX = t.clientX;
+      startY = t.clientY;
+      active = true;
+    },
+    { passive: true },
+  );
+
+  panel.addEventListener(
+    'touchmove',
+    (e) => {
+      if (!active || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - startX;
+      const dy = e.touches[0].clientY - startY;
+      if (Math.abs(dx) < Math.abs(dy)) return;
+      if (!reduced) {
+        panel.style.transform = `translateX(${dx * 0.4}px)`;
+      }
+    },
+    { passive: true },
+  );
+
+  panel.addEventListener(
+    'touchend',
+    (e) => {
+      if (!active) return;
+      active = false;
+      panel.style.transform = '';
+      if (reduced) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      if (Math.abs(dx) < threshold) return;
+      navigateLightbox(dx < 0 ? 1 : -1);
+    },
+    { passive: true },
+  );
 }
 
 /* ── CONTACT FORM ────────────────────────────────────── */
@@ -907,6 +998,7 @@ export function bindUIEvents() {
       if (btn.id === 'lb-detail-btn') return;
       btn.addEventListener('click', closeLightbox);
     });
+    initLightboxSwipe(lightbox);
   }
 
   document.addEventListener('click', (e) => {

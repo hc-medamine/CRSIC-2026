@@ -19,6 +19,35 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-19 — Motion M4: deviation fixes + PRD nice-to-haves
+
+**PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md) (Approved) — **stakeholder validated M1–M4**
+
+**Branch:** `feature/motion-m4` (PR #27)
+
+**Done (final pass):**
+- **Row-enter parity:** `cms-row-enter` stagger applied to the hand-rolled tables/lists that bypassed `ContentListPage` — news, events, publications, notifications, audit, org-units (PRD §4.11).
+- **Sticky action bar scroll shadow (fix PRD §4.18):** `FormStickyActions` now casts its shadow only when content scrolls beneath the pinned bar — sentinel + rAF-throttled rect check; `transition-[box-shadow]` guarded by the reduced-motion rule.
+- **Hero encodes committed:** web-optimized H.264 1080p30 re-encodes replace the 260MB/331MB LFS blobs (15MB/24MB) so the M3 instant-video fix propagates; unreferenced cover png (resurrected by the earlier stash-pop) deleted.
+- **Nice-to-have — lightbox swipe:** touch drag-follow + snap-to-adjacent-publication navigation in `js/ui.js` (`initLightboxSwipe`, 50px threshold); reduced-motion keeps navigation but skips the drag transform.
+- **Nice-to-have — gentle float:** director portrait floats after its staged entrance; partner logo medallions get a 6s float (`partnerMarkFloat`, `directorFloat`).
+- **Nice-to-have — empty-state pulse:** `.cms-empty-state` 55%→100% opacity 3.2s loop on shared ContentListPage, ui-bits queue, news/events/publications/audit/notifications.
+- **Verification:** SPA tests 7/7, CMS tests 18/18, eslint clean on all touched files, `ui.js` parses, both servers serving updated code.
+
+### 2026-08-18 — Motion M4: CMS daily-flow polish
+
+**PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md) (Approved)
+
+**Branch:** `feature/motion-m4` — **not merged until M1–M4 all pass** (hard rule)
+
+**Done:**
+- **Publish button state machine (M4.1):** new `PublishButton` in `cms/src/app/dashboard/form-ux.tsx` — idle → spinner (border-rotating ring) → gold `cms-check-pop` (spring scale-in, 420ms, auto-resets after 1.6s). Swapped into all 10 publish buttons (alert/event/law/news/platform/group/partner/publication/project/director forms). Uses the React-sanctioned "adjust state when props change" render pattern (no setState in effect).
+- **Sidebar active pill + collapsible groups (M4.2):** `cms-chrome.tsx` — active nav link gets `cms-nav-active` springy pill pop; `GroupLabel` replaced with `NavGroup` (Centre content / Research / Admin) — chevron toggles a `grid-template-rows 1fr↔0fr` height transition (RTL-aware rotation). `NavLink` hoisted out of render (fixes `react-hooks/static-components`).
+- **Modal spring-in + backdrop blur (M4.3):** `cms-modal-backdrop` (fade + blur(4px)) and `cms-modal-panel` (translateY 14px + scale 0.96 → spring-in 320ms) applied to media lightbox + media delete/blocked dialogs.
+- **List skeletons (M4.4):** shared `ListSkeleton` (`cms/src/app/dashboard/list-skeleton.tsx`) + `loading.tsx` added to all 10 content-list routes (news/publications/events/partners/laws/platforms/alerts/research-groups/research-projects/media) — shimmer mirrors the SPA `.skeleton` pattern (`.cms-skeleton`, gold-green gradient sweep).
+- **CSS:** keyframes/classes appended to `cms/src/app/globals.css` under the M4 banner; all collapse under the existing `prefers-reduced-motion` guard.
+- **Verification:** `cms npm test` 18/18 pass; `npx eslint` clean on all touched files (remaining repo errors are pre-existing on base — `away-panel`, `comment-thread`, `home-tip-banner`, `spa-preview-link`, `review-owner-panel`, `revision-history`, `slug.ts`); `/login` 200, `/dashboard` 307 (auth) on :3000.
+
 ### 2026-08-18 — Motion M3: SPA exploration & micro-interactions
 
 **PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md) (Approved — docs branch PR #23)

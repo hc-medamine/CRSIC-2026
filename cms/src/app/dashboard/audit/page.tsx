@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { requireSuperAdmin } from "@/lib/users";
 import { listAuditLog } from "@/lib/audit";
@@ -207,13 +208,17 @@ export default async function AuditLogPage({ searchParams }: Props) {
       </form>
 
       {rows.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-crs-border p-6 text-sm text-crs-muted">
+        <p className="cms-empty-state rounded-lg border border-dashed border-crs-border p-6 text-sm text-crs-muted">
           {t("auditEmpty", lang)}
         </p>
       ) : (
         <ul className="divide-y rounded-2xl border border-crs-border bg-crs-surface shadow-sm">
-          {rows.map((row) => (
-            <li key={row.id} className="px-4 py-3 text-sm">
+          {rows.map((row, i) => (
+            <li
+              key={row.id}
+              className="cms-row-enter px-4 py-3 text-sm"
+              style={{ "--row-delay": `${Math.min(i, 11) * 45}ms` } as CSSProperties}
+            >
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <p className="text-sm font-semibold text-crs-ink">
                   {auditActionLabel(row.action, lang)}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cmsToast } from "@/app/dashboard/cms-toast";
@@ -89,15 +89,16 @@ export function NotificationsClient({ initialUnread, initialItems }: Props) {
       </div>
 
       {items.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-crs-border bg-white p-6 text-sm text-crs-muted">
+        <p className="cms-empty-state rounded-lg border border-dashed border-crs-border bg-white p-6 text-sm text-crs-muted">
           {t("notifEmpty", lang)}
         </p>
       ) : (
         <ul className="divide-y rounded-2xl border border-crs-border bg-crs-surface shadow-sm">
-          {items.map((n) => (
+          {items.map((n, i) => (
             <li
               key={n.id}
-              className={`flex flex-col gap-1 px-4 py-3 ${n.readAt ? "bg-white" : "bg-crs-bg"}`}
+              className={`cms-row-enter flex flex-col gap-1 px-4 py-3 ${n.readAt ? "bg-white" : "bg-crs-bg"}`}
+              style={{ "--row-delay": `${Math.min(i, 11) * 45}ms` } as CSSProperties}
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>

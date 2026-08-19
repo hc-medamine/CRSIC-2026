@@ -8,6 +8,7 @@ import { CmsLangProvider } from "@/lib/i18n/cms-lang";
 import type { ContentType } from "@/lib/users";
 import {
   IconBell,
+  IconChevron,
   IconDoc,
   IconGlobe,
   IconHome,
@@ -52,11 +53,40 @@ const RESEARCH: NavItem[] = [
   { key: "researchProjects", href: "/dashboard/research-projects", contentType: "research_project", icon: <IconDoc /> },
 ];
 
-function GroupLabel({ children }: { children: React.ReactNode }) {
+function NavGroup({
+  label,
+  children,
+  defaultOpen = true,
+}: {
+  label: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
   return (
-    <p className="px-3 pb-1.5 pt-5 text-[10px] font-semibold uppercase tracking-[0.08em] text-crs-muted">
-      {children}
-    </p>
+    <div>
+      <button
+        type="button"
+        className="flex w-full items-center justify-between px-3 pb-1.5 pt-5 text-[10px] font-semibold uppercase tracking-[0.08em] text-crs-muted transition-colors hover:text-crs-ink"
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+      >
+        {label}
+        <IconChevron
+          className={`h-3.5 w-3.5 shrink-0 transition-transform duration-300 ${
+            open ? "rotate-90 rtl:-rotate-90" : ""
+          }`}
+          aria-hidden
+        />
+      </button>
+      <div
+        className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+      >
+        <div className="min-h-0 overflow-hidden">{children}</div>
+      </div>
+    </div>
   );
 }
 
@@ -65,6 +95,44 @@ function initials(name: string): string {
   if (parts.length === 0) return "?";
   if (parts.length === 1) return parts[0]!.slice(0, 2).toUpperCase();
   return `${parts[0]![0] ?? ""}${parts[1]![0] ?? ""}`.toUpperCase();
+}
+
+function NavLink({
+  item,
+  active,
+  label,
+  onNavigate,
+}: {
+  item: NavItem;
+  active: boolean;
+  label: string;
+  onNavigate: () => void;
+}) {
+  return (
+    <Link
+      href={item.href}
+      className={`relative flex min-h-11 items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${
+        active
+          ? "cms-nav-active bg-crs-primary/10 font-semibold text-crs-primary"
+          : "text-crs-ink/75 hover:bg-crs-bg hover:text-crs-ink"
+      }`}
+      aria-current={active ? "page" : undefined}
+      onClick={onNavigate}
+    >
+      {active ? (
+        <span className="absolute inset-y-2 start-0 w-1 rounded-full bg-crs-primary" aria-hidden />
+      ) : null}
+      <span className={`shrink-0 ${active ? "text-crs-primary" : "text-crs-muted"}`}>
+        {item.icon ?? <IconDoc />}
+      </span>
+      <span className="flex-1 truncate">{label}</span>
+      {item.badge && item.badge > 0 ? (
+        <span className="rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-medium text-white">
+          {item.badge}
+        </span>
+      ) : null}
+    </Link>
+  );
 }
 
 export function CmsChrome({
@@ -125,35 +193,6 @@ export function CmsChrome({
     return pathname === href || pathname.startsWith(`${href}/`);
   }
 
-  function NavLink({ item }: { item: NavItem }) {
-    const active = isActive(item.href);
-    return (
-      <Link
-        href={item.href}
-        className={`relative flex min-h-11 items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${
-          active
-            ? "bg-crs-primary/10 font-semibold text-crs-primary"
-            : "text-crs-ink/75 hover:bg-crs-bg hover:text-crs-ink"
-        }`}
-        aria-current={active ? "page" : undefined}
-        onClick={() => setMenuOpen(false)}
-      >
-        {active ? (
-          <span className="absolute inset-y-2 start-0 w-1 rounded-full bg-crs-primary" aria-hidden />
-        ) : null}
-        <span className={`shrink-0 ${active ? "text-crs-primary" : "text-crs-muted"}`}>
-          {item.icon ?? <IconDoc />}
-        </span>
-        <span className="flex-1 truncate">{t(item.key, lang)}</span>
-        {item.badge && item.badge > 0 ? (
-          <span className="rounded-full bg-red-600 px-1.5 py-0.5 text-[10px] font-medium text-white">
-            {item.badge}
-          </span>
-        ) : null}
-      </Link>
-    );
-  }
-
   const utility: NavItem[] = [];
   if (showMedia) utility.push({ key: "media", href: "/dashboard/media", icon: <IconMedia /> });
   utility.push(
@@ -180,42 +219,68 @@ export function CmsChrome({
 
   const navBody = (
     <>
-      <NavLink item={{ key: "home", href: "/dashboard", icon: <IconHome /> }} />
+      <NavLink
+        item={{ key: "home", href: "/dashboard", icon: <IconHome /> }}
+        active={isActive("/dashboard")}
+        label={t("home", lang)}
+        onNavigate={() => setMenuOpen(false)}
+      />
 
       {centreItems.length > 0 ? (
-        <>
-          <GroupLabel>{t("centreContent", lang)}</GroupLabel>
+        <NavGroup label={t("centreContent", lang)}>
           {centreItems.map((item) => (
-            <NavLink key={item.key} item={item} />
+            <NavLink
+              key={item.key}
+              item={item}
+              active={isActive(item.href)}
+              label={t(item.key, lang)}
+              onNavigate={() => setMenuOpen(false)}
+            />
           ))}
-        </>
+        </NavGroup>
       ) : null}
 
       {researchItems.length > 0 ? (
-        <>
-          <GroupLabel>{t("research", lang)}</GroupLabel>
+        <NavGroup label={t("research", lang)}>
           {researchItems.map((item) => (
-            <NavLink key={item.key} item={item} />
+            <NavLink
+              key={item.key}
+              item={item}
+              active={isActive(item.href)}
+              label={t(item.key, lang)}
+              onNavigate={() => setMenuOpen(false)}
+            />
           ))}
-        </>
+        </NavGroup>
       ) : null}
 
       {utility.length > 0 ? (
         <>
           <div className="mx-3 my-3 border-t border-crs-border" />
           {utility.map((item) => (
-            <NavLink key={item.key} item={item} />
+            <NavLink
+              key={item.key}
+              item={item}
+              active={isActive(item.href)}
+              label={t(item.key, lang)}
+              onNavigate={() => setMenuOpen(false)}
+            />
           ))}
         </>
       ) : null}
 
       {adminItems.length > 0 ? (
-        <>
-          <GroupLabel>{t("admin", lang)}</GroupLabel>
+        <NavGroup label={t("admin", lang)}>
           {adminItems.map((item) => (
-            <NavLink key={item.key} item={item} />
+            <NavLink
+              key={item.key}
+              item={item}
+              active={isActive(item.href)}
+              label={t(item.key, lang)}
+              onNavigate={() => setMenuOpen(false)}
+            />
           ))}
-        </>
+        </NavGroup>
       ) : null}
     </>
   );

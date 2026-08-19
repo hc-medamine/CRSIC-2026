@@ -77,7 +77,7 @@ export function QueueCard({
       </div>
 
       {visible.length === 0 ? (
-        <p className="px-4 py-6 text-sm text-crs-muted">{emptyLabel}</p>
+        <p className="cms-empty-state px-4 py-6 text-sm text-crs-muted">{emptyLabel}</p>
       ) : (
         <ul className="divide-y divide-crs-border/60">
           {visible.map((item) => (

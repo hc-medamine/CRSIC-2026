@@ -313,12 +313,12 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
 
       {pendingItem ? (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          className="cms-modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="media-delete-title"
         >
-          <div className="w-full max-w-md rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-lg">
+          <div className="cms-modal-panel w-full max-w-md rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-lg">
             <h2 id="media-delete-title" className="text-base font-semibold text-crs-ink">
               {t("mediaDeleteTitle", lang)}
             </h2>
@@ -352,12 +352,12 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
 
       {blockedRefs ? (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          className="cms-modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
           role="dialog"
           aria-modal="true"
           aria-labelledby="media-blocked-title"
         >
-          <div className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-lg">
+          <div className="cms-modal-panel max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-lg">
             <h2 id="media-blocked-title" className="text-base font-semibold text-crs-ink">
               {t("mediaBlockedTitle", lang)}
             </h2>

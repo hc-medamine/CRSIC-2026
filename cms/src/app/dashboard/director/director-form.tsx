@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MediaUploadField } from "@/app/dashboard/media-upload-field";
 import { cmsToast } from "@/app/dashboard/cms-toast";
-import { FormBanner, FormSection, FormStickyActions } from "@/app/dashboard/form-ux";
+import { FormBanner, FormSection, FormStickyActions, PublishButton } from "@/app/dashboard/form-ux";
 import { t } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 
@@ -219,14 +219,13 @@ export function DirectorEditorForm({ initial }: { initial: Initial }) {
             >
               {t("actionSaveDraft", lang)}
             </button>
-            <button
-              type="button"
-              disabled={pending}
-              className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
+            <PublishButton
+              pending={pending}
               onClick={() => void run("publish")}
+              className="min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
             >
               {t("actionPublish", lang)}
-            </button>
+            </PublishButton>
           </div>
         </FormStickyActions>
       </form>
