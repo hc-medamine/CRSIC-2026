@@ -14,7 +14,7 @@ export function slugifyTitle(title: string): string {
 
 /** Ensure uniqueness within a set of already-used slugs. */
 export function uniqueSlug(base: string, used: Set<string>): string {
-  let candidate = base || "item";
+  const candidate = base || "item";
   if (!used.has(candidate)) return candidate;
   let n = 2;
   while (used.has(`${base}-${n}`)) n += 1;
