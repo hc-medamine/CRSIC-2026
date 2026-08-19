@@ -397,6 +397,7 @@ Hard rules:
 
 Rules:
 
+0. **Never commit directly to `main`** — mandatory. All work lands on a branch; merge to `main` only when the work is complete, verified (smoke + tests), and **validated by the stakeholder**.
 1. Start every non-trivial change from an up-to-date `main`.
 2. One concern per branch — do not mix content dumps with UI refactors.
 3. Prefer short-lived branches; merge (or rebase locally) then delete the branch.

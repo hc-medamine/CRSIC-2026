@@ -44,7 +44,7 @@ npm run db:seed:super-admin  # first-time login setup
 
 ## Git & docs
 
-- Branch: `feature/` | `fix/` | `content/` | `docs/`; never force-push `main`.
+- **Mandatory — never commit directly to `main`.** All work happens on `feature/` | `fix/` | `content/` | `docs/` branches. Merge to `main` only when the work is complete, verified, and **validated by the stakeholder**. Never force-push `main`.
 - Conventional Commits: `feat:` `fix:` `content:` (data) `style:` `refactor:` `docs:` `chore:`.
 - `docs/WORKLOG.md`: append new entries **at the top** after meaningful changes.
 - Windows PATH note: git may live at `C:\Program Files\Git\cmd\git.exe`.
