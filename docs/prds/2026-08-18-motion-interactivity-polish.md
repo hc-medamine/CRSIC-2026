@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Approved** |
+| Status | **Delivered** (merged to `main` 2026-08-19 — PRs #24–#27) |
 | Date | 2026-08-18 |
 | Author | OpenCode session (with stakeholder) |
 | Owners | Stakeholder + OpenCode agent |
@@ -151,33 +151,34 @@
 | 2026-08-18 | Q&A locked 10 decisions (above) folded into Draft v2. Status remains **Draft** until stakeholder's final approval. |
 | 2026-08-18 | **Branch-only rule (mandatory):** never commit to `main` directly — merge only after stakeholder validation (recorded in `AGENTS.md` + README §5.3). |
 | 2026-08-18 | Stakeholder **approved Draft v2** → status **Approved**. Implementation may begin (M1 first, on `feature/motion-*` branches, phase-by-phase validated merges). |
+| 2026-08-19 | **All phases delivered.** M1 (PR #24), M2 (PR #25), M3 (PR #26), M4 (PR #27) merged to `main` phase-by-phase after local stakeholder validation; docs PRs #22 (branch rule) + #23 (this PRD) merged. Full backlog (incl. all three nice-to-haves: lightbox swipe, portrait float, empty-state pulse) shipped. Status: **Delivered**. |
 
 ## 12. Item backlog (source of truth for implementation)
 
 ### SPA
-- [ ] View transitions between hash pages (crossfade + directional slide; fade fallback)
-- [ ] Publications filter/search FLIP reflow
-- [ ] Drawer + lightbox spring-in with backdrop blur
-- [ ] Tab indicator morph (sliding pill)
-- [ ] Home pub carousel paging dots + drag cue (RTL-aware)
-- [ ] Hero ambient gold geometric floaters
-- [ ] Card cover zoom + gold shine sweep
-- [ ] Deeper card/CTA hover lift + glow ring (extends tilt/magnetic)
-- [ ] Touch press-scale on cards/CTAs
-- [ ] Hero headline word-by-word reveal
-- [ ] Section heading gold gradient pan
-- [ ] Lightbox swipe between images (touch)
+- [x] View transitions between hash pages (crossfade + directional slide; fade fallback)
+- [x] Publications filter/search FLIP reflow
+- [x] Drawer + lightbox spring-in with backdrop blur
+- [x] Tab indicator morph (sliding pill)
+- [x] Home pub carousel paging dots + drag cue (RTL-aware)
+- [x] Hero ambient gold geometric floaters
+- [x] Card cover zoom + gold shine sweep
+- [x] Deeper card/CTA hover lift + glow ring (extends tilt/magnetic)
+- [x] Touch press-scale on cards/CTAs
+- [x] Hero headline word-by-word reveal
+- [x] Section heading gold gradient pan
+- [x] Lightbox swipe between images (touch)
 
 ### CMS
-- [ ] Dashboard list/table row enter stagger (cap 12 rows)
-- [ ] Toast slide-in/out + auto-dismiss progress bar
-- [ ] Publish button spinner → gold checkmark pop
-- [ ] Sidebar active pill + collapsible groups
-- [ ] Modal/drawer spring-in + backdrop blur
-- [ ] Form validation shake + focus-ring glow
-- [ ] List skeletons while loading
-- [ ] Sticky action-bar scroll shadow
-- [ ] Empty-state illustration pulse
+- [x] Dashboard list/table row enter stagger (cap 12 rows)
+- [x] Toast slide-in/out + auto-dismiss progress bar
+- [x] Publish button spinner → gold checkmark pop
+- [x] Sidebar active pill + collapsible groups
+- [x] Modal/drawer spring-in + backdrop blur
+- [x] Form validation shake + focus-ring glow
+- [x] List skeletons while loading
+- [x] Sticky action-bar scroll shadow
+- [x] Empty-state illustration pulse
 
 ### Cross-app
-- [ ] Partner/director portrait gentle float
+- [x] Partner/director portrait gentle float

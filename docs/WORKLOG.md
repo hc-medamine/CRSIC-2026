@@ -19,6 +19,27 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-19 — Motion & interactivity polish: **all merged** + environment cleanup + docs refresh
+
+**PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md) — status **Delivered**
+
+**Merged to `main` (`df4b2d4`):**
+- M1 (PR #24) → M2 (PR #25) → M3 (PR #26) → M4 (PR #27) — phase-by-phase, each stakeholder-validated on local serve.
+- Docs PR #22 (branch-only rule) + PR #23 (this PRD, rebased onto `main` after a `docs/WORKLOG.md` merge conflict — Approved entry placed chronologically above the Draft entry).
+- All 7 open PRs closed; `origin/main` = `HEAD` (0 ahead / 0 behind).
+
+**Environment cleanup:**
+- All servers stopped (SPA :5500, CMS :3000; `Get-Process node` empty).
+- Caches removed: `cms/.next` (682 MB), no `.turbo` / `node_modules/.cache` present.
+- Junk removed: temp server logs + scratch `motion-prd.md` (Temp\opencode), stale git locks (none), `data/*.json` `.bak`/`.smoke-snap` artifacts.
+
+**Docs refreshed for current state:**
+- `README.md` — §3 tree (+ `css/motion.css`, `img/Hero/*.mp4` git-lfs), §6.3 motion-layer bullet, §6.5 hero video assets, §10 roadmap (step 4 nav-ux **Done**, step 5 motion **Done**, tech-debt row removed), §11 last-updated.
+- PRD — status **Delivered**, decision-log row, all §12 backlog boxes checked (incl. nice-to-haves).
+- `docs/prds/README.md` — index row updated to **Delivered**.
+
+---
+
 ### 2026-08-19 — Motion M4: deviation fixes + PRD nice-to-haves
 
 **PRD:** [prds/2026-08-18-motion-interactivity-polish.md](./prds/2026-08-18-motion-interactivity-polish.md) (Approved) — **stakeholder validated M1–M4**
@@ -88,7 +109,7 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 **Branch-only rule (mandatory, all future work):** never commit to `main` directly; merge only after stakeholder validation — recorded in `AGENTS.md` + README §5.3.
 
-**Next:** implement M1 on a `feature/motion-*` branch → stakeholder local validation → merge.
+**Status:** **Delivered** — M1–M4 merged phase-by-phase (PRs #24–#27) on 2026-08-19; see top entry.
 
 ### 2026-08-18 — Motion & interactivity polish PRD **Draft**
 
