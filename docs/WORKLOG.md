@@ -19,6 +19,36 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-19 — CMS Desk: shell + dashboard home implemented
+
+**Done:**
+- `CmsChrome` shell redesign (novice-first navigation, section chrome, onboarding placement).
+- Dashboard home: quick-stats row (content totals, **English pending** counter), onboarding banner (session-scoped toggleable show/hide hint — never permanently dismissed), animated **Content by editor** stats table.
+- Stats table is role-aware: **Editor** sees own authored rows; **Reviewer** sees editors + reviewers in their org scope (Super Admin excluded); **Super Admin** sees all active users.
+- Author-origin statuses: editors' `published` items count as **Approved** (they author, they don't publish); the **Published** column reflects the publishing role via `audit_log` (`*.publish|emergency_publish`, distinct per actor). Unpublished column dropped.
+- Zero-item users appear (users-first `LEFT JOIN`); color-coded status dots/badges, stagger-on-enter + hover animations, `prefers-reduced-motion` respected.
+
+**Files:** `cms/src/app/dashboard/{cms-chrome,home-onboarding,page,ui-bits}.tsx`, `cms/src/app/globals.css`, `cms/src/lib/content/queues.ts`, `cms/src/lib/i18n/labels.ts`, `docs/WORKLOG.md`
+
+**Verified:** CMS `tsc` clean, CMS tests 18/18, SPA tests 7/7, CMS lint at pre-existing baseline (9 problems in untouched files), live-DB queries for all three roles.
+
+**Next:** stakeholder walkthrough; merge to `main` only after validation.
+
+---
+
+### 2026-08-19 — CMS Desk: shell + dashboard redesign PRD **Approved**
+
+**Done:**
+- PRD-first workflow steps 1–8 for the CMS visual redesign slice: idea captured (CMS not attractive/intuitive; novice users first-class) → scope locked → [PRD `docs/prds/2026-08-19-cms-desk-design.md`](./prds/2026-08-19-cms-desk-design.md) **Approved**.
+- Locked decisions: distinct "CMS Desk" identity (option B), shell-wide scope, zero-dependency default, manual stakeholder walkthrough per merge, OS `prefers-reduced-motion`-only motion gate (no calm-mode toggle), dashboard quick-stats row, all nice-to-haves validated, SaaS-dashboard reference.
+- `AGENTS.md` tightened (agent-critical gotchas only; `--env-file=.env.local` hard-fail, smoke gate before merge, PRD-first default).
+
+**Files:** `docs/prds/2026-08-19-cms-desk-design.md`, `docs/prds/README.md`, `docs/WORKLOG.md`, `AGENTS.md`
+
+**Next:** implement on `feature/cms-desk-design` — shell (`CmsChrome`) then dashboard home; validated merges only.
+
+---
+
 ### 2026-08-19 — Server execution analysis + lint fixes
 
 **Servers run:** SPA :5500 (`npx serve`) + CMS :3000 (`next dev`, Turbopack) — both detached, logs captured, both serving cleanly.

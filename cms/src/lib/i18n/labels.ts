@@ -615,12 +615,6 @@ export const LABELS: LabelMap = {
   ctaCreate: { en: "Create", ar: "أنشئ" },
   ctaCreateContent: { en: "Create content", ar: "أنشئ محتوى" },
   ctaBrowseContent: { en: "Browse my content", ar: "تصفح محتواي" },
-  homeTip: {
-    en: "Tip: start from Home. Content types are under Centre content or Research.",
-    ar: "تلميح: ابدأوا من الرئيسية. أنواع المحتوى تحت «محتوى المركز» أو «البحث».",
-  },
-  dismissTip: { en: "Dismiss", ar: "إخفاء" },
-  showTip: { en: "Show tip", ar: "أظهر التلميح" },
   ctaEnglishNext: { en: "Next English item", ar: "العنصر الإنجليزي التالي" },
   moreInQueue: {
     en: "more — open an item above to continue.",
@@ -1224,6 +1218,55 @@ export const LABELS: LabelMap = {
   signedInAs: { en: "Signed in as", ar: "مسجّل الدخول باسم" },
   dismiss: { en: "Dismiss", ar: "إغلاق" },
   breadcrumb: { en: "Breadcrumb", ar: "مسار التنقل" },
+
+  // CMS Desk — shell search
+  navSearch: { en: "Search pages…", ar: "ابحث عن الصفحات…" },
+  navNoResults: { en: "No matching pages.", ar: "لا صفحات مطابقة." },
+
+  // CMS Desk — dashboard overview stats
+  statsOverview: { en: "Overview", ar: "نظرة عامة" },
+  statsDrafts: { en: "Drafts", ar: "المسودات" },
+  statsReview: { en: "Awaiting review", ar: "بانتظار المراجعة" },
+  statsPublished: { en: "Published", ar: "المنشور" },
+  statsEnglish: { en: "English pending", ar: "الإنجليزية معلّقة" },
+  statsSubmittedTitle: { en: "Content by editor", ar: "المحتوى حسب المحرر" },
+  statsSubmittedEmpty: { en: "No items yet", ar: "لا توجد عناصر بعد" },
+  statsSubmittedCount: {
+    en: "{count} item(s) submitted for review",
+    ar: "{count} عنصرًا أُرسل للمراجعة",
+  },
+  statsEditorTotal: { en: "Total", ar: "المجموع" },
+  statsEditorPublished: { en: "Published", ar: "المنشور" },
+
+  // CMS Desk — first-run onboarding
+  onboardingTitle: {
+    en: "Welcome to CRSIC content management",
+    ar: "مرحبًا بكم في نظام إدارة المحتوى",
+  },
+  onboardingSubtitle: {
+    en: "Three simple steps to keep the public site up to date.",
+    ar: "ثلاث خطوات بسيطة للحفاظ على الموقع العام محدّثًا.",
+  },
+  onboardingStep1: { en: "1 — Create an item in Arabic", ar: "1 — أنشئوا عنصرًا بالعربية" },
+  onboardingStep2: { en: "2 — Submit it for review", ar: "2 — أرسلوه للمراجعة" },
+  onboardingStep3: { en: "3 — Publish it to the public site", ar: "3 — انشروه على الموقع العام" },
+  onboardingGotIt: { en: "Got it", ar: "فهمت" },
+  onboardingShow: { en: "Show how it works", ar: "اعرضوا طريقة العمل" },
+
+  // CMS Desk — teaching empty states
+  emptyDraftsHint: {
+    en: "Create your first draft to get started.",
+    ar: "أنشئوا مسودتكم الأولى للبدء.",
+  },
+  emptyReviewHint: {
+    en: "Submitted items will appear here for your decision.",
+    ar: "ستظهر هنا العناصر المُرسلة لاتخاذ قراركم.",
+  },
+  emptyPublishedHint: {
+    en: "Published items appear here.",
+    ar: "ستظهر هنا العناصر المنشورة.",
+  },
+  emptyCtaCreate: { en: "Create an item", ar: "أنشئوا عنصرًا" },
 };
 
 const STATUS_KEYS: Record<string, string> = {

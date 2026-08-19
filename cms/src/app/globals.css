@@ -241,3 +241,88 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
   border-radius: 0.5rem;
 }
 
+/* ═══ CMS Desk — shell + dashboard identity (PRD 2026-08-19) ═══ */
+:root {
+  --crs-shadow-soft: 0 1px 3px rgba(26, 46, 38, 0.05);
+  --crs-shadow-lift: 0 12px 28px -14px rgba(26, 46, 38, 0.22);
+}
+
+/* Ambient shell background — subtle brand-tinted gradients, no layout shift */
+.cms-desk-bg {
+  background:
+    radial-gradient(1100px 420px at 88% -60px, rgba(201, 168, 76, 0.09), transparent 60%),
+    radial-gradient(900px 520px at -5% 112%, rgba(27, 67, 50, 0.05), transparent 60%),
+    #f3f2ed;
+}
+
+/* Page content enter on route change (wrapper keyed by pathname) */
+@keyframes cmsPageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.cms-page-enter {
+  animation: cmsPageIn 360ms var(--cms-ease-out) both;
+}
+
+/* Dashboard stat count pop-in on load */
+@keyframes cmsCountPop {
+  0%   { transform: scale(0.8); opacity: 0; }
+  60%  { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.cms-count-pop {
+  display: inline-block;
+  animation: cmsCountPop 420ms var(--cms-ease-out) both;
+}
+
+/* Card hover lift for queue/stat cards — gentle, transform+shadow only */
+.cms-card-lift {
+  transition: transform 180ms var(--cms-ease-out), box-shadow 180ms var(--cms-ease-out);
+}
+.cms-card-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--crs-shadow-lift);
+}
+
+/* CMS Desk — content-by-editor stats table */
+@keyframes cmsStatCell {
+  0%   { transform: scale(0.5); opacity: 0; }
+  60%  { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.cms-stat-cell {
+  animation: cmsStatCell 380ms var(--cms-ease-out) both;
+  animation-delay: calc(var(--row-delay, 0ms) + 120ms);
+}
+.cms-stat-row {
+  transition: background-color 160ms var(--cms-ease-out), box-shadow 180ms var(--cms-ease-out);
+}
+.cms-stat-row:hover {
+  background: linear-gradient(90deg, rgba(201, 168, 76, 0.08), transparent 55%);
+  box-shadow: inset 3px 0 0 var(--crs-accent);
+}
+.cms-stat-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  border-radius: 9999px;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5;
+  transition: transform 160ms var(--cms-ease-out);
+}
+.cms-stat-row:hover .cms-stat-badge {
+  transform: scale(1.08);
+}
+
+/* Shell search results list — soft rise */
+@keyframes cmsNavSearchIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.cms-nav-search-in {
+  animation: cmsNavSearchIn 220ms var(--cms-ease-out) both;
+}
+
