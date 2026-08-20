@@ -1,16 +1,12 @@
-import Link from "next/link";
-import type { CSSProperties } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listNewsForUser } from "@/lib/content/news";
 import { canAccessContentType } from "@/lib/content/permissions";
-import { CMS_LANG_COOKIE, normalizeLang, t, tf } from "@/lib/i18n/labels";
-import { EnStatusBadge } from "@/app/dashboard/en-status-badge";
+import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { ContentListFilters } from "@/app/dashboard/content-list-filters";
+import { ContentListPage } from "@/app/dashboard/content-list-page";
 import { filterContentItems } from "@/lib/content/filter-content-items";
-import { IconPlus } from "@/app/dashboard/cms-icons";
-import { PageBreadcrumb, StatusPill } from "@/app/dashboard/ui-bits";
 
 export default async function NewsListPage({
   searchParams,
@@ -30,83 +26,33 @@ export default async function NewsListPage({
   const items = filterContentItems(await listNewsForUser(user), q, statusFilter);
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
-      <PageBreadcrumb
-        items={[
-          { href: "/dashboard", label: t("home", lang) },
-          { label: t("news", lang) },
-        ]}
-      />
-
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">{t("news", lang)}</h1>
-          <p className="mt-1 text-sm text-crs-muted">{t("pageDescNews", lang)}</p>
-        </div>
-        <Link
-          href="/dashboard/news/new"
-          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-crs-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-crs-secondary"
-        >
-          <IconPlus className="h-4 w-4" />
-          {t("newArticle", lang)}
-        </Link>
-      </header>
-
-      <ContentListFilters
-        q={params.q ?? ""}
-        status={statusFilter}
-        placeholder={t("searchNews", lang)}
-      />
-
-      {items.length === 0 ? (
-        <p className="cms-empty-state rounded-2xl border border-dashed border-crs-border bg-crs-surface p-8 text-sm text-crs-muted">
-          {t("emptyNews", lang)}
-        </p>
-      ) : (
-        <div className="overflow-hidden rounded-2xl border border-crs-border bg-crs-surface shadow-[0_1px_3px_rgba(26,46,38,0.06)]">
-          <table className="w-full min-w-[640px] text-start text-sm">
-            <thead className="border-b border-crs-border bg-crs-bg/80 text-xs uppercase tracking-wide text-crs-muted">
-              <tr>
-                <th className="px-4 py-3 font-semibold">{t("colTitle", lang)}</th>
-                <th className="px-4 py-3 font-semibold">{t("colStatus", lang)}</th>
-                <th className="px-4 py-3 font-semibold">{t("colEn", lang)}</th>
-                <th className="px-4 py-3 font-semibold">{t("colUpdated", lang)}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-crs-border/70">
-              {items.map((item, i) => (
-                <tr
-                  key={item.id}
-                  className="cms-row-enter hover:bg-crs-bg/50"
-                  style={{ "--row-delay": `${Math.min(i, 11) * 45}ms` } as CSSProperties}
-                >
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/dashboard/news/${item.id}`}
-                      className="font-medium text-crs-ink hover:text-crs-primary hover:underline"
-                      dir="auto"
-                    >
-                      {item.title_ar || t("untitled", lang)}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatusPill status={item.status} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <EnStatusBadge status={item.en_status} />
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-crs-muted">
-                    {item.updated_at.toISOString().slice(0, 16).replace("T", " ")}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="border-t border-crs-border/70 px-4 py-3 text-xs text-crs-muted">
-            {tf("showingResults", lang, { n: items.length })}
-          </div>
-        </div>
-      )}
-    </main>
+    <ContentListPage
+      breadcrumbs={[
+        { href: "/dashboard", label: t("home", lang) },
+        { label: t("news", lang) },
+      ]}
+      title={t("news", lang)}
+      subtitle={t("pageDescNews", lang)}
+      newHref="/dashboard/news/new"
+      newLabel={t("newArticle", lang)}
+      emptyLabel={t("emptyNews", lang)}
+      listHref="/dashboard/news"
+      filtersActive={Boolean(q || statusFilter)}
+      toolbar={
+        <ContentListFilters
+          q={params.q ?? ""}
+          status={statusFilter}
+          placeholder={t("searchNews", lang)}
+        />
+      }
+      items={items.map((item) => ({
+        id: item.id,
+        href: `/dashboard/news/${item.id}`,
+        title: item.title_ar || t("untitled", lang),
+        status: item.status,
+        enStatus: item.en_status,
+        updatedAt: item.updated_at,
+      }))}
+    />
   );
 }

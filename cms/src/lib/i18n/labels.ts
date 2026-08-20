@@ -795,6 +795,15 @@ export const LABELS: LabelMap = {
   colUpdated: { en: "Updated", ar: "آخر تحديث" },
   untitled: { en: "(untitled)", ar: "(بدون عنوان)" },
   showingResults: { en: "Showing {n} result(s)", ar: "عرض {n} نتيجة" },
+  emptyFiltered: {
+    en: "No items match this search.",
+    ar: "لا عناصر تطابق هذا البحث.",
+  },
+  clearFilters: { en: "Clear filters", ar: "مسح التصفية" },
+  emptyCreateHint: {
+    en: "Create the first one to get started.",
+    ar: "أنشئ العنصر الأول للبدء.",
+  },
   filterAllStatus: { en: "All statuses", ar: "كل الحالات" },
   filterSearch: { en: "Search…", ar: "بحث…" },
   filterApply: { en: "Filter", ar: "تصفية" },
@@ -1190,6 +1199,14 @@ export const LABELS: LabelMap = {
   loginTestBubbles: {
     en: "Test only — one-click sign-in",
     ar: "للاختبار فقط — تسجيل دخول بنقرة واحدة",
+  },
+  loginDevDockAria: {
+    en: "Developer one-click sign-in accounts",
+    ar: "حسابات تسجيل الدخول السريع للمطورين",
+  },
+  loginDevDockEmpty: {
+    en: "No accounts resolved — need DB users plus bubble passwords in .env.local",
+    ar: "لا حسابات — يلزم مستخدمو قاعدة البيانات وكلمات مرور الفقاعات في .env.local",
   },
   imagesOnlyFormats: { en: "JPEG / PNG / WebP", ar: "JPEG / PNG / WebP" },
   imagesPdfFormats: { en: "JPEG / PNG / WebP / PDF", ar: "JPEG / PNG / WebP / PDF" },

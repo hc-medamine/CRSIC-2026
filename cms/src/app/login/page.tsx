@@ -1,4 +1,4 @@
-import { LoginForm } from "./login-form";
+import { LoginDevBubbles, LoginForm } from "./login-form";
 import { query } from "@/lib/db";
 import type { LoginBubble } from "./login-form";
 import { cookies } from "next/headers";
@@ -17,16 +17,23 @@ function env(name: string): string {
 }
 
 function editorEmailsFromEnv(): string[] {
-  const found: { n: number; email: string }[] = [];
+  const numbered: { n: number; email: string }[] = [];
+  const extra: string[] = [];
   for (const [key, raw] of Object.entries(process.env)) {
-    const m = /^EDITOR(\d+)_EMAIL$/i.exec(key);
-    if (!m) continue;
     const email = (raw ?? "").trim().toLowerCase();
     if (!email) continue;
-    found.push({ n: Number(m[1]), email });
+    const numberedMatch = /^EDITOR(\d+)_EMAIL$/i.exec(key);
+    if (numberedMatch) {
+      numbered.push({ n: Number(numberedMatch[1]), email });
+      continue;
+    }
+    if (/^EDITOR_EMAIL$/i.test(key)) extra.push(email);
+    if (/^EDITOR_EMAILS$/i.test(key)) {
+      extra.push(...email.split(/[,;\s]+/).filter(Boolean));
+    }
   }
-  found.sort((a, b) => a.n - b.n);
-  return found.map((f) => f.email);
+  numbered.sort((a, b) => a.n - b.n);
+  return [...new Set([...numbered.map((row) => row.email), ...extra])];
 }
 
 function passwordForUser(email: string, role: string, sharedEditorPassword: string): string {
@@ -50,11 +57,16 @@ function passwordForUser(email: string, role: string, sharedEditorPassword: stri
   );
 }
 
+/** One-click accounts in local `next dev` only. Set NEXT_PUBLIC_CMS_LOGIN_BUBBLES=0 to hide. */
+function loginBubblesEnabled(): boolean {
+  if (process.env.NODE_ENV === "production") return false;
+  const flag = env("NEXT_PUBLIC_CMS_LOGIN_BUBBLES").toLowerCase();
+  if (flag === "0" || flag === "false" || flag === "off") return false;
+  return true;
+}
+
 async function loginBubbles(lang: CmsLang): Promise<LoginBubble[]> {
-  const gated =
-    process.env.NODE_ENV !== "production" &&
-    process.env.NEXT_PUBLIC_CMS_LOGIN_BUBBLES === "1";
-  if (!gated) return [];
+  if (!loginBubblesEnabled()) return [];
 
   const sharedEditorPassword = env("CMS_LOGIN_BUBBLE_EDITOR_PASSWORD");
   const bubbles: LoginBubble[] = [];
@@ -65,15 +77,19 @@ async function loginBubbles(lang: CmsLang): Promise<LoginBubble[]> {
       display_name: string;
       name_ar: string | null;
       name_en: string | null;
-      role: "super_admin" | "reviewer";
+      role: "super_admin" | "reviewer" | "editor";
     }>(
       `SELECT email, display_name, name_ar, name_en, role
        FROM users
        WHERE is_active = TRUE
-         AND role IN ('super_admin', 'reviewer')
+         AND role IN ('super_admin', 'reviewer', 'editor')
          AND email NOT ILIKE 'smoke.%'
        ORDER BY
-         CASE role WHEN 'super_admin' THEN 0 ELSE 1 END,
+         CASE role
+           WHEN 'super_admin' THEN 0
+           WHEN 'reviewer' THEN 1
+           ELSE 2
+         END,
          display_name ASC,
          email ASC`,
     );
@@ -91,109 +107,42 @@ async function loginBubbles(lang: CmsLang): Promise<LoginBubble[]> {
         password,
       });
     }
+    if (bubbles.length > 0) return bubbles;
   } catch {
-    const saEmail =
-      env("CMS_LOGIN_BUBBLE_SA_EMAIL") ||
-      env("SEED_SUPER_ADMIN_EMAIL") ||
-      "f.chettih@crsic.dz";
-    const saPass = passwordForUser(saEmail, "super_admin", sharedEditorPassword);
-    if (saPass) {
-      bubbles.push({
-        label: `${roleLabel("super_admin", lang)} · ${
-          lang === "ar" ? "فاطمة الزهرة شتيح" : "Fatima El Zahra Chettih"
-        }`,
-        email: saEmail,
-        password: saPass,
-      });
-    }
-    const reviewerEmail =
-      env("CMS_LOGIN_BUBBLE_REVIEWER_EMAIL") || "f.boufatah@crsic.dz";
-    const reviewerPass = passwordForUser(reviewerEmail, "reviewer", sharedEditorPassword);
-    if (reviewerPass) {
-      bubbles.push({
-        label: `${roleLabel("reviewer", lang)} · ${
-          lang === "ar" ? "ف. بوفاتح" : "F. Boufatah"
-        }`,
-        email: reviewerEmail,
-        password: reviewerPass,
-      });
-    }
+    /* fall through to env-only list */
   }
 
-  const envEditorEmails = editorEmailsFromEnv();
-  if (envEditorEmails.length > 0 && sharedEditorPassword) {
-    const nameByEmail = new Map<
-      string,
-      { displayName: string; nameAr: string | null; nameEn: string | null }
-    >();
-    try {
-      const eds = await query<{
-        email: string;
-        display_name: string;
-        name_ar: string | null;
-        name_en: string | null;
-      }>(
-        `SELECT email, display_name, name_ar, name_en FROM users
-         WHERE is_active = TRUE AND role = 'editor'
-           AND email = ANY($1::text[])`,
-        [envEditorEmails],
-      );
-      for (const row of eds.rows) {
-        nameByEmail.set(row.email.toLowerCase(), {
-          displayName: row.display_name?.trim() || row.email,
-          nameAr: row.name_ar,
-          nameEn: row.name_en,
-        });
-      }
-    } catch {
-      /* labels fall back to email local-part */
-    }
-
-    for (const email of envEditorEmails) {
-      const password = passwordForUser(email, "editor", sharedEditorPassword);
-      if (!password) continue;
-      const person = nameByEmail.get(email);
-      const name = person
-        ? localizedDisplayName(person, lang) || email.split("@")[0] || email
-        : email.split("@")[0] || email;
-      bubbles.push({
-        label: `${roleLabel("editor", lang)} · ${name}`,
-        email,
-        password,
-      });
-    }
-    return bubbles;
+  const saEmail =
+    env("CMS_LOGIN_BUBBLE_SA_EMAIL") || env("SEED_SUPER_ADMIN_EMAIL") || "f.chettih@crsic.dz";
+  const saPass = passwordForUser(saEmail, "super_admin", sharedEditorPassword);
+  if (saPass) {
+    bubbles.push({
+      label: `${roleLabel("super_admin", lang)} · ${
+        lang === "ar" ? "فاطمة الزهرة شتيح" : "Fatima El Zahra Chettih"
+      }`,
+      email: saEmail,
+      password: saPass,
+    });
   }
-
-  try {
-    const eds = await query<{
-      email: string;
-      display_name: string;
-      name_ar: string | null;
-      name_en: string | null;
-    }>(
-      `SELECT email, display_name, name_ar, name_en FROM users
-       WHERE is_active = TRUE AND role = 'editor' AND email NOT ILIKE 'smoke.%'
-       ORDER BY display_name ASC, email ASC`,
-    );
-    for (const row of eds.rows) {
-      const password = passwordForUser(row.email, "editor", sharedEditorPassword);
-      if (!password) continue;
-      const name =
-        localizedDisplayName(
-          { displayName: row.display_name, nameAr: row.name_ar, nameEn: row.name_en },
-          lang,
-        ) || row.email;
-      bubbles.push({
-        label: `${roleLabel("editor", lang)} · ${name}`,
-        email: row.email,
-        password,
-      });
-    }
-  } catch {
-    /* ignore */
+  const reviewerEmail =
+    env("CMS_LOGIN_BUBBLE_REVIEWER_EMAIL") || env("REVIEW_EMAIL") || "f.boufatah@crsic.dz";
+  const reviewerPass = passwordForUser(reviewerEmail, "reviewer", sharedEditorPassword);
+  if (reviewerPass) {
+    bubbles.push({
+      label: `${roleLabel("reviewer", lang)} · ${lang === "ar" ? "ف. بوفاتح" : "F. Boufatah"}`,
+      email: reviewerEmail,
+      password: reviewerPass,
+    });
   }
-
+  for (const email of editorEmailsFromEnv()) {
+    const password = passwordForUser(email, "editor", sharedEditorPassword);
+    if (!password) continue;
+    bubbles.push({
+      label: `${roleLabel("editor", lang)} · ${email.split("@")[0] || email}`,
+      email,
+      password,
+    });
+  }
   return bubbles;
 }
 
@@ -204,13 +153,14 @@ export default async function LoginPage() {
   const bubbles = await loginBubbles(lang);
 
   return (
-    <main
-      dir={dir}
-      lang={lang}
-      className={`relative flex min-h-screen flex-col justify-center overflow-hidden px-6 py-16 ${
-        lang === "ar" ? "font-[family-name:var(--font-tajawal)]" : "font-sans"
-      }`}
-    >
+    <>
+      <main
+        dir={dir}
+        lang={lang}
+        className={`relative flex min-h-screen flex-col justify-center overflow-hidden px-6 py-16 ${
+          lang === "ar" ? "font-[family-name:var(--font-tajawal)]" : "font-sans"
+        }`}
+      >
       <div
         className="pointer-events-none absolute inset-0"
         style={{
@@ -223,6 +173,7 @@ export default async function LoginPage() {
         <LoginLangToggle lang={lang} />
       </div>
       <div className="relative mx-auto w-full max-w-md">
+        <LoginDevBubbles bubbles={bubbles} lang={lang} enabled={loginBubblesEnabled()} />
         <div className="rounded-3xl border border-crs-border/80 bg-crs-surface/95 p-8 shadow-[0_20px_50px_rgba(26,46,38,0.08)] backdrop-blur">
           <div className="mb-6 flex flex-col items-center text-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -240,10 +191,11 @@ export default async function LoginPage() {
             <h1 className="mt-5 text-2xl font-semibold text-crs-ink">{t("loginSignIn", lang)}</h1>
             <p className="mt-1.5 text-sm text-crs-muted">{t("loginWelcome", lang)}</p>
           </div>
-          <LoginForm bubbles={bubbles} initialLang={lang} />
+          <LoginForm initialLang={lang} />
         </div>
         <p className="mt-6 text-center text-xs text-crs-muted">{t("loginFooter", lang)}</p>
       </div>
-    </main>
+      </main>
+    </>
   );
 }
