@@ -105,6 +105,7 @@ async function loginBubbles(lang: CmsLang): Promise<LoginBubble[]> {
         label: `${roleLabel(row.role, lang)} · ${name}`,
         email: row.email,
         password,
+        role: row.role,
       });
     }
     if (bubbles.length > 0) return bubbles;
@@ -122,6 +123,7 @@ async function loginBubbles(lang: CmsLang): Promise<LoginBubble[]> {
       }`,
       email: saEmail,
       password: saPass,
+      role: "super_admin",
     });
   }
   const reviewerEmail =
@@ -132,6 +134,7 @@ async function loginBubbles(lang: CmsLang): Promise<LoginBubble[]> {
       label: `${roleLabel("reviewer", lang)} · ${lang === "ar" ? "ف. بوفاتح" : "F. Boufatah"}`,
       email: reviewerEmail,
       password: reviewerPass,
+      role: "reviewer",
     });
   }
   for (const email of editorEmailsFromEnv()) {
@@ -141,6 +144,7 @@ async function loginBubbles(lang: CmsLang): Promise<LoginBubble[]> {
       label: `${roleLabel("editor", lang)} · ${email.split("@")[0] || email}`,
       email,
       password,
+      role: "editor",
     });
   }
   return bubbles;

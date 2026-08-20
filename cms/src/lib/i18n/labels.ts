@@ -1200,6 +1200,7 @@ export const LABELS: LabelMap = {
     en: "Test only — one-click sign-in",
     ar: "للاختبار فقط — تسجيل دخول بنقرة واحدة",
   },
+  loginBubbleLegend: { en: "Colour key", ar: "دليل الألوان" },
   loginDevDockAria: {
     en: "Developer one-click sign-in accounts",
     ar: "حسابات تسجيل الدخول السريع للمطورين",
