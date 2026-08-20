@@ -19,6 +19,70 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-20 — CMS Desk interiors PRD **Approved**; I1 lists in progress
+
+**PRD:** [prds/2026-08-20-cms-desk-interiors.md](./prds/2026-08-20-cms-desk-interiors.md) — status **Approved**.
+
+**Branch:** `feature/cms-desk-interiors` — I1 (lists) implemented, pending walkthrough; I2 after stakeholder validation.
+
+**I1 done:**
+- `ContentListPage` Desk restyle (header card, teaching empty + create CTA, filtered-empty + clear filters, whole-row click, RTL `border-s` accent).
+- News / events / publications are thin wrappers around `ContentListPage` + `ContentListFilters` (`?q=` / `?status=` preserved).
+- Other `ContentListPage` routes inherit the restyle. `ListSkeleton` header matches. New CMS labels: `emptyFiltered`, `clearFilters`, `emptyCreateHint`.
+- Dev login bubbles: on by default in `npm run dev` (hide with `NEXT_PUBLIC_CMS_LOGIN_BUBBLES=0`); dark bottom strip, **not** inside the login card.
+
+**Next:** stakeholder walkthrough (News + Partners, AR + EN) on `cms npm run dev`; then merge I1.
+
+---
+
+### 2026-08-20 — CMS Desk interiors PRD **Draft** (scope locked)
+
+**PRD:** [prds/2026-08-20-cms-desk-interiors.md](./prds/2026-08-20-cms-desk-interiors.md) — status **Draft**. **Superseded:** Approved same day (entry above).
+
+**Locked:** lists + forms + admin pages; login yes; phases **I1 then I2**; unify news/events/publications onto `ContentListPage`; visual only; zero new deps; media “showing N” (no pager); public SPA out.
+
+**Blind spots folded in:** filtered-empty vs inventory-empty; do not add filters to other types; editors in I2; login visual only; Home/shell out.
+
+**Files:** `docs/prds/2026-08-20-cms-desk-interiors.md`, `docs/prds/README.md`, `README.md`, `docs/WORKLOG.md`
+
+**Next:** stakeholder marks PRD **Approved** → implement I1 on `feature/cms-desk-interiors` (lists only). No code before Approved.
+
+---
+
+### 2026-08-20 — CMS Desk marked **Delivered**; interiors follow-on started (idea)
+
+**Done (docs chore, no code):**
+- [PRD `2026-08-19-cms-desk-design.md`](./prds/2026-08-19-cms-desk-design.md) status **Delivered**; index + README §10/§11 synced to merge `25b15cc`.
+- Orphan untracked cover `img/covers/fa99c136a4874d85b98426d2bdf9e07e.png` removed (not referenced).
+- Next product slice captured as **CMS Desk interiors** (list / edit / detail pages) — PRD-first; no implementation until Approved.
+
+**Files:** `docs/prds/2026-08-19-cms-desk-design.md`, `docs/prds/README.md`, `README.md`, `docs/WORKLOG.md`
+
+**Next:** lock interiors scope with stakeholder, then Draft PRD. **Superseded:** lock + Draft PRD same day (entry above).
+
+---
+
+### 2026-08-20 — Server run + debug capture + production speed pass
+
+**Servers run:** SPA :5500 (`npx serve`, detached, log captured) + CMS :3000 (`next start` **production build**, detached, log captured).
+
+**Debug findings (captured from logs + probes):**
+- SPA missing `favicon.ico` → browser auto-request 404s on every load. Fixed by adding `<link rel="icon" type="image/png" href="img/nav-crsic-logo.png">` to `index.html` head.
+- CMS `/dashboard` unauthenticated → correct 307 → `/login` (throw `UNAUTHENTICATED` → catch → redirect pattern in `dashboard/layout.tsx`); the logged `Error: UNAUTHENTICATED` is expected noise from that pattern.
+- CMS build warning (pre-existing, benign): Turbopack NFT "whole project traced" on `src/app/api/media/file/route.ts` (runtime `path.join` over `img/`); works fine at runtime.
+- SPA `serve` already sends brotli/gzip (`Content-Encoding: br`) + ETags.
+
+**Speed/production improvements applied:**
+- CMS now runs a **production build** (`next build` + `next start`) instead of dev Turbopack — Ready in 421ms, warm `/login` ≈ 42–63ms, full route tree compiled.
+- Added `serve.json` cache headers for the SPA: images/video `public, max-age=2592000, immutable`, JS/CSS `public, max-age=86400`, `data/*.json` `public, max-age=3600`.
+- Warm response times verified: CMS `/login` 42ms (cold 108ms), SPA `/` 43ms.
+
+**Files:** `index.html`, `serve.json`, `docs/WORKLOG.md`
+
+**Verified:** SPA tests 7/7; no 404s in fresh SPA log; cache headers confirmed on assets.
+
+---
+
 ### 2026-08-19 — CMS Desk: shell + dashboard home implemented
 
 **Done:**
@@ -32,7 +96,7 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 **Verified:** CMS `tsc` clean, CMS tests 18/18, SPA tests 7/7, CMS lint at pre-existing baseline (9 problems in untouched files), live-DB queries for all three roles.
 
-**Next:** stakeholder walkthrough; merge to `main` only after validation.
+**Merged:** `25b15cc` on `main` (local merge of `feature/cms-desk-design`, 2026-08-19). List/detail/edit interiors were out of scope — follow-on slice, not this PRD.
 
 ---
 

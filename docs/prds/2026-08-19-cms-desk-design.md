@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Approved** (2026-08-19) |
+| Status | **Delivered** (2026-08-19) |
 | Date | 2026-08-19 |
 | Author | OpenCode session (with stakeholder) |
 | Owners | Stakeholder + OpenCode agent |
@@ -121,6 +121,7 @@
 | 2026-08-19 | Scope locked (step 6): **option B — distinct CMS identity**, codenamed **CMS Desk**; **shell-wide** scope (all dashboard routes); **zero-dependency default** (may be lifted only if necessary + agreed); **manual stakeholder walkthrough** per merge. PRD drafted as **Draft**. No code until **Approved**. |
 | 2026-08-19 | Open questions resolved → **Draft v2**: drop calm-mode toggle (OS `prefers-reduced-motion` only), dashboard quick-stats row in scope, all nice-to-haves validated (shell search, ambient background), reference style = modern SaaS dashboards. |
 | 2026-08-19 | Stakeholder **approved Draft v2** → status **Approved**. Implementation may begin on `feature/cms-desk-design`, validated merges only. |
+| 2026-08-19 | Shell + dashboard home implemented on `feature/cms-desk-design` and merged to `main` (`25b15cc`). Status: **Delivered**. List/detail/edit page interiors remain out of this PRD (follow-on slice). |
 
 ## 11. Item backlog (source of truth for implementation)
 

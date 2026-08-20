@@ -11,7 +11,7 @@ export function ListSkeleton({ rows = 6 }: { rows?: number }) {
         <div className="cms-skeleton h-4 w-16" />
       </div>
 
-      <header className="flex flex-wrap items-end justify-between gap-4">
+      <header className="flex flex-wrap items-end justify-between gap-4 rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-[var(--crs-shadow-soft)] lg:p-6">
         <div className="flex flex-col gap-2">
           <div className="cms-skeleton h-8 w-56" />
           <div className="cms-skeleton h-4 w-72" />

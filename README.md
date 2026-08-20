@@ -715,6 +715,8 @@ No separate staging config files exist in-repo.
 | — | Root Markdown stubs removed (README only at root) | **Done** |
 | 4 | Internal web app + database (users, roles, publish news/events/publications) — **no external CMS**, **no email features** | **On `main`** — core CMS + research groups/projects + authoring pack + [navigation & authoring UX](./docs/prds/2026-07-23-cms-navigation-authoring-ux.md) (M1–M3, PR #14). |
 | 5 | Motion & interactivity polish (SPA + CMS) | **Done on `main`** — [PRD](./docs/prds/2026-08-18-motion-interactivity-polish.md) M1–M4 merged phase-by-phase (PRs #24–#27) + docs PRs #22/#23; reduced-motion gated, zero new deps. |
+| — | CMS Desk (shell + dashboard home) | **Done on `main`** — [PRD](./docs/prds/2026-08-19-cms-desk-design.md) merged `25b15cc`. |
+| — | CMS Desk interiors (lists, forms, admin, login) | **Approved** — [PRD](./docs/prds/2026-08-20-cms-desk-interiors.md). I1 lists on `feature/cms-desk-interiors`; I2 after walkthrough. |
 
 ### Known issues / gaps
 
@@ -742,7 +744,7 @@ Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Product spec:
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-08-19** (Motion & interactivity polish merged to `main` — PRs #22–#27) |
+| Last updated     | **2026-08-20** (CMS Desk interiors PRD Approved; I1 in progress) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes

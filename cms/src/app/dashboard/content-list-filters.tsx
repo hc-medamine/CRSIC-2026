@@ -39,13 +39,13 @@ export function ContentListFilters({
           name="q"
           defaultValue={q}
           placeholder={placeholder ?? t("filterSearch", lang)}
-          className="min-h-11 w-full rounded-xl border border-crs-border bg-crs-surface pe-3 ps-10 text-sm text-crs-ink"
+          className="min-h-11 w-full rounded-xl border border-crs-border bg-crs-bg/40 pe-3 ps-10 text-sm text-crs-ink outline-none focus-visible:border-crs-accent focus-visible:ring-2 focus-visible:ring-crs-accent/30"
         />
       </label>
       <select
         name="status"
         defaultValue={status}
-        className="min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 text-sm text-crs-ink"
+        className="min-h-11 rounded-xl border border-crs-border bg-crs-bg/40 px-3 text-sm text-crs-ink outline-none focus-visible:border-crs-accent focus-visible:ring-2 focus-visible:ring-crs-accent/30"
       >
         {statusOptions.map((o) => (
           <option key={o.value || "all"} value={o.value}>
@@ -55,7 +55,7 @@ export function ContentListFilters({
       </select>
       <button
         type="submit"
-        className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 text-sm text-crs-ink hover:bg-crs-bg"
+        className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 text-sm font-medium text-crs-ink hover:bg-crs-bg"
       >
         {t("filterApply", lang)}
       </button>
