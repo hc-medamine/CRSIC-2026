@@ -39,6 +39,8 @@ function editorEmailsFromEnv(): string[] {
 function passwordForUser(email: string, role: string, sharedEditorPassword: string): string {
   const e = email.trim().toLowerCase();
   const local = e.split("@")[0]?.replace(/\./g, "_").toUpperCase() ?? "";
+  const localSeed =
+    env("SEED_SUPER_ADMIN_PASSWORD") || env("CMS_LOGIN_BUBBLE_SA_PASSWORD");
 
   if (role === "super_admin") {
     return (
@@ -48,12 +50,17 @@ function passwordForUser(email: string, role: string, sharedEditorPassword: stri
     );
   }
   if (role === "reviewer") {
-    return env("CMS_LOGIN_BUBBLE_REVIEWER_PASSWORD") || env(`CMS_LOGIN_BUBBLE_PW_${local}`);
+    return (
+      env("CMS_LOGIN_BUBBLE_REVIEWER_PASSWORD") ||
+      env(`CMS_LOGIN_BUBBLE_PW_${local}`) ||
+      localSeed
+    );
   }
   return (
     env(`CMS_LOGIN_BUBBLE_PW_${local}`) ||
     sharedEditorPassword ||
-    env("CMS_LOGIN_BUBBLE_EDITOR2_PASSWORD")
+    env("CMS_LOGIN_BUBBLE_EDITOR2_PASSWORD") ||
+    localSeed
   );
 }
 

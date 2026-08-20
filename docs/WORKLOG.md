@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-20 — Local CMS staff table + seed includes all four editors
+
+**Docs / seed:** `cms/README.md` staff table, `cms/.env.example` login-bubble emails, and `cms/scripts/seed-staff.ts` (`npm run db:seed:staff`) now list all four editors: `i.megoussi`, `t.medjelled`, `a.djefal`, `a.derrafa`. Super Admin + Reviewer unchanged.
+
+---
+
 ### 2026-08-20 — CMS Desk interiors PRD **Approved**; I1 lists in progress
 
 **PRD:** [prds/2026-08-20-cms-desk-interiors.md](./prds/2026-08-20-cms-desk-interiors.md) — status **Approved**.

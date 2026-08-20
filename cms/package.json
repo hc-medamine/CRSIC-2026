@@ -21,6 +21,7 @@
     "test": "node --env-file=.env.local --import tsx --test --test-force-exit \"src/lib/**/*.test.ts\"",
     "db:cleanup:smoke": "node --env-file=.env.local --import tsx scripts/cleanup-smoke-data.ts",
     "db:seed:super-admin": "node --env-file=.env.local --import tsx scripts/seed-super-admin.ts",
+    "db:seed:staff": "node --env-file=.env.local --import tsx scripts/seed-staff.ts",
     "db:seed:research-groups": "node --env-file=.env.local --import tsx scripts/seed-research-groups.ts",
     "db:seed:welcome-notifications": "node --env-file=.env.local --import tsx scripts/seed-welcome-notifications.ts",
     "db:import-legacy": "node --env-file=.env.local --import tsx scripts/import-legacy.ts",
@@ -53,5 +54,10 @@
     "tailwindcss": "^4",
     "tsx": "^4.23.1",
     "typescript": "^5"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "sharp@0.34.5": true,
+    "unrs-resolver@1.12.2": true
   }
 }

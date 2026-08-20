@@ -21,6 +21,7 @@ Next.js (App Router) admin app for Step 4 — see [docs/prds/2026-07-19-internal
 cd cms
 npm install
 npm run db:seed:super-admin
+npm run db:seed:staff
 npm run dev
 ```
 
@@ -49,6 +50,8 @@ committed. Names are stored AR (authoritative) + EN.
 | Reviewer | F. Boufatah | فريحة بوفاتح | Fariha Boufatah | `f.boufatah@crsic.dz` |
 | Editor | i.megoussi | ايمان مقوسي | Megoussi Imen | `i.megoussi@crsic.dz` |
 | Editor | t.medjelled | طارق مجلد | Tarek Medjelled | `t.medjelled@crsic.dz` |
+| Editor | a.djefal | a.djefal | a.djefal | `a.djefal@crsic.dz` |
+| Editor | a.derrafa | a.derrafa | a.derrafa | `a.derrafa@crsic.dz` |
 
 **Smoke accounts are test-only** (automation for `npm run db:smoke`), not real staff — keep but do
 not treat as people: `smoke.editor@crsic.dz`, `smoke.reviewer@crsic.dz`.
@@ -60,6 +63,12 @@ not treat as people: `smoke.editor@crsic.dz`, `smoke.reviewer@crsic.dz`.
 | News | Done | `data/news.json` |
 | Events | Done | `data/events.json` |
 | Publications | Done | `data/publications.json` (`covers.length === pubs.length`) |
+| Partners | Done | `data/partners.json` |
+| Alerts | Done | `data/alerts.json` |
+| Laws | Done | `data/laws.json` |
+| Platforms | Done | `data/platforms.json` |
+| Research groups / projects | Done | `data/research-groups.json`, `data/research-projects.json` |
+| Site director | Done | `data/director.json` (singleton, not `content_items`) |
 
 Editors need the matching content-type scope (`news` / `event` / `publication`). Four-eyes: authors cannot approve their own items.
 

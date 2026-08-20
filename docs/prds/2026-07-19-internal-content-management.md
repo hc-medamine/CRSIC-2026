@@ -648,6 +648,7 @@ Order: **least effort → most complex** (locked 2026-07-21):
 | 2026-07-20 | Media: **5 MB** max; **images + PDF**; public path **`img/cms/{news|events|covers}/`**; **stable path on replace** |
 | 2026-07-20 | **No merge to `main` until CMS is fully complete** (smoke alone is not enough); Phase 2/3 stay deferred unless added |
 | 2026-07-20 | Named staff accounts (closes prior TBD): Super Admin **F. Chettih** `f.chettih@crsic.dz`; Reviewer **F. Boufatah** `f.boufatah@crsic.dz`; Editors **i.megoussi** `i.megoussi@crsic.dz` (Megoussi Imen / ايمان مقوسي), **t.medjelled** `t.medjelled@crsic.dz` (Tarek Medjelled / طارق مجلد). `smoke.*` accounts are automation-only, not staff. |
+| 2026-08-20 | Staff table expanded: editors **a.djefal** `a.djefal@crsic.dz` and **a.derrafa** `a.derrafa@crsic.dz` (also listed in `cms/.env.example` login bubbles). Seed via `npm run db:seed:staff`. |
 | 2026-07-20 | Public JSON rebuilt from rows where **`live_payload IS NOT NULL`** (not only `status='published'`); "create revision" keeps the public copy live until next publish (migration `010_live_payload.sql`) |
 | 2026-07-20 | Legacy cutover: import current `data/*.json` into CMS as live items via `npm run db:import-legacy` before first production publish, OR accept loss of non-imported cards ([CMS-CUTOVER.md](../runbooks/CMS-CUTOVER.md)) |
 | 2026-07-21 | PRD status → **Approved** (stakeholder; had remained Review by omission) |
