@@ -56,8 +56,8 @@ Estimated time: **~10 minutes**.
 
 | # | Check | Pass? |
 |---|--------|-------|
-| F1 | `/dashboard/media` upload image + PDF | ☐ |
-| F2 | Replace keeps same public path | ☐ |
+| F1 | `/dashboard/media` as Editor: own-folder upload image + PDF (SA still sees all) | ☐ |
+| F2 | Replace unused file keeps same public path; replace of a **published** file shows confirm first | ☐ |
 | F3 | Audit `media.upload` / `media.replace` | ☐ |
 | F4 | Delete unused upload → asset leaves library; audit `media.delete` | ☐ |
 | F5 | Delete asset still on a draft/published/revision → blocked dialog lists references (no force-delete) | ☐ |

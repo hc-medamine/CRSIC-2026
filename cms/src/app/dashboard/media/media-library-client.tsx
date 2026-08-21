@@ -22,6 +22,8 @@ export type MediaLibraryItem = {
   linkedHref: string | null;
   linkedContentType: string | null;
   linkedCount: number;
+  canManage: boolean;
+  liveOnPublic: boolean;
 };
 
 type MediaRef = {
@@ -132,6 +134,9 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
     ? items.find((i) => i.id === pendingDeleteId) ?? null
     : null;
 
+  const selectedItem = lastId ? items.find((i) => i.id === lastId) ?? null : null;
+  const liveReplaceConfirm = Boolean(selectedItem?.liveOnPublic);
+
   const visibleItems =
     filter === "all" ? items : items.filter((item) => item.bucket === filter);
 
@@ -181,31 +186,42 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
             <p className="mt-1 text-xs text-crs-muted">{t("mediaSelectFolderToUpload", lang)}</p>
           </label>
         ) : null}
+        {liveReplaceConfirm ? (
+          <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-950">
+            {t("mediaLiveReplaceHint", lang)}
+          </p>
+        ) : null}
         <MediaUploadField
           bucket={uploadBucket}
           publicPath={lastPath}
           mediaId={lastId}
           imagesOnly={false}
           label={t("uploadImageOrPdf", lang)}
+          liveReplaceConfirm={liveReplaceConfirm}
           onUploaded={({ publicPath, mediaId }) => {
             setLastPath(publicPath);
             setLastId(mediaId);
-            setItems((prev) => [
-              {
-                id: mediaId,
-                bucket: uploadBucket,
-                mimeType: publicPath.endsWith(".pdf") ? "application/pdf" : "image/*",
-                publicPath,
-                updatedAt: new Date().toISOString(),
-                uploaderNameAr: null,
-                uploaderNameEn: null,
-                linkedTitleAr: null,
-                linkedHref: null,
-                linkedContentType: null,
-                linkedCount: 0,
-              },
-              ...prev.filter((i) => i.id !== mediaId),
-            ]);
+            setItems((prev) => {
+              const prevItem = prev.find((i) => i.id === mediaId);
+              return [
+                {
+                  id: mediaId,
+                  bucket: uploadBucket,
+                  mimeType: publicPath.endsWith(".pdf") ? "application/pdf" : "image/*",
+                  publicPath,
+                  updatedAt: new Date().toISOString(),
+                  uploaderNameAr: prevItem?.uploaderNameAr ?? null,
+                  uploaderNameEn: prevItem?.uploaderNameEn ?? null,
+                  linkedTitleAr: prevItem?.linkedTitleAr ?? null,
+                  linkedHref: prevItem?.linkedHref ?? null,
+                  linkedContentType: prevItem?.linkedContentType ?? null,
+                  linkedCount: prevItem?.linkedCount ?? 0,
+                  canManage: true,
+                  liveOnPublic: prevItem?.liveOnPublic ?? false,
+                },
+                ...prev.filter((i) => i.id !== mediaId),
+              ];
+            });
           }}
         />
       </div>
@@ -274,12 +290,18 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
                   <p className="text-xs text-crs-muted" dir="auto">
                     {t("mediaBy", lang)}: {uploader}
                   </p>
+                  {item.liveOnPublic ? (
+                    <p className="mt-0.5 text-xs font-medium text-amber-800">
+                      {t("mediaOnPublicSite", lang)}
+                    </p>
+                  ) : null}
                   {item.linkedCount > 1 ? (
                     <p className="mt-0.5 text-xs text-crs-muted">
                       {tf("mediaAlsoUsed", lang, { n: item.linkedCount - 1 })}
                     </p>
                   ) : null}
                 </div>
+                {item.canManage ? (
                 <div className="flex flex-wrap gap-3">
                   <button
                     type="button"
@@ -305,6 +327,7 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
                     {t("mediaDelete", lang)}
                   </button>
                 </div>
+                ) : null}
               </li>
             );
           })}

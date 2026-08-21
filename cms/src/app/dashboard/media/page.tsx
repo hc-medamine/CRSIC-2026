@@ -1,7 +1,13 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
-import { canAccessMediaBucket, listMediaForUser, registerLegacyCoverFiles } from "@/lib/media/store";
+import {
+  canAccessMediaBucket,
+  canManageMediaAsset,
+  listMediaForUser,
+  registerLegacyCoverFiles,
+} from "@/lib/media/store";
+import { mediaReplaceAffectsPublic } from "@/lib/media/replacePublic";
 import { listMediaReferencesForPaths } from "@/lib/media/references";
 import { MEDIA_BUCKETS, type MediaBucket } from "@/lib/media/config";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
@@ -18,9 +24,6 @@ const SOURCE_PRIORITY = [
 
 export default async function MediaLibraryPage() {
   const user = await requireUser();
-  if (user.role !== "super_admin") {
-    redirect("/dashboard");
-  }
 
   const bucketFlags = await Promise.all(
     MEDIA_BUCKETS.map(async (bucket) => [bucket, await canAccessMediaBucket(user, bucket)] as const),
@@ -57,6 +60,8 @@ export default async function MediaLibraryPage() {
       linkedHref: primary?.dashboardPath ?? null,
       linkedContentType: primary?.contentType ?? null,
       linkedCount: linkedItemIds.size,
+      canManage: canManageMediaAsset(user, r),
+      liveOnPublic: mediaReplaceAffectsPublic(refs),
     };
   });
 

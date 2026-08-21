@@ -151,3 +151,5 @@ export async function isMediaReferenced(publicPath: string): Promise<boolean> {
   const refs = await listMediaReferences(publicPath);
   return refs.length > 0;
 }
+
+export { mediaReplaceAffectsPublic } from "./replacePublic";

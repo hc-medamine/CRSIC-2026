@@ -19,6 +19,18 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-21 — Publication covers belong to the publication Editor
+
+All `covers` media rows (73, previously Super Admin) now `uploaded_by` the Editor who claims publications (currently Medjelled). `npm run db:reassign:to-claims -- --apply` moves cover ownership with desk changes. New legacy `img/covers/` registrations use that Editor, not whoever opened the library.
+
+---
+
+### 2026-08-21 — Editors/reviewers get the media library (with replace seatbelt)
+
+`/dashboard/media` is no longer Super Admin-only. Editors see their own uploads in folders that match their content scopes; reviewers see files in their scopes but can only replace/delete what they uploaded. Replacing a file that is on a published page (or a live public copy) asks for confirmation first — same URL, public site updates immediately. Delete-when-in-use is unchanged.
+
+---
+
 ### 2026-08-21 — Align authorship with live editor desks
 
 Live CMS scopes are the desk SSOT (staff will re-check later). Seed + cutover map now match: Megoussi news/event/law/partner; Medjelled publication/platform; Djefal all four research depts; Derrafa alert. Reassigned 36 publications, 3 laws, and 4 east research groups so Editors can open their own items. Ops: `cd cms && npm run db:reassign:to-claims -- --apply`.

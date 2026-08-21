@@ -30,8 +30,8 @@ export const LABELS: LabelMap = {
   researchProjects: { en: "Research projects", ar: "المشاريع البحثية" },
   media: { en: "Media library", ar: "مكتبة الوسائط" },
   mediaLibraryHint: {
-    en: "Images and PDFs used on the public site. Cards show the related item, last update, and who uploaded.",
-    ar: "الصور وملفات PDF المستخدمة في الموقع. تعرض البطاقات العنصر المرتبط وآخر تحديث ومن قام بالرفع.",
+    en: "Images and PDFs in your content folders. Editors see their own uploads; replacing a published file updates the public site immediately.",
+    ar: "الصور وملفات PDF في مجلدات نطاقكم. يرى المحررون مرفوعاتهم فقط؛ استبدال ملف منشور يحدّث الموقع فورًا.",
   },
   mediaBucketAll: { en: "All media", ar: "كل الوسائط" },
   mediaBucketNews: { en: "News", ar: "الأخبار" },
@@ -81,6 +81,13 @@ export const LABELS: LabelMap = {
     en: "Select to replace (same URL)",
     ar: "اختيار للاستبدال (نفس الرابط)",
   },
+  mediaOnPublicSite: { en: "On the public site", ar: "على الموقع العام" },
+  mediaLiveReplaceHint: {
+    en: "This file is on a published page. Replacing it updates the public site immediately (same URL).",
+    ar: "هذا الملف ظاهر في صفحة منشورة. استبداله يحدّث الموقع فورًا (نفس الرابط).",
+  },
+  mediaReplaceTitle: { en: "Replace a published file?", ar: "استبدال ملف منشور؟" },
+  mediaReplaceConfirm: { en: "Replace anyway", ar: "استبدال على أي حال" },
   mediaDelete: { en: "Delete", ar: "حذف" },
   mediaDeleteTitle: { en: "Delete this media?", ar: "حذف هذه الوسائط؟" },
   mediaDeleteLinked: {

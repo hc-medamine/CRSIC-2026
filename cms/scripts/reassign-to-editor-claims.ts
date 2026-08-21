@@ -7,7 +7,8 @@
  *   npm run db:reassign:to-claims -- --apply
  *
  * After staff change desks (User management or seed-staff), re-run this so
- * list-for-user matches the new claims.
+ * list-for-user matches the new claims. Cover uploads (`bucket = covers`)
+ * follow the publication Editor.
  */
 import { pool } from "../src/lib/db";
 
@@ -110,6 +111,21 @@ async function main() {
       summary[key] = (summary[key] ?? 0) + 1;
     }
 
+    const pubClaim = editorFor(claims, "publication", null);
+    const coverRows = pubClaim
+      ? await client.query<{ id: string; email: string }>(
+          `SELECT m.id, u.email
+           FROM media_assets m
+           JOIN users u ON u.id = m.uploaded_by
+           WHERE m.bucket = 'covers' AND m.uploaded_by IS DISTINCT FROM $1`,
+          [pubClaim.editor_id],
+        )
+      : { rows: [] as { id: string; email: string }[] };
+    const coverByFrom: Record<string, number> = {};
+    for (const row of coverRows.rows) {
+      coverByFrom[row.email] = (coverByFrom[row.email] ?? 0) + 1;
+    }
+
     console.log(APPLY ? "APPLY" : "DRY-RUN");
     console.log(`Items scanned: ${items.rows.length}`);
     console.log(`Would reassign: ${moves.length}`);
@@ -121,9 +137,22 @@ async function main() {
     for (const s of skipped) {
       console.warn(`SKIP ${s.type} ${s.id} — ${s.reason}`);
     }
+    if (pubClaim) {
+      console.log(
+        `Cover uploads → ${pubClaim.email}: ${coverRows.rows.length}${
+          Object.keys(coverByFrom).length
+            ? ` (${Object.entries(coverByFrom)
+                .map(([e, n]) => `${e} ${n}`)
+                .join(", ")})`
+            : ""
+        }`,
+      );
+    } else {
+      console.warn("No publication editor claim — cover ownership left unchanged.");
+    }
 
     if (!APPLY) {
-      console.log("No writes. Re-run with --apply to update created_by.");
+      console.log("No writes. Re-run with --apply to update created_by / cover uploaded_by.");
       return;
     }
 
@@ -176,10 +205,26 @@ async function main() {
         saUser.email,
         "content.bulk_reassign_to_claims",
         "content",
-        `Desk authorship reassign: ${moves.length} items; skipped ${skipped.length}`,
-        JSON.stringify({ reassigned: moves.length, skipped: skipped.length, byMove: summary }),
+        `Desk authorship reassign: ${moves.length} items; skipped ${skipped.length}; covers ${coverRows.rows.length}`,
+        JSON.stringify({
+          reassigned: moves.length,
+          skipped: skipped.length,
+          byMove: summary,
+          covers: pubClaim
+            ? { to: pubClaim.email, n: coverRows.rows.length, from: coverByFrom }
+            : null,
+        }),
       ],
     );
+
+    if (pubClaim && coverRows.rows.length > 0) {
+      await client.query(
+        `UPDATE media_assets
+         SET uploaded_by = $1
+         WHERE bucket = 'covers' AND uploaded_by IS DISTINCT FROM $1`,
+        [pubClaim.editor_id],
+      );
+    }
 
     await client.query("COMMIT");
     console.log("Committed.");

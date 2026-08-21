@@ -108,7 +108,8 @@ Before the first production publish, import the existing static cards so nothing
 - Published files under `img/cms/` are **tracked in git** so clones get the same binaries the SPA serves
 - One-shot cutover (legacy `img/covers` / `img/Holders` → `img/cms/`): `npm run db:migrate:media-to-cms`
 - WordPress → CMS (owned types, dry-run first): `npm run db:cutover:wordpress` then `-- --apply` after signing `tmp/wp-cutover-report.json`
-- Replace overwrites the **same** public path
+- Replace overwrites the **same** public path (library asks for confirm when the file is already on a published page)
+- Editors: own uploads in folders matching their content scopes. Reviewers: see scoped files; replace/delete only what they uploaded. Super Admin: all.
 - Staging: `cms/uploads/` (gitignored); UI: `/dashboard/media` and content forms
 - Migrations auto-run on `npm run dev` / `npm run build`
 - Audit log (Super Admin): `/dashboard/audit`
