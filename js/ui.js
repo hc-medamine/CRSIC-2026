@@ -33,6 +33,7 @@ import { createEventYearGroups, createHomeEventCard } from './components/eventCa
 import { createPartnerCard } from './components/partnerCard.js';
 import { createJournalCard } from './components/journalCard.js';
 import { createNewsCard } from './components/newsCard.js';
+import { mountHomeNewsCarousel } from './components/homeNewsCarousel.js';
 import { createLawCard, createPlatformCard } from './components/catalogCard.js';
 import { mountFeaturedCarousel } from './components/featuredCarousel.js';
 import { createContentByline, formatNewsDate } from './components/contentByline.js';
@@ -302,7 +303,7 @@ export function renderAll() {
       hpg.dataset.loaded = '1';
     }
     if (hng) {
-      replaceChildren(hng, news.slice(0, 6).map(createNewsCard));
+      mountHomeNewsCarousel(hng, news);
       hng.dataset.loaded = '1';
     }
     const ng = document.getElementById('news-grid');

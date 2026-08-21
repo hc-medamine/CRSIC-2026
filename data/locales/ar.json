@@ -341,6 +341,8 @@
   "feat_carousel_next": "التالي",
   "feat_carousel_pause": "إيقاف العرض المتحرك",
   "feat_carousel_play": "تشغيل العرض المتحرك",
+  "home_news_pause": "إيقاف أخبار المركز",
+  "home_news_play": "تشغيل أخبار المركز",
   "aria_feat_carousel": "مستجدات المركز",
   "director_quote": "نعمل معًا على تعزيز البحث العلمي الأصيل في العلوم الإسلامية والحضارة، خدمةً للمعرفة وللمجتمع.",
   "director_name": "اسم المدير (placeholder)",

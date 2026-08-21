@@ -19,6 +19,30 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-21 — Home news carousel: instant resume + opening fade
+
+Stakeholder: no delay after leaving a card; first page change is an immediate fade once Center News is on screen so visitors see the carousel, then 5s dwell. [prds/2026-08-21-home-news-carousel.md](./prds/2026-08-21-home-news-carousel.md).
+
+---
+
+### 2026-08-21 — Home news carousel: faster dwell, card-only hover, no stretch
+
+Stakeholder tweak on the approved PRD: autoplay starts immediately (no 3s idle), dwell **5s**, hover-pause only on cards (gaps keep rotating), last page keeps natural card height. [prds/2026-08-21-home-news-carousel.md](./prds/2026-08-21-home-news-carousel.md).
+
+---
+
+### 2026-08-21 — Home news carousel
+
+PRD [2026-08-21-home-news-carousel.md](./prds/2026-08-21-home-news-carousel.md) **Approved**. Home **أخبار المركز** pages through the full `news.json` list (6 per page, 7s dwell, loop) with header pause/play, swipe, and keyboard arrows. `#news` listing unchanged.
+
+---
+
+### 2026-08-21 — PRD Draft: Home news carousel
+
+Locked decision: Home **أخبار المركز** pages through the full news list (6 per page, 7s dwell, loop). Pause/play in the header; swipe + keyboard; no dots/arrows. `#news` unchanged. Draft: [prds/2026-08-21-home-news-carousel.md](./prds/2026-08-21-home-news-carousel.md). No implementation until **Approved**.
+
+---
+
 ### 2026-08-21 — Publication covers belong to the publication Editor
 
 All `covers` media rows (73, previously Super Admin) now `uploaded_by` the Editor who claims publications (currently Medjelled). `npm run db:reassign:to-claims -- --apply` moves cover ownership with desk changes. New legacy `img/covers/` registrations use that Editor, not whoever opened the library.

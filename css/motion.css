@@ -848,3 +848,12 @@ html[dir="rtl"] {
     animation: partnerMarkFloat 6s var(--ease-out-soft) infinite alternate;
   }
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  #home-news-grid.home-news-grid--carousel {
+    transition: opacity 0.32s ease;
+  }
+  #home-news-grid.home-news-grid--carousel.is-fading {
+    opacity: 0;
+  }
+}
