@@ -1,7 +1,7 @@
 /**
  * Featured home events carousel (3 newest) — CRSIC brand, vanilla JS.
  */
-import { getAllEvents } from '../data.js';
+import { getAllEvents, cmsItemImageSrc } from '../data.js';
 import { t } from '../i18n.js';
 import { el, replaceChildren, safeImageSrc, prefersReducedMotion } from '../utils.js';
 
@@ -91,12 +91,8 @@ function eventResume(e) {
  * @returns {string}
  */
 function eventImageSrc(e, i) {
-  const fromImg = safeImageSrc((e && e.img) || '');
-  if (fromImg) return fromImg;
-  const media = Array.isArray(e && e.media) ? e.media : [];
-  const firstImage = media.find((m) => m && (m.kind === 'image' || m.src));
-  const fromMedia = safeImageSrc((firstImage && firstImage.src) || '');
-  if (fromMedia) return fromMedia;
+  const fromCms = safeImageSrc(cmsItemImageSrc(e));
+  if (fromCms) return fromCms;
   return safeImageSrc(HOLDER[i % HOLDER.length] || '');
 }
 

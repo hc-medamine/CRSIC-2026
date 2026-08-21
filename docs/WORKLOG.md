@@ -19,6 +19,28 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-21 — WordPress → CMS/SPA cutover PRD **Approved**
+
+**PRD:** [prds/2026-08-21-wordpress-cms-spa-cutover.md](./prds/2026-08-21-wordpress-cms-spa-cutover.md) — status **Approved**.
+
+**Locked:** scrape CMS-owned types on `crsic.dz`; match type+title/slug update-in-place or insert; recover media or leave empty; author = scoped editor; publisher = Boufatah; overwrite live JSON after dry-run sign-off. Journals/OJS and static pages out of this slice.
+
+---
+
+### 2026-08-21 — SPA consumes CMS item media; published `img/cms/` is tracked
+
+**Why:** Publication cards were reading the parallel `covers[i]` array instead of each CMS-published item’s `media[]`, so a cover that existed on disk (`img/covers/i05.jpg`) did not show for *مقالات في اللغة والفقه والإعجاز القرآني* (published path `img/cms/covers/…`). `img/cms/**` was gitignored, so clones lost published binaries.
+
+**SPA:** Cards and details prefer CMS item fields (`media[]`, then `img` / `cover` / `og_image`). Publication cards use `coverSrcFromPub`.
+
+**Git:** Root `.gitignore` no longer ignores `img/cms/**`. Staging stays `cms/uploads/**`. New CMS cover uploads go to `img/cms/covers/` (`publicPathFor`).
+
+**Cutover:** `npm run db:migrate:media-to-cms` copied every CMS-managed image into `img/cms/{bucket}/`, registered `media_assets`, rewrote `live_payload`, and rebuilt public JSON. Partner photos were re-fetched from crsic.dz (9/11; CRASC and the multi-university agreement have no matching WP post, so they stay emoji-only until uploaded in CMS).
+
+**Cover remap:** SPA was showing mixed covers because `covers[]` was filename-ordered, not title-matched (journal issues and other books sat on the wrong titles). Covers were reassigned by reading the title on each image. JSON fetch now uses `cache: 'no-store'` so CMS remaps show on the next load.
+
+---
+
 ### 2026-08-20 — Local CMS staff table + seed includes all four editors
 
 **Docs / seed:** `cms/README.md` staff table, `cms/.env.example` login-bubble emails, and `cms/scripts/seed-staff.ts` (`npm run db:seed:staff`) now list all four editors: `i.megoussi`, `t.medjelled`, `a.djefal`, `a.derrafa`. Super Admin + Reviewer unchanged.

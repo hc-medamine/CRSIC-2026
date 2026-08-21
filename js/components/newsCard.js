@@ -1,6 +1,7 @@
 /**
  * News card — safe DOM builder (no innerHTML).
  */
+import { cmsItemImageSrc } from '../data.js';
 import { el, safeImageSrc } from '../utils.js';
 
 const GRADIENTS = [
@@ -46,7 +47,7 @@ function createPlaceholderSvg() {
  */
 export function createNewsCard(n, i) {
   let mediaChild;
-  const src = n.img ? safeImageSrc(n.img) : '';
+  const src = safeImageSrc(cmsItemImageSrc(n));
   if (src) {
     mediaChild = el('img', {
       className: 'news-thumb',

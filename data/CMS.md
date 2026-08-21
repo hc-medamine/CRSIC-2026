@@ -13,7 +13,7 @@ When `CONTENT_BASE_URL` is set (e.g. `https://cdn.example.com/crsic/`), the app 
 
 | `laws.json` | `{ "laws": object[] }` — each: `{ id, slug, title, titleEn?, summary, summaryEn?, body?, bodyEn?, img?, media?, externalUrl?, ...SEO }` — hub `#page-laws`; detail `#law/{slug}` (native SPA). Optional `externalUrl` shows as secondary text link labeled **More information** / **المصدر** (not a primary CTA). |
 | `platforms.json` | `{ "platforms": object[] }` — each: `{ id, slug, kind: visual\|radio\|mobility, title, summary, body?, bodyEn?, img?, media?, externalUrl?, ...SEO }` — hub `#page-platforms`; detail `#platform/{slug}`; same secondary `externalUrl` link. |
-| `publications.json` | `{ "covers": string[], "pubs": object[] }` — pubs may include `id`, `slug`, `summary`, `body` (sanitized HTML allowlist), `media[]` + optional SEO fields |
+| `publications.json` | `{ "covers": string[], "pubs": object[] }` — SPA cards/details use each pub’s `media[]` (CMS source of truth); `covers[]` is derived and kept `covers.length === pubs.length` |
 | `partners.json` | `{ "nat": object[], "intl": object[] }` — optional SEO fields on items |
 | `alerts.json` | `{ "items": object[] }` — at most one live item; each has `id`, `message_ar`, `message_en`, `link`, `link_label_ar`, `link_label_en` + optional SEO fields |
 | `research-groups.json` | `{ "items": object[] }` — `id`, `slug`, `orgUnitId`, `name_ar`/`name_en`, `summary_*`, optional `lead_*` / `members` |

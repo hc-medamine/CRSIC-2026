@@ -29,7 +29,7 @@ CMS writes:
 | Location | Role |
 |----------|------|
 | `cms/uploads/` | Staging copy (gitignored) |
-| `img/cms/news\|events\|covers/` | Public paths used by the SPA (gitignored binaries) |
+| `img/cms/{bucket}/` | Published public paths used by the SPA (**tracked in git**) |
 
 Backup both trees together with the DB dump (same timestamp):
 
@@ -66,7 +66,7 @@ npm run db:status
 
 ### Media
 
-Unzip the matching media archive over the repo so `cms/uploads/` and `img/cms/` match the restored DB `media_assets.public_path` rows.
+Published `img/cms/` files are tracked in git. Restore `cms/uploads/` from the matching media zip so staging copies exist; copy any missing `img/cms/` binaries from that zip if they were never committed.
 
 ### Public JSON
 

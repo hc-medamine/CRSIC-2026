@@ -13,7 +13,7 @@ Project docs index: [docs/README.md](../docs/README.md).
 
 | File | Contents |
 |------|----------|
-| `publications.json` | `covers[]` + `pubs[]` (same length; index-aligned). Pubs may include detail fields: `id`, `slug`, `summary`, `body`, `media[]` |
+| `publications.json` | CMS-published `pubs[]` (each item has `media[]`). `covers[]` is a derived parallel array for older consumers; the SPA reads each pub’s `media` first |
 | `events.json` | `intl[]` + `nat[]` events (detail: `id`, `slug`, `summary`, `body`, `media[]`) |
 | `partners.json` | `nat[]` + `intl[]` partners |
 | `alerts.json` | `items[]` — site-wide banner, at most one live item (empty array when none) |
@@ -33,9 +33,13 @@ Project docs index: [docs/README.md](../docs/README.md).
 
 ## Add a publication
 
-1. Add a cover image under `img/covers/` (e.g. `c28.jpg`).
-2. Append the path to `covers` in `publications.json`.
-3. Append a matching object to `pubs`:
+Prefer **CMS publish** (upload cover → Review → Publish). That writes `pubs[].media[]` and a matching `covers[]` entry, and copies the file to `img/cms/covers/` (tracked in git).
+
+For a rare hand edit:
+
+1. Put the cover under `img/cms/covers/` (CMS hashed name) or `img/covers/` (legacy filename).
+2. Append a matching object to `pubs` with `media[].src` set to that path.
+3. Append the same path to `covers` so `covers.length === pubs.length`.
 
 ```json
 {
@@ -47,12 +51,12 @@ Project docs index: [docs/README.md](../docs/README.md).
   "slug": "عنوان-المؤلف",
   "summary": "وصف مختصر دون وسوم HTML.",
   "body": "",
-  "media": [{ "kind": "image", "src": "img/covers/c28.jpg" }]
+  "media": [{ "kind": "image", "src": "img/cms/covers/<hash>.jpg" }]
 }
 ```
 
 `type` must be `"collective"` or `"individual"`.  
-**Keep `covers.length === pubs.length`.**  
+The SPA cards and details use each item’s CMS `media` (then `img` / `cover`).  
 Public deep link: `#publication/{slug}`.
 
 ## Add an event
@@ -67,17 +71,17 @@ Append to `intl` or `nat` in `events.json`:
   "title": "عنوان الملتقى",
   "type": "ملتقى وطني",
   "status": "done",
-  "img": "img/Holders/0.jpg",
+  "img": "img/cms/events/<hash>.jpg",
   "id": "legacy-event-عنوان-الملتقى",
   "slug": "عنوان-الملتقى",
   "summary": "",
   "body": "",
-  "media": [{ "kind": "image", "src": "img/Holders/0.jpg" }]
+  "media": [{ "kind": "image", "src": "img/cms/events/<hash>.jpg" }]
 }
 ```
 
 `status`: `"done"` or `"upcoming"`.  
-`img` is **optional** — used by the home teaser cards; if omitted, the home grid cycles `img/Holders/0.jpg`–`5.jpg`.  
+`img` / `media` come from CMS publish (`img/cms/events/`). If an event has no image, the featured carousel may fall back to `img/Holders/0.jpg`–`5.jpg`.  
 Deep link: `#event/{slug}`.
 
 The home section `#home-events-grid` shows the **3 newest** events (intl + nat merged, sorted by date). The full events page still lists every item by year.
@@ -107,14 +111,14 @@ Use `"items": []` when there is no active alert. `link` is optional (`null` or a
 
 ```json
 {
-  "img": "img/Holders/0.jpg",
+  "img": "img/cms/news/<hash>.jpg",
   "label": "خبر",
   "title": "عنوان الخبر",
   "id": "legacy-news-عنوان-الخبر",
   "slug": "عنوان-الخبر",
   "summary": "",
   "body": "",
-  "media": [{ "kind": "image", "src": "img/Holders/0.jpg" }]
+  "media": [{ "kind": "image", "src": "img/cms/news/<hash>.jpg" }]
 }
 ```
 

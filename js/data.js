@@ -44,7 +44,7 @@ let loadPromise = null;
  */
 async function fetchJson(relativePath) {
   const url = contentUrl(relativePath, import.meta.url);
-  const res = await fetch(url);
+  const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) {
     throw new Error(`HTTP ${res.status} loading ${relativePath}`);
   }
@@ -158,6 +158,37 @@ export function getPub(i) {
 /** @param {number} i */
 export function getCover(i) {
   return covers[i];
+}
+
+/**
+ * Primary image from a CMS-published item (`media[]`, then `img` / `cover` / `og_image`).
+ * @param {object|undefined} item
+ * @returns {string}
+ */
+export function cmsItemImageSrc(item) {
+  if (!item) return '';
+  const fromMedia = Array.isArray(item.media)
+    ? item.media.find((m) => m && m.kind === 'image' && m.src)?.src
+    : '';
+  return String(fromMedia || item.img || item.cover || item.og_image || '').trim();
+}
+
+/**
+ * Cover for a CMS-published publication: item fields first, then legacy `covers[i]`.
+ * @param {object|undefined} pub
+ * @param {number} [index]
+ * @returns {string}
+ */
+export function coverSrcFromPub(pub, index) {
+  const fromItem = cmsItemImageSrc(pub);
+  if (fromItem) return fromItem;
+  const fromCovers = Number.isInteger(index) ? covers[index] : '';
+  return String(fromCovers || '').trim();
+}
+
+/** @param {number} i */
+export function getCoverForPub(i) {
+  return coverSrcFromPub(pubs[i], i);
 }
 
 /** @returns {object[]} */
@@ -311,12 +342,6 @@ export function findPublicationByKey(key) {
   if (index < 0) return null;
   return { pub: pubs[index], index };
 }
-
-/** @param {number} i */
-export function getCoverForPub(i) {
-  return covers[i] || '';
-}
-
 
 export function getLaws() {
   return laws;

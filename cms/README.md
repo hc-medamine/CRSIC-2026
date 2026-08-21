@@ -95,7 +95,9 @@ Before the first production publish, import the existing static cards so nothing
 ## Media
 
 - Max **5 MB**; JPEG / PNG / WebP / PDF (magic-byte checked)
-- Public paths: `img/cms/news/`, `img/cms/events/`, `img/cms/covers/`
+- Public paths: `img/cms/{news|events|covers|partners|research|alerts|laws|platforms|site}/`
+- Published files under `img/cms/` are **tracked in git** so clones get the same binaries the SPA serves
+- One-shot cutover (legacy `img/covers` / `img/Holders` → `img/cms/`): `npm run db:migrate:media-to-cms`
 - Replace overwrites the **same** public path
 - Staging: `cms/uploads/` (gitignored); UI: `/dashboard/media` and content forms
 - Migrations auto-run on `npm run dev` / `npm run build`

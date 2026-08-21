@@ -4,7 +4,6 @@
  */
 import {
   getPubs,
-  getCover,
   getPub,
   getNews,
   getJournals,
@@ -593,7 +592,7 @@ function resolveLightboxContent(type, slug, index) {
       badge: pub.dept || '',
       meta: pub.type === 'collective' ? t('badge_collective') : t('badge_individual'),
       summary: pub.summary || pub.desc || '',
-      cover: getCoverForPub(idx) || (pub.media && pub.media[0] && pub.media[0].src) || '',
+      cover: getCoverForPub(idx) || '',
     };
   }
 

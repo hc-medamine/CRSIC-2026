@@ -27,6 +27,7 @@ Product specs for CRSIC live here. **New feature slices follow the PRD-first wor
 | [2026-08-18-motion-interactivity-polish.md](./2026-08-18-motion-interactivity-polish.md) | **Delivered** (2026-08-19) | Motion/interactivity polish SPA + CMS — M1–M4, showy everywhere, OS-only motion gate, explicit perf budget; all merged to `main` (PRs #24–#27) |
 | [2026-08-19-cms-desk-design.md](./2026-08-19-cms-desk-design.md) | **Delivered** (2026-08-19) | CMS Desk — shell + dashboard home on `main` (`25b15cc`); list/edit interiors are a follow-on slice |
 | [2026-08-20-cms-desk-interiors.md](./2026-08-20-cms-desk-interiors.md) | **Approved** (2026-08-20) | Desk interiors — I1 lists then I2 forms/admin/login; unify news/events/pubs onto `ContentListPage`; visual only |
+| [2026-08-21-wordpress-cms-spa-cutover.md](./2026-08-21-wordpress-cms-spa-cutover.md) | **Approved** (2026-08-21) | WP scrape → CMS-owned types; enrich/ingest; editor author + Boufatah publisher; live JSON overwrite after dry-run |
 
 ## Related
 

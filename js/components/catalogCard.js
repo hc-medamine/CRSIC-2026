@@ -1,6 +1,7 @@
 /**
  * Laws & platforms catalog cards — native SPA hash details.
  */
+import { cmsItemImageSrc } from '../data.js';
 import { t, getLang } from '../i18n.js';
 import { el, safeImageSrc } from '../utils.js';
 
@@ -12,7 +13,7 @@ export function createLawCard(law) {
   const lang = getLang();
   const title = lang === 'en' && law.titleEn ? law.titleEn : (law.title || '');
   const summary = lang === 'en' && law.summaryEn ? law.summaryEn : (law.summary || '');
-  const img = safeImageSrc(law.img || '');
+  const img = safeImageSrc(cmsItemImageSrc(law));
   const slug = law.slug || law.id || '';
   const href = slug ? `#law/${encodeURIComponent(slug)}` : '#laws';
   const media = img
@@ -47,7 +48,7 @@ export function createPlatformCard(platform) {
   const lang = getLang();
   const title = lang === 'en' && platform.titleEn ? platform.titleEn : (platform.title || '');
   const summary = lang === 'en' && platform.summaryEn ? platform.summaryEn : (platform.summary || '');
-  const img = safeImageSrc(platform.img || '');
+  const img = safeImageSrc(cmsItemImageSrc(platform));
   const slug = platform.slug || platform.id || '';
   const href = slug ? `#platform/${encodeURIComponent(slug)}` : '#platforms';
 

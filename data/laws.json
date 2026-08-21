@@ -1,30 +1,30 @@
 {
     "laws": [
         {
-            "id": "51ba06fc-2b92-4ea4-967e-4d0778768cbe",
-            "img": "img/Holders/0.jpg",
-            "body": "<p>أُنشئ مركز البحث في العلوم الإسلامية والحضارة بالأغواط بموجب المرسوم التنفيذي رقم <strong>15-136</strong> المؤرخ في <strong>23 مايو 2015</strong>، وافتُتح رسمياً في 27 يناير 2016.</p><p>يُعدّ المركز مؤسسة عمومية ذات طابع علمي وتكنولوجي، وهو المؤسسة الوطنية الوحيدة المتخصصة في هذا الحقل الرائد على المستوى الوطني.</p><p>يحدّد المرسوم مهام المركز في تسيير مشاريع البحث العلمي، ومتابعة تطور العلوم والتكنولوجيا في مجال تخصصه، وجمع المعلومات التقنية، وتثمين نتائج البحث، وضمان التكوين المستمر للباحثين.</p>",
-            "slug": "مرسوم-تنفيذي-15-136",
+            "id": "a49f2182-a3a7-4b56-ab15-1883b76b0ff7",
+            "img": "img/cms/laws/639fe723a15946c69a1e23e3f0f72c54.jpg",
+            "body": "<p>صدر قرار التنظيم الداخلي لمركز البحث في العلوم الإسلامية والحضارة بتاريخ <strong>12 يوليو 2018</strong>، ويحدّد هيكل المركز الإداري والعلمي.</p><p>يشمل التنظيم أقسام البحث العلمي الأساسية، منها: الدراسات القرآنية والفقهية؛ الفكر والعقيدة والحوار مع الغير؛ التاريخ الثقافي للجزائر؛ والحضارة الإسلامية، إضافة إلى فرق البحث المرتبطة بها.</p><p>يوضّح القرار أيضاً توزيع الصلاحيات بين إدارة المركز والهيئات العلمية، وآليات متابعة مشاريع البحث ونشر المخرجات العلمية.</p>",
+            "slug": "قرار-التنظيم-الداخلي-2018",
             "media": [
                 {
-                    "src": "img/Holders/0.jpg",
+                    "src": "img/cms/laws/639fe723a15946c69a1e23e3f0f72c54.jpg",
                     "kind": "image"
                 }
             ],
-            "title": "المرسوم التنفيذي رقم 15-136",
-            "bodyEn": "<p>The Research Centre in Islamic Sciences and Civilisation in Laghouat was established by Executive Decree No. <strong>15-136</strong> of <strong>23 May 2015</strong>, and was officially inaugurated on 27 January 2016.</p><p>It is a public institution of a scientific and technological character, and the only national institution specialised in this pioneering field.</p><p>The decree sets out the Centre’s missions: managing research projects, monitoring science and technology developments in its field, gathering technical information, valorising research results, and ensuring continuing education for researchers.</p>",
-            "summary": "إنشاء مركز البحث في العلوم الإسلامية والحضارة بالأغواط كمؤسسة عمومية ذات طابع علمي وتكنولوجي.",
-            "titleEn": "Executive decree No. 15-136",
-            "summaryEn": "Establishment of the Research Centre in Islamic Sciences and Civilisation in Laghouat as a public scientific and technological institution."
+            "title": "قرار التنظيم الداخلي (12 يوليو 2018)",
+            "bodyEn": "<p>The internal organisation decision of the Research Centre in Islamic Sciences and Civilisation was issued on <strong>12 July 2018</strong> and defines the Centre’s administrative and scientific structure.</p><p>It covers the main research departments — Qur’anic and fiqh studies; thought, creed and dialogue; cultural history of Algeria; and Islamic civilisation — together with their research groups.</p><p>The decision also clarifies the distribution of powers between Centre management and scientific bodies, and the mechanisms for following research projects and publishing scientific outputs.</p>",
+            "summary": "يحدّد التنظيم الداخلي للمركز وأقسامه البحثية وهيكل التسيير.",
+            "titleEn": "Internal organisation decision (12 July 2018)",
+            "summaryEn": "Defines the Centre’s internal organisation, research departments, and management structure."
         },
         {
-            "id": "32e1cfa8-f9e2-447a-b204-09acd492c528",
-            "img": "img/Holders/1.jpg",
+            "id": "ab12cbe3-b17c-423c-89e3-811e04d8a61d",
+            "img": "img/cms/laws/c9401dd7b5f145aca01a64f764952d87.jpg",
             "body": "<p>يخضع مركز البحث في العلوم الإسلامية والحضارة في تنظيمه لأحكام المرسوم التنفيذي رقم <strong>11-396</strong> المؤرخ في <strong>24 نوفمبر 2011</strong>، الذي يحدّد القانون الأساسي النموذجي للمؤسسات العمومية ذات الطابع العلمي والتكنولوجي.</p><p>يتبع المركز إدارياً لمديرية البحث العلمي والتطوير التكنولوجي التابعة لوزارة التعليم العالي والبحث العلمي في الجزائر.</p><p>يوفّر هذا الإطار القواعد المتعلقة بالتنظيم الداخلي، وهيئات التسيير، والصلاحيات العلمية والإدارية التي تنطبق على مؤسسات البحث من هذا النوع.</p>",
             "slug": "مرسوم-تنفيذي-11-396",
             "media": [
                 {
-                    "src": "img/Holders/1.jpg",
+                    "src": "img/cms/laws/c9401dd7b5f145aca01a64f764952d87.jpg",
                     "kind": "image"
                 }
             ],
@@ -35,21 +35,21 @@
             "summaryEn": "General organisational framework for scientific and technological research institutions."
         },
         {
-            "id": "2528a539-c5d5-4091-b7f3-fea2d6299223",
-            "img": "img/Holders/2.jpg",
-            "body": "<p>صدر قرار التنظيم الداخلي لمركز البحث في العلوم الإسلامية والحضارة بتاريخ <strong>12 يوليو 2018</strong>، ويحدّد هيكل المركز الإداري والعلمي.</p><p>يشمل التنظيم أقسام البحث العلمي الأساسية، منها: الدراسات القرآنية والفقهية؛ الفكر والعقيدة والحوار مع الغير؛ التاريخ الثقافي للجزائر؛ والحضارة الإسلامية، إضافة إلى فرق البحث المرتبطة بها.</p><p>يوضّح القرار أيضاً توزيع الصلاحيات بين إدارة المركز والهيئات العلمية، وآليات متابعة مشاريع البحث ونشر المخرجات العلمية.</p>",
-            "slug": "قرار-التنظيم-الداخلي-2018",
+            "id": "3deed521-b2f2-437b-bce6-7b46747e7801",
+            "img": "img/cms/laws/2aead2e799bf431caabdb0749ca519df.jpg",
+            "body": "<p>أُنشئ مركز البحث في العلوم الإسلامية والحضارة بالأغواط بموجب المرسوم التنفيذي رقم <strong>15-136</strong> المؤرخ في <strong>23 مايو 2015</strong>، وافتُتح رسمياً في 27 يناير 2016.</p><p>يُعدّ المركز مؤسسة عمومية ذات طابع علمي وتكنولوجي، وهو المؤسسة الوطنية الوحيدة المتخصصة في هذا الحقل الرائد على المستوى الوطني.</p><p>يحدّد المرسوم مهام المركز في تسيير مشاريع البحث العلمي، ومتابعة تطور العلوم والتكنولوجيا في مجال تخصصه، وجمع المعلومات التقنية، وتثمين نتائج البحث، وضمان التكوين المستمر للباحثين.</p>",
+            "slug": "مرسوم-تنفيذي-15-136",
             "media": [
                 {
-                    "src": "img/Holders/2.jpg",
+                    "src": "img/cms/laws/2aead2e799bf431caabdb0749ca519df.jpg",
                     "kind": "image"
                 }
             ],
-            "title": "قرار التنظيم الداخلي (12 يوليو 2018)",
-            "bodyEn": "<p>The internal organisation decision of the Research Centre in Islamic Sciences and Civilisation was issued on <strong>12 July 2018</strong> and defines the Centre’s administrative and scientific structure.</p><p>It covers the main research departments — Qur’anic and fiqh studies; thought, creed and dialogue; cultural history of Algeria; and Islamic civilisation — together with their research groups.</p><p>The decision also clarifies the distribution of powers between Centre management and scientific bodies, and the mechanisms for following research projects and publishing scientific outputs.</p>",
-            "summary": "يحدّد التنظيم الداخلي للمركز وأقسامه البحثية وهيكل التسيير.",
-            "titleEn": "Internal organisation decision (12 July 2018)",
-            "summaryEn": "Defines the Centre’s internal organisation, research departments, and management structure."
+            "title": "المرسوم التنفيذي رقم 15-136",
+            "bodyEn": "<p>The Research Centre in Islamic Sciences and Civilisation in Laghouat was established by Executive Decree No. <strong>15-136</strong> of <strong>23 May 2015</strong>, and was officially inaugurated on 27 January 2016.</p><p>It is a public institution of a scientific and technological character, and the only national institution specialised in this pioneering field.</p><p>The decree sets out the Centre’s missions: managing research projects, monitoring science and technology developments in its field, gathering technical information, valorising research results, and ensuring continuing education for researchers.</p>",
+            "summary": "إنشاء مركز البحث في العلوم الإسلامية والحضارة بالأغواط كمؤسسة عمومية ذات طابع علمي وتكنولوجي.",
+            "titleEn": "Executive decree No. 15-136",
+            "summaryEn": "Establishment of the Research Centre in Islamic Sciences and Civilisation in Laghouat as a public scientific and technological institution."
         }
     ]
 }
