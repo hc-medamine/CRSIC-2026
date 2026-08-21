@@ -98,7 +98,7 @@ const SECTION_CONTAINERS = {
 /** Show loading skeletons before async data arrives. */
 export function primeSkeletons() {
   fillSkeletons(document.getElementById('home-pub-grid'), 'skeleton-pub', 4);
-  fillSkeletons(document.getElementById('home-news-grid'), 'skeleton-news', 6);
+  fillSkeletons(document.getElementById('home-news-grid'), 'skeleton-news', 3);
   fillSkeletons(document.getElementById('news-grid'), 'skeleton-news', 8);
   fillSkeletons(document.getElementById('home-events-grid'), 'skeleton-event', 3);
   fillSkeletons(document.getElementById('pub-grid'), 'skeleton-pub', 8);
@@ -276,7 +276,7 @@ export function renderAll() {
   const feat = document.getElementById('home-feat-carousel');
 
   fillSkeletons(hpg, 'skeleton-pub', 4);
-  fillSkeletons(hng, 'skeleton-news', 6);
+  fillSkeletons(hng, 'skeleton-news', 3);
   fillSkeletons(document.getElementById('news-grid'), 'skeleton-news', 8);
   fillSkeletons(heg, 'skeleton-event', 3);
   fillSkeletons(pg, 'skeleton-pub', 8);

@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-21 — Home news carousel: 3 cards per page
+
+Stakeholder: Home **أخبار المركز** is one row of 3 (not 6). 39 items → 13 pages. [prds/2026-08-21-home-news-carousel.md](./prds/2026-08-21-home-news-carousel.md).
+
+---
+
 ### 2026-08-21 — Home news carousel: instant resume + opening fade
 
 Stakeholder: no delay after leaving a card; first page change is an immediate fade once Center News is on screen so visitors see the carousel, then 5s dwell. [prds/2026-08-21-home-news-carousel.md](./prds/2026-08-21-home-news-carousel.md).

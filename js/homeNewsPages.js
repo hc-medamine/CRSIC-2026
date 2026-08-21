@@ -1,6 +1,6 @@
 /** Page math for the Home Center News carousel (PRD 2026-08-21). */
 
-export const HOME_NEWS_PAGE_SIZE = 6;
+export const HOME_NEWS_PAGE_SIZE = 3;
 
 /**
  * @param {number} length
