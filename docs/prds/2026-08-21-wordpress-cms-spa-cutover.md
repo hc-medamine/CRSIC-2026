@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Approved** |
+| Status | **Delivered** on `main` (2026-08-21, merge `b1c022c`) |
 | Date | 2026-08-21 |
 | Author | Stakeholder + agent |
 | Owners | Product / CMS |

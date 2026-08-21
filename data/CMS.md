@@ -1,35 +1,35 @@
 # Connecting published content (CDN / remote JSON)
 
-The public SPA reads static JSON via `CONTENT_BASE_URL` in `js/config.js`. Leave it empty to use local `/data` files.
+The public SPA reads static JSON via `CONTENT_BASE_URL` in `js/config.js`. Leave it empty to use local `/data` files. **Live `main` (2026-08-21)** already contains the WordPress-cutover snapshots plus `featured-news.json`.
 
 ## Contract (required endpoints)
 
-When `CONTENT_BASE_URL` is set (e.g. `https://cdn.example.com/crsic/`), the app fetches:
+When `CONTENT_BASE_URL` is set (e.g. `https://cdn.example.com/crsic/`), the app fetches **all** of these filenames (same shapes as local `/data`):
 
 | Path | Shape |
 |------|--------|
-| `news.json` | `{ "news": object[] }` — items may include detail fields (`summary`, `body` as plain text or sanitized HTML allowlist) + optional SEO: `meta_title_ar`/`meta_title_en`, `meta_description_ar`/`meta_description_en`, `og_image` |
-| `events.json` | `{ "intl": object[], "nat": object[] }` — items may include detail (`body` same allowlist) + same optional SEO fields |
-
-| `laws.json` | `{ "laws": object[] }` — each: `{ id, slug, title, titleEn?, summary, summaryEn?, body?, bodyEn?, img?, media?, externalUrl?, ...SEO }` — hub `#page-laws`; detail `#law/{slug}` (native SPA). Optional `externalUrl` shows as secondary text link labeled **More information** / **المصدر** (not a primary CTA). |
-| `platforms.json` | `{ "platforms": object[] }` — each: `{ id, slug, kind: visual\|radio\|mobility, title, summary, body?, bodyEn?, img?, media?, externalUrl?, ...SEO }` — hub `#page-platforms`; detail `#platform/{slug}`; same secondary `externalUrl` link. |
-| `publications.json` | `{ "covers": string[], "pubs": object[] }` — SPA cards/details use each pub’s `media[]` (CMS source of truth); `covers[]` is derived and kept `covers.length === pubs.length` |
-| `partners.json` | `{ "nat": object[], "intl": object[] }` — optional SEO fields on items |
-| `alerts.json` | `{ "items": object[] }` — at most one live item; each has `id`, `message_ar`, `message_en`, `link`, `link_label_ar`, `link_label_en` + optional SEO fields |
-| `research-groups.json` | `{ "items": object[] }` — `id`, `slug`, `orgUnitId`, `name_ar`/`name_en`, `summary_*`, optional `lead_*` / `members` |
-| `research-projects.json` | `{ "items": object[] }` — `id`, `slug`, `orgUnitId`, `groupId`, title/lead/dibaja/questions/duration AR+EN, `axes[]`/`impacts[]` (`{ar,en?}`), optional SEO |
-| `director.json` | singleton `{ quote_ar, quote_en, name_ar, name_en, role_ar, role_en, portrait, portrait_alt_ar?, portrait_alt_en? }` — About director block; CMS publish (`/dashboard/director`). Soft-fail: SPA keeps locale placeholders if missing. |
-| `featured-news.json` | `{ "ids": string[] }` — ordered public news ids for Home `#home-feat-carousel`, max 10. Empty or all missing → SPA shows 3 newest news. CMS: `/dashboard/featured-news`. |
-| `locales/ar.json` | flat key → string |
+| `news.json` | `{ "news": object[] }` — `id`, `slug`, `date`, `title`, `label`, `summary`, `body`, `img`, `media[]`, bylines (`editor_*`, `reviewer_*`, `publisher_*`), optional SEO |
+| `featured-news.json` | `{ "ids": string[] }` — ordered public news ids for `#home-feat-carousel`, max 10. Empty or all missing → SPA shows 3 newest news. CMS: `/dashboard/featured-news` |
+| `events.json` | `{ "intl": object[], "nat": object[] }` — detail + `status` (`upcoming` \| `ongoing` \| `done`) + bylines + optional SEO |
+| `publications.json` | `{ "covers": string[], "pubs": object[] }` — SPA uses each pub’s `media[]`; keep `covers.length === pubs.length` |
+| `partners.json` | `{ "nat": object[], "intl": object[] }` — optional summary/body + SEO |
+| `alerts.json` | `{ "items": object[] }` — at most one live item |
+| `laws.json` | `{ "laws": object[] }` — hub `#laws`; detail `#law/{slug}`; optional `externalUrl` |
+| `platforms.json` | `{ "platforms": object[] }` — `kind`: visual \| radio \| mobility; hub `#platforms`; detail `#platform/{slug}` |
+| `research-groups.json` | `{ "items": object[] }` |
+| `research-projects.json` | `{ "items": object[] }` |
+| `director.json` | singleton `{ quote_ar, quote_en, name_ar, name_en, role_ar, role_en, portrait, … }` — CMS `/dashboard/director`. Soft-fail: SPA keeps locale placeholders |
+| `journals.json` | `{ "journals": object[] }` — **not** CMS-published (OJS) |
+| `locales/ar.json` | flat key → string (350 keys; must match EN) |
 | `locales/en.json` | flat key → string |
 
-SPA deep links (hash): `#news` (list), `#news/{slug}`, `#event/{slug}`, `#publication/{slug}`, `#research-project/{slug}`, `#law/{slug}`, `#platform/{slug}`. Preview (CMS A1): `#preview/{token}` — SPA fetches a short-lived candidate payload from `{PREVIEW_API_BASE}/api/public/preview/{token}` (see `js/config.js`). Does not touch live JSON.
+SPA deep links (hash): `#news`, `#news/{slug}`, `#event/{slug}`, `#publication/{slug}`, `#partner/{slug}`, `#research-group/{slug}`, `#research-project/{slug}`, `#law/{slug}`, `#platform/{slug}`, `#laws`, `#platforms`. Preview (CMS A1): `#preview/{token}` — SPA fetches `{PREVIEW_API_BASE}/api/public/preview/{token}` (see `js/config.js`). Does not touch live JSON.
 
 Set CMS `PUBLIC_SITE_URL` to the SPA origin so “Open public preview” opens the right tab. Set SPA `PREVIEW_API_BASE` to the CMS origin when they differ.
 
 **Body HTML allowlist (news/events/pubs):** `p`, `br`, `strong`/`b`, `em`/`i`, `ul`/`ol`/`li`, `a[href]` (http/https/mailto). Plain text remains valid; the SPA renders either safely.
 
-Field schemas: [README.md](./README.md) (this folder). Full product docs: [docs/README.md](../docs/README.md).
+Field schemas: [README.md](./README.md) (this folder). Full product docs: [docs/README.md](../docs/README.md). Root product SSOT: [README.md](../README.md) §4.
 
 ## Enable remote published snapshots
 

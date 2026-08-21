@@ -43,7 +43,8 @@ Compress-Archive -Path "cms\uploads","img\cms" -DestinationPath "C:\backups\crsi
 Publish also writes `data/*.json.bak` beside each file. For a deliberate cutover backup:
 
 ```powershell
-Copy-Item data\news.json,data\events.json,data\publications.json C:\backups\json-$stamp\
+Copy-Item data\*.json C:\backups\json-$stamp\
+# at minimum: news, events, publications, featured-news, partners, alerts, laws, platforms, director, research-*, locales
 ```
 
 ---

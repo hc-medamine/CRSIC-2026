@@ -1,6 +1,6 @@
 # Smoke checklist — CRSIC internal CMS
 
-Run on branch `feature/step4-internal-cms` with Postgres up and `cd cms && npm run dev`.  
+Run on **`main`** (or a branch based on it) with Postgres up and `cd cms && npm run dev`.  
 Use **two accounts** (four-eyes): one Editor (or Super Admin as author) and a **different** Reviewer.
 
 Estimated time: **~10 minutes**.
@@ -63,6 +63,15 @@ Estimated time: **~10 minutes**.
 | F5 | Delete asset still on a draft/published/revision → blocked dialog lists references (no force-delete) | ☐ |
 | F6 | Upload to buckets `partners` / `research` / `alerts` from media library | ☐ |
 
+## Fb. Home featured news playlist
+
+| # | Check | Pass? |
+|---|--------|-------|
+| Fb1 | `/dashboard/featured-news` loads (run `npm run db:migrate` if table missing — `029_site_featured_news.sql`) | ☐ |
+| Fb2 | News Editor can add/reorder ≤10 published news and **save draft**; cannot publish | ☐ |
+| Fb3 | Reviewer or Super Admin can **publish**; `data/featured-news.json` updates; empty live → SPA 3 newest | ☐ |
+| Fb4 | Unpublish a playlist news item → it drops from the strip (no silent backfill) | ☐ |
+
 ## G. Preview parity (all 7 types)
 
 | # | Check | Pass? |
@@ -114,4 +123,4 @@ Estimated time: **~10 minutes**.
 
 ---
 
-CMS Phase 1 is on `main`. Further CMS work ships on feature branches (e.g. detail-page schema).
+CMS Phase 1 + WordPress cutover + featured playlist are on **`main`**. Further CMS work ships on `feature/` branches. Never commit directly to `main`.

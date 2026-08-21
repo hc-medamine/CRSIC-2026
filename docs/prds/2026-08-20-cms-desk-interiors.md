@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Approved** (2026-08-20) |
+| Status | **Approved** (2026-08-20) — **I1 Delivered** on `main` (PR #31). **I2** forms/admin interiors still follow-on |
 | Date | 2026-08-20 |
 | Author | Cursor session (with stakeholder) |
 | Owners | Stakeholder + agent |

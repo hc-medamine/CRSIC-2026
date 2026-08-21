@@ -16,7 +16,7 @@ Product specs for CRSIC live here. **New feature slices follow the PRD-first wor
 
 | PRD | Status | Notes |
 |-----|--------|-------|
-| [2026-07-19-internal-content-management.md](./2026-07-19-internal-content-management.md) | **Approved** (2026-07-21) | Step 4 core CMS — Phases 1–3 on `main` |
+| [2026-07-19-internal-content-management.md](./2026-07-19-internal-content-management.md) | **Delivered** on `main` | Step 4 core CMS — Phases 1–3 + later slices; do not reopen `feature/step4-internal-cms` |
 | [2026-07-22-cms-authoring-quality-pack.md](./2026-07-22-cms-authoring-quality-pack.md) | **Approved** (2026-07-22) | Preview (A1), rich editor (B2+H1), SEO (S2+F1+L1+P1), EN queue (D1); order O1 |
 | [2026-07-23-cms-navigation-authoring-ux.md](./2026-07-23-cms-navigation-authoring-ux.md) | **Approved** (2026-07-23) | Role-grouped nav, Home cockpit, forms, empty/error states — phased M1–M3 |
 | [2026-07-23-cms-direction-b-visual.md](./2026-07-23-cms-direction-b-visual.md) | **Approved** (2026-07-23) | CMS Direction B; public Themes **dropped** 2026-07-26 (§8) |
@@ -26,10 +26,11 @@ Product specs for CRSIC live here. **New feature slices follow the PRD-first wor
 | [2026-07-27-laws-platforms-parity-director-cms.md](./2026-07-27-laws-platforms-parity-director-cms.md) | **Approved** (2026-07-27) | Attachments + SPA externalUrl + seed cutover; Director CMS (SA + centre-wide Reviewer); journals/About pages OOS |
 | [2026-08-18-motion-interactivity-polish.md](./2026-08-18-motion-interactivity-polish.md) | **Delivered** (2026-08-19) | Motion/interactivity polish SPA + CMS — M1–M4, showy everywhere, OS-only motion gate, explicit perf budget; all merged to `main` (PRs #24–#27) |
 | [2026-08-19-cms-desk-design.md](./2026-08-19-cms-desk-design.md) | **Delivered** (2026-08-19) | CMS Desk — shell + dashboard home on `main` (`25b15cc`); list/edit interiors are a follow-on slice |
-| [2026-08-20-cms-desk-interiors.md](./2026-08-20-cms-desk-interiors.md) | **Approved** (2026-08-20) | Desk interiors — I1 lists then I2 forms/admin/login; unify news/events/pubs onto `ContentListPage`; visual only |
-| [2026-08-21-spa-news-event-card-byline.md](./2026-08-21-spa-news-event-card-byline.md) | **Approved** (2026-08-21) | News+event cards: date stamp, editor, reviewer, publisher (Boufatah); news sorted by story date |
-| [2026-08-21-home-news-carousel.md](./2026-08-21-home-news-carousel.md) | **Approved** (2026-08-21) | Home Center News: 3-card paged autoplay, pause button, swipe/keyboard; `#news` unchanged |
-| [2026-08-21-home-featured-news-playlist.md](./2026-08-21-home-featured-news-playlist.md) | **Approved** (2026-08-21) | Home featured strip: curated news playlist max 10, four-eyes, fallback 3 newest |
+| [2026-08-20-cms-desk-interiors.md](./2026-08-20-cms-desk-interiors.md) | **Approved** — I1 **Delivered** on `main` (PR #31) | I1 lists + login bubbles; I2 forms/admin still follow-on |
+| [2026-08-21-wordpress-cms-spa-cutover.md](./2026-08-21-wordpress-cms-spa-cutover.md) | **Delivered** (2026-08-21) | WP → CMS/SPA owned types; `img/cms/` git-tracked; merged `b1c022c` |
+| [2026-08-21-spa-news-event-card-byline.md](./2026-08-21-spa-news-event-card-byline.md) | **Delivered** (2026-08-21) | News+event cards: date, editor, reviewer, publisher (Boufatah); news sorted by story date |
+| [2026-08-21-home-news-carousel.md](./2026-08-21-home-news-carousel.md) | **Delivered** (2026-08-21) | Home Center News: 3-card paged autoplay, pause, swipe/keyboard; `#news` unchanged |
+| [2026-08-21-home-featured-news-playlist.md](./2026-08-21-home-featured-news-playlist.md) | **Delivered** (2026-08-21) | Home featured strip: curated news playlist max 10, four-eyes; empty → 3 newest |
 
 ## Related
 

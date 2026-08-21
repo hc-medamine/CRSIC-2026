@@ -10,6 +10,7 @@ Project docs live under `docs/`. The root [README.md](../README.md) remains the 
 | [qa/SMOKE-CMS.md](./qa/SMOKE-CMS.md) | CMS smoke checklist + `npm run db:smoke` |
 | [qa/RTL-LTR.md](./qa/RTL-LTR.md) | RTL/LTR BiDi QA + logical-CSS authoring rules |
 | [runbooks/CMS-OPS.md](./runbooks/CMS-OPS.md) | CMS backup/restore, password reset, offboarding |
+| [runbooks/CMS-CUTOVER.md](./runbooks/CMS-CUTOVER.md) | Legacy JSON import policy (`db:import-legacy`); WP cutover already on `main` |
 | [audits/AUDIT.md](./audits/AUDIT.md) | Closed architecture audit (P0–P3) |
 | [audits/UIUX.md](./audits/UIUX.md) | UI/UX audit findings + fix log |
 | [audits/PARITY.md](./audits/PARITY.md) | AR/EN parity matrix (partial EN) |
@@ -29,7 +30,8 @@ docs/
 │   ├── SMOKE-CMS.md   # CMS smoke
 │   └── RTL-LTR.md     # RTL/LTR BiDi QA + authoring
 ├── runbooks/
-│   └── CMS-OPS.md     # CMS operations
+│   ├── CMS-OPS.md     # CMS operations
+│   └── CMS-CUTOVER.md # Legacy JSON import + live_payload policy
 ├── audits/
 │   ├── AUDIT.md       # Closed code audit
 │   ├── UIUX.md        # UI/UX audit log

@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | Approved |
+| Status | **Delivered** on `main` (Phases 1–3). Later slices (Desk, WP cutover, featured playlist) extend this PRD. Historical “implement on `feature/step4-internal-cms`” below is **archive** — use `feature/` branches from current `main`. |
 | Date | 2026-07-19 |
 | Author | Product discovery (CRSIC 2026) |
 | Owners | _(to be assigned — CRSIC + implementing team)_ |

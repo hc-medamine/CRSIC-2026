@@ -59,7 +59,7 @@ The public SPA has no application backend of its own; contact uses `mailto:`. Op
 | Auth / payments / email SaaS | **None**                                                         | Form opens the user’s mail client to `contact@crsic.dz` |
 | Monitoring                   | **None**                                                         | —                                                       |
 | Linters / formatters         | **None** (SPA)                                                   | No ESLint / Prettier at repo root                       |
-| Unit tests                   | Node built-in (`node --test`)                                    | `tests/*.test.mjs` (a11y Escape stack + `?lang=`); no CI |
+| Unit tests                   | Node built-in (`node --test`)                                    | `tests/*.test.mjs` (a11y, i18n, featured playlist, Home news pager); no CI |
 | Bundler                      | **None**                                                         | Browser loads ES modules directly                       |
 | Local serve                  | Live Server **5501** or `npm run spa` **5500**                   | `.vscode/settings.json` / root `package.json`           |
 
@@ -92,9 +92,10 @@ CRSIC 2026/
 ├── package.json               # Root convenience: `npm run spa` (static serve :5500)
 ├── index.html                 # Single HTML shell: all page sections, nav, footer, schema.org
 ├── cms/                       # Internal CMS (Next.js + PostgreSQL)
-│   ├── README.md              # Local CMS setup
+│   ├── README.md              # Local CMS setup (staff desks, publish, ops scripts)
 │   ├── package.json           # Next app deps + db:* scripts
 │   ├── .env.example           # Template only (no secrets)
+│   ├── sql/                   # Numbered Postgres migrations (001–029)
 │   └── src/                   # App Router (dashboard + API)
 ├── css/
 │   ├── style.css              # Design system, layout, animations (CSS variables in :root)
@@ -111,14 +112,21 @@ CRSIC 2026/
 │   ├── router.js              # hash navigation, PAGE_PARENT, deep links
 │   ├── safeBody.js            # sanitized rich-text body renderer (allowlist)
 │   ├── seoHead.js             # per-item title / meta / OG for detail pages
+│   ├── featuredNews.js        # Home featured playlist resolve (max 10; fallback 3 newest)
+│   ├── homeNewsPages.js       # Home Center News page slices (3 per page)
 │   ├── ui.js                  # render, filters, lightbox, contact form, drawer
 │   ├── utils.js               # DOM helpers, sanitizers, throttle/debounce
 │   └── components/            # Safe DOM card builders (no string innerHTML)
-│       ├── pubCard.js
+│       ├── catalogCard.js
+│       ├── contentByline.js   # news/event date + editor/reviewer/publisher
+│       ├── detailPage.js
 │       ├── eventCard.js
-│       ├── newsCard.js
+│       ├── featuredCarousel.js # Home featured news strip (#home-feat-carousel)
+│       ├── homeNewsCarousel.js # Home أخبار المركز 3-card pager
 │       ├── journalCard.js
-│       └── partnerCard.js
+│       ├── newsCard.js
+│       ├── partnerCard.js
+│       └── pubCard.js
 ├── data/                      # Runtime content (edit without touching JS; CMS publish target)
 │   ├── README.md              # Editor guide
 │   ├── CMS.md                 # CDN / remote JSON publish contract
@@ -135,7 +143,7 @@ CRSIC 2026/
 │   ├── research-groups.json   # Research teams (CMS-published)
 │   ├── research-projects.json # Research projects (CMS-published)
 │   └── locales/
-│       ├── ar.json            # Arabic UI chrome (~333 keys)
+│       ├── ar.json            # Arabic UI chrome (350 keys; must match EN)
 │       └── en.json            # English UI chrome (same keys)
 ├── img/
 │   ├── crsic_logo.png         # Brand / OG image
@@ -144,8 +152,9 @@ CRSIC 2026/
 │   ├── Hero/                  # Hero background videos (MP4, git-lfs)
 │   │   ├── hero-bg.mp4
 │   │   └── about-hero-bg.mp4
-│   ├── covers/                # Publication covers c00–c27, i00–i07
-│   └── Holders/               # News photos 0.jpg–5.jpg
+│   ├── cms/                   # CMS-published binaries (git-tracked; news/events/covers/…)
+│   ├── covers/                # Legacy publication covers c00–c27, i00–i07
+│   └── Holders/               # Placeholder photos 0.jpg–5.jpg
 ├── scripts/                   # One-off content / data scripts (backfill, smoke helpers)
 ├── vercel.json                # Vercel 301s for legacy /about
 ├── _redirects                 # Netlify 301s
@@ -163,7 +172,10 @@ CRSIC 2026/
 │   └── prds/
 │       ├── README.md          # PRD folder guide
 │       └── TEMPLATE.md        # Concise PRD template
-├── tests/                     # Node built-in tests (`node --test`)
+├── tests/                     # SPA unit tests (`npm test` → node --test tests/*.test.mjs)
+│   ├── a11y-i18n.test.mjs
+│   ├── featured-news.test.mjs
+│   └── home-news-carousel.test.mjs
 └── .vscode/
     └── settings.json          # Live Server port 5501
 ```
@@ -225,6 +237,9 @@ erDiagram
   PARTNERS ||--o{ PARTNER_INTL : intl
   JOURNALS ||--o{ JOURNAL : journals
   NEWS_FILE ||--o{ NEWS_ITEM : news
+  FEATURED_NEWS ||--o{ NEWS_ITEM : ordered_ids
+  LAWS_FILE ||--o{ LAW : laws
+  PLATFORMS_FILE ||--o{ PLATFORM : platforms
 ```
 
 #### `publications.json`
@@ -245,18 +260,19 @@ erDiagram
 | `intl` / `nat` | `object[]` | International vs national |
 | `day`, `month`, `year` | string | Display fragments (month often abbreviated Arabic) |
 | `title`, `type` | string | Title and event kind label |
-| `status` | `"done"` \| `"upcoming"` | Status badge |
-| `img` | string (optional) | Home teaser photo; if omitted, Holders `0`–`5` cycle |
-| `editor_ar` / `editor_en`, `reviewer_ar` / `reviewer_en`, `publisher_ar` / `publisher_en` | display names | Card byline (publisher is always Fariha Boufatah) |
+| `status` | `"upcoming"` \| `"ongoing"` \| `"done"` | Badge on SPA cards |
+| `img` | string (optional) | Teaser photo; CMS publish uses `img/cms/events/`; if omitted, Holders `0`–`5` cycle |
+| `editor_ar` / `editor_en`, `reviewer_ar` / `reviewer_en`, `publisher_ar` / `publisher_en` | display names | Card byline (publisher line is Fariha Boufatah; identical reviewer+publisher collapse to one line) |
 
-Home teaser `#home-events-grid` uses `getHomeEvents(3)` (intl + nat merged, newest first). Full events page still lists all items by year.
+Home teaser `#home-events-grid` uses `getHomeEvents(3)` (intl + nat merged, newest first). Full events page still lists all items by year. The Home **featured** strip (`#home-feat-carousel`) is **news**, not events.
 
 #### `partners.json`
 
-| Field                              | Type       |
-| ---------------------------------- | ---------- |
-| `nat` / `intl`                     | `object[]` |
-| `name`, `country`, `date`, `emoji` | strings    |
+| Field | Type |
+|-------|------|
+| `nat` / `intl` | `object[]` |
+| `name`, `country`, `date`, `emoji` | strings |
+| `summary_ar` / `summary_en`, `body_ar` / `body_en` | optional narrative (SPA card teaser + expandable detail) |
 
 #### `journals.json`
 
@@ -270,11 +286,27 @@ Home teaser `#home-events-grid` uses `getHomeEvents(3)` (intl + nat merged, newe
 
 | Field | Type |
 |-------|------|
-| `news[]` | objects |
-| `img` | path string or `null` |
+| `news[]` | objects, **story-date descending** (`date`) |
+| `id`, `slug` | public identity; deep link `#news/{slug}` |
+| `img` | path string or `null` (CMS: `img/cms/news/`) |
 | `label`, `title` | strings |
-| `date` | `YYYY-MM-DD` or `""` (story date; list is newest first) |
-| `editor_ar` / `editor_en`, `reviewer_ar` / `reviewer_en`, `publisher_ar` / `publisher_en` | display names only |
+| `summary`, `body` | plain text or sanitized HTML allowlist |
+| `date` | `YYYY-MM-DD` or `""` (story date; not CMS `live_at`) |
+| `editor_ar` / `editor_en`, `reviewer_ar` / `reviewer_en`, `publisher_ar` / `publisher_en` | display names only (no emails/ids) |
+
+Home **أخبار المركز** (`#home-news-grid`) pages **all** news, **3 cards per page**, 5s autoplay ([PRD](./docs/prds/2026-08-21-home-news-carousel.md)). `#news` listing is unchanged.
+
+#### `featured-news.json`
+
+| Field | Type |
+|-------|------|
+| `ids` | `string[]` — ordered public news `id`s, **max 10** |
+
+Empty array or missing file → Home featured strip shows **3 newest** news. CMS desk `/dashboard/featured-news` (four-eyes on the playlist). CTA `#news/{slug}`.
+
+#### `laws.json` / `platforms.json` / `director.json` / research
+
+See [data/CMS.md](./data/CMS.md). Hubs: `#laws`, `#platforms`. Details: `#law/{slug}`, `#platform/{slug}`, `#research-group/{slug}`, `#research-project/{slug}`. Director singleton feeds the About block.
 
 #### Locales
 
@@ -294,26 +326,27 @@ Flat maps `key → string` in `data/locales/ar.json` and `en.json`. Keys must st
 
 See [data/README.md](./data/README.md) for add-publication / add-event recipes.
 
-### 4.3 Current data description (as of README date)
+### 4.3 Current data description (as of 2026-08-21, `main` @ `b1c022c`)
 
-Approximate inventory of shipped content:
+Approximate inventory of **shipped public JSON** after WordPress cutover + Home playlist work:
 
-| Resource           | Count / contents                                                                      |
-| ------------------ | ------------------------------------------------------------------------------------- |
-| Publications       | **36** (`covers` ↔ `pubs`); ~28 collective (`c00`–`c27`) + 8 individual (`i00`–`i07`) |
-| Events             | **20** total across `intl` + `nat` (mostly `status: "done"`)                          |
-| Partners           | **11** — 3 international + 8 national                                                 |
-| Journals           | **4** — all link to `https://crsic.dz/ojsre/`                                         |
-| News               | **9** items (6 with `img/Holders/*.jpg`, 3 with `img: null`)                          |
-| Locale keys | **~333** per language (AR/EN key sets match) |
-| Alerts | `alerts.json` — 0 live items currently (schema: `items[]`, at most one live) |
-| Laws / Platforms | `laws.json` (3), `platforms.json` (3) — hubs + detail routes |
-| Research | `research-groups.json` (8 items), `research-projects.json` (1 item), `director.json` (singleton) |
+| Resource | Count / contents |
+|----------|------------------|
+| Publications | **36** (`covers` ↔ `pubs`); covers live under `img/cms/covers/` (legacy `img/covers/` still present) |
+| Events | **55** — 14 `intl` + 41 `nat` |
+| Partners | **17** — 5 international + 12 national |
+| Journals | **4** — all link to `https://crsic.dz/ojsre/` (OJS; not authored in CMS) |
+| News | **39** items (story-date sorted) |
+| Featured playlist | `featured-news.json` `{ ids: [] }` — empty → SPA fallback 3 newest news |
+| Locale keys | **350** per language (AR/EN key sets match) |
+| Alerts | `alerts.json` — 0 live items (`items[]`, at most one live) |
+| Laws / Platforms | `laws.json` (3), `platforms.json` (3) |
+| Research | `research-groups.json` (8), `research-projects.json` (1), `director.json` (singleton) |
 | Locale preference | `localStorage` `crsic_lang` + URL `?lang=ar\|en` |
-| Admin accounts     | **None** — no auth                                                                    |
-| Sample credentials | **None**                                                                              |
+| Public SPA auth | **None** |
+| CMS staff | Seeded people in Postgres — see [`cms/README.md`](./cms/README.md) (emails are login ids; passwords never in git) |
 
-**Hard-coded in HTML (not JSON):** hero copy (via i18n keys), about / mission / vision / values, organisational chart, research department tabs (`r1`–`r4`) and team descriptions. Home publications, **events**, and news teasers are JSON-driven.
+**Hard-coded in HTML (not JSON):** hero copy (via i18n keys), about / mission / vision / values, organisational chart. Research department tabs (`r1`–`r4`) load groups from `research-groups.json`. Home publications, events teaser, **featured news**, and Center News are JSON-driven.
 
 **Client-only persistence:**
 
@@ -347,7 +380,7 @@ flowchart LR
 - Rendering uses `createElement` / `textContent` and helpers in `js/utils.js` (`safeImageSrc`, `setTrustedBrHtml` for `<br>` only) to avoid XSS from content strings.
 - Contact “API”: `handleContactForm` builds `mailto:contact@crsic.dz?subject=…&body=…` — no HTTP POST.
 
-Remote publish contract (optional CDN / same JSON filenames): [data/CMS.md](./data/CMS.md). No external CMS — publishing will later be owned by an internal app (roadmap §10).
+Remote publish contract (optional CDN / same JSON filenames): [data/CMS.md](./data/CMS.md). **Internal CMS** (`cms/`) is the authoring app; it rebuilds these files on publish. Journals stay on OJS. No third-party/external CMS.
 
 ---
 
@@ -381,15 +414,16 @@ Hard rules:
 | Topic | Current state |
 |-------|----------------|
 | Repository | **On GitHub** — [hc-medamine/CRSIC-2026](https://github.com/hc-medamine/CRSIC-2026) |
-| Remote | `origin` → `https://github.com/hc-medamine/CRSIC-2026.git` (`main` tracks `origin/main`) |
-| Ignore rules | [`.gitignore`](./.gitignore) — OS junk, `.claude/`, secrets, optional `node_modules/` |
+| Remote | `origin` → `https://github.com/hc-medamine/CRSIC-2026.git` |
+| Default branch | `main` — cutover + Home playlist merged **2026-08-21** (`b1c022c`) |
+| Ignore rules | [`.gitignore`](./.gitignore) — OS junk, `.claude/`, secrets, `cms/uploads/`, `.next/`, optional `node_modules/` |
 | Tracked IDE hint | `.vscode/settings.json` (Live Server port 5501) is tracked; other `.vscode/*` ignored |
 | Changelog | [docs/WORKLOG.md](./docs/WORKLOG.md) — append new entries **at the top** |
-| Release process | Manual static deploy of project root; bump content by editing JSON or switching `CONTENT_BASE_URL` |
+| Release process | Merge to `main` (stakeholder-validated) → static deploy of project root; CMS `npm run db:migrate` on each environment; content via CMS publish or `CONTENT_BASE_URL` |
 | Coding standards | ES modules, named exports, JSDoc on public functions, no `innerHTML` assignment in `/js`, CSS variables for brand colours |
-| Lint / format | **None** yet |
-| PR template / issue board | **None** yet |
-| Area ownership | `/data` (editors), `/js`+`/css` (developers), `/img` (media) |
+| Lint / format | SPA: **none**. CMS: `cd cms && npm run lint` (eslint) |
+| PR template / issue board | **None** yet (`gh` CLI not required; merges may be local + `git push origin main`) |
+| Area ownership | `/data` + `img/cms/` (editors via CMS), `/js`+`/css` (developers), `/img` (media) |
 
 **PATH note (Windows):** Git lives at `C:\Program Files\Git\cmd\git.exe`. If `git` is not recognised in a terminal, add that `cmd` folder to the user PATH, or call git via the full path.
 
@@ -501,7 +535,8 @@ Do this yourself on the machine — project docs do not store credentials.
 
 | Mode | How |
 |------|-----|
-| Default | Edit files under `/data` + images under `/img` |
+| **CMS (owned types)** | Author in `cms/` → four-eyes → Publish rebuilds `data/*.json` and copies media to `img/cms/{bucket}/` (git-tracked) |
+| Hand edit | Edit files under `/data` + images under `/img` — only for types not in CMS (journals) or emergency; keep `covers.length === pubs.length` |
 | Optional remote | Set `CONTENT_BASE_URL` in `js/config.js` to a CDN/API base that serves the same filenames ([data/CMS.md](./data/CMS.md)) |
 
 Editors should follow [data/README.md](./data/README.md): UTF-8, valid JSON, no HTML in content strings, hard-refresh after edits if the host caches JSON.
@@ -510,20 +545,31 @@ Editors should follow [data/README.md](./data/README.md): UTF-8, valid JSON, no 
 
 Hash SPA. Default route: `#home` (or empty hash).
 
-| Hash            | Section id          | Purpose                                                  |
-| --------------- | ------------------- | -------------------------------------------------------- | ----- |
-| `#home`         | `page-home`         | Hero, stats, departments teaser, latest pubs/events/news |
-| `#news`         | `page-news`         | Full news list (Home “View all”)                         |
-| `#about`        | `page-about`        | Mission, vision, values, research axes                   |
-| `#org`          | `page-org`          | Organisational chart (nav parent: about)                 |
-| `#research`     | `page-research`     | Research tabs `r1`–`r4`                                  |
-| `#publications` | `page-publications` | Filters: all / collective / individual; search           |
-| `#events`       | `page-events`       | Tabs: `intl`                                             | `nat` |
-| `#cooperation`  | `page-cooperation`  | Partners (nav parent: events)                            |
-| `#journals`     | `page-journals`     | Journal cards                                            |
-| `#contact`      | `page-contact`      | Contact info + mailto form                               |
+| Hash | Section id | Purpose |
+|------|------------|---------|
+| `#home` | `page-home` | Hero, stats, featured news carousel, Center News pager, events teaser, pubs |
+| `#news` | `page-news` | Full news list (search + year chips) |
+| `#news/{slug}` | `page-detail` | News article |
+| `#about` | `page-about` | Mission, vision, values, director word, research axes |
+| `#org` | `page-org` | Organisational chart (nav parent: about) |
+| `#research` | `page-research` | Research tabs `r1`–`r4` (groups from JSON) |
+| `#research-group/{slug}` | `page-detail` | Research group |
+| `#research-project/{slug}` | `page-detail` | Research project |
+| `#publications` | `page-publications` | Filters: all / collective / individual; search |
+| `#publication/{slug}` | `page-detail` | Publication |
+| `#events` | `page-events` | Tabs: intl / nat |
+| `#event/{slug}` | `page-detail` | Event |
+| `#cooperation` | `page-cooperation` | Partners (nav parent: events) |
+| `#partner/{slug}` | `page-detail` | Partner |
+| `#journals` | `page-journals` | Journal cards (OJS links) |
+| `#laws` | `page-laws` | Laws hub |
+| `#law/{slug}` | `page-detail` | Law / decree |
+| `#platforms` | `page-platforms` | Platforms hub |
+| `#platform/{slug}` | `page-detail` | Platform |
+| `#contact` | `page-contact` | Contact info + mailto form |
+| `#preview/{token}` | `page-detail` | CMS A1 candidate (not live JSON) |
 
-**Parent nav mapping** (`PAGE_PARENT` in `js/router.js`): `org` → `about`, `research` → `about`, `cooperation` → `events`, `news` → `home`.
+**Parent nav mapping** (`PAGE_PARENT` in `js/router.js`): `org` → `about`, `research` → `about`, `cooperation` → `events`, `news` → `home`, `detail` → `home`.
 
 Deep links may pass `data-tab` / `data-filter` on navigable elements.
 
@@ -533,9 +579,11 @@ Deep links may pass `data-tab` / `data-filter` on navigable elements.
 - **Mobile:** drawer + bottom tab bar (home / publications / journals / events / more)
 - **Breadcrumb** bar (hidden on home)
 - **Publications / events / news (home):** JSON-filled (`#home-pub-grid`, `#home-events-grid`, `#home-news-grid`)
+- **Home featured strip** (`#home-feat-carousel`): curated news playlist (max 10) or 3 newest news; kicker/CTA news; `#news/{slug}`; pause/arrows/dots
+- **Home Center News** (`#home-news-grid`): all `news.json`, **3 cards/page**, 5s autoplay, header pause, swipe/keyboard; `#news` unchanged
 - **Home publications (mobile ≤768px):** `#home-pub-grid` is a horizontal CSS scroll-snap carousel (~82% card width + peek of the next card); tablet/desktop keep the multi-column `.pub-grid`. Full list via “View all publications” → `#publications`
 - **Publications page:** type filter + search; lightbox with cover and CTA to external library page; `#pub-grid` stays a responsive grid (not a carousel)
-- **Events / research:** tab switching; home shows 3 newest from `events.json`
+- **Events / research:** tab switching; home shows 3 newest from `events.json` (upcoming-events teaser — not the featured strip)
 - **Language:** AR (RTL) ↔ EN (LTR); `?lang=` + `localStorage`; optional banner for `en*`/`fr*` browsers
 - **Contact:** client-side required-field shake; success message; opens mail client
 - **A11y:** skip link, ARIA on nav/drawer/lightbox (focus trap), `prefers-reduced-motion` respected; touch devices skip decorative card tilt
@@ -560,8 +608,9 @@ Deep links may pass `data-tab` / `data-filter` on navigable elements.
 | `img/nav-crsic-logo.png` | Navbar                                       |
 | `img/crsic_flags.jpg`    | Hero background (fallback)                   |
 | `img/Hero/*.mp4`         | Hero background videos (home + about; git-lfs) |
-| `img/covers/*`           | Publication covers (lazy-loaded)             |
-| `img/Holders/*`          | News (and related) photography               |
+| `img/cms/{news,events,covers,partners,research,alerts,laws,platforms,site}/` | CMS-published public binaries (**tracked in git**) |
+| `img/covers/*` | Legacy publication covers |
+| `img/Holders/*` | Placeholder photography (carousel fallbacks) |
 | Fonts                    | Google Fonts CDN (Amiri display, Tajawal UI) |
 
 **Optimisation notes:** serve over HTTP/2 or a CDN; prefer WebP/AVIF in a future pass — not implemented today. Unused large assets (`crsic_door.jpg`, `Holders/6.jpg`, `nav-crsic-logo2.png`) were removed on 2026-07-16.
@@ -623,7 +672,8 @@ cd cms
 npm install
 # configure .env.local — see cms/README.md
 npm run db:seed:super-admin
-npm run dev   # http://localhost:3000
+npm run db:seed:staff          # real desks (optional after first SA)
+npm run dev                    # http://localhost:3000 — runs db:migrate (incl. 029 featured playlist)
 ```
 
 ### 7.5 Tests, lint, build
@@ -662,7 +712,13 @@ When `CONTENT_BASE_URL` is `https://cdn.example.com/crsic/`:
 | GET    | `partners.json`     | `{ nat: object[], intl: object[] }`    |
 | GET    | `journals.json`     | `{ journals: object[] }`               |
 | GET    | `news.json`         | `{ news: object[] }`                   |
-| GET    | `featured-news.json`| `{ ids: string[] }` (max 10; empty → fallback) |
+| GET    | `featured-news.json`| `{ ids: string[] }` (max 10; empty → 3 newest news) |
+| GET    | `alerts.json`       | `{ items: object[] }` (at most one live) |
+| GET    | `laws.json`         | `{ laws: object[] }`                   |
+| GET    | `platforms.json`    | `{ platforms: object[] }`              |
+| GET    | `research-groups.json` | `{ items: object[] }`               |
+| GET    | `research-projects.json` | `{ items: object[] }`             |
+| GET    | `director.json`     | director singleton                     |
 | GET    | `locales/ar.json`   | flat key → string                      |
 | GET    | `locales/en.json`   | flat key → string                      |
 
@@ -719,30 +775,38 @@ No separate staging config files exist in-repo.
 | — | Home pubs mobile horizontal carousel | **Done** on `main` |
 | — | Docs layout under `docs/` (+ PRD scaffold) | **Done** — [docs/README.md](./docs/README.md) |
 | — | Root Markdown stubs removed (README only at root) | **Done** |
-| 4 | Internal web app + database (users, roles, publish news/events/publications) — **no external CMS**, **no email features** | **On `main`** — core CMS + research groups/projects + authoring pack + [navigation & authoring UX](./docs/prds/2026-07-23-cms-navigation-authoring-ux.md) (M1–M3, PR #14). |
-| 5 | Motion & interactivity polish (SPA + CMS) | **Done on `main`** — [PRD](./docs/prds/2026-08-18-motion-interactivity-polish.md) M1–M4 merged phase-by-phase (PRs #24–#27) + docs PRs #22/#23; reduced-motion gated, zero new deps. |
-| — | CMS Desk (shell + dashboard home) | **Done on `main`** — [PRD](./docs/prds/2026-08-19-cms-desk-design.md) merged `25b15cc`. |
-| — | CMS Desk interiors (lists, forms, admin, login) | **Approved** — [PRD](./docs/prds/2026-08-20-cms-desk-interiors.md). I1 lists on `feature/cms-desk-interiors`; I2 after walkthrough. |
+| 4 | Internal web app + database (users, roles, publish) — **no external CMS**, **no email/SMTP** | **On `main`** — Next.js 16 + PostgreSQL 18; migrations through `029_site_featured_news.sql` |
+| 5 | Motion & interactivity polish (SPA + CMS) | **Done on `main`** — [PRD](./docs/prds/2026-08-18-motion-interactivity-polish.md) (PRs #24–#27) |
+| — | CMS Desk (shell + dashboard home) | **Done on `main`** — [PRD](./docs/prds/2026-08-19-cms-desk-design.md) (`25b15cc`) |
+| — | CMS Desk interiors (lists, forms, admin, login) | **I1 lists on `main`** (PR #31). I2 forms/admin still follow-on — [PRD](./docs/prds/2026-08-20-cms-desk-interiors.md) |
+| — | WordPress → CMS/SPA cutover (owned types) | **Done on `main`** (`b1c022c`) — [PRD](./docs/prds/2026-08-21-wordpress-cms-spa-cutover.md) |
+| — | News/event card bylines | **Done on `main`** — [PRD](./docs/prds/2026-08-21-spa-news-event-card-byline.md) |
+| — | Home Center News 3-card pager | **Done on `main`** — [PRD](./docs/prds/2026-08-21-home-news-carousel.md) |
+| — | Home featured news playlist (max 10, four-eyes) | **Done on `main`** — [PRD](./docs/prds/2026-08-21-home-featured-news-playlist.md). Empty live → 3 newest news |
 
 ### Known issues / gaps
 
 1. **Editorial content language** — pubs/events/news/partners/journals bodies are intentionally Arabic-only in EN UI (notice + switch); full bilingual schema **blocked pending approval** — see [docs/audits/PARITY.md](./docs/audits/PARITY.md).
 2. **Contact depends on a local mail client** — no server-side mailer or form API.
 3. **Audit TODOs are closed**; no `TODO`/`FIXME` markers remain in app JS for open defects.
+4. **Home featured playlist** is empty until Reviewer/SA publishes `/dashboard/featured-news` (SPA fallback is live).
+5. **CMS Desk I2** (forms/admin interiors) is not closed as a full slice.
 
 ### Technical debt
 
 | Priority | Item |
 |----------|------|
 | Medium | Dual-field or locale-keyed content if EN parity is required |
-| Medium | Further image compression / WebP for covers and Holders |
-| Low | Introduce linting/formatting once the team grows |
+| Medium | Further image compression / WebP for covers and `img/cms/` |
+| Low | Introduce SPA linting/formatting once the team grows |
 
-### Product direction (post–step 3.5)
+### Product direction
 
-Own **internal web app + database** (Node + local PostgreSQL): authenticated users with roles and publishing tasks (news, events, publications metadata). Public site remains the visitor face; no third-party/external CMS; **no email/SMTP features**. Development is local-first on `feature/step4-internal-cms`; go-live only when the product works with zero friction.
+Own **internal CMS + PostgreSQL** (`cms/`): authenticated users with roles and publishing tasks. Public site remains the visitor face; no third-party/external CMS; **no email/SMTP features**. Development continues on `feature/` \| `fix/` \| `content/` \| `docs/` branches; **never commit directly to `main`**. Go-live on `crsic.dz` only when ops say the product works with zero friction.
 
-Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Product spec: [docs/prds/2026-07-19-internal-content-management.md](./docs/prds/2026-07-19-internal-content-management.md).
+**CMS deferred backlog** (do not implement without a new Approved PRD): list pagination (~200-row trigger), bulk ops / clone / import-export UI, scheduled publish, recycle bin, media crop, EN body parity, journals in CMS, static institutional pages in CMS, CMS UI to reassign editor/reviewer/publisher (ops scripts already exist). See [docs/WORKLOG.md](./docs/WORKLOG.md) § Deferred backlog.
+
+Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Core spec: [docs/prds/2026-07-19-internal-content-management.md](./docs/prds/2026-07-19-internal-content-management.md).
 
 ---
 
@@ -750,7 +814,7 @@ Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Product spec:
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-08-20** (CMS Desk interiors PRD Approved; I1 in progress) |
+| Last updated     | **2026-08-21** (`main` merge `b1c022c` — WP cutover, bylines, Home news pager, featured playlist) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes

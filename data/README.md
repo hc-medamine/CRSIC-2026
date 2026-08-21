@@ -13,16 +13,20 @@ Project docs index: [docs/README.md](../docs/README.md).
 
 | File | Contents |
 |------|----------|
-| `publications.json` | CMS-published `pubs[]` (each item has `media[]`). `covers[]` is a derived parallel array for older consumers; the SPA reads each pub’s `media` first |
-| `events.json` | `intl[]` + `nat[]` events (detail: `id`, `slug`, `summary`, `body`, `media[]`) |
-| `partners.json` | `nat[]` + `intl[]` partners |
+| `publications.json` | CMS-published `pubs[]` (each item has `media[]`). `covers[]` is a derived parallel array; SPA reads each pub’s `media` first. **36** items; keep `covers.length === pubs.length` |
+| `events.json` | `intl[]` (14) + `nat[]` (41). Detail: `id`, `slug`, `summary`, `body`, `media[]`, `status` (`upcoming` \| `ongoing` \| `done`), bylines |
+| `partners.json` | `nat[]` (12) + `intl[]` (5); optional `summary_*` / `body_*` |
 | `alerts.json` | `items[]` — site-wide banner, at most one live item (empty array when none) |
 | `research-groups.json` | `items[]` — research groups by `orgUnitId` (CMS-published) |
-| `research-projects.json` | `items[]` — research projects with `groupId` (CMS-published); detail via `#research-project/{slug}` |
-| `journals.json` | `journals[]` |
-| `news.json` | `news[]` (detail: `id`, `slug`, `summary`, `body`, `media[]`, `date`, editor/reviewer/publisher names) |
-| `locales/ar.json` | Arabic UI chrome strings (flat key → string) |
-| `locales/en.json` | English UI chrome strings (same keys as `ar`) |
+| `research-projects.json` | `items[]` — research projects with `groupId`; detail `#research-project/{slug}` |
+| `journals.json` | `journals[]` — **not** CMS; OJS remains |
+| `news.json` | `news[]` (**39**, story-date desc). Detail: `id`, `slug`, `summary`, `body`, `media[]`, `date`, editor/reviewer/publisher names |
+| `featured-news.json` | `{ "ids": [] }` — ordered public news ids for Home `#home-feat-carousel`, max 10. Empty → 3 newest news |
+| `laws.json` | `laws[]` — hub `#laws`, detail `#law/{slug}` |
+| `platforms.json` | `platforms[]` — hub `#platforms`, detail `#platform/{slug}` |
+| `director.json` | About director singleton (CMS `/dashboard/director`) |
+| `locales/ar.json` | Arabic UI chrome (350 keys) |
+| `locales/en.json` | English UI chrome (same keys as `ar`) |
 
 ## Edit UI labels (i18n)
 
@@ -80,11 +84,11 @@ Append to `intl` or `nat` in `events.json`:
 }
 ```
 
-`status`: `"done"` or `"upcoming"`.  
-`img` / `media` come from CMS publish (`img/cms/events/`). If an event has no image, the featured carousel may fall back to `img/Holders/0.jpg`–`5.jpg`.  
+`status`: `"upcoming"` \| `"ongoing"` \| `"done"`.  
+`img` / `media` come from CMS publish (`img/cms/events/`). If an event has no image, cards may fall back to `img/Holders/0.jpg`–`5.jpg`.  
 Deep link: `#event/{slug}`.
 
-The home section `#home-events-grid` shows the **3 newest** events (intl + nat merged, sorted by date). The full events page still lists every item by year.
+The home section `#home-events-grid` shows the **3 newest** events (intl + nat merged, sorted by date). The full events page still lists every item by year. The Home **featured** strip is **news** (`featured-news.json`), not events.
 
 ## Add a site alert
 
@@ -123,6 +127,10 @@ Use `"items": []` when there is no active alert. `link` is optional (`null` or a
 ```
 
 Use `"img": null` when there is no photo. Deep link: `#news/{slug}`.
+
+Cards also show `date` plus editor / reviewer / publisher names when present.
+
+Home **أخبار المركز** pages all news **3 per page**. Home **featured** strip reads `featured-news.json` `ids` (max 10); empty list uses the 3 newest news.
 
 `media[]` entries: `{ "kind": "image"|"pdf", "src": "…", "alt": "optional" }`.
 

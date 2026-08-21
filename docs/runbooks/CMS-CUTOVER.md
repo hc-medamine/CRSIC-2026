@@ -5,6 +5,8 @@ existing (legacy) static cards.
 
 Related: [CMS-OPS.md](./CMS-OPS.md), [cms/README.md](../../cms/README.md), PRD Phase 1.
 
+**Status on `main` (2026-08-21):** WordPress → CMS/SPA owned-type cutover **already applied** (`b1c022c`). Public JSON + `img/cms/` in git match that run. Re-running `npm run db:cutover:wordpress -- --apply` is idempotent. This document still describes the **original** `db:import-legacy` path (static JSON → CMS rows) for a fresh database.
+
 ---
 
 ## 1. How publish drives the public JSON

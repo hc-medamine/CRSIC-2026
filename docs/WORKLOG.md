@@ -19,6 +19,18 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-21 — `main` is the live SSOT (cutover merge)
+
+Merged `feature/wordpress-cms-spa-cutover` → `main` (`b1c022c`) and pushed. A clone of `main` now has:
+
+- WordPress-owned-type cutover public JSON + `img/cms/` binaries
+- News/event bylines; Home Center News 3-card pager; Home featured **news** playlist (`data/featured-news.json`, CMS `/dashboard/featured-news`, SQL `029`)
+- Inventory: **39** news, **55** events, **36** pubs, **17** partners, **350** locale keys
+
+Docs refreshed to match. After clone: `cd cms && npm run db:migrate` (or `npm run dev`). Featured playlist live ids are still **empty** until Reviewer/SA publish — SPA fallback is 3 newest news.
+
+---
+
 ### 2026-08-21 — Home featured news playlist (max 10)
 
 Approved PRD: [prds/2026-08-21-home-featured-news-playlist.md](./prds/2026-08-21-home-featured-news-playlist.md). `#home-feat-carousel` is a CMS-curated news playlist (≤10), four-eyes on the playlist, empty live → 3 newest news. Upcoming events teaser unchanged. Desk: `/dashboard/featured-news`. Run `cms` `db:migrate` (`029_site_featured_news.sql`).

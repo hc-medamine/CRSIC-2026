@@ -1,15 +1,16 @@
 # CRSIC internal CMS (`cms/`)
 
-Next.js (App Router) admin app for Step 4 — see [docs/prds/2026-07-19-internal-content-management.md](../docs/prds/2026-07-19-internal-content-management.md).
+Next.js 16 (App Router) + React 19 + PostgreSQL 18 admin app. Lives on **`main`** (merged 2026-08-21, `b1c022c`). Spec: [docs/prds/2026-07-19-internal-content-management.md](../docs/prds/2026-07-19-internal-content-management.md).
 
 ## Local stack (locked)
 
 | Item | Value |
 |------|--------|
-| Framework | Next.js (App Router) |
+| Framework | Next.js 16 App Router + React 19 + Tailwind 4 |
 | Database | PostgreSQL 18 — database `crsic_db`, role `crsic_cms_app` |
-| Branch | `feature/step4-internal-cms` |
-| Email/SMTP | Not used |
+| Migrations | `cms/sql/001_*.sql` … `029_site_featured_news.sql` (auto on `dev` / `build`) |
+| Branch | Develop on `feature/` \| `fix/` — never commit directly to `main` |
+| Email/SMTP | Not used (email is login id only) |
 
 ## Setup
 
@@ -65,7 +66,7 @@ committed. Names are stored AR (authoritative) + EN.
 **Smoke accounts are test-only** (automation for `npm run db:smoke`), not real staff — keep but do
 not treat as people: `smoke.editor@crsic.dz`, `smoke.reviewer@crsic.dz`.
 
-## Content workflows (in progress)
+## Content workflows
 
 | Type | Status | Public snapshot |
 |------|--------|-----------------|
@@ -77,19 +78,20 @@ not treat as people: `smoke.editor@crsic.dz`, `smoke.reviewer@crsic.dz`.
 | Laws | Done | `data/laws.json` |
 | Platforms | Done | `data/platforms.json` |
 | Research groups / projects | Done | `data/research-groups.json`, `data/research-projects.json` |
-| Site director | Done | `data/director.json` (singleton, not `content_items`) |
+| Site director | Done | `data/director.json` (singleton `site_director`, not `content_items`) |
+| Home featured news | Done | `data/featured-news.json` (singleton `site_featured_news`; max 10 ids; four-eyes on the **playlist**) |
 
-Editors need the matching content-type scope (`news` / `event` / `publication`). Four-eyes: authors cannot approve their own items.
+Editors need the matching content-type scope. Four-eyes: authors cannot approve their own **content items**. Featured playlist: News Editor + SA + Reviewer can edit the draft; **only Reviewer or SA publish**.
 
 Public JSON is rebuilt from rows **where `live_payload IS NOT NULL`** (migration `010`), so:
 
 - **Publish** sets `live_payload` (P1 public object) + `status = published`.
 - **Unpublish** clears `live_payload` + `status = unpublished`.
-- **Create revision (public stays live)** sends a published item back to `draft` but **keeps**
-  `live_payload`, so the public site keeps serving the last published copy until the next publish.
+- **Create revision (public stays live)** sends a published item back to `draft` but **keeps** `live_payload`.
 
-Before the first production publish, import the existing static cards so nothing is lost — see
-[CMS-CUTOVER.md](../docs/runbooks/CMS-CUTOVER.md) and `npm run db:import-legacy`.
+**WordPress cutover (owned types) is already applied on `main`.** Re-run is idempotent: `npm run db:cutover:wordpress` (dry-run) then `-- --apply` after signing `tmp/wp-cutover-report.json`. Original JSON import: [CMS-CUTOVER.md](../docs/runbooks/CMS-CUTOVER.md) and `npm run db:import-legacy`.
+
+Desk: `/dashboard/featured-news` (next to News). After clone: `npm run db:migrate` so `029` exists. Empty live playlist → SPA shows 3 newest news.
 
 ### Operational features
 
@@ -108,6 +110,8 @@ Before the first production publish, import the existing static cards so nothing
 - Published files under `img/cms/` are **tracked in git** so clones get the same binaries the SPA serves
 - One-shot cutover (legacy `img/covers` / `img/Holders` → `img/cms/`): `npm run db:migrate:media-to-cms`
 - WordPress → CMS (owned types, dry-run first): `npm run db:cutover:wordpress` then `-- --apply` after signing `tmp/wp-cutover-report.json`
+- Reassign items to live desks: `npm run db:reassign:to-claims -- --apply`
+- Backfill news/event bylines: `npm run db:backfill:bylines`
 - Replace overwrites the **same** public path (library asks for confirm when the file is already on a published page)
 - Editors: own uploads in folders matching their content scopes. Reviewers: see scoped files; replace/delete only what they uploaded. Super Admin: all.
 - Staging: `cms/uploads/` (gitignored); UI: `/dashboard/media` and content forms
@@ -116,6 +120,19 @@ Before the first production publish, import the existing static cards so nothing
 - Automated smoke: `npm run db:smoke` — see [docs/qa/SMOKE-CMS.md](../docs/qa/SMOKE-CMS.md)
 - Ops runbook: [docs/runbooks/CMS-OPS.md](../docs/runbooks/CMS-OPS.md) (backup/restore, password reset, offboarding)
 - Revision history on each news/event/publication detail page (select + compare)
+
+## Ops scripts (`cd cms`)
+
+| Script | Role |
+|--------|------|
+| `npm run db:migrate` / `db:status` | Apply / list `sql/*.sql` |
+| `npm run db:seed:super-admin` | First login |
+| `npm run db:seed:staff` | Real people + desks |
+| `npm run db:import-legacy` | Static JSON → CMS rows (fresh DB) |
+| `npm run db:cutover:wordpress` | WP → CMS owned types (dry-run; `-- --apply`) |
+| `npm run db:reassign:to-claims -- --apply` | Item authorship follows live desks |
+| `npm run db:backfill:bylines` | Public byline names on news/events |
+| `npm run db:smoke` | Automated CMS smoke |
 
 ## Secrets
 
