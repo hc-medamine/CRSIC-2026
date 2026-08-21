@@ -6,6 +6,7 @@ import { canReview } from "@/lib/content/permissions";
 import { getContentMeta, getRevisionById } from "@/lib/content/revisions";
 import { assertNotAwayFrozen } from "@/lib/content/ooo";
 import { SEO_SNAPSHOT_COLUMNS } from "@/lib/content/seo";
+import { pruneFeaturedNewsItem } from "@/lib/content/featuredNews";
 
 export type ContentType =
   | "news"
@@ -294,6 +295,9 @@ export async function deleteContentItem(user: SessionUser, id: string): Promise<
   });
 
   await query(`DELETE FROM content_items WHERE id = $1`, [id]);
+  if (item.content_type === "news") {
+    await pruneFeaturedNewsItem(id);
+  }
   return item.content_type;
 }
 

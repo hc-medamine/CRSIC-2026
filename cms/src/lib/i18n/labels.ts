@@ -20,6 +20,7 @@ export const LABELS: LabelMap = {
   research: { en: "Research", ar: "البحث" },
   admin: { en: "Administration", ar: "الإدارة" },
   news: { en: "News", ar: "الأخبار" },
+  featuredNews: { en: "Home featured news", ar: "أخبار الصفحة الرئيسية المميزة" },
   events: { en: "Events", ar: "الفعاليات" },
   publications: { en: "Publications", ar: "المنشورات" },
   partners: { en: "Partners", ar: "الشراكات" },
@@ -67,6 +68,51 @@ export const LABELS: LabelMap = {
   directorMissingRow: {
     en: "Director record missing. Run database migrations.",
     ar: "سجل المدير غير موجود. نفّذوا ترحيلات قاعدة البيانات.",
+  },
+  featuredNewsTitle: { en: "Home featured playlist", ar: "قائمة الأخبار المميزة" },
+  featuredNewsPlaylist: { en: "Playlist", ar: "القائمة" },
+  featuredNewsHelp: {
+    en: "Choose up to 10 published news items for the Home featured carousel. Order here is the public order.",
+    ar: "اختاروا حتى 10 أخبار منشورة لشريط الصفحة الرئيسية. الترتيب هنا هو ترتيب العرض.",
+  },
+  featuredNewsCount: { en: "{n} of {max} items", ar: "{n} من {max} عناصر" },
+  featuredNewsEmpty: {
+    en: "No items yet. Add published news below, or publish an empty list to use the newest-three fallback.",
+    ar: "لا عناصر بعد. أضيفوا أخبارًا منشورة أدناه، أو انشروا قائمة فارغة لاستخدام أحدث ثلاثة أخبار.",
+  },
+  featuredNewsAdd: { en: "Add published news", ar: "إضافة خبر منشور" },
+  featuredNewsAddBtn: { en: "Add", ar: "إضافة" },
+  featuredNewsPickOne: { en: "Select a news item…", ar: "اختاروا خبرًا…" },
+  featuredNewsUp: { en: "Up", ar: "أعلى" },
+  featuredNewsDown: { en: "Down", ar: "أسفل" },
+  featuredNewsRemove: { en: "Remove", ar: "إزالة" },
+  featuredNewsMax: {
+    en: "The playlist already has 10 items. Remove one before adding another.",
+    ar: "القائمة تحتوي على 10 عناصر. أزيلوا عنصرًا قبل إضافة آخر.",
+  },
+  featuredNewsFallbackBanner: {
+    en: "Home is currently showing the three newest news items (no live playlist).",
+    ar: "الصفحة الرئيسية تعرض حاليًا أحدث ثلاثة أخبار (لا قائمة منشورة).",
+  },
+  featuredNewsNeedsReview: {
+    en: "A Reviewer or Super Admin must publish this playlist to the public site.",
+    ar: "يجب أن ينشر المراجع أو المشرف الأعلى هذه القائمة على الموقع.",
+  },
+  featuredNewsSaved: { en: "Featured playlist saved", ar: "حُفظت قائمة الأخبار المميزة" },
+  featuredNewsPublished: {
+    en: "Featured playlist published",
+    ar: "نُشرت قائمة الأخبار المميزة",
+  },
+  featuredNewsSaveFailed: { en: "Could not save the playlist", ar: "تعذّر حفظ القائمة" },
+  featuredNewsPublishFailed: { en: "Could not publish the playlist", ar: "تعذّر نشر القائمة" },
+  featuredNewsLastPublished: { en: "Last published", ar: "آخر نشر" },
+  featuredNewsNeverPublished: {
+    en: "Never published — Home uses the newest-three fallback.",
+    ar: "لم تُنشر بعد — الصفحة الرئيسية تستخدم أحدث ثلاثة أخبار.",
+  },
+  featuredNewsMissingRow: {
+    en: "Featured news record missing. Run database migrations.",
+    ar: "سجل الأخبار المميزة غير موجود. شغّلوا ترحيل قاعدة البيانات.",
   },
   mediaUploadTo: { en: "Upload to folder", ar: "الرفع إلى المجلد" },
   mediaSelectFolderToUpload: {

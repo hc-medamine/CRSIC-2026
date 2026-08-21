@@ -4,6 +4,7 @@
  * Callers use sync getters after await loadData().
  */
 import { contentUrl } from './config.js';
+import { normalizeFeaturedIds } from './featuredNews.js';
 
 /** @type {string[]} */
 let covers = [];
@@ -31,6 +32,8 @@ let laws = [];
 let platforms = [];
 /** @type {object | null} */
 let director = null;
+/** @type {string[]} */
+let featuredNewsIds = [];
 
 /** @type {Record<string, string>} resource key → error message */
 const loadErrors = {};
@@ -53,17 +56,23 @@ async function fetchJson(relativePath) {
 
 /**
  * Soft-load one resource; on failure record error and leave cache empty for that resource.
+ * Optional resources (empty playlist) must not trip the Home data-error banner.
  * @param {string} key
  * @param {string} relativePath
  * @param {(data: object) => void} apply
+ * @param {{ optional?: boolean }} [opts]
  */
-async function loadResource(key, relativePath, apply) {
+async function loadResource(key, relativePath, apply, opts) {
   try {
     const data = await fetchJson(relativePath);
     apply(data);
     delete loadErrors[key];
   } catch (err) {
     console.error(`[data] Failed to load ${relativePath}:`, err);
+    if (opts && opts.optional) {
+      delete loadErrors[key];
+      return;
+    }
     loadErrors[key] = err && err.message ? err.message : String(err);
   }
 }
@@ -119,6 +128,14 @@ export function loadData() {
             ? data
             : null;
       }),
+      loadResource(
+        'featuredNews',
+        'featured-news.json',
+        (data) => {
+          featuredNewsIds = normalizeFeaturedIds(data && data.ids);
+        },
+        { optional: true },
+      ),
     ]);
 
     loaded = true;
@@ -265,6 +282,11 @@ export function getJournals() {
 /** @returns {object[]} */
 export function getNews() {
   return news;
+}
+
+/** Ordered ids from featured-news.json (may be empty → SPA fallback). */
+export function getFeaturedNewsIds() {
+  return featuredNewsIds;
 }
 
 /** @returns {object[]} */

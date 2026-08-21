@@ -124,6 +124,7 @@ CRSIC 2026/
 │   ├── CMS.md                 # CDN / remote JSON publish contract
 │   ├── alerts.json            # Site-wide alert (CMS-published)
 │   ├── director.json          # About director block (CMS-published)
+│   ├── featured-news.json     # Home featured playlist ids (CMS-published)
 │   ├── events.json
 │   ├── journals.json
 │   ├── laws.json              # Laws hub + detail (CMS-published)
@@ -661,6 +662,7 @@ When `CONTENT_BASE_URL` is `https://cdn.example.com/crsic/`:
 | GET    | `partners.json`     | `{ nat: object[], intl: object[] }`    |
 | GET    | `journals.json`     | `{ journals: object[] }`               |
 | GET    | `news.json`         | `{ news: object[] }`                   |
+| GET    | `featured-news.json`| `{ ids: string[] }` (max 10; empty → fallback) |
 | GET    | `locales/ar.json`   | flat key → string                      |
 | GET    | `locales/en.json`   | flat key → string                      |
 

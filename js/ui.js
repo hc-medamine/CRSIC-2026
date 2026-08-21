@@ -129,7 +129,9 @@ export function showDataLoadErrors(errors) {
     ids.forEach((id) => {
       const node = document.getElementById(id);
       if (node && !node.children.length) {
-        replaceChildren(node, [el('div', { className: 'data-load-error', text: label })]);
+        replaceChildren(node, [
+          el('div', { className: 'data-load-error', text: t('data_load_error') }),
+        ]);
         node.dataset.loaded = '1';
       }
     });

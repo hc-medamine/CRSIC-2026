@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-21 — Home featured news playlist (max 10)
+
+Approved PRD: [prds/2026-08-21-home-featured-news-playlist.md](./prds/2026-08-21-home-featured-news-playlist.md). `#home-feat-carousel` is a CMS-curated news playlist (≤10), four-eyes on the playlist, empty live → 3 newest news. Upcoming events teaser unchanged. Desk: `/dashboard/featured-news`. Run `cms` `db:migrate` (`029_site_featured_news.sql`).
+
+---
+
 ### 2026-08-21 — Home news carousel: 3 cards per page
 
 Stakeholder: Home **أخبار المركز** is one row of 3 (not 6). 39 items → 13 pages. [prds/2026-08-21-home-news-carousel.md](./prds/2026-08-21-home-news-carousel.md).

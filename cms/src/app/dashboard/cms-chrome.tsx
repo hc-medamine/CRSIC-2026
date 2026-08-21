@@ -166,10 +166,20 @@ export function CmsChrome({
     };
   }, [lang, dir]);
 
-  const centreItems = useMemo(
-    () => CENTRE.filter((i) => i.contentType && allowed.has(i.contentType)),
-    [allowed],
-  );
+  const centreItems = useMemo(() => {
+    const items = CENTRE.filter((i) => i.contentType && allowed.has(i.contentType));
+    if (allowed.has("news")) {
+      const newsIndex = items.findIndex((i) => i.key === "news");
+      const insertAt = newsIndex >= 0 ? newsIndex + 1 : items.length;
+      items.splice(insertAt, 0, {
+        key: "featuredNews",
+        href: "/dashboard/featured-news",
+        contentType: "news",
+        icon: <IconGlobe />,
+      });
+    }
+    return items;
+  }, [allowed]);
   const researchItems = useMemo(
     () => RESEARCH.filter((i) => i.contentType && allowed.has(i.contentType)),
     [allowed],

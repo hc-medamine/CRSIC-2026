@@ -19,6 +19,7 @@ When `CONTENT_BASE_URL` is set (e.g. `https://cdn.example.com/crsic/`), the app 
 | `research-groups.json` | `{ "items": object[] }` — `id`, `slug`, `orgUnitId`, `name_ar`/`name_en`, `summary_*`, optional `lead_*` / `members` |
 | `research-projects.json` | `{ "items": object[] }` — `id`, `slug`, `orgUnitId`, `groupId`, title/lead/dibaja/questions/duration AR+EN, `axes[]`/`impacts[]` (`{ar,en?}`), optional SEO |
 | `director.json` | singleton `{ quote_ar, quote_en, name_ar, name_en, role_ar, role_en, portrait, portrait_alt_ar?, portrait_alt_en? }` — About director block; CMS publish (`/dashboard/director`). Soft-fail: SPA keeps locale placeholders if missing. |
+| `featured-news.json` | `{ "ids": string[] }` — ordered public news ids for Home `#home-feat-carousel`, max 10. Empty or all missing → SPA shows 3 newest news. CMS: `/dashboard/featured-news`. |
 | `locales/ar.json` | flat key → string |
 | `locales/en.json` | flat key → string |
 
