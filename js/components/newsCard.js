@@ -3,6 +3,7 @@
  */
 import { cmsItemImageSrc } from '../data.js';
 import { el, safeImageSrc } from '../utils.js';
+import { createContentByline } from './contentByline.js';
 
 const GRADIENTS = [
   'linear-gradient(135deg,#1B4332,#2D6A4F)',
@@ -66,6 +67,12 @@ export function createNewsCard(n, i) {
   }
 
   const slug = n.slug || n.id || '';
+  const year = String(n.date || '').slice(0, 4);
+  const haystack = [n.title, n.label, n.summary, n.editor_ar, n.editor_en, n.reviewer_ar, n.date]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  const byline = createContentByline(n, { includeDate: true });
   return el('article', {
     className: 'news-card news-card--link',
     attrs: slug
@@ -74,8 +81,13 @@ export function createNewsCard(n, i) {
           tabindex: 0,
           'data-lightbox-type': 'news',
           'data-lightbox-slug': slug,
+          'data-year': /^\d{4}$/.test(year) ? year : '',
+          'data-q': haystack,
         }
-      : {},
+      : {
+          'data-year': /^\d{4}$/.test(year) ? year : '',
+          'data-q': haystack,
+        },
     children: [
       el('div', { className: 'card-media', children: [mediaChild] }),
       el('div', {
@@ -83,7 +95,8 @@ export function createNewsCard(n, i) {
         children: [
           el('div', { className: 'news-label', text: n.label || '' }),
           el('div', { className: 'news-title card-title', text: n.title || '' }),
-        ],
+          byline,
+        ].filter(Boolean),
       }),
     ],
   });

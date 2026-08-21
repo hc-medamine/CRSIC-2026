@@ -3,6 +3,7 @@
  */
 import { t } from '../i18n.js';
 import { el } from '../utils.js';
+import { createContentByline } from './contentByline.js';
 
 /** Short month labels in events.json → longer Arabic display for home cards. */
 const MONTH_DISPLAY_AR = {
@@ -83,6 +84,7 @@ export function createHomeEventCard(e, i = 0) {
           el('span', { className: badgeClass, text: badgeText }),
           el('div', { className: 'event-row-type', text: type }),
           el('div', { className: 'event-row-title', text: title }),
+          createContentByline(e, { includeDate: false }),
           el('div', {
             className: 'event-row-meta',
             children: [
@@ -148,6 +150,7 @@ export function createEvCard(e) {
         children: [
           el('div', { className: 'ev-type', text: e.type || '' }),
           el('div', { className: 'ev-title', text: e.title || '' }),
+          createContentByline(e, { includeDate: false }),
           pill,
         ],
       }),

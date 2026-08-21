@@ -14,19 +14,21 @@ export function createPubCard(p, i) {
   const cover = safeImageSrc(coverSrcFromPub(p, i));
   const badge = p.type === 'collective' ? t('badge_collective') : t('badge_individual');
 
-  const img = el('img', {
-    attrs: {
-      src: cover,
-      alt: p.t || '',
-      loading: 'lazy',
-    },
-    style: {
-      width: '100%',
-      height: '100%',
-      'object-fit': 'cover',
-      display: 'block',
-    },
-  });
+  const img = cover
+    ? el('img', {
+        attrs: {
+          src: cover,
+          alt: p.t || '',
+          loading: 'lazy',
+        },
+        style: {
+          width: '100%',
+          height: '100%',
+          'object-fit': 'cover',
+          display: 'block',
+        },
+      })
+    : el('div', { className: 'pub-cover-empty', attrs: { 'aria-hidden': 'true' } });
 
   const slug = p.slug || p.id || '';
   return el('article', {

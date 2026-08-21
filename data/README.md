@@ -20,7 +20,7 @@ Project docs index: [docs/README.md](../docs/README.md).
 | `research-groups.json` | `items[]` — research groups by `orgUnitId` (CMS-published) |
 | `research-projects.json` | `items[]` — research projects with `groupId` (CMS-published); detail via `#research-project/{slug}` |
 | `journals.json` | `journals[]` |
-| `news.json` | `news[]` (detail: `id`, `slug`, `summary`, `body`, `media[]`) |
+| `news.json` | `news[]` (detail: `id`, `slug`, `summary`, `body`, `media[]`, `date`, editor/reviewer/publisher names) |
 | `locales/ar.json` | Arabic UI chrome strings (flat key → string) |
 | `locales/en.json` | English UI chrome strings (same keys as `ar`) |
 

@@ -19,6 +19,48 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-21 — Byline: collapse identical reviewer + publisher
+
+When المراجعة and النشر are the same person, the SPA shows one line (**المراجعة والنشر** / **Reviewer & Publisher**) instead of repeating the name.
+
+---
+
+### 2026-08-21 — News list search/year filter + card byline
+
+`#page-news` has a search box and year chips (same toolbar pattern as publications). Approved byline PRD: news/event cards and details show date (news) plus التحرير / المراجعة / النشر. Publisher is always فريحة بوفاتح / Fariha Boufatah. Backfill: `cd cms && npm run db:backfill:bylines -- --apply`.
+
+---
+
+### 2026-08-21 — News list page (`#news`)
+
+Home “Center News / View all” pointed at `#home-news-grid`, which the router treated as a missing page. It now opens `#page-news` with the full news grid. `#home-news-grid` aliases to `#news`.
+
+---
+
+### 2026-08-21 — News/event card byline PRD **Approved**
+
+**PRD:** [prds/2026-08-21-spa-news-event-card-byline.md](./prds/2026-08-21-spa-news-event-card-byline.md) — status **Approved**.
+
+**Locked for draft:** news + event cards (Home + lists, details should match); news date = WP article date if imported else CMS `published_at`, list sorted by that date; events keep occurrence day/month/year; التحرير/المراجعة from CMS names; النشر always Boufatah.
+
+---
+
+### 2026-08-21 — WordPress cutover `--apply`
+
+**PRD:** [prds/2026-08-21-wordpress-cms-spa-cutover.md](./prds/2026-08-21-wordpress-cms-spa-cutover.md).
+
+Applied 98/100 planned rows (author = scoped editor, publisher = Boufatah). Public JSON rebuilt. Two platform payloads failed on empty WP media then were repaired by keeping existing `img/cms/platforms` files. Publications/laws unchanged (no WP listing). DB dump: `tmp/crsic_db-pre-wp-cutover-*.dump`. JSON copy under `tmp/wp-cutover-*/json/`.
+
+---
+
+### 2026-08-21 — WordPress cutover script (dry-run first)
+
+**PRD:** [prds/2026-08-21-wordpress-cms-spa-cutover.md](./prds/2026-08-21-wordpress-cms-spa-cutover.md) (Approved).
+
+Ops CLI: `cd cms && npm run db:cutover:wordpress` scrapes known WP hubs on `crsic.dz`, matches type+title/slug, writes `tmp/wp-cutover-report.json`. `--apply` only after sign-off (author = scoped editor, publisher = Boufatah). Publication JSON may now carry an empty cover string when WP has no image (SPA omits `img` src).
+
+---
+
 ### 2026-08-21 — WordPress → CMS/SPA cutover PRD **Approved**
 
 **PRD:** [prds/2026-08-21-wordpress-cms-spa-cutover.md](./prds/2026-08-21-wordpress-cms-spa-cutover.md) — status **Approved**.

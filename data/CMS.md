@@ -22,7 +22,7 @@ When `CONTENT_BASE_URL` is set (e.g. `https://cdn.example.com/crsic/`), the app 
 | `locales/ar.json` | flat key → string |
 | `locales/en.json` | flat key → string |
 
-SPA deep links (hash): `#news/{slug}`, `#event/{slug}`, `#publication/{slug}`, `#research-project/{slug}`, `#law/{slug}`, `#platform/{slug}`. Preview (CMS A1): `#preview/{token}` — SPA fetches a short-lived candidate payload from `{PREVIEW_API_BASE}/api/public/preview/{token}` (see `js/config.js`). Does not touch live JSON.
+SPA deep links (hash): `#news` (list), `#news/{slug}`, `#event/{slug}`, `#publication/{slug}`, `#research-project/{slug}`, `#law/{slug}`, `#platform/{slug}`. Preview (CMS A1): `#preview/{token}` — SPA fetches a short-lived candidate payload from `{PREVIEW_API_BASE}/api/public/preview/{token}` (see `js/config.js`). Does not touch live JSON.
 
 Set CMS `PUBLIC_SITE_URL` to the SPA origin so “Open public preview” opens the right tab. Set SPA `PREVIEW_API_BASE` to the CMS origin when they differ.
 

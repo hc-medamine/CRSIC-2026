@@ -18,6 +18,7 @@ import {
   getResearchProjectsForGroup,
 } from '../data.js';
 import { applyItemSeoHead, restoreSiteSeoHead } from '../seoHead.js';
+import { createContentByline } from './contentByline.js';
 
 /**
  * @param {object[]} media
@@ -157,7 +158,7 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
 
   if (item && opts.isPreview) {
     if (type === 'news') {
-      backPage = 'home';
+      backPage = 'news';
       title = item.title || '';
       metaLine = item.label || '';
       summary = item.summary || '';
@@ -188,7 +189,7 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
     }
   } else if (type === 'news') {
     item = findNewsByKey(slugOrId);
-    backPage = 'home';
+    backPage = 'news';
     if (item) {
       title = item.title || '';
       metaLine = item.label || '';
@@ -277,6 +278,9 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
           ? el('p', { className: 'detail-meta', text: metaLine })
           : null,
         el('h1', { className: 'detail-title section-title', text: title }),
+        type === 'news' || type === 'event'
+          ? createContentByline(item, { includeDate: type === 'news' })
+          : null,
       ].filter(Boolean),
     }),
   );

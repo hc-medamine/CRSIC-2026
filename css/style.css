@@ -1904,6 +1904,42 @@ a.partner-card-link:hover { border-color: var(--green-deep); }
   overflow: hidden;
 }
 
+.card-byline {
+  margin-top: 0.55rem;
+  font-size: 11px;
+  color: var(--text-subtle);
+  line-height: 1.55;
+}
+.card-byline-date {
+  display: block;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 0.28rem;
+}
+.card-byline-people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.9rem;
+}
+.card-byline-role {
+  color: var(--gold);
+  font-weight: 600;
+  margin-inline-end: 0.28rem;
+}
+.card-byline-name {
+  color: var(--text-body);
+}
+.event-row-body .card-byline,
+.ev-body .card-byline {
+  margin-top: 0.4rem;
+}
+#lb-byline .card-byline {
+  margin-top: 0.45rem;
+}
+.detail-header .card-byline {
+  margin-top: 0.7rem;
+}
+
 /* ── CONTACT FORM ───────────────────────────────────── */
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .form-group { display: flex; flex-direction: column; gap: 6px; }

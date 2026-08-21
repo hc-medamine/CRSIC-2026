@@ -3,7 +3,7 @@ import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { appendWorkflowComment } from "@/lib/content/comments";
-import { buildEventPayload, rebuildPublicEventsJson } from "@/lib/publish/eventsJson";
+import { buildEventPayloadForItem, rebuildPublicEventsJson } from "@/lib/publish/eventsJson";
 import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 import { normalizeAttachments, type PublicMediaItem } from "@/lib/publish/media";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
@@ -460,7 +460,7 @@ export async function publishEvent(user: SessionUser, id: string) {
     titleAr: existing.title_ar,
     existingSlug: existing.public_slug,
   });
-  const payload = buildEventPayload({ ...existing, public_slug: slug });
+  const payload = await buildEventPayloadForItem({ ...existing, public_slug: slug });
   const item = await mutateThenRebuildPublic({
     itemId: id,
     mutate: async () => {

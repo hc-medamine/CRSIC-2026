@@ -12,8 +12,8 @@ import { contentPathSegment, type ContentType } from "@/lib/content/lifecycle";
 import { getNewsById } from "@/lib/content/news";
 import { getEventById } from "@/lib/content/events";
 import { getPublicationById } from "@/lib/content/publications";
-import { buildNewsPayload, rebuildPublicNewsJson } from "@/lib/publish/newsJson";
-import { buildEventPayload, rebuildPublicEventsJson } from "@/lib/publish/eventsJson";
+import { buildNewsPayloadForItem, rebuildPublicNewsJson } from "@/lib/publish/newsJson";
+import { buildEventPayloadForItem, rebuildPublicEventsJson } from "@/lib/publish/eventsJson";
 import {
   buildPublicationPayload,
   rebuildPublicPublicationsJson,
@@ -143,7 +143,7 @@ export async function emergencyPublish(
       titleAr: existing.title_ar,
       existingSlug: existing.public_slug,
     });
-    const payload = buildNewsPayload({ ...existing, public_slug: slug });
+    const payload = await buildNewsPayloadForItem({ ...existing, public_slug: slug });
     const published = await mutateThenRebuildPublic({
       itemId: item.id,
       mutate: async () => {
@@ -188,7 +188,7 @@ export async function emergencyPublish(
       titleAr: existing.title_ar,
       existingSlug: existing.public_slug,
     });
-    const payload = buildEventPayload({ ...existing, public_slug: slug });
+    const payload = await buildEventPayloadForItem({ ...existing, public_slug: slug });
     await mutateThenRebuildPublic({
       itemId: item.id,
       mutate: async () => {

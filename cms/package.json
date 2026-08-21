@@ -29,6 +29,8 @@
 
     "db:import:laws-platforms": "node --env-file=.env.local --import tsx scripts/import-laws-platforms.ts",
     "db:migrate:media-to-cms": "node --env-file=.env.local --import tsx scripts/migrate-public-media-into-cms.ts",
+    "db:cutover:wordpress": "node --env-file=.env.local --import tsx scripts/cutover-from-wordpress.ts",
+    "db:backfill:bylines": "node --env-file=.env.local --import tsx scripts/backfill-news-event-bylines.ts",
     "db:reassign-legacy-authorship": "node --env-file=.env.local --import tsx scripts/reassign-legacy-authorship.ts",
     "db:set-legacy-publisher-boufatah": "node --env-file=.env.local --import tsx scripts/set-legacy-publisher-boufatah.ts",
     "db:reassign:partners-people": "node --env-file=.env.local --import tsx scripts/reassign-partners-people.ts"

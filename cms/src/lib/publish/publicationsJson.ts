@@ -4,7 +4,6 @@ import { query } from "@/lib/db";
 import {
   buildMediaList,
   primaryImageSrc,
-  type PublicMediaItem,
 } from "@/lib/publish/media";
 import { slugifyTitle, uniqueSlug } from "@/lib/publish/slug";
 import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
@@ -49,10 +48,7 @@ export function buildPublicationPayload(
   usedSlugs?: Set<string>,
 ): StoredPubPayload {
   const media = buildMediaList(row.attachments, row.image_path, row.image_alt_ar);
-  const cover = primaryImageSrc(media)?.trim() || row.image_path?.trim();
-  if (!cover) {
-    throw new Error(`Publication "${row.title_ar}" is missing a cover path`);
-  }
+  const cover = primaryImageSrc(media)?.trim() || row.image_path?.trim() || "";
   const base = row.public_slug?.trim() || slugifyTitle(row.title_ar);
   const slug = usedSlugs ? uniqueSlug(base, usedSlugs) : base;
   if (usedSlugs) usedSlugs.add(slug);
@@ -67,7 +63,7 @@ export function buildPublicationPayload(
       desc: summary,
       summary,
       body: sanitizeBodyHtml(row.body_ar) || "",
-      media: (media.length > 0 ? media : [{ kind: "image", src: cover }]) as PublicMediaItem[],
+      media,
     },
     row,
   );
@@ -98,10 +94,7 @@ export async function rebuildPublicPublicationsJson(): Promise<{
   for (const row of result.rows) {
     const p = row.live_payload;
     const media = buildMediaList(p.media, p.cover, undefined);
-    const cover = primaryImageSrc(media)?.trim() || p.cover?.trim();
-    if (!cover) {
-      throw new Error(`Live publication "${p.t}" is missing cover path`);
-    }
+    const cover = primaryImageSrc(media)?.trim() || p.cover?.trim() || "";
     const summary = p.summary?.trim() || p.desc?.trim() || "";
     pubs.push({
       id: p.id || `legacy-publication-${p.slug || slugifyTitle(p.t || "item")}`,
@@ -112,7 +105,7 @@ export async function rebuildPublicPublicationsJson(): Promise<{
       desc: summary,
       summary,
       body: p.body?.trim() || "",
-      media: media.length > 0 ? media : [{ kind: "image", src: cover }],
+      media,
       ...seoFromRow(p),
     });
     covers.push(cover);

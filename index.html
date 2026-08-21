@@ -385,7 +385,7 @@
         <div class="section-shell">
           <div class="section-header">
             <h2 class="section-title" data-i18n="home_news_section">أخبار المركز</h2>
-            <a class="section-link" href="#home-news-grid" data-i18n="home_view_all_news">عرض الكل</a>
+            <a class="section-link" href="#news" data-page="news" data-i18n="home_view_all_news">عرض كل الأخبار</a>
           </div>
           <div class="g3 news-grid" id="home-news-grid"></div>
         </div>
@@ -403,6 +403,43 @@
       </section>
 
     </section><!-- /page-home -->
+
+
+    <!-- ▌ PAGE: NEWS ▐ -->
+    <section class="page" id="page-news">
+      <div class="page-hero">
+        <div class="page-hero-inner">
+          <div class="page-hero-tag" data-i18n="news_hero_tag">مستجدات المركز وأنشطته</div>
+          <h1 data-i18n="news_hero_h1">أخبار المركز</h1>
+          <p data-i18n="news_hero_p">أخبار وأنشطة مركز البحث في العلوم الإسلامية والحضارة.</p>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="section-shell">
+          <div class="pub-toolbar" id="news-toolbar">
+            <div class="pub-search-wrap">
+              <span class="pub-search-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16"
+                  fill="none">
+                  <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.3" />
+                  <path d="M10 10L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+                </svg></span>
+              <input class="pub-search-input" type="search" id="news-search" data-i18n-placeholder="news_search_ph"
+                placeholder="ابحث في الأخبار..." data-i18n-aria="aria_news_search" aria-label="بحث في الأخبار"
+                autocomplete="off">
+            </div>
+            <div class="dept-tabs" id="news-year-filter" role="group" data-i18n-aria="aria_news_year_filters"
+              aria-label="تصفية حسب السنة">
+              <button type="button" class="dept-tab active" data-news-year="all" data-i18n="filter_all">الكل</button>
+            </div>
+          </div>
+          <div class="pub-count" id="news-count"></div>
+          <div class="g3 news-grid" id="news-grid" data-i18n-aria="aria_news_grid" aria-label="أخبار المركز"></div>
+          <div class="empty-state catalog-empty hidden" id="news-empty">
+            <p data-i18n="news_empty">لا توجد أخبار منشورة بعد.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
 
     <!-- ▌ PAGE: ABOUT ▐ -->
@@ -1165,6 +1202,7 @@
             <span class="lightbox-dept-badge" id="lb-dept"></span>
             <div class="lightbox-title" id="lb-title"></div>
             <div class="lightbox-year" id="lb-year"></div>
+            <div id="lb-byline"></div>
           </div>
         </div>
         <div class="lightbox-body">
