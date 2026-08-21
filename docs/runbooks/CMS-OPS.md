@@ -29,7 +29,7 @@ CMS writes:
 | Location | Role |
 |----------|------|
 | `cms/uploads/` | Staging copy (gitignored) |
-| `img/cms/news\|events\|covers/` | Public paths used by the SPA (gitignored binaries) |
+| `img/cms/{bucket}/` | Published public paths used by the SPA (**tracked in git**) |
 
 Backup both trees together with the DB dump (same timestamp):
 
@@ -66,7 +66,7 @@ npm run db:status
 
 ### Media
 
-Unzip the matching media archive over the repo so `cms/uploads/` and `img/cms/` match the restored DB `media_assets.public_path` rows.
+Published `img/cms/` files are tracked in git. Restore `cms/uploads/` from the matching media zip so staging copies exist; copy any missing `img/cms/` binaries from that zip if they were never committed.
 
 ### Public JSON
 
@@ -81,7 +81,23 @@ Or restore from the dated JSON folder taken in §1.
 
 ---
 
-## 3. Super Admin password reset (no email)
+## 3. Public card byline (news / events)
+
+Public news and event cards always credit **فريحة بوفاتح / Fariha Boufatah** as الناشر / Publisher, even if another Reviewer later publishes. That is locked in [the byline PRD](../prds/2026-08-21-spa-news-event-card-byline.md) until a later PRD changes it.
+
+After importing or reassigning authors, refresh public JSON:
+
+```powershell
+cd cms
+npm run db:backfill:bylines            # dry-run
+npm run db:backfill:bylines -- --apply
+```
+
+News story dates for WordPress-imported rows come from WP `article:published_time` (stored on `live_payload`), not from CMS `live_at`. New CMS publishes use `published_at` (date part).
+
+---
+
+## 4. Super Admin password reset (no email)
 
 1. Sign in as an existing Super Admin (or use local seed if you still have `SEED_*` in `.env.local`).
 2. Open **User management** → choose the user → **Reset password**.
@@ -100,7 +116,7 @@ That upserts the seed Super Admin password from env. Rotate afterward and remove
 
 ---
 
-## 4. Offboarding a staff account
+## 5. Offboarding a staff account
 
 **Prefer soft offboarding:**
 
@@ -126,17 +142,37 @@ Deactivate remains the default recommendation when you only need to block login.
 
 **Research smoke:** `cd cms && npm run db:smoke:research` — SA author + smoke Reviewer four-eyes for group then project; verifies public JSON; purges smoke rows and rebuilds research JSON. Optional SPA check: `KEEP_RESEARCH_SMOKE=1 npm run db:smoke:research` then refresh `#research` (cleanup afterward with `npm run db:cleanup:smoke`).
 
+**WordPress → CMS cutover (owned types):** PRD [2026-08-21-wordpress-cms-spa-cutover.md](../prds/2026-08-21-wordpress-cms-spa-cutover.md). From `cms/`:
+
+```powershell
+npm run db:cutover:wordpress
+# review tmp/wp-cutover-report.json — then, after a DB dump:
+npm run db:cutover:wordpress -- --apply
+```
+
+Dry-run writes no DB/JSON. Apply overwrites live JSON after copying `data/*.json` to `tmp/wp-cutover-*/json/`. If the report exceeds ~200 public items, stop and agree a date cap (or `--force-volume`). Journals/OJS and static institutional pages are out of this slice.
+
 **Editor content types (exclusivity):** SPA types — at most one Editor CMS-wide. Research types — at most one Editor **per org**. Types must appear in the union of that Editor’s org catalogs.
+
+**Provisional desks** (pending staff confirmation; see `cms/README.md` staff table). To move items to whoever currently claims each type:
+
+```powershell
+cd cms
+npm run db:reassign:to-claims            # dry-run
+npm run db:reassign:to-claims -- --apply
+```
+
+There is no CMS UI for bulk reassign (deferred). After `npm run db:seed:staff` or a scope change in User management, re-run the apply command so `created_by` matches the new claims.
 
 ---
 
-## 5. Publish cutover caution
+## 6. Publish cutover caution
 
 First CMS publish for a content type **replaces** that public JSON with **CMS-published items only** (`.bak` first). Until a full re-import of legacy static content exists, treat publish as destructive for legacy cards. Prefer smoke items + unpublish + restore from `.bak` / snapshot during testing.
 
 ---
 
-## 6. Health checks
+## 7. Health checks
 
 | Check | How |
 |-------|-----|
@@ -149,7 +185,7 @@ First CMS publish for a content type **replaces** that public JSON with **CMS-pu
 
 ---
 
-## 7. Legacy JSON cutover
+## 8. Legacy JSON cutover
 
 See [CMS-CUTOVER.md](./CMS-CUTOVER.md) for the full policy and the `npm run db:import-legacy`
 step that imports the current `data/*.json` into the CMS as live items **before** the first
@@ -157,7 +193,7 @@ production publish (so no legacy cards are lost).
 
 ---
 
-## 8. Backup / restore drill
+## 9. Backup / restore drill
 
 ### Drill log
 

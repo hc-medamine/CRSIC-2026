@@ -19,6 +19,130 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-21 — Home featured news playlist (max 10)
+
+Approved PRD: [prds/2026-08-21-home-featured-news-playlist.md](./prds/2026-08-21-home-featured-news-playlist.md). `#home-feat-carousel` is a CMS-curated news playlist (≤10), four-eyes on the playlist, empty live → 3 newest news. Upcoming events teaser unchanged. Desk: `/dashboard/featured-news`. Run `cms` `db:migrate` (`029_site_featured_news.sql`).
+
+---
+
+### 2026-08-21 — Home news carousel: 3 cards per page
+
+Stakeholder: Home **أخبار المركز** is one row of 3 (not 6). 39 items → 13 pages. [prds/2026-08-21-home-news-carousel.md](./prds/2026-08-21-home-news-carousel.md).
+
+---
+
+### 2026-08-21 — Home news carousel: instant resume + opening fade
+
+Stakeholder: no delay after leaving a card; first page change is an immediate fade once Center News is on screen so visitors see the carousel, then 5s dwell. [prds/2026-08-21-home-news-carousel.md](./prds/2026-08-21-home-news-carousel.md).
+
+---
+
+### 2026-08-21 — Home news carousel: faster dwell, card-only hover, no stretch
+
+Stakeholder tweak on the approved PRD: autoplay starts immediately (no 3s idle), dwell **5s**, hover-pause only on cards (gaps keep rotating), last page keeps natural card height. [prds/2026-08-21-home-news-carousel.md](./prds/2026-08-21-home-news-carousel.md).
+
+---
+
+### 2026-08-21 — Home news carousel
+
+PRD [2026-08-21-home-news-carousel.md](./prds/2026-08-21-home-news-carousel.md) **Approved**. Home **أخبار المركز** pages through the full `news.json` list (6 per page, 7s dwell, loop) with header pause/play, swipe, and keyboard arrows. `#news` listing unchanged.
+
+---
+
+### 2026-08-21 — PRD Draft: Home news carousel
+
+Locked decision: Home **أخبار المركز** pages through the full news list (6 per page, 7s dwell, loop). Pause/play in the header; swipe + keyboard; no dots/arrows. `#news` unchanged. Draft: [prds/2026-08-21-home-news-carousel.md](./prds/2026-08-21-home-news-carousel.md). No implementation until **Approved**.
+
+---
+
+### 2026-08-21 — Publication covers belong to the publication Editor
+
+All `covers` media rows (73, previously Super Admin) now `uploaded_by` the Editor who claims publications (currently Medjelled). `npm run db:reassign:to-claims -- --apply` moves cover ownership with desk changes. New legacy `img/covers/` registrations use that Editor, not whoever opened the library.
+
+---
+
+### 2026-08-21 — Editors/reviewers get the media library (with replace seatbelt)
+
+`/dashboard/media` is no longer Super Admin-only. Editors see their own uploads in folders that match their content scopes; reviewers see files in their scopes but can only replace/delete what they uploaded. Replacing a file that is on a published page (or a live public copy) asks for confirmation first — same URL, public site updates immediately. Delete-when-in-use is unchanged.
+
+---
+
+### 2026-08-21 — Align authorship with live editor desks
+
+Live CMS scopes are the desk SSOT (staff will re-check later). Seed + cutover map now match: Megoussi news/event/law/partner; Medjelled publication/platform; Djefal all four research depts; Derrafa alert. Reassigned 36 publications, 3 laws, and 4 east research groups so Editors can open their own items. Ops: `cd cms && npm run db:reassign:to-claims -- --apply`.
+
+---
+
+### 2026-08-21 — Byline: collapse identical reviewer + publisher
+
+When المراجعة and النشر are the same person, the SPA shows one line (**المراجعة والنشر** / **Reviewer & Publisher**) instead of repeating the name.
+
+---
+
+### 2026-08-21 — News list search/year filter + card byline
+
+`#page-news` has a search box and year chips (same toolbar pattern as publications). Approved byline PRD: news/event cards and details show date (news) plus التحرير / المراجعة / النشر. Publisher is always فريحة بوفاتح / Fariha Boufatah. Backfill: `cd cms && npm run db:backfill:bylines -- --apply`.
+
+---
+
+### 2026-08-21 — News list page (`#news`)
+
+Home “Center News / View all” pointed at `#home-news-grid`, which the router treated as a missing page. It now opens `#page-news` with the full news grid. `#home-news-grid` aliases to `#news`.
+
+---
+
+### 2026-08-21 — News/event card byline PRD **Approved**
+
+**PRD:** [prds/2026-08-21-spa-news-event-card-byline.md](./prds/2026-08-21-spa-news-event-card-byline.md) — status **Approved**.
+
+**Locked for draft:** news + event cards (Home + lists, details should match); news date = WP article date if imported else CMS `published_at`, list sorted by that date; events keep occurrence day/month/year; التحرير/المراجعة from CMS names; النشر always Boufatah.
+
+---
+
+### 2026-08-21 — WordPress cutover `--apply`
+
+**PRD:** [prds/2026-08-21-wordpress-cms-spa-cutover.md](./prds/2026-08-21-wordpress-cms-spa-cutover.md).
+
+Applied 98/100 planned rows (author = scoped editor, publisher = Boufatah). Public JSON rebuilt. Two platform payloads failed on empty WP media then were repaired by keeping existing `img/cms/platforms` files. Publications/laws unchanged (no WP listing). DB dump: `tmp/crsic_db-pre-wp-cutover-*.dump`. JSON copy under `tmp/wp-cutover-*/json/`.
+
+---
+
+### 2026-08-21 — WordPress cutover script (dry-run first)
+
+**PRD:** [prds/2026-08-21-wordpress-cms-spa-cutover.md](./prds/2026-08-21-wordpress-cms-spa-cutover.md) (Approved).
+
+Ops CLI: `cd cms && npm run db:cutover:wordpress` scrapes known WP hubs on `crsic.dz`, matches type+title/slug, writes `tmp/wp-cutover-report.json`. `--apply` only after sign-off (author = scoped editor, publisher = Boufatah). Publication JSON may now carry an empty cover string when WP has no image (SPA omits `img` src).
+
+---
+
+### 2026-08-21 — WordPress → CMS/SPA cutover PRD **Approved**
+
+**PRD:** [prds/2026-08-21-wordpress-cms-spa-cutover.md](./prds/2026-08-21-wordpress-cms-spa-cutover.md) — status **Approved**.
+
+**Locked:** scrape CMS-owned types on `crsic.dz`; match type+title/slug update-in-place or insert; recover media or leave empty; author = scoped editor; publisher = Boufatah; overwrite live JSON after dry-run sign-off. Journals/OJS and static pages out of this slice.
+
+---
+
+### 2026-08-21 — SPA consumes CMS item media; published `img/cms/` is tracked
+
+**Why:** Publication cards were reading the parallel `covers[i]` array instead of each CMS-published item’s `media[]`, so a cover that existed on disk (`img/covers/i05.jpg`) did not show for *مقالات في اللغة والفقه والإعجاز القرآني* (published path `img/cms/covers/…`). `img/cms/**` was gitignored, so clones lost published binaries.
+
+**SPA:** Cards and details prefer CMS item fields (`media[]`, then `img` / `cover` / `og_image`). Publication cards use `coverSrcFromPub`.
+
+**Git:** Root `.gitignore` no longer ignores `img/cms/**`. Staging stays `cms/uploads/**`. New CMS cover uploads go to `img/cms/covers/` (`publicPathFor`).
+
+**Cutover:** `npm run db:migrate:media-to-cms` copied every CMS-managed image into `img/cms/{bucket}/`, registered `media_assets`, rewrote `live_payload`, and rebuilt public JSON. Partner photos were re-fetched from crsic.dz (9/11; CRASC and the multi-university agreement have no matching WP post, so they stay emoji-only until uploaded in CMS).
+
+**Cover remap:** SPA was showing mixed covers because `covers[]` was filename-ordered, not title-matched (journal issues and other books sat on the wrong titles). Covers were reassigned by reading the title on each image. JSON fetch now uses `cache: 'no-store'` so CMS remaps show on the next load.
+
+---
+
+### 2026-08-20 — Local CMS staff table + seed includes all four editors
+
+**Docs / seed:** `cms/README.md` staff table, `cms/.env.example` login-bubble emails, and `cms/scripts/seed-staff.ts` (`npm run db:seed:staff`) now list all four editors: `i.megoussi`, `t.medjelled`, `a.djefal`, `a.derrafa`. Super Admin + Reviewer unchanged.
+
+---
+
 ### 2026-08-20 — CMS Desk interiors PRD **Approved**; I1 lists in progress
 
 **PRD:** [prds/2026-08-20-cms-desk-interiors.md](./prds/2026-08-20-cms-desk-interiors.md) — status **Approved**.

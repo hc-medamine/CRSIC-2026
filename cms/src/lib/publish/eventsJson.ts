@@ -9,6 +9,13 @@ import {
 import { slugifyTitle, uniqueSlug } from "@/lib/publish/slug";
 import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
 import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
+import {
+  loadPublicByline,
+  PUBLIC_PUBLISHER_AR,
+  PUBLIC_PUBLISHER_EN,
+  personPublicNames,
+  type PublicBylineFields,
+} from "@/lib/publish/publicByline";
 
 export type PublicEventItem = {
   id: string;
@@ -23,6 +30,12 @@ export type PublicEventItem = {
   summary: string;
   body: string;
   media: PublicMediaItem[];
+  editor_ar: string;
+  editor_en: string;
+  reviewer_ar: string;
+  reviewer_en: string;
+  publisher_ar: string;
+  publisher_en: string;
 } & PublicSeoFields;
 
 /** Public item plus the scope used to bucket it into intl/nat on rebuild. */
@@ -48,7 +61,7 @@ type PayloadSource = {
   meta_description_ar?: string | null;
   meta_description_en?: string | null;
   og_image?: string | null;
-};
+} & Partial<PublicBylineFields>;
 
 /** Public object for an event row (persisted to content_items.live_payload). */
 export function buildEventPayload(
@@ -78,6 +91,12 @@ export function buildEventPayload(
       summary: row.summary_ar?.trim() || "",
       body: sanitizeBodyHtml(row.body_ar) || "",
       media,
+      editor_ar: (row.editor_ar || "").trim(),
+      editor_en: (row.editor_en || "").trim(),
+      reviewer_ar: (row.reviewer_ar || "").trim(),
+      reviewer_en: (row.reviewer_en || "").trim(),
+      publisher_ar: PUBLIC_PUBLISHER_AR,
+      publisher_en: PUBLIC_PUBLISHER_EN,
     },
     row,
   );
@@ -89,6 +108,21 @@ export function buildEventPayload(
   return item;
 }
 
+export async function buildEventPayloadForItem(
+  row: PayloadSource,
+  usedSlugs?: Set<string>,
+): Promise<StoredEventPayload> {
+  const byline = row.id ? await loadPublicByline(row.id) : {
+    editor_ar: "",
+    editor_en: "",
+    reviewer_ar: "",
+    reviewer_en: "",
+    publisher_ar: PUBLIC_PUBLISHER_AR,
+    publisher_en: PUBLIC_PUBLISHER_EN,
+  };
+  return buildEventPayload({ ...row, ...byline }, usedSlugs);
+}
+
 function publicEventsPath(): string {
   return join(process.cwd(), "..", "data", "events.json");
 }
@@ -98,11 +132,23 @@ export async function rebuildPublicEventsJson(): Promise<{
   nat: number;
   path: string;
 }> {
-  const result = await query<{ live_payload: StoredEventPayload }>(
-    `SELECT live_payload
-     FROM content_items
-     WHERE content_type = 'event' AND live_payload IS NOT NULL
-     ORDER BY live_at DESC NULLS LAST, created_at ASC`,
+  const result = await query<{
+    live_payload: StoredEventPayload;
+    editor_name_ar: string | null;
+    editor_name_en: string | null;
+    editor_display: string | null;
+    reviewer_name_ar: string | null;
+    reviewer_name_en: string | null;
+    reviewer_display: string | null;
+  }>(
+    `SELECT c.live_payload,
+            e.name_ar AS editor_name_ar, e.name_en AS editor_name_en, e.display_name AS editor_display,
+            r.name_ar AS reviewer_name_ar, r.name_en AS reviewer_name_en, r.display_name AS reviewer_display
+     FROM content_items c
+     LEFT JOIN users e ON e.id = c.created_by
+     LEFT JOIN users r ON r.id = c.review_owner_id
+     WHERE c.content_type = 'event' AND c.live_payload IS NOT NULL
+     ORDER BY c.live_at DESC NULLS LAST, c.created_at ASC`,
   );
 
   const intl: PublicEventItem[] = [];
@@ -111,6 +157,16 @@ export async function rebuildPublicEventsJson(): Promise<{
   for (const row of result.rows) {
     const { scope, ...item } = row.live_payload;
     const media = buildMediaList(item.media, item.img, undefined);
+    const editor = personPublicNames({
+      nameAr: row.editor_name_ar,
+      nameEn: row.editor_name_en,
+      displayName: row.editor_display,
+    });
+    const reviewer = personPublicNames({
+      nameAr: row.reviewer_name_ar,
+      nameEn: row.reviewer_name_en,
+      displayName: row.reviewer_display,
+    });
     const publicItem: PublicEventItem = {
       id: item.id || `legacy-event-${item.slug || slugifyTitle(item.title || "item")}`,
       slug: item.slug || slugifyTitle(item.title || "item"),
@@ -128,6 +184,12 @@ export async function rebuildPublicEventsJson(): Promise<{
       summary: item.summary?.trim() || "",
       body: item.body?.trim() || "",
       media,
+      editor_ar: editor.ar || item.editor_ar || "",
+      editor_en: editor.en || item.editor_en || "",
+      reviewer_ar: reviewer.ar || item.reviewer_ar || "",
+      reviewer_en: reviewer.en || item.reviewer_en || "",
+      publisher_ar: PUBLIC_PUBLISHER_AR,
+      publisher_en: PUBLIC_PUBLISHER_EN,
       ...seoFromRow(item),
     };
     const primary = primaryImageSrc(media) ?? item.img;

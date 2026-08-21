@@ -4,7 +4,6 @@
  */
 import {
   getPubs,
-  getCover,
   getPub,
   getNews,
   getJournals,
@@ -34,8 +33,10 @@ import { createEventYearGroups, createHomeEventCard } from './components/eventCa
 import { createPartnerCard } from './components/partnerCard.js';
 import { createJournalCard } from './components/journalCard.js';
 import { createNewsCard } from './components/newsCard.js';
+import { mountHomeNewsCarousel } from './components/homeNewsCarousel.js';
 import { createLawCard, createPlatformCard } from './components/catalogCard.js';
 import { mountFeaturedCarousel } from './components/featuredCarousel.js';
+import { createContentByline, formatNewsDate } from './components/contentByline.js';
 
 /** @type {null|(() => void)} */
 let releaseDrawerTrap = null;
@@ -58,6 +59,7 @@ function fillSkeletons(container, className, n) {
 
 /* ── PUBLICATION FILTER STATE ────────────────────────── */
 let currentPubType = 'all';
+let currentNewsYear = 'all';
 
 export function getCurrentPubType() {
   return currentPubType;
@@ -76,6 +78,7 @@ const BC_MAP = {
   contact: [{ key: 'bc_contact', page: 'contact' }],
   laws: [{ key: 'bc_laws', page: 'laws' }],
   platforms: [{ key: 'bc_platforms', page: 'platforms' }],
+  news: [{ key: 'bc_news', page: 'news' }],
   detail: [{ key: 'bc_detail', page: 'home' }],
 };
 
@@ -84,7 +87,7 @@ const BOTTOM_TAB_PAGES = ['home', 'publications', 'journals', 'events'];
 
 const SECTION_CONTAINERS = {
   publications: ['home-pub-grid', 'pub-grid'],
-  news: ['home-news-grid'],
+  news: ['home-news-grid', 'news-grid'],
   journals: ['journals-grid'],
   events: ['home-events-grid', 'ev-intl-list', 'ev-nat-list'],
   partners: ['nat-partners', 'intl-partners'],
@@ -95,7 +98,8 @@ const SECTION_CONTAINERS = {
 /** Show loading skeletons before async data arrives. */
 export function primeSkeletons() {
   fillSkeletons(document.getElementById('home-pub-grid'), 'skeleton-pub', 4);
-  fillSkeletons(document.getElementById('home-news-grid'), 'skeleton-news', 6);
+  fillSkeletons(document.getElementById('home-news-grid'), 'skeleton-news', 3);
+  fillSkeletons(document.getElementById('news-grid'), 'skeleton-news', 8);
   fillSkeletons(document.getElementById('home-events-grid'), 'skeleton-event', 3);
   fillSkeletons(document.getElementById('pub-grid'), 'skeleton-pub', 8);
   fillSkeletons(document.getElementById('journals-grid'), 'skeleton-journal', 4);
@@ -125,7 +129,9 @@ export function showDataLoadErrors(errors) {
     ids.forEach((id) => {
       const node = document.getElementById(id);
       if (node && !node.children.length) {
-        replaceChildren(node, [el('div', { className: 'data-load-error', text: label })]);
+        replaceChildren(node, [
+          el('div', { className: 'data-load-error', text: t('data_load_error') }),
+        ]);
         node.dataset.loaded = '1';
       }
     });
@@ -272,7 +278,8 @@ export function renderAll() {
   const feat = document.getElementById('home-feat-carousel');
 
   fillSkeletons(hpg, 'skeleton-pub', 4);
-  fillSkeletons(hng, 'skeleton-news', 6);
+  fillSkeletons(hng, 'skeleton-news', 3);
+  fillSkeletons(document.getElementById('news-grid'), 'skeleton-news', 8);
   fillSkeletons(heg, 'skeleton-event', 3);
   fillSkeletons(pg, 'skeleton-pub', 8);
   fillSkeletons(jg, 'skeleton-journal', 4);
@@ -298,8 +305,21 @@ export function renderAll() {
       hpg.dataset.loaded = '1';
     }
     if (hng) {
-      replaceChildren(hng, news.slice(0, 6).map(createNewsCard));
+      mountHomeNewsCarousel(hng, news);
       hng.dataset.loaded = '1';
+    }
+    const ng = document.getElementById('news-grid');
+    const newsEmpty = document.getElementById('news-empty');
+    if (ng) {
+      if (news.length) {
+        replaceChildren(ng, news.map(createNewsCard));
+      } else {
+        replaceChildren(ng, []);
+      }
+      setCatalogEmptyState(ng, newsEmpty, news.length > 0);
+      ng.dataset.loaded = '1';
+      syncNewsYearFilter(news);
+      applyNewsFilter();
     }
     if (heg) {
       replaceChildren(heg, homeEvents.map(createHomeEventCard));
@@ -408,6 +428,84 @@ export function applyPubFilter() {
   }
 
   if (!reduced) flipPubCards(firstRects, wasShown, 220);
+}
+
+function newsYearFromCard(card) {
+  return (card.dataset.year || '').trim();
+}
+
+function syncNewsYearFilter(news) {
+  const host = document.getElementById('news-year-filter');
+  if (!host) return;
+  const years = [...new Set(
+    (news || [])
+      .map((n) => String(n.date || '').slice(0, 4))
+      .filter((y) => /^\d{4}$/.test(y)),
+  )].sort((a, b) => b.localeCompare(a));
+
+  if (currentNewsYear !== 'all' && !years.includes(currentNewsYear)) {
+    currentNewsYear = 'all';
+  }
+
+  const nodes = [
+    el('button', {
+      className: `dept-tab${currentNewsYear === 'all' ? ' active' : ''}`,
+      text: t('filter_all'),
+      attrs: { type: 'button', 'data-news-year': 'all' },
+    }),
+    ...years.map((year) =>
+      el('button', {
+        className: `dept-tab${currentNewsYear === year ? ' active' : ''}`,
+        text: year,
+        attrs: { type: 'button', 'data-news-year': year },
+      }),
+    ),
+  ];
+  replaceChildren(host, nodes);
+  host.hidden = years.length === 0;
+}
+
+export function setNewsYear(year, btn) {
+  currentNewsYear = year || 'all';
+  document.querySelectorAll('#news-year-filter .dept-tab').forEach((b) => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  applyNewsFilter();
+}
+
+export function applyNewsFilter() {
+  const searchEl = document.getElementById('news-search');
+  const q = ((searchEl && searchEl.value) || '').trim().toLowerCase();
+  const cards = Array.from(document.querySelectorAll('#news-grid .news-card'));
+  const grid = document.getElementById('news-grid');
+  let visible = 0;
+
+  cards.forEach((card) => {
+    const yearMatch = currentNewsYear === 'all' || newsYearFromCard(card) === currentNewsYear;
+    const hay = (card.dataset.q || card.textContent || '').toLowerCase();
+    const textMatch = !q || hay.includes(q);
+    const show = yearMatch && textMatch;
+    card.style.display = show ? '' : 'none';
+    if (show) visible += 1;
+  });
+
+  const countEl = document.getElementById('news-count');
+  if (countEl) {
+    countEl.textContent = visible > 0 ? t('news_count').replace('{n}', String(visible)) : '';
+  }
+
+  let noRes = document.getElementById('news-no-results');
+  if (!visible && cards.length) {
+    if (!noRes && grid) {
+      noRes = el('div', { className: 'pub-no-results', attrs: { id: 'news-no-results' } });
+      grid.appendChild(noRes);
+    }
+    if (noRes) {
+      noRes.textContent = t('news_search_empty');
+      noRes.style.display = '';
+    }
+  } else if (noRes) {
+    noRes.style.display = 'none';
+  }
 }
 
 /**
@@ -520,6 +618,7 @@ export function updateContentLocaleNotices() {
     'home-pub-grid',
     'home-events-grid',
     'home-news-grid',
+    'news-grid',
     'pub-grid',
     'ev-intl-list',
     'ev-nat-list',
@@ -593,7 +692,7 @@ function resolveLightboxContent(type, slug, index) {
       badge: pub.dept || '',
       meta: pub.type === 'collective' ? t('badge_collective') : t('badge_individual'),
       summary: pub.summary || pub.desc || '',
-      cover: getCoverForPub(idx) || (pub.media && pub.media[0] && pub.media[0].src) || '',
+      cover: getCoverForPub(idx) || '',
     };
   }
 
@@ -607,9 +706,10 @@ function resolveLightboxContent(type, slug, index) {
       slug: item.slug || item.id || '',
       title: item.title || '',
       badge: item.label || '',
-      meta: '',
+      meta: formatNewsDate(item.date) || '',
       summary: item.summary || '',
       cover: mediaImg || '',
+      item,
     };
   }
 
@@ -629,6 +729,7 @@ function resolveLightboxContent(type, slug, index) {
       meta: [dateLine, statusLabel].filter(Boolean).join(' · '),
       summary: item.summary || '',
       cover: mediaImg || LB_HOLDER_FALLBACK[0],
+      item,
     };
   }
 
@@ -679,6 +780,16 @@ export function openLightbox(optsOrIndex, triggerEl) {
   document.getElementById('lb-dept').textContent = content.badge;
   document.getElementById('lb-year').textContent = content.meta;
   document.getElementById('lb-desc').textContent = content.summary;
+
+  const bylineHost = document.getElementById('lb-byline');
+  if (bylineHost) {
+    const showDate = content.type === 'news';
+    const byline =
+      (content.type === 'news' || content.type === 'event') && content.item
+        ? createContentByline(content.item, { includeDate: showDate && !content.meta })
+        : null;
+    replaceChildren(bylineHost, byline ? [byline] : []);
+  }
 
   const detailBtn = document.getElementById('lb-detail-btn');
   if (detailBtn) {
@@ -989,6 +1100,20 @@ export function bindUIEvents() {
   const pubSearch = document.getElementById('pub-search');
   if (pubSearch) {
     pubSearch.addEventListener('input', applyPubFilter);
+  }
+
+  const newsYearFilter = document.getElementById('news-year-filter');
+  if (newsYearFilter) {
+    newsYearFilter.addEventListener('click', (e) => {
+      const btn = e.target.closest('.dept-tab[data-news-year]');
+      if (!btn) return;
+      setNewsYear(btn.dataset.newsYear, btn);
+    });
+  }
+
+  const newsSearch = document.getElementById('news-search');
+  if (newsSearch) {
+    newsSearch.addEventListener('input', applyNewsFilter);
   }
 
   const lightbox = document.getElementById('lightbox');

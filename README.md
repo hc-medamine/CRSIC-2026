@@ -124,6 +124,7 @@ CRSIC 2026/
 │   ├── CMS.md                 # CDN / remote JSON publish contract
 │   ├── alerts.json            # Site-wide alert (CMS-published)
 │   ├── director.json          # About director block (CMS-published)
+│   ├── featured-news.json     # Home featured playlist ids (CMS-published)
 │   ├── events.json
 │   ├── journals.json
 │   ├── laws.json              # Laws hub + detail (CMS-published)
@@ -246,6 +247,7 @@ erDiagram
 | `title`, `type` | string | Title and event kind label |
 | `status` | `"done"` \| `"upcoming"` | Status badge |
 | `img` | string (optional) | Home teaser photo; if omitted, Holders `0`–`5` cycle |
+| `editor_ar` / `editor_en`, `reviewer_ar` / `reviewer_en`, `publisher_ar` / `publisher_en` | display names | Card byline (publisher is always Fariha Boufatah) |
 
 Home teaser `#home-events-grid` uses `getHomeEvents(3)` (intl + nat merged, newest first). Full events page still lists all items by year.
 
@@ -266,11 +268,13 @@ Home teaser `#home-events-grid` uses `getHomeEvents(3)` (intl + nat merged, newe
 
 #### `news.json`
 
-| Field            | Type                  |
-| ---------------- | --------------------- |
-| `news[]`         | objects               |
-| `img`            | path string or `null` |
-| `label`, `title` | strings               |
+| Field | Type |
+|-------|------|
+| `news[]` | objects |
+| `img` | path string or `null` |
+| `label`, `title` | strings |
+| `date` | `YYYY-MM-DD` or `""` (story date; list is newest first) |
+| `editor_ar` / `editor_en`, `reviewer_ar` / `reviewer_en`, `publisher_ar` / `publisher_en` | display names only |
 
 #### Locales
 
@@ -509,6 +513,7 @@ Hash SPA. Default route: `#home` (or empty hash).
 | Hash            | Section id          | Purpose                                                  |
 | --------------- | ------------------- | -------------------------------------------------------- | ----- |
 | `#home`         | `page-home`         | Hero, stats, departments teaser, latest pubs/events/news |
+| `#news`         | `page-news`         | Full news list (Home “View all”)                         |
 | `#about`        | `page-about`        | Mission, vision, values, research axes                   |
 | `#org`          | `page-org`          | Organisational chart (nav parent: about)                 |
 | `#research`     | `page-research`     | Research tabs `r1`–`r4`                                  |
@@ -518,7 +523,7 @@ Hash SPA. Default route: `#home` (or empty hash).
 | `#journals`     | `page-journals`     | Journal cards                                            |
 | `#contact`      | `page-contact`      | Contact info + mailto form                               |
 
-**Parent nav mapping** (`PAGE_PARENT` in `js/router.js`): `org` → `about`, `research` → `about`, `cooperation` → `events`.
+**Parent nav mapping** (`PAGE_PARENT` in `js/router.js`): `org` → `about`, `research` → `about`, `cooperation` → `events`, `news` → `home`.
 
 Deep links may pass `data-tab` / `data-filter` on navigable elements.
 
@@ -657,6 +662,7 @@ When `CONTENT_BASE_URL` is `https://cdn.example.com/crsic/`:
 | GET    | `partners.json`     | `{ nat: object[], intl: object[] }`    |
 | GET    | `journals.json`     | `{ journals: object[] }`               |
 | GET    | `news.json`         | `{ news: object[] }`                   |
+| GET    | `featured-news.json`| `{ ids: string[] }` (max 10; empty → fallback) |
 | GET    | `locales/ar.json`   | flat key → string                      |
 | GET    | `locales/en.json`   | flat key → string                      |
 

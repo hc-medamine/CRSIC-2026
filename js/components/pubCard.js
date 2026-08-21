@@ -1,7 +1,7 @@
 /**
  * Publication card — safe DOM builder (no innerHTML).
  */
-import { getCover } from '../data.js';
+import { coverSrcFromPub } from '../data.js';
 import { t } from '../i18n.js';
 import { el, safeImageSrc } from '../utils.js';
 
@@ -11,22 +11,24 @@ import { el, safeImageSrc } from '../utils.js';
  * @returns {HTMLElement}
  */
 export function createPubCard(p, i) {
-  const cover = safeImageSrc(getCover(i));
+  const cover = safeImageSrc(coverSrcFromPub(p, i));
   const badge = p.type === 'collective' ? t('badge_collective') : t('badge_individual');
 
-  const img = el('img', {
-    attrs: {
-      src: cover,
-      alt: p.t || '',
-      loading: 'lazy',
-    },
-    style: {
-      width: '100%',
-      height: '100%',
-      'object-fit': 'cover',
-      display: 'block',
-    },
-  });
+  const img = cover
+    ? el('img', {
+        attrs: {
+          src: cover,
+          alt: p.t || '',
+          loading: 'lazy',
+        },
+        style: {
+          width: '100%',
+          height: '100%',
+          'object-fit': 'cover',
+          display: 'block',
+        },
+      })
+    : el('div', { className: 'pub-cover-empty', attrs: { 'aria-hidden': 'true' } });
 
   const slug = p.slug || p.id || '';
   return el('article', {

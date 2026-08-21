@@ -20,7 +20,7 @@ import { el, replaceChildren, prefersReducedMotion } from './utils.js';
 import { t } from './i18n.js';
 
 /** Maps child pages to their primary nav parent. */
-export const PAGE_PARENT = { org: 'about', research: 'about', cooperation: 'events', detail: 'home' };
+export const PAGE_PARENT = { org: 'about', research: 'about', cooperation: 'events', news: 'home', detail: 'home' };
 
 /**
  * View Transitions API available and motion allowed?
@@ -71,6 +71,9 @@ export function parseHash(hashRaw) {
     }
   });
   const [first, second] = segments;
+  if (first === 'home-news-grid') {
+    return { pageId: 'news' };
+  }
   if (first === 'preview' && second) {
     return { pageId: 'detail', previewToken: second };
   }

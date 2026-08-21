@@ -39,7 +39,5 @@ export function isMediaBucket(value: string): value is MediaBucket {
 
 export function publicPathFor(bucket: MediaBucket, id: string, extension: string): string {
   const key = id.replace(/-/g, "");
-  // Publication covers share one public folder (legacy SPA + CMS uploads).
-  if (bucket === "covers") return `img/covers/${key}.${extension}`;
   return `img/cms/${bucket}/${key}.${extension}`;
 }

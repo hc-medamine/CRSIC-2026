@@ -3,7 +3,7 @@ import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { appendWorkflowComment } from "@/lib/content/comments";
-import { buildNewsPayload, rebuildPublicNewsJson } from "@/lib/publish/newsJson";
+import { buildNewsPayloadForItem, rebuildPublicNewsJson } from "@/lib/publish/newsJson";
 import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 import { normalizeAttachments, type PublicMediaItem } from "@/lib/publish/media";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
@@ -18,6 +18,7 @@ import {
 } from "@/lib/content/permissions";
 import { notifyOnSubmit } from "@/lib/content/delegation";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
+import { pruneFeaturedNewsItem } from "@/lib/content/featuredNews";
 
 async function auditNews(
   user: SessionUser,
@@ -496,7 +497,7 @@ export async function publishNews(user: SessionUser, id: string) {
     titleAr: existing.title_ar,
     existingSlug: existing.public_slug,
   });
-  const payload = buildNewsPayload({ ...existing, public_slug: slug });
+  const payload = await buildNewsPayloadForItem({ ...existing, public_slug: slug });
   const item = await mutateThenRebuildPublic({
     itemId: id,
     mutate: async () => {
@@ -564,5 +565,6 @@ export async function unpublishNews(user: SessionUser, id: string) {
     linkPath: `/dashboard/news/${item.id}`,
   });
   await auditNews(user, "news.unpublish", item, "Unpublished from news.json");
+  await pruneFeaturedNewsItem(id);
   return item;
 }

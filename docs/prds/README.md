@@ -27,6 +27,9 @@ Product specs for CRSIC live here. **New feature slices follow the PRD-first wor
 | [2026-08-18-motion-interactivity-polish.md](./2026-08-18-motion-interactivity-polish.md) | **Delivered** (2026-08-19) | Motion/interactivity polish SPA + CMS — M1–M4, showy everywhere, OS-only motion gate, explicit perf budget; all merged to `main` (PRs #24–#27) |
 | [2026-08-19-cms-desk-design.md](./2026-08-19-cms-desk-design.md) | **Delivered** (2026-08-19) | CMS Desk — shell + dashboard home on `main` (`25b15cc`); list/edit interiors are a follow-on slice |
 | [2026-08-20-cms-desk-interiors.md](./2026-08-20-cms-desk-interiors.md) | **Approved** (2026-08-20) | Desk interiors — I1 lists then I2 forms/admin/login; unify news/events/pubs onto `ContentListPage`; visual only |
+| [2026-08-21-spa-news-event-card-byline.md](./2026-08-21-spa-news-event-card-byline.md) | **Approved** (2026-08-21) | News+event cards: date stamp, editor, reviewer, publisher (Boufatah); news sorted by story date |
+| [2026-08-21-home-news-carousel.md](./2026-08-21-home-news-carousel.md) | **Approved** (2026-08-21) | Home Center News: 3-card paged autoplay, pause button, swipe/keyboard; `#news` unchanged |
+| [2026-08-21-home-featured-news-playlist.md](./2026-08-21-home-featured-news-playlist.md) | **Approved** (2026-08-21) | Home featured strip: curated news playlist max 10, four-eyes, fallback 3 newest |
 
 ## Related
 

@@ -24,12 +24,10 @@ data/*.json.bak
 data/*.json.smoke-snap
 data/*.json.tmp
 
-# CMS local uploads + published CMS media (binary; regenerated via upload)
+# CMS local upload staging (not published yet).
+# Published public media under img/cms/ is tracked in git.
 cms/uploads/**
 !cms/uploads/.gitkeep
-img/cms/**
-!img/cms/**/
-!img/cms/**/.gitkeep
 
 # Logs & caches
 *.log

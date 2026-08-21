@@ -1,6 +1,7 @@
 /**
  * Partner card — safe DOM builder (no innerHTML).
  */
+import { cmsItemImageSrc } from '../data.js';
 import { el, safeImageSrc } from '../utils.js';
 
 /**
@@ -9,7 +10,7 @@ import { el, safeImageSrc } from '../utils.js';
  */
 export function createPartnerCard(p) {
   const slug = p.slug || p.id;
-  const imgSrc = safeImageSrc(p.img || '');
+  const imgSrc = safeImageSrc(cmsItemImageSrc(p));
   const mark = imgSrc
     ? el('div', {
         className: 'partner-mark partner-mark-img',

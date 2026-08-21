@@ -12,8 +12,8 @@ import { getResearchGroupById } from "@/lib/content/researchGroups";
 import { getResearchProjectById } from "@/lib/content/researchProjects";
 import { getLawById } from "@/lib/content/laws";
 import { getPlatformById } from "@/lib/content/platforms";
-import { buildNewsPayload } from "@/lib/publish/newsJson";
-import { buildEventPayload } from "@/lib/publish/eventsJson";
+import { buildNewsPayloadForItem } from "@/lib/publish/newsJson";
+import { buildEventPayloadForItem } from "@/lib/publish/eventsJson";
 import { buildPublicationPayload } from "@/lib/publish/publicationsJson";
 import { buildPartnerPayload } from "@/lib/publish/partnersJson";
 import { buildAlertPayload } from "@/lib/publish/alertsJson";
@@ -91,12 +91,12 @@ async function buildCandidatePayload(
   if (contentType === "news") {
     const row = await getNewsById(id);
     if (!row) return null;
-    return buildNewsPayload(row) as unknown as Record<string, unknown>;
+    return (await buildNewsPayloadForItem(row)) as unknown as Record<string, unknown>;
   }
   if (contentType === "event") {
     const row = await getEventById(id);
     if (!row) return null;
-    return buildEventPayload(row) as unknown as Record<string, unknown>;
+    return (await buildEventPayloadForItem(row)) as unknown as Record<string, unknown>;
   }
   if (contentType === "publication") {
     const row = await getPublicationById(id);

@@ -13,16 +13,17 @@ When `CONTENT_BASE_URL` is set (e.g. `https://cdn.example.com/crsic/`), the app 
 
 | `laws.json` | `{ "laws": object[] }` — each: `{ id, slug, title, titleEn?, summary, summaryEn?, body?, bodyEn?, img?, media?, externalUrl?, ...SEO }` — hub `#page-laws`; detail `#law/{slug}` (native SPA). Optional `externalUrl` shows as secondary text link labeled **More information** / **المصدر** (not a primary CTA). |
 | `platforms.json` | `{ "platforms": object[] }` — each: `{ id, slug, kind: visual\|radio\|mobility, title, summary, body?, bodyEn?, img?, media?, externalUrl?, ...SEO }` — hub `#page-platforms`; detail `#platform/{slug}`; same secondary `externalUrl` link. |
-| `publications.json` | `{ "covers": string[], "pubs": object[] }` — pubs may include `id`, `slug`, `summary`, `body` (sanitized HTML allowlist), `media[]` + optional SEO fields |
+| `publications.json` | `{ "covers": string[], "pubs": object[] }` — SPA cards/details use each pub’s `media[]` (CMS source of truth); `covers[]` is derived and kept `covers.length === pubs.length` |
 | `partners.json` | `{ "nat": object[], "intl": object[] }` — optional SEO fields on items |
 | `alerts.json` | `{ "items": object[] }` — at most one live item; each has `id`, `message_ar`, `message_en`, `link`, `link_label_ar`, `link_label_en` + optional SEO fields |
 | `research-groups.json` | `{ "items": object[] }` — `id`, `slug`, `orgUnitId`, `name_ar`/`name_en`, `summary_*`, optional `lead_*` / `members` |
 | `research-projects.json` | `{ "items": object[] }` — `id`, `slug`, `orgUnitId`, `groupId`, title/lead/dibaja/questions/duration AR+EN, `axes[]`/`impacts[]` (`{ar,en?}`), optional SEO |
 | `director.json` | singleton `{ quote_ar, quote_en, name_ar, name_en, role_ar, role_en, portrait, portrait_alt_ar?, portrait_alt_en? }` — About director block; CMS publish (`/dashboard/director`). Soft-fail: SPA keeps locale placeholders if missing. |
+| `featured-news.json` | `{ "ids": string[] }` — ordered public news ids for Home `#home-feat-carousel`, max 10. Empty or all missing → SPA shows 3 newest news. CMS: `/dashboard/featured-news`. |
 | `locales/ar.json` | flat key → string |
 | `locales/en.json` | flat key → string |
 
-SPA deep links (hash): `#news/{slug}`, `#event/{slug}`, `#publication/{slug}`, `#research-project/{slug}`, `#law/{slug}`, `#platform/{slug}`. Preview (CMS A1): `#preview/{token}` — SPA fetches a short-lived candidate payload from `{PREVIEW_API_BASE}/api/public/preview/{token}` (see `js/config.js`). Does not touch live JSON.
+SPA deep links (hash): `#news` (list), `#news/{slug}`, `#event/{slug}`, `#publication/{slug}`, `#research-project/{slug}`, `#law/{slug}`, `#platform/{slug}`. Preview (CMS A1): `#preview/{token}` — SPA fetches a short-lived candidate payload from `{PREVIEW_API_BASE}/api/public/preview/{token}` (see `js/config.js`). Does not touch live JSON.
 
 Set CMS `PUBLIC_SITE_URL` to the SPA origin so “Open public preview” opens the right tab. Set SPA `PREVIEW_API_BASE` to the CMS origin when they differ.
 

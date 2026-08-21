@@ -1,7 +1,8 @@
 /**
- * Featured home events carousel (3 newest) — CRSIC brand, vanilla JS.
+ * Featured home news carousel (curated playlist, max 10) — CRSIC brand, vanilla JS.
  */
-import { getAllEvents } from '../data.js';
+import { cmsItemImageSrc, getFeaturedNewsIds, getNews } from '../data.js';
+import { newsResume, resolveFeaturedNews } from '../featuredNews.js';
 import { t } from '../i18n.js';
 import { el, replaceChildren, safeImageSrc, prefersReducedMotion } from '../utils.js';
 
@@ -47,65 +48,22 @@ function setControl(btn, name, label) {
 }
 
 /**
- * Featured slides: prefer events that have résumé copy, then fill from newest.
- * @param {number} [limit=3]
- * @returns {object[]}
- */
-function getFeaturedCarouselEvents(limit = 3) {
-  const n = Math.max(0, Number(limit) || 0);
-  const all = getAllEvents();
-  const withResume = all.filter((e) => String((e && (e.summary || e.body)) || '').trim());
-  const without = all.filter((e) => !String((e && (e.summary || e.body)) || '').trim());
-  return [...withResume, ...without].slice(0, n);
-}
-
-/**
- * @param {object} e
- * @returns {string}
- */
-function eventResume(e) {
-  const summary = String((e && e.summary) || '').trim();
-  if (summary) return summary;
-
-  const body = String((e && e.body) || '')
-    .replace(/\\n/g, '\n')
-    .replace(/\s+/g, ' ')
-    .trim();
-  if (body) {
-    return body.length > 320 ? `${body.slice(0, 320).trim()}…` : body;
-  }
-
-  const type = String((e && e.type) || '').trim();
-  const day = String((e && e.day) || '').trim();
-  const month = String((e && e.month) || '').trim();
-  const year = String((e && e.year) || '').trim();
-  const date = [day, month, year].filter(Boolean).join(' ');
-  const loc = t('home_event_loc');
-  const bits = [type, date, loc].filter(Boolean);
-  return bits.join(' — ');
-}
-
-/**
- * @param {object} e
+ * @param {object} item
  * @param {number} i
  * @returns {string}
  */
-function eventImageSrc(e, i) {
-  const fromImg = safeImageSrc((e && e.img) || '');
-  if (fromImg) return fromImg;
-  const media = Array.isArray(e && e.media) ? e.media : [];
-  const firstImage = media.find((m) => m && (m.kind === 'image' || m.src));
-  const fromMedia = safeImageSrc((firstImage && firstImage.src) || '');
-  if (fromMedia) return fromMedia;
+function newsImageSrc(item, i) {
+  const fromCms = safeImageSrc(cmsItemImageSrc(item));
+  if (fromCms) return fromCms;
   return safeImageSrc(HOLDER[i % HOLDER.length] || '');
 }
 
 /**
- * Ensure each slide gets a distinct image when seed data reuses placeholders.
- * @param {object[]} events
+ * Ensure each slide gets a distinct image when items reuse placeholders.
+ * @param {object[]} items
  * @returns {string[]}
  */
-function uniqueSlideImages(events) {
+function uniqueSlideImages(items) {
   const used = new Set();
   const extras = [
     'img/Holders/0.jpg',
@@ -115,8 +73,8 @@ function uniqueSlideImages(events) {
     'img/Holders/4.jpg',
     'img/Holders/5.jpg',
   ];
-  return events.map((e, i) => {
-    let src = eventImageSrc(e, i);
+  return items.map((item, i) => {
+    let src = newsImageSrc(item, i);
     if (src && !used.has(src)) {
       used.add(src);
       return src;
@@ -136,8 +94,8 @@ function uniqueSlideImages(events) {
  */
 export function mountFeaturedCarousel(root) {
   if (!root) return;
-  const events = getFeaturedCarouselEvents(3);
-  if (!events.length) {
+  const items = resolveFeaturedNews(getNews(), getFeaturedNewsIds());
+  if (!items.length) {
     root.hidden = true;
     return;
   }
@@ -146,7 +104,7 @@ export function mountFeaturedCarousel(root) {
   let index = 0;
   let timer = null;
   const reduce = prefersReducedMotion();
-  const slideImages = uniqueSlideImages(events);
+  const slideImages = uniqueSlideImages(items);
 
   const track = el('div', {
     className: 'feat-carousel-track',
@@ -155,11 +113,11 @@ export function mountFeaturedCarousel(root) {
       'aria-live': 'polite',
     },
   });
-  const slides = events.map((e, i) => {
+  const slides = items.map((item, i) => {
     const imgSrc = slideImages[i] || '';
-    const title = e.title || '';
-    const summary = eventResume(e);
-    const slug = e.slug || e.id || '';
+    const title = item.title || '';
+    const summary = newsResume(item);
+    const slug = item.slug || item.id || '';
     const slide = el('div', {
       className: 'feat-carousel-slide' + (i === 0 ? ' is-active' : ''),
       attrs: {
@@ -193,7 +151,7 @@ export function mountFeaturedCarousel(root) {
         el('a', {
           className: 'feat-carousel-cta',
           text: t('feat_carousel_cta'),
-          attrs: { href: `#event/${encodeURIComponent(slug)}` },
+          attrs: { href: `#news/${encodeURIComponent(slug)}` },
         }),
       );
     }
@@ -267,7 +225,7 @@ export function mountFeaturedCarousel(root) {
   controls.append(prevBtn, pauseBtn, nextBtn);
 
   const dots = el('div', { className: 'feat-carousel-dots', attrs: { role: 'tablist' } });
-  events.forEach((_, i) => {
+  items.forEach((_, i) => {
     const d = el('button', {
       className: 'feat-carousel-dot' + (i === 0 ? ' is-active' : ''),
       attrs: { type: 'button', 'aria-label': `${i + 1}` },

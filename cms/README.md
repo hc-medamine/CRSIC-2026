@@ -21,6 +21,7 @@ Next.js (App Router) admin app for Step 4 — see [docs/prds/2026-07-19-internal
 cd cms
 npm install
 npm run db:seed:super-admin
+npm run db:seed:staff
 npm run dev
 ```
 
@@ -49,6 +50,17 @@ committed. Names are stored AR (authoritative) + EN.
 | Reviewer | F. Boufatah | فريحة بوفاتح | Fariha Boufatah | `f.boufatah@crsic.dz` |
 | Editor | i.megoussi | ايمان مقوسي | Megoussi Imen | `i.megoussi@crsic.dz` |
 | Editor | t.medjelled | طارق مجلد | Tarek Medjelled | `t.medjelled@crsic.dz` |
+| Editor | a.djefal | a.djefal | a.djefal | `a.djefal@crsic.dz` |
+| Editor | a.derrafa | a.derrafa | a.derrafa | `a.derrafa@crsic.dz` |
+
+**Provisional desks** (live CMS as of 2026-08-21 — staff will re-check and we will change this again). Seeded by `npm run db:seed:staff`. After a desk change, run `npm run db:reassign:to-claims -- --apply` so Editors can open the items they own.
+
+| Editor | Org | Types |
+|--------|-----|-------|
+| `i.megoussi@crsic.dz` | `centre_wide` | news, event, law, partner |
+| `t.medjelled@crsic.dz` | `centre_wide` | publication, platform |
+| `a.djefal@crsic.dz` | all four research depts | research_group, research_project |
+| `a.derrafa@crsic.dz` | `centre_wide` | alert |
 
 **Smoke accounts are test-only** (automation for `npm run db:smoke`), not real staff — keep but do
 not treat as people: `smoke.editor@crsic.dz`, `smoke.reviewer@crsic.dz`.
@@ -60,6 +72,12 @@ not treat as people: `smoke.editor@crsic.dz`, `smoke.reviewer@crsic.dz`.
 | News | Done | `data/news.json` |
 | Events | Done | `data/events.json` |
 | Publications | Done | `data/publications.json` (`covers.length === pubs.length`) |
+| Partners | Done | `data/partners.json` |
+| Alerts | Done | `data/alerts.json` |
+| Laws | Done | `data/laws.json` |
+| Platforms | Done | `data/platforms.json` |
+| Research groups / projects | Done | `data/research-groups.json`, `data/research-projects.json` |
+| Site director | Done | `data/director.json` (singleton, not `content_items`) |
 
 Editors need the matching content-type scope (`news` / `event` / `publication`). Four-eyes: authors cannot approve their own items.
 
@@ -86,8 +104,12 @@ Before the first production publish, import the existing static cards so nothing
 ## Media
 
 - Max **5 MB**; JPEG / PNG / WebP / PDF (magic-byte checked)
-- Public paths: `img/cms/news/`, `img/cms/events/`, `img/cms/covers/`
-- Replace overwrites the **same** public path
+- Public paths: `img/cms/{news|events|covers|partners|research|alerts|laws|platforms|site}/`
+- Published files under `img/cms/` are **tracked in git** so clones get the same binaries the SPA serves
+- One-shot cutover (legacy `img/covers` / `img/Holders` → `img/cms/`): `npm run db:migrate:media-to-cms`
+- WordPress → CMS (owned types, dry-run first): `npm run db:cutover:wordpress` then `-- --apply` after signing `tmp/wp-cutover-report.json`
+- Replace overwrites the **same** public path (library asks for confirm when the file is already on a published page)
+- Editors: own uploads in folders matching their content scopes. Reviewers: see scoped files; replace/delete only what they uploaded. Super Admin: all.
 - Staging: `cms/uploads/` (gitignored); UI: `/dashboard/media` and content forms
 - Migrations auto-run on `npm run dev` / `npm run build`
 - Audit log (Super Admin): `/dashboard/audit`

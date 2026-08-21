@@ -15,6 +15,8 @@ type Props = {
   disabled?: boolean;
   imagesOnly?: boolean;
   label?: string;
+  /** When replacing a file that is already on the public site, confirm first. */
+  liveReplaceConfirm?: boolean;
   onUploaded: (info: { publicPath: string; mediaId: string }) => void;
 };
 
@@ -25,6 +27,7 @@ export function MediaUploadField({
   disabled,
   imagesOnly = true,
   label,
+  liveReplaceConfirm = false,
   onUploaded,
 }: Props) {
   const lang = useCmsLang();
@@ -34,6 +37,7 @@ export function MediaUploadField({
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  const [pendingReplaceFile, setPendingReplaceFile] = useState<File | null>(null);
 
   const accept = imagesOnly
     ? "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
@@ -42,9 +46,8 @@ export function MediaUploadField({
   const previewSrc = cmsMediaSrc(publicPath);
   const isPdf = publicPath.toLowerCase().endsWith(".pdf");
 
-  const uploadFile = useCallback(
-    async (file: File | null) => {
-      if (!file || disabled) return;
+  const postFile = useCallback(
+    async (file: File) => {
       setPending(true);
       setError(null);
       try {
@@ -73,7 +76,20 @@ export function MediaUploadField({
         if (inputRef.current) inputRef.current.value = "";
       }
     },
-    [bucket, disabled, imagesOnly, lang, mediaId, onUploaded],
+    [bucket, imagesOnly, lang, mediaId, onUploaded],
+  );
+
+  const uploadFile = useCallback(
+    async (file: File | null) => {
+      if (!file || disabled) return;
+      if (mediaId && liveReplaceConfirm) {
+        setPendingReplaceFile(file);
+        if (inputRef.current) inputRef.current.value = "";
+        return;
+      }
+      await postFile(file);
+    },
+    [disabled, liveReplaceConfirm, mediaId, postFile],
   );
 
   function onDrop(e: DragEvent) {
@@ -146,6 +162,46 @@ export function MediaUploadField({
         </div>
       ) : null}
       {error ? <p className="text-xs text-red-600">{error}</p> : null}
+      {pendingReplaceFile ? (
+        <div
+          className="cms-modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="media-replace-title"
+        >
+          <div className="cms-modal-panel w-full max-w-md rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-lg">
+            <h2 id="media-replace-title" className="text-base font-semibold text-crs-ink">
+              {t("mediaReplaceTitle", lang)}
+            </h2>
+            <p className="mt-2 text-sm text-crs-muted">{t("mediaLiveReplaceHint", lang)}</p>
+            <p className="mt-2 text-xs text-crs-muted" dir="auto">
+              {pendingReplaceFile.name}
+            </p>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                className="rounded-xl border border-crs-border px-3 py-2 text-sm"
+                disabled={pending}
+                onClick={() => setPendingReplaceFile(null)}
+              >
+                {t("mediaCancel", lang)}
+              </button>
+              <button
+                type="button"
+                className="rounded-xl bg-crs-primary px-3 py-2 text-sm text-white disabled:opacity-60"
+                disabled={pending}
+                onClick={() => {
+                  const next = pendingReplaceFile;
+                  setPendingReplaceFile(null);
+                  void postFile(next);
+                }}
+              >
+                {pending ? t("uploading", lang) : t("mediaReplaceConfirm", lang)}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <MediaLightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />
     </div>
   );

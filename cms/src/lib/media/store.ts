@@ -190,8 +190,20 @@ function mimeForExtension(ext: string): string {
 /**
  * Register on-disk publication covers (`img/covers/*`) into media_assets so the
  * media library lists every book cover, not only CMS uploads under img/cms/covers.
- * Idempotent: skips paths already present.
+ * Idempotent: skips paths already present. New rows belong to the publication Editor.
  */
+export async function publicationEditorId(): Promise<string | null> {
+  const result = await query<{ editor_id: string }>(
+    `SELECT ect.editor_id
+     FROM editor_content_type_claims ect
+     JOIN users u ON u.id = ect.editor_id
+     WHERE ect.content_type = 'publication' AND u.is_active = TRUE
+     ORDER BY ect.created_at ASC NULLS LAST
+     LIMIT 1`,
+  );
+  return result.rows[0]?.editor_id ?? null;
+}
+
 export async function registerLegacyCoverFiles(fallbackUploaderId: string): Promise<number> {
   const coversDir = join(publicRepoRoot(), "img", "covers");
   if (!existsSync(coversDir)) return 0;
@@ -201,6 +213,7 @@ export async function registerLegacyCoverFiles(fallbackUploaderId: string): Prom
   );
   if (files.length === 0) return 0;
 
+  const deskOwner = await publicationEditorId();
   let inserted = 0;
   for (const name of files) {
     const publicPath = `img/covers/${name}`;
@@ -240,7 +253,8 @@ export async function registerLegacyCoverFiles(fallbackUploaderId: string): Prom
        LIMIT 1`,
       [publicPath],
     );
-    const uploadedBy = owner.rows[0]?.created_by || fallbackUploaderId;
+    const uploadedBy =
+      deskOwner || owner.rows[0]?.created_by || fallbackUploaderId;
     const updatedAt = owner.rows[0]?.updated_at ?? null;
 
     try {
