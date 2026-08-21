@@ -65,8 +65,6 @@ const TYPE_BUCKET: Record<CmsType, MediaBucket> = {
   research_project: "research",
 };
 
-const CENTRE_TYPES: CmsType[] = ["news", "event", "publication", "partner", "alert", "law", "platform"];
-
 type Staff = { id: string; email: string; display_name: string; role: string };
 
 type PlanRow = {
@@ -89,19 +87,15 @@ function reportPath(): string {
   return join(repoRoot(), "tmp", "wp-cutover-report.json");
 }
 
+/** Provisional desks — keep in sync with cms/scripts/seed-staff.ts until staff confirm. */
 function editorEmailFor(item: ScrapedItem): string | null {
-  if (item.type === "law" || item.type === "platform") return MEDJELLED;
-  if (CENTRE_TYPES.includes(item.type) && item.type !== "law" && item.type !== "platform") {
+  if (item.type === "publication" || item.type === "platform") return MEDJELLED;
+  if (item.type === "alert") return DERRAFA;
+  if (item.type === "news" || item.type === "event" || item.type === "partner" || item.type === "law") {
     return MEGOUSSI;
   }
   if (item.type === "research_group" || item.type === "research_project") {
-    if (item.orgUnitId === "dept_quran_fiqh" || item.orgUnitId === "dept_thought_dialogue") {
-      return DJEFAL;
-    }
-    if (item.orgUnitId === "dept_algeria_history" || item.orgUnitId === "dept_islamic_civ") {
-      return DERRAFA;
-    }
-    return null;
+    return DJEFAL;
   }
   return MEGOUSSI;
 }

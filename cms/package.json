@@ -32,6 +32,7 @@
     "db:cutover:wordpress": "node --env-file=.env.local --import tsx scripts/cutover-from-wordpress.ts",
     "db:backfill:bylines": "node --env-file=.env.local --import tsx scripts/backfill-news-event-bylines.ts",
     "db:reassign-legacy-authorship": "node --env-file=.env.local --import tsx scripts/reassign-legacy-authorship.ts",
+    "db:reassign:to-claims": "node --env-file=.env.local --import tsx scripts/reassign-to-editor-claims.ts",
     "db:set-legacy-publisher-boufatah": "node --env-file=.env.local --import tsx scripts/set-legacy-publisher-boufatah.ts",
     "db:reassign:partners-people": "node --env-file=.env.local --import tsx scripts/reassign-partners-people.ts"
   },

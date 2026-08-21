@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-21 — Align authorship with live editor desks
+
+Live CMS scopes are the desk SSOT (staff will re-check later). Seed + cutover map now match: Megoussi news/event/law/partner; Medjelled publication/platform; Djefal all four research depts; Derrafa alert. Reassigned 36 publications, 3 laws, and 4 east research groups so Editors can open their own items. Ops: `cd cms && npm run db:reassign:to-claims -- --apply`.
+
+---
+
 ### 2026-08-21 — Byline: collapse identical reviewer + publisher
 
 When المراجعة and النشر are the same person, the SPA shows one line (**المراجعة والنشر** / **Reviewer & Publisher**) instead of repeating the name.

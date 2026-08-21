@@ -1,6 +1,8 @@
 /**
  * Local staff seed — Reviewer + Editors from cms/README.md and cms/.env.example.
  * Super Admin is seeded separately via npm run db:seed:super-admin.
+ * Desk types are provisional (staff will re-check). After changing them, run
+ * `npm run db:reassign:to-claims -- --apply` so authorship follows the new claims.
  */
 import { hashPassword } from "../src/lib/auth/password";
 import { query } from "../src/lib/db";
@@ -82,12 +84,17 @@ async function main() {
   const orgs = await allOrgUnitIds();
   if (orgs.length === 0) throw new Error("No org units found");
 
-  const spaEditorial: ContentType[] = ["news", "event", "publication", "partner", "alert"];
-  const spaLawsPlatforms: ContentType[] = ["law", "platform"];
-  const researchTypes: ContentType[] = ["research_group", "research_project"];
+  // Provisional desks — match live CMS as of 2026-08-21. Staff will re-check;
+  // change these arrays then re-run seed + `npm run db:reassign:to-claims -- --apply`.
+  // Order matters for SPA exclusivity: release overlapping types before taking them.
   const centreWide = ["centre_wide"];
-  const researchWest = ["dept_quran_fiqh", "dept_thought_dialogue"];
-  const researchEast = ["dept_algeria_history", "dept_islamic_civ"];
+  const researchDepts = [
+    "dept_quran_fiqh",
+    "dept_thought_dialogue",
+    "dept_algeria_history",
+    "dept_islamic_civ",
+  ];
+  const researchTypes: ContentType[] = ["research_group", "research_project"];
 
   await upsertStaff(
     {
@@ -110,13 +117,12 @@ async function main() {
       nameAr: "ايمان مقوسي",
       nameEn: "Megoussi Imen",
       role: "editor",
-      contentTypes: spaEditorial,
+      contentTypes: ["news", "event", "law", "partner"],
       orgUnitIds: centreWide,
     },
     orgs,
   );
 
-  // Upsert medjelled before research editors so old research claims are released.
   await upsertStaff(
     {
       email: "t.medjelled@crsic.dz",
@@ -125,7 +131,21 @@ async function main() {
       nameAr: "طارق مجلد",
       nameEn: "Tarek Medjelled",
       role: "editor",
-      contentTypes: spaLawsPlatforms,
+      contentTypes: ["publication", "platform"],
+      orgUnitIds: centreWide,
+    },
+    orgs,
+  );
+
+  await upsertStaff(
+    {
+      email: "a.derrafa@crsic.dz",
+      password: editorPassword,
+      displayName: "a.derrafa",
+      nameAr: "a.derrafa",
+      nameEn: "a.derrafa",
+      role: "editor",
+      contentTypes: ["alert"],
       orgUnitIds: centreWide,
     },
     orgs,
@@ -140,21 +160,7 @@ async function main() {
       nameEn: "a.djefal",
       role: "editor",
       contentTypes: researchTypes,
-      orgUnitIds: researchWest,
-    },
-    orgs,
-  );
-
-  await upsertStaff(
-    {
-      email: "a.derrafa@crsic.dz",
-      password: editorPassword,
-      displayName: "a.derrafa",
-      nameAr: "a.derrafa",
-      nameEn: "a.derrafa",
-      role: "editor",
-      contentTypes: researchTypes,
-      orgUnitIds: researchEast,
+      orgUnitIds: researchDepts,
     },
     orgs,
   );

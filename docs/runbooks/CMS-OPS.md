@@ -154,6 +154,16 @@ Dry-run writes no DB/JSON. Apply overwrites live JSON after copying `data/*.json
 
 **Editor content types (exclusivity):** SPA types — at most one Editor CMS-wide. Research types — at most one Editor **per org**. Types must appear in the union of that Editor’s org catalogs.
 
+**Provisional desks** (pending staff confirmation; see `cms/README.md` staff table). To move items to whoever currently claims each type:
+
+```powershell
+cd cms
+npm run db:reassign:to-claims            # dry-run
+npm run db:reassign:to-claims -- --apply
+```
+
+There is no CMS UI for bulk reassign (deferred). After `npm run db:seed:staff` or a scope change in User management, re-run the apply command so `created_by` matches the new claims.
+
 ---
 
 ## 6. Publish cutover caution

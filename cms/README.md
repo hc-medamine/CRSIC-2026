@@ -53,6 +53,15 @@ committed. Names are stored AR (authoritative) + EN.
 | Editor | a.djefal | a.djefal | a.djefal | `a.djefal@crsic.dz` |
 | Editor | a.derrafa | a.derrafa | a.derrafa | `a.derrafa@crsic.dz` |
 
+**Provisional desks** (live CMS as of 2026-08-21 — staff will re-check and we will change this again). Seeded by `npm run db:seed:staff`. After a desk change, run `npm run db:reassign:to-claims -- --apply` so Editors can open the items they own.
+
+| Editor | Org | Types |
+|--------|-----|-------|
+| `i.megoussi@crsic.dz` | `centre_wide` | news, event, law, partner |
+| `t.medjelled@crsic.dz` | `centre_wide` | publication, platform |
+| `a.djefal@crsic.dz` | all four research depts | research_group, research_project |
+| `a.derrafa@crsic.dz` | `centre_wide` | alert |
+
 **Smoke accounts are test-only** (automation for `npm run db:smoke`), not real staff — keep but do
 not treat as people: `smoke.editor@crsic.dz`, `smoke.reviewer@crsic.dz`.
 
