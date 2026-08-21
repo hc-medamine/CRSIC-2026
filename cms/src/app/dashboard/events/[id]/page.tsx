@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import { CMS_LANG_COOKIE, normalizeLang, t, localizedDisplayName } from "@/lib/i18n/labels";
@@ -19,6 +18,7 @@ import { CommentThread } from "@/app/dashboard/comment-thread";
 import { ReviewOwnerPanel } from "@/app/dashboard/review-owner-panel";
 import { EscalatePanel } from "@/app/dashboard/escalate-panel";
 import { EmergencyPanel } from "@/app/dashboard/emergency-panel";
+import { EditPageShell } from "@/app/dashboard/content-list-page";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -75,17 +75,19 @@ export default async function EventDetailPage({ params }: Props) {
   const media = item.image_path ? await getMediaByPublicPath(item.image_path) : null;
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
-      <header className="flex items-center justify-between border-b border-crs-border pb-4">
-        <div>
-          <p className="text-sm uppercase tracking-wide text-crs-muted">{t("events", lang)}</p>
-          <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">{t("editReview", lang)}</h1>
-        </div>
-        <Link href="/dashboard/events" className="inline-flex min-h-11 items-center text-sm text-crs-primary hover:underline">{t("backToList", lang)}</Link>
-      </header>
+    <EditPageShell
+      breadcrumbs={[
+        { href: "/dashboard", label: t("home", lang) },
+        { href: "/dashboard/events", label: t("events", lang) },
+        { label: t("edit", lang) },
+      ]}
+      title={t("editReview", lang)}
+      subtitle={item.title_ar || undefined}
+      wide
+    >
 
       {!reviewer && canReview(user) && item.created_by === user.id ? (
-        <p className="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+        <p className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
           {t("fourEyesNotice", lang)}
         </p>
       ) : null}
@@ -220,6 +222,6 @@ export default async function EventDetailPage({ params }: Props) {
       />
 
       <RevisionHistory contentItemId={item.id} contentType="event" canRestore={canManage} />
-    </main>
+    </EditPageShell>
   );
 }

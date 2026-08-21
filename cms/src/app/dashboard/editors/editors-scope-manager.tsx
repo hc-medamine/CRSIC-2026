@@ -17,6 +17,7 @@ import {
   tf,
 } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
+import { DeskEmptyState } from "@/app/dashboard/desk-ui";
 
 const CONTENT_TYPES: ContentType[] = ALL_CONTENT_TYPES;
 
@@ -127,9 +128,9 @@ export function EditorsScopeManager({
       {message ? <p className="text-sm text-green-700">{message}</p> : null}
 
       {editors.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-crs-border p-6 text-sm text-crs-muted">
-          {t("editorsEmpty", lang)}
-        </p>
+        <DeskEmptyState>
+          <p className="text-sm text-crs-muted">{t("editorsEmpty", lang)}</p>
+        </DeskEmptyState>
       ) : (
         <ul className="grid gap-4">
           {editors.map((ed) => {
@@ -137,7 +138,7 @@ export function EditorsScopeManager({
             return (
               <li
                 key={ed.id}
-                className="grid gap-3 rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm"
+                className="grid gap-3 rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-[var(--crs-shadow-soft)]"
               >
                 <div>
                   <p className="font-medium text-crs-ink">

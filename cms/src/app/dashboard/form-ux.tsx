@@ -18,10 +18,10 @@ export function FormSection({
   children: ReactNode;
 }) {
   return (
-    <section className="flex flex-col gap-3 rounded-2xl border border-crs-border/80 bg-crs-bg/30 p-4 first:mt-0">
+    <section className="flex flex-col gap-4 rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-[var(--crs-shadow-soft)] first:mt-0 lg:p-6">
       <div className="flex items-start gap-3">
         {typeof step === "number" ? (
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-crs-primary text-xs font-semibold text-white">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-crs-primary text-xs font-semibold text-white">
             {step}
           </span>
         ) : null}
@@ -49,11 +49,11 @@ export function AdvancedDisclosure({
   defaultOpen?: boolean;
 }) {
   return (
-    <details className="rounded-2xl border border-crs-border bg-crs-bg/60 open:bg-crs-surface">
-      <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-crs-ink marker:content-none [&::-webkit-details-marker]:hidden">
+    <details className="rounded-2xl border border-crs-border bg-crs-surface shadow-[var(--crs-shadow-soft)] open:bg-crs-surface">
+      <summary className="cursor-pointer list-none px-5 py-4 text-sm font-medium text-crs-ink marker:content-none [&::-webkit-details-marker]:hidden">
         <span className="flex min-h-11 items-center gap-3">
           {typeof step === "number" ? (
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-crs-primary text-xs font-semibold text-white">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-crs-primary text-xs font-semibold text-white">
               {step}
             </span>
           ) : null}
@@ -63,7 +63,7 @@ export function AdvancedDisclosure({
           </span>
         </span>
       </summary>
-      <div className="grid gap-3 border-t border-crs-border/80 px-4 py-4">{children}</div>
+      <div className="grid gap-3 border-t border-crs-border/80 px-5 py-5">{children}</div>
     </details>
   );
 }
@@ -103,8 +103,8 @@ export function FormStickyActions({ children }: { children: ReactNode }) {
       <div ref={sentinelRef} className="h-px" aria-hidden="true" />
       <div
         ref={barRef}
-        className={`sticky bottom-0 z-10 mt-6 border-t border-crs-border bg-crs-surface/95 py-4 backdrop-blur transition-[box-shadow] duration-200 ${
-          castShadow ? "shadow-[0_-8px_20px_-14px_rgba(26,46,38,0.35)]" : ""
+        className={`sticky bottom-0 z-10 mt-6 rounded-2xl border border-crs-border bg-crs-surface/95 px-4 py-4 backdrop-blur transition-[box-shadow] duration-200 ${
+          castShadow ? "shadow-[var(--crs-shadow-lift)]" : "shadow-[var(--crs-shadow-soft)]"
         }`}
       >
         <div className="flex flex-wrap items-center justify-end gap-2">{children}</div>
@@ -127,7 +127,7 @@ export function FormBanner({
         ? "border-crs-secondary/30 bg-crs-primary/10 text-crs-primary"
         : "border-crs-border bg-crs-bg text-crs-ink";
   return (
-    <div className={`rounded-2xl border px-4 py-3 text-sm ${styles}`} role="status">
+    <div className={`rounded-2xl border px-4 py-3 text-sm shadow-[var(--crs-shadow-soft)] ${styles}`} role="status">
       {children}
     </div>
   );
@@ -179,7 +179,7 @@ export function PublishButton({
   pending,
   onClick,
   children,
-  className = "w-fit rounded bg-crs-primary px-4 py-2 text-sm text-white hover:bg-crs-secondary disabled:opacity-60",
+  className = "w-fit rounded-xl bg-crs-primary px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-crs-secondary disabled:opacity-60",
   disabled = false,
 }: {
   pending: boolean;

@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Approved** (2026-08-20) — **I1 Delivered** on `main` (PR #31). **I2** forms/admin interiors still follow-on |
+| Status | **Approved** (2026-08-20) — **I1 Delivered** on `main` (PR #31). **I2** forms/admin/login implemented on `feature/cms-desk-interiors-i2` — awaiting walkthrough |
 | Date | 2026-08-20 |
 | Author | Cursor session (with stakeholder) |
 | Owners | Stakeholder + agent |
@@ -151,9 +151,9 @@
 
 **I2 — Forms, admin, login** (merge 2, after walkthrough)
 
-- [ ] Restyle `EditPageShell` + `form-ux` primitives; apply across all create/edit types + director + profile
-- [ ] Restyle media library + “showing N” (+ truncated hint at limit)
-- [ ] Restyle users, org units, editors, audit, notifications (honesty on caps if present)
-- [ ] Login visual alignment
-- [ ] Should-have: preview chrome i18n + Desk spacing; edit-page panel chrome
+- [x] Restyle `EditPageShell` + `form-ux` primitives; apply across all create/edit types + director + profile
+- [x] Restyle media library + “showing N” (+ truncated hint at limit)
+- [x] Restyle users, org units, editors, audit, notifications (honesty on caps if present)
+- [x] Login visual alignment
+- [x] Should-have: preview chrome i18n + Desk spacing; edit-page panel chrome
 - [ ] AR + EN walkthrough: create/edit news, login, media

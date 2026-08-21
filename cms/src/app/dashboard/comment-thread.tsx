@@ -93,7 +93,7 @@ export function CommentThread({ contentItemId, refreshToken }: Props) {
   }
 
   return (
-    <section className="rounded border border-crs-border bg-white p-4">
+    <section className="rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-[var(--crs-shadow-soft)]">
       <h2 className="mb-3 text-lg font-semibold">{t("commentsTitle", lang)}</h2>
       <p className="mb-4 text-xs text-crs-muted">{t("commentsHint", lang)}</p>
 

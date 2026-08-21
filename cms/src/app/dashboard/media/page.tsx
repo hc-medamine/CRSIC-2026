@@ -11,7 +11,8 @@ import { mediaReplaceAffectsPublic } from "@/lib/media/replacePublic";
 import { listMediaReferencesForPaths } from "@/lib/media/references";
 import { MEDIA_BUCKETS, type MediaBucket } from "@/lib/media/config";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
-import { PageBreadcrumb } from "@/app/dashboard/ui-bits";
+import { AdminPageShell } from "@/app/dashboard/desk-ui";
+import { MEDIA_LIBRARY_FETCH_LIMIT } from "@/lib/cms-limits";
 import { MediaLibraryClient, type MediaLibraryItem } from "./media-library-client";
 
 const SOURCE_PRIORITY = [
@@ -40,7 +41,7 @@ export default async function MediaLibraryPage() {
     await registerLegacyCoverFiles(user.id);
   }
 
-  const assets = await listMediaForUser(user, 400);
+  const assets = await listMediaForUser(user, MEDIA_LIBRARY_FETCH_LIMIT);
   const refsByPath = await listMediaReferencesForPaths(assets.map((a) => a.public_path));
 
   const items: MediaLibraryItem[] = assets.map((r) => {
@@ -69,19 +70,19 @@ export default async function MediaLibraryPage() {
   const lang = normalizeLang(cookieStore.get(CMS_LANG_COOKIE)?.value);
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
-      <PageBreadcrumb
-        items={[
-          { href: "/dashboard", label: t("home", lang) },
-          { label: t("media", lang) },
-        ]}
+    <AdminPageShell
+      breadcrumbs={[
+        { href: "/dashboard", label: t("home", lang) },
+        { label: t("media", lang) },
+      ]}
+      title={t("media", lang)}
+      subtitle={t("mediaLibraryHint", lang)}
+    >
+      <MediaLibraryClient
+        initialItems={items}
+        allowedBuckets={allowedBuckets}
+        fetchLimit={MEDIA_LIBRARY_FETCH_LIMIT}
       />
-      <header>
-        <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">{t("media", lang)}</h1>
-        <p className="mt-1 text-sm text-crs-muted">{t("mediaLibraryHint", lang)}</p>
-      </header>
-
-      <MediaLibraryClient initialItems={items} allowedBuckets={allowedBuckets} />
-    </main>
+    </AdminPageShell>
   );
 }

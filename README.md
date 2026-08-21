@@ -778,7 +778,7 @@ No separate staging config files exist in-repo.
 | 4 | Internal web app + database (users, roles, publish) — **no external CMS**, **no email/SMTP** | **On `main`** — Next.js 16 + PostgreSQL 18; migrations through `029_site_featured_news.sql` |
 | 5 | Motion & interactivity polish (SPA + CMS) | **Done on `main`** — [PRD](./docs/prds/2026-08-18-motion-interactivity-polish.md) (PRs #24–#27) |
 | — | CMS Desk (shell + dashboard home) | **Done on `main`** — [PRD](./docs/prds/2026-08-19-cms-desk-design.md) (`25b15cc`) |
-| — | CMS Desk interiors (lists, forms, admin, login) | **I1 lists on `main`** (PR #31). I2 forms/admin still follow-on — [PRD](./docs/prds/2026-08-20-cms-desk-interiors.md) |
+| — | CMS Desk interiors (lists, forms, admin, login) | **I1 on `main`** (PR #31). **I2** on `feature/cms-desk-interiors-i2` — awaiting walkthrough — [PRD](./docs/prds/2026-08-20-cms-desk-interiors.md) |
 | — | WordPress → CMS/SPA cutover (owned types) | **Done on `main`** (`b1c022c`) — [PRD](./docs/prds/2026-08-21-wordpress-cms-spa-cutover.md) |
 | — | News/event card bylines | **Done on `main`** — [PRD](./docs/prds/2026-08-21-spa-news-event-card-byline.md) |
 | — | Home Center News 3-card pager | **Done on `main`** — [PRD](./docs/prds/2026-08-21-home-news-carousel.md) |
@@ -790,7 +790,7 @@ No separate staging config files exist in-repo.
 2. **Contact depends on a local mail client** — no server-side mailer or form API.
 3. **Audit TODOs are closed**; no `TODO`/`FIXME` markers remain in app JS for open defects.
 4. **Home featured playlist** is empty until Reviewer/SA publishes `/dashboard/featured-news` (SPA fallback is live).
-5. **CMS Desk I2** (forms/admin interiors) is not closed as a full slice.
+5. **CMS Desk I2** (forms/admin/login) is implemented on `feature/cms-desk-interiors-i2`; merge after the AR+EN walkthrough.
 
 ### Technical debt
 
@@ -804,7 +804,19 @@ No separate staging config files exist in-repo.
 
 Own **internal CMS + PostgreSQL** (`cms/`): authenticated users with roles and publishing tasks. Public site remains the visitor face; no third-party/external CMS; **no email/SMTP features**. Development continues on `feature/` \| `fix/` \| `content/` \| `docs/` branches; **never commit directly to `main`**. Go-live on `crsic.dz` only when ops say the product works with zero friction.
 
-**CMS deferred backlog** (do not implement without a new Approved PRD): list pagination (~200-row trigger), bulk ops / clone / import-export UI, scheduled publish, recycle bin, media crop, EN body parity, journals in CMS, static institutional pages in CMS, CMS UI to reassign editor/reviewer/publisher (ops scripts already exist). See [docs/WORKLOG.md](./docs/WORKLOG.md) § Deferred backlog.
+**CMS deferred backlog** (do not implement without a new Approved PRD; simple → complex):
+
+1. CMS UI to reassign editor/reviewer/publisher (ops scripts already exist)
+2. Server list pagination (~200-row trigger)
+3. Soft-delete recycle bin (hard-delete + ref scan already shipped)
+4. Scheduled publish
+5. Bulk ops / clone / import-export UI
+6. Media crop / optimize / variants
+7. EN editorial body parity
+8. Static institutional pages in CMS (locales only today)
+9. Journals in CMS (OJS remains)
+
+See [docs/WORKLOG.md](./docs/WORKLOG.md) § Deferred backlog.
 
 Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Core spec: [docs/prds/2026-07-19-internal-content-management.md](./docs/prds/2026-07-19-internal-content-management.md).
 

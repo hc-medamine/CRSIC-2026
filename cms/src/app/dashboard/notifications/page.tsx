@@ -2,34 +2,31 @@ import { cookies } from "next/headers";
 import { requireUser } from "@/lib/auth/session";
 import { countUnread, listNotificationsForUser } from "@/lib/notifications";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
-import { PageBreadcrumb } from "@/app/dashboard/ui-bits";
+import { AdminPageShell } from "@/app/dashboard/desk-ui";
+import { NOTIFICATIONS_FETCH_LIMIT } from "@/lib/cms-limits";
 import { NotificationsClient } from "./notifications-client";
 
 export default async function NotificationsPage() {
   const user = await requireUser();
   const [items, unread] = await Promise.all([
-    listNotificationsForUser(user.id),
+    listNotificationsForUser(user.id, NOTIFICATIONS_FETCH_LIMIT),
     countUnread(user.id),
   ]);
   const cookieStore = await cookies();
   const lang = normalizeLang(cookieStore.get(CMS_LANG_COOKIE)?.value);
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
-      <PageBreadcrumb
-        items={[
-          { href: "/dashboard", label: t("home", lang) },
-          { label: t("notifications", lang) },
-        ]}
-      />
-      <header>
-        <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">
-          {t("notifications", lang)}
-        </h1>
-        <p className="mt-1 text-sm text-crs-muted">{t("notificationsHint", lang)}</p>
-      </header>
-
+    <AdminPageShell
+      breadcrumbs={[
+        { href: "/dashboard", label: t("home", lang) },
+        { label: t("notifications", lang) },
+      ]}
+      title={t("notifications", lang)}
+      subtitle={t("notificationsHint", lang)}
+      wide={false}
+    >
       <NotificationsClient
+        fetchLimit={NOTIFICATIONS_FETCH_LIMIT}
         initialUnread={unread}
         initialItems={items.map((n) => ({
           id: n.id,
@@ -41,6 +38,6 @@ export default async function NotificationsPage() {
           createdAt: n.created_at.toISOString(),
         }))}
       />
-    </main>
+    </AdminPageShell>
   );
 }

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { requireSuperAdmin, listOrgUnits, listUsers } from "@/lib/users";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
-import { PageBreadcrumb } from "@/app/dashboard/ui-bits";
+import { AdminPageShell } from "@/app/dashboard/desk-ui";
 import { UsersManager } from "./users-manager";
 
 export default async function UsersPage() {
@@ -12,25 +12,23 @@ export default async function UsersPage() {
   const lang = normalizeLang(cookieStore.get(CMS_LANG_COOKIE)?.value);
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
-      <PageBreadcrumb
-        items={[
-          { href: "/dashboard", label: t("home", lang) },
-          { label: t("users", lang) },
-        ]}
-      />
-      <header>
-        <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">{t("users", lang)}</h1>
-        <p className="mt-1 text-sm text-crs-muted">
+    <AdminPageShell
+      breadcrumbs={[
+        { href: "/dashboard", label: t("home", lang) },
+        { label: t("users", lang) },
+      ]}
+      title={t("users", lang)}
+      subtitle={
+        <>
           {t("pageDescUsers", lang)}{" "}
           <Link href="/dashboard/org-units" className="font-medium text-crs-primary hover:underline">
             {t("usersOrgUnitsLink", lang)}
           </Link>
           .
-        </p>
-      </header>
-
+        </>
+      }
+    >
       <UsersManager initialUsers={users} orgUnits={orgUnits} />
-    </main>
+    </AdminPageShell>
   );
 }

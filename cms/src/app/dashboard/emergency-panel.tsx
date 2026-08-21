@@ -74,7 +74,7 @@ export function EmergencyPanel({
   if (!canEmergencyPublish && !needsPostReview) return null;
 
   return (
-    <section className="grid gap-2 rounded-lg border border-red-200 bg-red-50 p-4">
+    <section className="grid gap-2 rounded-2xl border border-red-200 bg-red-50 p-5 shadow-[var(--crs-shadow-soft)]">
       <h2 className="text-lg font-medium text-red-950">{t("emergencyPublish", lang)}</h2>
       <p className="text-xs text-red-900">{t("emergencyHint", lang)}</p>
 

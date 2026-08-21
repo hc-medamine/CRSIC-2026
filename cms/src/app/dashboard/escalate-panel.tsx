@@ -56,7 +56,7 @@ export function EscalatePanel({ contentItemId, canEscalate, escalatedAt }: Props
   }
 
   return (
-    <section className="grid gap-2 rounded-lg border border-amber-200 bg-amber-50 p-4">
+    <section className="grid gap-2 rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-[var(--crs-shadow-soft)]">
       <h2 className="text-lg font-medium text-amber-950">{t("escalateTitle", lang)}</h2>
       <p className="text-xs text-amber-900">{t("escalateHint", lang)}</p>
       {escalatedAt ? (

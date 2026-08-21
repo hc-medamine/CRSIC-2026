@@ -168,24 +168,15 @@ export default async function LoginPage() {
       <main
         dir={dir}
         lang={lang}
-        className={`relative flex min-h-screen flex-col justify-center overflow-hidden px-6 py-16 ${
+        className={`cms-desk-bg relative flex min-h-screen flex-col justify-center overflow-hidden px-6 py-16 ${
           lang === "ar" ? "font-[family-name:var(--font-tajawal)]" : "font-sans"
         }`}
       >
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 60% at 20% 20%, rgba(45,106,79,0.12), transparent 55%), radial-gradient(ellipse 70% 50% at 90% 80%, rgba(201,168,76,0.14), transparent 50%), linear-gradient(160deg, #f7f6f2 0%, #ebe8e0 100%)",
-        }}
-        aria-hidden
-      />
       <div className="absolute end-6 top-6 z-10">
         <LoginLangToggle lang={lang} />
       </div>
       <div className="relative mx-auto w-full max-w-md">
-        <LoginDevBubbles bubbles={bubbles} lang={lang} enabled={loginBubblesEnabled()} />
-        <div className="rounded-3xl border border-crs-border/80 bg-crs-surface/95 p-8 shadow-[0_20px_50px_rgba(26,46,38,0.08)] backdrop-blur">
+        <div className="rounded-2xl border border-crs-border bg-crs-surface/95 p-8 shadow-[var(--crs-shadow-lift)]">
           <div className="mb-6 flex flex-col items-center text-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -204,6 +195,7 @@ export default async function LoginPage() {
           </div>
           <LoginForm initialLang={lang} />
         </div>
+        <LoginDevBubbles bubbles={bubbles} lang={lang} enabled={loginBubblesEnabled()} />
         <p className="mt-6 text-center text-xs text-crs-muted">{t("loginFooter", lang)}</p>
       </div>
       </main>

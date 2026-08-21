@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { query } from "@/lib/db";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
-import { PageBreadcrumb } from "@/app/dashboard/ui-bits";
+import { EditPageShell } from "@/app/dashboard/content-list-page";
 import { ProfileForm } from "./profile-form";
 import { AwayPanel } from "@/app/dashboard/away-panel";
 
@@ -30,18 +30,14 @@ export default async function ProfilePage() {
   const lang = normalizeLang(cookieStore.get(CMS_LANG_COOKIE)?.value);
 
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
-      <PageBreadcrumb
-        items={[
-          { href: "/dashboard", label: t("home", lang) },
-          { label: t("profile", lang) },
-        ]}
-      />
-      <header>
-        <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">{t("profile", lang)}</h1>
-        <p className="mt-1 text-sm text-crs-muted">{t("profileHint", lang)}</p>
-      </header>
-
+    <EditPageShell
+      breadcrumbs={[
+        { href: "/dashboard", label: t("home", lang) },
+        { label: t("profile", lang) },
+      ]}
+      title={t("profile", lang)}
+      subtitle={t("profileHint", lang)}
+    >
       <ProfileForm
         initial={{
           email: row.email,
@@ -53,6 +49,6 @@ export default async function ProfilePage() {
       />
 
       <AwayPanel canManage={row.role === "reviewer"} />
-    </main>
+    </EditPageShell>
   );
 }

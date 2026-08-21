@@ -114,6 +114,19 @@ Estimated time: **~10 minutes**.
 | J5 | CMS: create draft group/project → submit → (other) approve → publish → public JSON updates | ☐ |
 | J6 | Automated: `npm run db:smoke:research` (group + project four-eyes; cleans smoke titles) | ☐ |
 
+## Desk interiors I2 (forms / admin / login)
+
+Walk AR + EN on `:3000`. Visual only — workflow and publish rules stay the same.
+
+| # | Check | Pass? |
+|---|--------|-------|
+| Dsk1 | Create or edit **news**: numbered form sections, sticky Save/Submit, comment/revision panels match Desk cards | ☐ |
+| Dsk2 | Login still authenticates; language toggle works; non-production bubbles sit **under** the sign-in card | ☐ |
+| Dsk3 | `/dashboard/media` shows “Showing N”; if N hits the load cap, truncated hint appears (no pager) | ☐ |
+| Dsk4 | One admin page (users **or** audit) uses the same header card as lists; filters/actions still work | ☐ |
+| Dsk5 | In-CMS preview chrome is localized (Home / Preview) in AR and EN | ☐ |
+| Dsk6 | `prefers-reduced-motion: reduce` keeps new interiors static | ☐ |
+
 ## G. Gate
 
 | # | Check | Pass? |

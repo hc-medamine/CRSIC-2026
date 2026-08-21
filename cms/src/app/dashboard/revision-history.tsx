@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { formatDateTime } from "@/lib/format-datetime";
+import { contentTypeApiSegment } from "@/lib/content/api-segment";
 import { t, tf, localizedDisplayName } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 
@@ -36,16 +37,6 @@ type Props = {
   contentType: ContentType;
   canRestore?: boolean;
 };
-
-function apiSegment(type: ContentType): string {
-  if (type === "news") return "news";
-  if (type === "event") return "events";
-  if (type === "publication") return "publications";
-  if (type === "partner") return "partners";
-  if (type === "research_group") return "research-groups";
-  if (type === "research_project") return "research-projects";
-  return "alerts";
-}
 
 const HIGHLIGHT_KEYS = [
   "title_ar",
@@ -114,7 +105,7 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
     setError(null);
     setMessage(null);
     try {
-      const res = await fetch(`/api/${apiSegment(contentType)}/${contentItemId}`, {
+      const res = await fetch(`/api/${contentTypeApiSegment(contentType)}/${contentItemId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "restore_revision", revisionId: selectedId }),
@@ -153,7 +144,7 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
   })();
 
   return (
-    <section className="grid gap-3 rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm">
+    <section className="grid gap-3 rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-[var(--crs-shadow-soft)]">
       <div>
         <h2 className="text-lg font-medium text-crs-ink">{t("revisionHistory", lang)}</h2>
         <p className="text-xs text-crs-muted">{t("revisionHistoryHint", lang)}</p>

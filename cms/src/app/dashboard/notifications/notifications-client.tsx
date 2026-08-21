@@ -11,6 +11,7 @@ import {
   t,
 } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
+import { DeskEmptyState, HonestyCount } from "@/app/dashboard/desk-ui";
 
 type Item = {
   id: string;
@@ -25,9 +26,10 @@ type Item = {
 type Props = {
   initialUnread: number;
   initialItems: Item[];
+  fetchLimit: number;
 };
 
-export function NotificationsClient({ initialUnread, initialItems }: Props) {
+export function NotificationsClient({ initialUnread, initialItems, fetchLimit }: Props) {
   const lang = useCmsLang();
   const router = useRouter();
   const [items, setItems] = useState(initialItems);
@@ -82,18 +84,19 @@ export function NotificationsClient({ initialUnread, initialItems }: Props) {
           type="button"
           disabled={pending || unread === 0}
           onClick={() => void markAll()}
-          className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-50"
+          className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm font-medium text-crs-ink hover:bg-crs-bg disabled:opacity-50"
         >
           {t("notifMarkAllRead", lang)}
         </button>
       </div>
 
       {items.length === 0 ? (
-        <p className="cms-empty-state rounded-lg border border-dashed border-crs-border bg-white p-6 text-sm text-crs-muted">
-          {t("notifEmpty", lang)}
-        </p>
+        <DeskEmptyState>
+          <p className="text-sm text-crs-muted">{t("notifEmpty", lang)}</p>
+        </DeskEmptyState>
       ) : (
-        <ul className="divide-y rounded-2xl border border-crs-border bg-crs-surface shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-crs-border bg-crs-surface shadow-[var(--crs-shadow-soft)]">
+        <ul className="divide-y divide-crs-border/70">
           {items.map((n, i) => (
             <li
               key={n.id}
@@ -138,6 +141,8 @@ export function NotificationsClient({ initialUnread, initialItems }: Props) {
             </li>
           ))}
         </ul>
+        <HonestyCount count={items.length} fetchLimit={fetchLimit} />
+        </div>
       )}
     </div>
   );

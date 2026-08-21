@@ -5,6 +5,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 import { t, tf } from "@/lib/i18n/labels";
 import { IconPlus } from "./cms-icons";
+import { DeskEmptyState, DeskPageHeader } from "./desk-ui";
 import { PageBreadcrumb, StatusPill } from "./ui-bits";
 import { EnStatusBadge } from "./en-status-badge";
 
@@ -70,13 +71,11 @@ export function ContentListPage({
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
       <PageBreadcrumb items={breadcrumbs} />
-      <header className="flex flex-wrap items-end justify-between gap-4 rounded-2xl border border-crs-border bg-gradient-to-br from-crs-surface via-crs-surface to-crs-accent/10 p-5 shadow-[var(--crs-shadow-soft)] lg:p-6">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-crs-ink lg:text-3xl">{title}</h1>
-          {subtitle ? <p className="mt-2 text-sm text-crs-muted">{subtitle}</p> : null}
-        </div>
-        <NewButton href={newHref} label={newLabel} />
-      </header>
+      <DeskPageHeader
+        title={title}
+        subtitle={subtitle}
+        actions={<NewButton href={newHref} label={newLabel} />}
+      />
 
       {toolbar ? (
         <div className="rounded-2xl border border-crs-border bg-crs-surface/90 p-3 shadow-[var(--crs-shadow-soft)]">
@@ -85,7 +84,7 @@ export function ContentListPage({
       ) : null}
 
       {items.length === 0 ? (
-        <div className="cms-empty-state flex flex-col items-start gap-4 rounded-2xl border border-dashed border-crs-border bg-crs-surface p-8 shadow-[var(--crs-shadow-soft)] sm:p-10">
+        <DeskEmptyState>
           {filteredEmpty ? (
             <>
               <p className="text-sm text-crs-muted">{t("emptyFiltered", lang)}</p>
@@ -107,7 +106,7 @@ export function ContentListPage({
               <NewButton href={newHref} label={newLabel} />
             </>
           )}
-        </div>
+        </DeskEmptyState>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-crs-border bg-crs-surface shadow-[var(--crs-shadow-soft)]">
           <table className="w-full min-w-[640px] text-start text-sm">
@@ -168,7 +167,7 @@ type EditShellProps = {
   wide?: boolean;
 };
 
-/** Direction B create/edit page shell. */
+/** Desk create/edit page shell. */
 export function EditPageShell({ breadcrumbs, title, subtitle, children, wide }: EditShellProps) {
   return (
     <main
@@ -177,10 +176,7 @@ export function EditPageShell({ breadcrumbs, title, subtitle, children, wide }: 
       }`}
     >
       <PageBreadcrumb items={breadcrumbs} />
-      <header>
-        <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">{title}</h1>
-        {subtitle ? <p className="mt-1 text-sm text-crs-muted" dir="auto">{subtitle}</p> : null}
-      </header>
+      <DeskPageHeader title={title} subtitle={subtitle} />
       {children}
     </main>
   );

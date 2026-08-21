@@ -120,7 +120,7 @@ const ROLE_DOT: Record<LoginBubble["role"], string> = {
 
 const LEGEND_ROLES: LoginBubble["role"][] = ["super_admin", "reviewer", "editor"];
 
-/** Dev-only one-click accounts — colour-coded by role, above the sign-in card. */
+/** Dev-only one-click accounts — colour-coded by role, below the sign-in card. */
 export function LoginDevBubbles({ bubbles, lang, enabled = false }: DockProps) {
   const [pending, setPending] = useState(false);
   if (!enabled || bubbles.length === 0) return null;
@@ -139,7 +139,7 @@ export function LoginDevBubbles({ bubbles, lang, enabled = false }: DockProps) {
 
   return (
     <aside
-      className="mb-4 rounded-2xl border border-crs-border bg-crs-surface/90 px-4 py-3 shadow-[var(--crs-shadow-soft)]"
+      className="mt-4 rounded-2xl border border-crs-border bg-crs-surface/90 px-4 py-3 shadow-[var(--crs-shadow-soft)]"
       aria-label={t("loginDevDockAria", lang)}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">

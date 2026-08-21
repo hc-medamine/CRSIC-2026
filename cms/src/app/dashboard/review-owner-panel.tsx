@@ -84,7 +84,7 @@ export function ReviewOwnerPanel({
   }
 
   return (
-    <section className="grid gap-2 rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm">
+    <section className="grid gap-2 rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-[var(--crs-shadow-soft)]">
       <h2 className="text-lg font-medium text-crs-ink">{t("reviewOwnerTitle", lang)}</h2>
       <p className="text-xs text-crs-muted">{t("reviewOwnerHint", lang)}</p>
       <p className="text-sm text-crs-ink/90">

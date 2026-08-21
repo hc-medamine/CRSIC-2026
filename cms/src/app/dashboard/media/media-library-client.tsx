@@ -9,6 +9,7 @@ import type { MediaBucket } from "@/lib/media/config";
 import { formatDateTime } from "@/lib/format-datetime";
 import { t, tf, contentTypeLabel } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
+import { DeskEmptyState, HonestyCount } from "@/app/dashboard/desk-ui";
 
 export type MediaLibraryItem = {
   id: string;
@@ -40,6 +41,7 @@ type MediaRef = {
 type Props = {
   initialItems: MediaLibraryItem[];
   allowedBuckets: MediaBucket[];
+  fetchLimit: number;
 };
 
 type FolderFilter = "all" | MediaBucket;
@@ -69,7 +71,7 @@ function sourceLabel(ref: MediaRef, lang: "en" | "ar"): string {
   return ref.source;
 }
 
-export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
+export function MediaLibraryClient({ initialItems, allowedBuckets, fetchLimit }: Props) {
   const lang = useCmsLang();
   const buckets = useMemo(
     () => (allowedBuckets.length > 0 ? allowedBuckets : (["news"] as MediaBucket[])),
@@ -149,7 +151,7 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid gap-3 rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm">
+      <div className="grid gap-3 rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-[var(--crs-shadow-soft)]">
         <label className="text-sm">
           <span className="font-medium">{t("fieldBucket", lang)}</span>
           <select
@@ -233,11 +235,12 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
       ) : null}
 
       {visibleItems.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-crs-border p-6 text-sm text-crs-muted">
-          {t("mediaEmpty", lang)}
-        </p>
+        <DeskEmptyState>
+          <p className="text-sm text-crs-muted">{t("mediaEmpty", lang)}</p>
+        </DeskEmptyState>
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="overflow-hidden rounded-2xl border border-crs-border bg-crs-surface shadow-[var(--crs-shadow-soft)]">
+        <ul className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
           {visibleItems.map((item) => {
             const src = cmsMediaSrc(item.publicPath);
             const pdf = item.mimeType.includes("pdf") || isPdfPath(item.publicPath);
@@ -250,7 +253,7 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
             return (
               <li
                 key={item.id}
-                className="flex flex-col gap-2 rounded-2xl border border-crs-border bg-crs-surface p-3 shadow-sm"
+                className="flex flex-col gap-2 rounded-2xl border border-crs-border bg-crs-bg/40 p-3"
               >
                 {pdf || !src ? (
                   <div className="flex h-36 items-center justify-center rounded-xl bg-crs-bg text-sm font-semibold uppercase text-crs-muted">
@@ -332,6 +335,12 @@ export function MediaLibraryClient({ initialItems, allowedBuckets }: Props) {
             );
           })}
         </ul>
+        <HonestyCount
+          count={visibleItems.length}
+          loadedCount={items.length}
+          fetchLimit={fetchLimit}
+        />
+        </div>
       )}
 
       {pendingItem ? (

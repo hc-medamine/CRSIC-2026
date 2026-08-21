@@ -191,7 +191,7 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
 
       <form
         onSubmit={createOrg}
-        className="grid gap-3 cms-form rounded-2xl border border-crs-border bg-crs-surface p-6 shadow-sm"
+        className="grid gap-3 cms-form rounded-2xl border border-crs-border bg-crs-surface p-6 shadow-[var(--crs-shadow-soft)]"
       >
         <h2 className="text-lg font-medium text-crs-ink">{t("orgCreateTitle", lang)}</h2>
         <p className="text-xs text-crs-muted">{t("orgCreateHint", lang)}</p>
@@ -255,7 +255,7 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
         </button>
       </form>
 
-      <section className="overflow-x-auto rounded-2xl border border-crs-border bg-crs-surface shadow-sm">
+      <section className="overflow-x-auto rounded-2xl border border-crs-border bg-crs-surface shadow-[var(--crs-shadow-soft)]">
         <table className="min-w-full text-start text-sm">
           <thead className="border-b bg-crs-bg text-crs-muted">
             <tr>

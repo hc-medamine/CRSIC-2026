@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-21 — CMS Desk interiors I2 (forms, admin, login)
+
+**Branch:** `feature/cms-desk-interiors-i2` (PRD [prds/2026-08-20-cms-desk-interiors.md](./prds/2026-08-20-cms-desk-interiors.md)). Visual only: shared form kit + `EditPageShell` on all create/edit types, director, featured playlist, profile; admin pages (media/users/orgs/editors/audit/notifications) use Desk headers + “showing N” honesty on capped fetches; login uses Desk ambient with bubbles under the card; preview chrome localized. Bugfix: law/platform restore + reassign now hit `/api/laws` and `/api/platforms` (they previously fell through to alerts). No migrations. Walkthrough still required before merge.
+
+---
+
 ### 2026-08-21 — `main` is the live SSOT (cutover merge)
 
 Merged `feature/wordpress-cms-spa-cutover` → `main` (`b1c022c`) and pushed. A clone of `main` now has:
@@ -423,19 +429,19 @@ Ops CLI: `cd cms && npm run db:cutover:wordpress` scrapes known WP hubs on `crsi
 
 #### Deferred backlog (not now — future PRDs)
 
-Remind on CMS/product sessions; do **not** start without stakeholder PRD lock:
+Remind on CMS/product sessions; do **not** start without stakeholder PRD lock. Ordered **simple → complex**:
 
-| Item | Notes |
-|------|--------|
-| Server list pagination | Trigger ~200 rows per type |
-| Bulk ops / clone / import-export UI | Classic CMS niceties |
-| Scheduled publish | `published_at` is stamp only today |
-| Soft-delete recycle bin | Hard-delete + ref scan already shipped |
-| Media crop / optimize / variants | |
-| EN editorial body parity | See [audits/PARITY.md](./audits/PARITY.md) |
-| Journals in CMS | Stay on OJS; intentional OOS |
-| Static institutional pages in CMS | Locales only |
-| CMS UI to reassign editor/reviewer/publisher | Ops scripts exist for legacy |
+| # | Item | Why this rank |
+|---|------|----------------|
+| 1 | CMS UI to reassign editor/reviewer/publisher | Ops scripts already exist; wrap in a Desk screen |
+| 2 | Server list pagination | Mechanical; trigger ~200 rows per type |
+| 3 | Soft-delete recycle bin | Restore UX on top of shipped hard-delete + ref scan |
+| 4 | Scheduled publish | Time-based workflow; `published_at` is a stamp only today |
+| 5 | Bulk ops / clone / import-export UI | Several classic CMS surfaces |
+| 6 | Media crop / optimize / variants | Imaging pipeline + extra storage |
+| 7 | EN editorial body parity | Schema + forms + SPA across types — see [audits/PARITY.md](./audits/PARITY.md) |
+| 8 | Static institutional pages in CMS | New types + SPA routes; locales only today |
+| 9 | Journals in CMS | Replace OJS; largest product change |
 
 ---
 

@@ -848,6 +848,24 @@ export const LABELS: LabelMap = {
   colUpdated: { en: "Updated", ar: "آخر تحديث" },
   untitled: { en: "(untitled)", ar: "(بدون عنوان)" },
   showingResults: { en: "Showing {n} result(s)", ar: "عرض {n} نتيجة" },
+  listTruncatedHint: {
+    en: "This list is at the current load limit. Older items may not appear.",
+    ar: "هذه القائمة بلغت حد التحميل الحالي. قد لا تظهر عناصر أقدم.",
+  },
+  previewChrome: { en: "Preview", ar: "معاينة" },
+  previewCandidate: {
+    en: "Candidate preview (not live public JSON)",
+    ar: "معاينة مرشّحة (ليست النسخة العامة المنشورة)",
+  },
+  previewMeta: {
+    en: "Type: {type} · expires {when} UTC",
+    ar: "النوع: {type} · تنتهي {when} UTC",
+  },
+  previewSpaMissing: {
+    en: "Public site not running at this origin. Start the SPA (e.g. npm run spa from the repo root) to use the SPA tab.",
+    ar: "الموقع العام غير شغّال على هذا العنوان. شغّلوا الواجهة (مثل npm run spa من جذر المشروع) لاستخدام تبويب الموقع.",
+  },
+  previewOpenOnSite: { en: "Open on public site", ar: "فتح على الموقع العام" },
   emptyFiltered: {
     en: "No items match this search.",
     ar: "لا عناصر تطابق هذا البحث.",

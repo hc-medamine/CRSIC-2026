@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { useRouter } from "next/navigation";
+import { contentTypeApiSegment } from "@/lib/content/api-segment";
 import { t, localizedDisplayName, roleLabel } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 
@@ -32,16 +33,6 @@ type Props = {
   currentAuthorId: string;
 };
 
-function apiSegment(type: ContentType): string {
-  if (type === "news") return "news";
-  if (type === "event") return "events";
-  if (type === "publication") return "publications";
-  if (type === "partner") return "partners";
-  if (type === "research_group") return "research-groups";
-  if (type === "research_project") return "research-projects";
-  return "alerts";
-}
-
 export function ReassignAuthor({ contentItemId, contentType, currentAuthorId }: Props) {
   const lang = useCmsLang();
   const router = useRouter();
@@ -70,7 +61,7 @@ export function ReassignAuthor({ contentItemId, contentType, currentAuthorId }: 
     setError(null);
     setMessage(null);
     try {
-      const res = await fetch(`/api/${apiSegment(contentType)}/${contentItemId}`, {
+      const res = await fetch(`/api/${contentTypeApiSegment(contentType)}/${contentItemId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "reassign", newUserId: target }),
@@ -91,7 +82,7 @@ export function ReassignAuthor({ contentItemId, contentType, currentAuthorId }: 
   }
 
   return (
-    <section className="grid gap-2 rounded-2xl border border-crs-border bg-crs-surface p-4 shadow-sm">
+    <section className="grid gap-2 rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-[var(--crs-shadow-soft)]">
       <h2 className="text-lg font-medium text-crs-ink">{t("reassignAuthor", lang)}</h2>
       <p className="text-xs text-crs-muted">{t("reassignHint", lang)}</p>
       {error ? <p className="text-sm text-red-600">{error}</p> : null}

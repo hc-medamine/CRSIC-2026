@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { requireUser } from "@/lib/auth/session";
 import { canManageDirector, getSiteDirector } from "@/lib/content/director";
+import { EditPageShell } from "@/app/dashboard/content-list-page";
 import { DirectorEditorForm } from "./director-form";
 
 export default async function DirectorPage() {
@@ -15,29 +15,26 @@ export default async function DirectorPage() {
   const row = await getSiteDirector();
   if (!row) {
     return (
-      <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-8">
+      <EditPageShell
+        breadcrumbs={[
+          { href: "/dashboard", label: t("home", lang) },
+          { label: t("directorWord", lang) },
+        ]}
+        title={t("directorWordTitle", lang)}
+      >
         <p className="text-sm text-red-700">{t("directorMissingRow", lang)}</p>
-      </main>
+      </EditPageShell>
     );
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
-      <header className="flex items-center justify-between border-b border-crs-border pb-4">
-        <div>
-          <p className="text-sm uppercase tracking-wide text-crs-muted">{t("directorWord", lang)}</p>
-          <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">
-            {t("directorWordTitle", lang)}
-          </h1>
-        </div>
-        <Link
-          href="/dashboard"
-          className="inline-flex min-h-11 items-center text-sm text-crs-primary hover:underline"
-        >
-          {t("backToList", lang)}
-        </Link>
-      </header>
-
+    <EditPageShell
+      breadcrumbs={[
+        { href: "/dashboard", label: t("home", lang) },
+        { label: t("directorWord", lang) },
+      ]}
+      title={t("directorWordTitle", lang)}
+    >
       <DirectorEditorForm
         initial={{
           quoteAr: row.quote_ar,
@@ -53,6 +50,6 @@ export default async function DirectorPage() {
           updatedAt: row.updated_at.toISOString(),
         }}
       />
-    </main>
+    </EditPageShell>
   );
 }

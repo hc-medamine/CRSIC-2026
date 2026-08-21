@@ -12,7 +12,8 @@ import {
   auditEntityLabel,
   contentTypeLabel,
 } from "@/lib/i18n/labels";
-import { PageBreadcrumb } from "@/app/dashboard/ui-bits";
+import { AdminPageShell, HonestyCount } from "@/app/dashboard/desk-ui";
+import { AUDIT_LOG_FETCH_LIMIT } from "@/lib/cms-limits";
 
 type Props = {
   searchParams: Promise<{
@@ -108,25 +109,22 @@ export default async function AuditLogPage({ searchParams }: Props) {
     entityType,
     from,
     to,
-    limit: 150,
+    limit: AUDIT_LOG_FETCH_LIMIT,
   });
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
-      <PageBreadcrumb
-        items={[
-          { href: "/dashboard", label: t("home", lang) },
-          { label: t("audit", lang) },
-        ]}
-      />
-      <header>
-        <h1 className="text-3xl font-semibold tracking-tight text-crs-ink">{t("audit", lang)}</h1>
-        <p className="mt-1 text-sm text-crs-muted">{t("pageDescAudit", lang)}</p>
-      </header>
+    <AdminPageShell
+      breadcrumbs={[
+        { href: "/dashboard", label: t("home", lang) },
+        { label: t("audit", lang) },
+      ]}
+      title={t("audit", lang)}
+      subtitle={t("pageDescAudit", lang)}
+    >
 
       <form
         method="get"
-        className="grid gap-3 rounded-2xl border border-crs-border bg-crs-surface p-4 text-sm sm:grid-cols-2 lg:grid-cols-3"
+        className="grid gap-3 rounded-2xl border border-crs-border bg-crs-surface p-4 text-sm shadow-[var(--crs-shadow-soft)] sm:grid-cols-2 lg:grid-cols-3"
       >
         <label>
           <span className="font-medium">{t("auditFilterAction", lang)}</span>
@@ -192,7 +190,7 @@ export default async function AuditLogPage({ searchParams }: Props) {
         <div className="flex flex-wrap items-end gap-2 sm:col-span-2 lg:col-span-3">
           <button
             type="submit"
-            className="rounded-lg bg-crs-primary hover:bg-crs-secondary px-3 py-2 text-white"
+            className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary"
           >
             {t("auditApply", lang)}
           </button>
@@ -208,11 +206,12 @@ export default async function AuditLogPage({ searchParams }: Props) {
       </form>
 
       {rows.length === 0 ? (
-        <p className="cms-empty-state rounded-lg border border-dashed border-crs-border p-6 text-sm text-crs-muted">
+        <p className="cms-empty-state rounded-2xl border border-dashed border-crs-border bg-crs-surface p-8 text-sm text-crs-muted shadow-[var(--crs-shadow-soft)]">
           {t("auditEmpty", lang)}
         </p>
       ) : (
-        <ul className="divide-y rounded-2xl border border-crs-border bg-crs-surface shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-crs-border bg-crs-surface shadow-[var(--crs-shadow-soft)]">
+        <ul className="divide-y divide-crs-border/70">
           {rows.map((row, i) => (
             <li
               key={row.id}
@@ -235,7 +234,9 @@ export default async function AuditLogPage({ searchParams }: Props) {
             </li>
           ))}
         </ul>
+        <HonestyCount count={rows.length} fetchLimit={AUDIT_LOG_FETCH_LIMIT} />
+        </div>
       )}
-    </main>
+    </AdminPageShell>
   );
 }
