@@ -169,6 +169,19 @@ PRD [2026-08-22-cms-recycle-bin.md](../prds/2026-08-22-cms-recycle-bin.md). Run 
 | Rb5 | Item older than 90 days: opening the bin shows a banner + **Purge** (does **not** auto-delete). Purge removes only those stale rows | ☐ |
 | Rb6 | Editor / Reviewer: no Recycle bin nav; `/dashboard/recycle-bin` redirects Home; `GET/POST /api/recycle-bin` is 403 | ☐ |
 
+## News list bulk (unpublish / recycle)
+
+PRD [2026-08-22-cms-news-bulk-actions.md](../prds/2026-08-22-cms-news-bulk-actions.md). Reviewer + Super Admin on `/dashboard/news` only. Same list chrome (checkbox, sticky bar, Desk modal).
+
+| # | Check | Pass? |
+|---|--------|-------|
+| Nb1 | Editor: no checkboxes or bulk bar on `/dashboard/news`. `POST /api/news/bulk` unpublish returns skipped `reviewer_required` (does not abort without a report) | ☐ |
+| Nb2 | Reviewer: checkboxes + **Unpublish** only (no recycle). Select mixed published (not own) + own story → confirm count → own is skipped (four-eyes); others leave `news.json`; one rebuild | ☐ |
+| Nb3 | Super Admin: **Move to recycle bin** on a mix of published + unpublished + a draft → one confirm names published-first; published unpublished then binned; unpublished binned; draft skipped; report lists each skip | ☐ |
+| Nb4 | Load more rows can be selected; header checkbox is loaded rows only (not the whole CMS). Filter change clears selection | ☐ |
+| Nb5 | Featured playlist drops unpublished/binned ids. Edit-page Unpublish / Move to recycle bin still work. No N in-CMS unpublish notifications for the bulk | ☐ |
+| Nb6 | Events / publications lists have no checkboxes | ☐ |
+
 ## G. Gate
 
 | # | Check | Pass? |

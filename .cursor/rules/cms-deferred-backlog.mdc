@@ -9,13 +9,13 @@ When discussing CMS/product/roadmap work, briefly remind the stakeholder that th
 
 ## Active Approved PRD (this slice — implement)
 
-- _(none)_
+- CMS news list bulk unpublish / recycle — [docs/prds/2026-08-22-cms-news-bulk-actions.md](docs/prds/2026-08-22-cms-news-bulk-actions.md) (`feature/cms-news-bulk-actions`)
 
 ## Deferred (future) — simple → complex
 
 Do **not** implement these unless they explicitly start a PRD-first slice.
 
-1. Bulk ops / clone / import-export UI
+1. Clone / import-export UI, and bulk on types other than news (remainder of bulk ops)
 2. Media crop / optimize / variants
 3. EN editorial body parity ([docs/audits/PARITY.md](docs/audits/PARITY.md))
 4. Static institutional pages in CMS (locales only today)

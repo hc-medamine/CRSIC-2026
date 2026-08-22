@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listNewsForUser } from "@/lib/content/news";
-import { canAccessContentType } from "@/lib/content/permissions";
+import { canAccessContentType, canReview } from "@/lib/content/permissions";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { ContentListFilters } from "@/app/dashboard/content-list-filters";
 import { ContentListPage } from "@/app/dashboard/content-list-page";
@@ -58,6 +58,11 @@ export default async function NewsListPage({
         q,
         status: statusFilter,
       }}
+      bulk={
+        canReview(user)
+          ? { apiPath: "/api/news/bulk", canRecycle: user.role === "super_admin" }
+          : undefined
+      }
       items={listed.items.map((item) => ({
         id: item.id,
         href: `/dashboard/news/${item.id}`,

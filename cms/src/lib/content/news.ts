@@ -539,42 +539,60 @@ export async function publishNews(user: SessionUser, id: string) {
   return item;
 }
 
-export async function unpublishNews(user: SessionUser, id: string) {
+export type UnpublishNewsOpts = {
+  /** Default true. Bulk unpublish sets false, then rebuilds `news.json` once. */
+  rebuild?: boolean;
+  /** Default true. Bulk unpublish sets false (no N in-CMS pings). */
+  notify?: boolean;
+  /** Default true. Bulk sets false until the shared JSON rebuild succeeds. */
+  prune?: boolean;
+};
+
+export async function unpublishNews(user: SessionUser, id: string, opts: UnpublishNewsOpts = {}) {
   const existing = await getNewsById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
   if (existing.status !== "published") throw new Error("Item is not published");
 
-  const item = await mutateThenRebuildPublic({
-    itemId: id,
-    mutate: async () => {
-      const result = await query<NewsItem>(
-        `UPDATE content_items SET
-          status = 'unpublished',
-          live_payload = NULL,
-          live_at = NULL,
-          needs_post_review = FALSE,
-          emergency_published_at = NULL,
-          emergency_published_by = NULL,
-          emergency_reason = NULL,
-          updated_by = $2,
-          updated_at = NOW()
-         WHERE id = $1 RETURNING *`,
-        [id, user.id],
-      );
-      return result.rows[0];
-    },
-    rebuild: rebuildPublicNewsJson,
-  });
+  const mutate = async () => {
+    const result = await query<NewsItem>(
+      `UPDATE content_items SET
+        status = 'unpublished',
+        live_payload = NULL,
+        live_at = NULL,
+        needs_post_review = FALSE,
+        emergency_published_at = NULL,
+        emergency_published_by = NULL,
+        emergency_reason = NULL,
+        updated_by = $2,
+        updated_at = NOW()
+       WHERE id = $1 RETURNING *`,
+      [id, user.id],
+    );
+    return result.rows[0];
+  };
+
+  const item =
+    opts.rebuild === false
+      ? await mutate()
+      : await mutateThenRebuildPublic({
+          itemId: id,
+          mutate,
+          rebuild: rebuildPublicNewsJson,
+        });
   await addRevision(item.id, "unpublished", snapshotOf(item), user.id, "Unpublished");
-  await createNotification({
-    userId: item.created_by,
-    type: "news.unpublished",
-    title: "News unpublished",
-    body: item.title_ar,
-    linkPath: `/dashboard/news/${item.id}`,
-  });
+  if (opts.notify !== false) {
+    await createNotification({
+      userId: item.created_by,
+      type: "news.unpublished",
+      title: "News unpublished",
+      body: item.title_ar,
+      linkPath: `/dashboard/news/${item.id}`,
+    });
+  }
   await auditNews(user, "news.unpublish", item, "Unpublished from news.json");
-  await pruneFeaturedNewsItem(id);
+  if (opts.prune !== false) {
+    await pruneFeaturedNewsItem(id);
+  }
   return item;
 }

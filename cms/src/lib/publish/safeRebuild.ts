@@ -1,6 +1,6 @@
 import { query } from "@/lib/db";
 
-type LiveState = {
+export type LiveState = {
   status: string;
   live_payload: unknown;
   live_at: Date | null;

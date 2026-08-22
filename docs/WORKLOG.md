@@ -19,6 +19,18 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-22 — Implementing CMS news list bulk unpublish / recycle
+
+**Branch:** `feature/cms-news-bulk-actions`. **PRD:** [prds/2026-08-22-cms-news-bulk-actions.md](./prds/2026-08-22-cms-news-bulk-actions.md) **Approved**. News list checkboxes (Reviewer + SA); Unpublish; SA recycle of published = unpublish-then-bin in one confirm; skip ineligible + per-item report; one `news.json` rebuild per bulk unpublish. Visual: existing Desk list / checkbox / sticky bar / modal. Clone and import/export stay follow-on PRDs.
+
+---
+
+### 2026-08-22 — PRD **Approved**: CMS news list bulk unpublish / recycle
+
+Stakeholder approved [prds/2026-08-22-cms-news-bulk-actions.md](./prds/2026-08-22-cms-news-bulk-actions.md). Keep today’s gates; no extra four-eyes; skip + report; Desk-native visuals (select → bar → confirm → report → dismiss).
+
+---
+
 ### 2026-08-22 — Scheduled publish **cancelled** (removed from backlog)
 
 Stakeholder: skip and **delete** the idea. Confirms 2026-07-21 lock: manual Approve → Publish only; no `scheduled` status, cron, or schedule UI. Do **not** re-list it as deferred. Next remaining deferred item: **bulk ops / clone / import-export** (own PRD first).
@@ -485,7 +497,7 @@ Remind on CMS/product sessions; do **not** start without stakeholder PRD lock. O
 | 2 | Server list pagination | **Delivered** on `main` — [prds/2026-08-22-cms-list-load-more.md](./prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more) |
 | 3 | Soft-delete recycle bin | **Delivered** on `main` — [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md) (PR #34) |
 | — | Scheduled publish | **Cancelled** (2026-07-21, confirmed 2026-08-22). Removed from this list. Manual Approve → Publish only. |
-| 4 | Bulk ops / clone / import-export UI | Several classic CMS surfaces |
+| 4 | Bulk ops / clone / import-export UI | **News list bulk** — Approved PRD, implementing on `feature/cms-news-bulk-actions`. Clone / import-export / other types still deferred. |
 | 5 | Media crop / optimize / variants | Imaging pipeline + extra storage |
 | 6 | EN editorial body parity | Schema + forms + SPA across types — see [audits/PARITY.md](./audits/PARITY.md) |
 | 7 | Static institutional pages in CMS | New types + SPA routes; locales only today |
