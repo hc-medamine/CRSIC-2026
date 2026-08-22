@@ -220,11 +220,11 @@ export function CmsChrome({
     adminItems.push(
       { key: "users", href: "/dashboard/users", icon: <IconUsers /> },
       { key: "orgUnits", href: "/dashboard/org-units", icon: <IconShield /> },
-      { key: "editors", href: "/dashboard/editors", icon: <IconUsers /> },
+      { key: "desks", href: "/dashboard/editors", icon: <IconUsers /> },
       { key: "audit", href: "/dashboard/audit", icon: <IconShield /> },
     );
   } else if (role === "reviewer") {
-    adminItems.push({ key: "editors", href: "/dashboard/editors", icon: <IconUsers /> });
+    adminItems.push({ key: "desks", href: "/dashboard/editors", icon: <IconUsers /> });
   }
 
   const roleText = roleLabel(role, lang);

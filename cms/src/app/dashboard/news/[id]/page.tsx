@@ -16,6 +16,7 @@ import { RevisionHistory } from "@/app/dashboard/revision-history";
 import { ReassignAuthor } from "@/app/dashboard/reassign-author";
 import { CommentThread } from "@/app/dashboard/comment-thread";
 import { ReviewOwnerPanel } from "@/app/dashboard/review-owner-panel";
+import { PublisherPanel } from "@/app/dashboard/publisher-panel";
 import { EscalatePanel } from "@/app/dashboard/escalate-panel";
 import { EmergencyPanel } from "@/app/dashboard/emergency-panel";
 import { EditPageShell } from "@/app/dashboard/content-list-page";
@@ -161,6 +162,26 @@ export default async function NewsDetailPage({ params }: Props) {
         contentItemId={item.id}
         canEscalate={canEscalate}
         escalatedAt={ownerMeta.escalatedAt}
+      />
+
+      <PublisherPanel
+        key={`${item.id}:${people.publicPublisher?.id ?? item.publisher_id ?? ""}`}
+        contentItemId={item.id}
+        orgUnitId={item.org_unit_id}
+        currentPublisherId={people.publicPublisher?.id ?? item.publisher_id ?? null}
+        currentPublisherName={
+          people.publicPublisher
+            ? localizedDisplayName(
+                {
+                  displayName: people.publicPublisher.displayName,
+                  nameAr: people.publicPublisher.nameAr,
+                  nameEn: people.publicPublisher.nameEn,
+                },
+                lang,
+              )
+            : null
+        }
+        canEdit={canManage}
       />
 
       <ReviewOwnerPanel

@@ -127,6 +127,22 @@ Walk AR + EN on `:3000`. Visual only — workflow and publish rules stay the sam
 | Dsk5 | In-CMS preview chrome is localized (Home / Preview) in AR and EN | ☐ |
 | Dsk6 | `prefers-reduced-motion: reduce` keeps new interiors static | ☐ |
 
+## Align authorship (desks + public publisher)
+
+PRD [2026-08-22-cms-reassign-authorship-ui.md](../prds/2026-08-22-cms-reassign-authorship-ui.md). Run `cd cms && npm run db:migrate` (`030`). Super Admin + Reviewer only.
+
+| # | Check | Pass? |
+|---|--------|-------|
+| Al1 | `/dashboard/editors` (**Desks**) shows who-owns-what + dry-run + rebuild badge (Never until first success). `/dashboard/authorship` redirects here | ☐ |
+| Al2 | Editor cannot open **Desks** (no nav; `/dashboard/editors` redirects) | ☐ |
+| Al3 | Reviewer Apply cannot change items outside their exclusive orgs | ☐ |
+| Al4 | Apply then a published news card editor/reviewer/publisher match CMS (or Boufatah fallback) | ☐ |
+| Al5 | Per-item **Public publisher** on a published news or event rebuilds that JSON; Align badge unchanged | ☐ |
+| Al6 | Receiving Editor gets one in-CMS notification; Reviewer Apply notifies active Super Admins | ☐ |
+| Al7 | Second Apply with no desk changes is a no-op (no extra notifications) | ☐ |
+| Al8 | Badge shows last success time + news/event counts after a rebuild | ☐ |
+| Al9 | Unsaved desk checkboxes disable **Apply** until **Save desks**; after save the dry-run updates on the same page | ☐ |
+
 ## G. Gate
 
 | # | Check | Pass? |

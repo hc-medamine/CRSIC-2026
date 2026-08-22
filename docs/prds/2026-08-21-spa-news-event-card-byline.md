@@ -88,6 +88,7 @@ Who feels it: public visitors on Home and News/Events lists; institutional trans
 - Event card: keep day/month/year badge; add the same byline under the title (do not duplicate the calendar as a fourth date).
 - AR RTL / EN LTR; Bahij / existing type. No new public brand colours.
 - Publisher is always the same person by design; still show the line so visitors see النشر.
+- **Superseded for publisher credit** by [2026-08-22-cms-reassign-authorship-ui.md](./2026-08-22-cms-reassign-authorship-ui.md): public publisher is the assigned scoped Reviewer, else Boufatah.
 
 ## 7. Technical notes
 

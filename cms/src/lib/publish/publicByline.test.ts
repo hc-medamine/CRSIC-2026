@@ -6,6 +6,7 @@ import {
   personPublicNames,
   publicBylineFromPeople,
   resolveNewsStoryDate,
+  resolvePublicPublisher,
   toIsoDate,
 } from "./publicByline";
 
@@ -49,8 +50,46 @@ describe("resolveNewsStoryDate", () => {
   });
 });
 
+describe("resolvePublicPublisher", () => {
+  it("falls back to Boufatah when missing, inactive, or not a Reviewer (F1)", () => {
+    assert.deepEqual(resolvePublicPublisher(null), {
+      ar: PUBLIC_PUBLISHER_AR,
+      en: PUBLIC_PUBLISHER_EN,
+    });
+    assert.equal(
+      resolvePublicPublisher({
+        nameAr: "أ",
+        nameEn: "A",
+        role: "reviewer",
+        isActive: false,
+      }).ar,
+      PUBLIC_PUBLISHER_AR,
+    );
+    assert.equal(
+      resolvePublicPublisher({
+        nameAr: "أ",
+        nameEn: "A",
+        role: "super_admin",
+        isActive: true,
+      }).ar,
+      PUBLIC_PUBLISHER_AR,
+    );
+  });
+
+  it("uses assigned Reviewer names", () => {
+    const hit = resolvePublicPublisher({
+      nameAr: "فريحة بوفاتح",
+      nameEn: "Fariha Boufatah",
+      role: "reviewer",
+      isActive: true,
+    });
+    assert.equal(hit.ar, "فريحة بوفاتح");
+    assert.equal(hit.en, "Fariha Boufatah");
+  });
+});
+
 describe("publicBylineFromPeople", () => {
-  it("uses AR/EN names with display_name fallback and fixed publisher", () => {
+  it("uses AR/EN names with display_name fallback and F1 publisher", () => {
     const byline = publicBylineFromPeople(
       { nameAr: "ايمان مقوسي", nameEn: "", displayName: "i.megoussi" },
       { nameAr: "", nameEn: "", displayName: "F. Boufatah" },
@@ -60,6 +99,22 @@ describe("publicBylineFromPeople", () => {
     assert.equal(byline.reviewer_ar, "F. Boufatah");
     assert.equal(byline.publisher_ar, PUBLIC_PUBLISHER_AR);
     assert.equal(byline.publisher_en, PUBLIC_PUBLISHER_EN);
+  });
+
+  it("writes assigned Reviewer publisher names into JSON fields", () => {
+    const byline = publicBylineFromPeople(
+      { nameAr: "محرر", nameEn: "Editor", displayName: "ed" },
+      { nameAr: "مراجع", nameEn: "Reviewer", displayName: "rev" },
+      {
+        nameAr: "ناشر",
+        nameEn: "Publisher",
+        displayName: "pub",
+        role: "reviewer",
+        isActive: true,
+      },
+    );
+    assert.equal(byline.publisher_ar, "ناشر");
+    assert.equal(byline.publisher_en, "Publisher");
   });
 
   it("omits empty editor/reviewer names", () => {

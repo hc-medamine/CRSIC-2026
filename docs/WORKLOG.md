@@ -19,6 +19,18 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-22 — Align authorship **Delivered** on `main`
+
+Merged `feature/cms-align-authorship` → `main`. **PRD:** [prds/2026-08-22-cms-reassign-authorship-ui.md](./prds/2026-08-22-cms-reassign-authorship-ui.md). One **Desks** page (`/dashboard/editors`): claims + Align dry-run/Apply; `publisher_id`; JSON rebuild + notifies; rebuild status badge. Migration `030`. After pull: `cd cms && npm run db:migrate` (or `npm run dev`). Next deferred item: **server list pagination** (own PRD first).
+
+---
+
+### 2026-08-22 — PRD **Approved**: CMS Align authorship UI
+
+**PRD:** [prds/2026-08-22-cms-reassign-authorship-ui.md](./prds/2026-08-22-cms-reassign-authorship-ui.md) — **Approved**. Desk Align-to-claims (SA + Reviewer, R1 org scope), assignable scoped publisher on news/events (F1 Boufatah fallback), JSON rebuild + in-CMS notifies, rebuild status badge. Implements deferred backlog **#1**. Do not start remaining deferred items without their own PRDs.
+
+---
+
 ### 2026-08-21 — CMS Desk interiors I2 (forms, admin, login)
 
 **Branch:** `feature/cms-desk-interiors-i2` (PRD [prds/2026-08-20-cms-desk-interiors.md](./prds/2026-08-20-cms-desk-interiors.md)). Visual only: shared form kit + `EditPageShell` on all create/edit types, director, featured playlist, profile; admin pages (media/users/orgs/editors/audit/notifications) use Desk headers + “showing N” honesty on capped fetches; login uses Desk ambient with bubbles under the card; preview chrome localized. Bugfix: law/platform restore + reassign now hit `/api/laws` and `/api/platforms` (they previously fell through to alerts). No migrations. Walkthrough still required before merge.
@@ -433,7 +445,7 @@ Remind on CMS/product sessions; do **not** start without stakeholder PRD lock. O
 
 | # | Item | Why this rank |
 |---|------|----------------|
-| 1 | CMS UI to reassign editor/reviewer/publisher | Ops scripts already exist; wrap in a Desk screen |
+| 1 | CMS UI to reassign editor/reviewer/publisher | **Delivered** on `main` — [prds/2026-08-22-cms-reassign-authorship-ui.md](./prds/2026-08-22-cms-reassign-authorship-ui.md) |
 | 2 | Server list pagination | Mechanical; trigger ~200 rows per type |
 | 3 | Soft-delete recycle bin | Restore UX on top of shipped hard-delete + ref scan |
 | 4 | Scheduled publish | Time-based workflow; `published_at` is a stamp only today |

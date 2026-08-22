@@ -15,6 +15,7 @@ import {
   PUBLIC_PUBLISHER_EN,
   personPublicNames,
   resolveNewsStoryDate,
+  resolvePublicPublisher,
   type PublicBylineFields,
 } from "@/lib/publish/publicByline";
 
@@ -63,13 +64,20 @@ type PayloadSource = {
 } & Partial<PublicBylineFields>;
 
 function bylineFromRow(row: PayloadSource): PublicBylineFields {
+  const publisher = resolvePublicPublisher({
+    nameAr: row.publisher_ar,
+    nameEn: row.publisher_en,
+    displayName: row.publisher_ar || row.publisher_en,
+    role: "reviewer",
+    isActive: true,
+  });
   return {
     editor_ar: (row.editor_ar || "").trim(),
     editor_en: (row.editor_en || "").trim(),
     reviewer_ar: (row.reviewer_ar || "").trim(),
     reviewer_en: (row.reviewer_en || "").trim(),
-    publisher_ar: PUBLIC_PUBLISHER_AR,
-    publisher_en: PUBLIC_PUBLISHER_EN,
+    publisher_ar: publisher.ar,
+    publisher_en: publisher.en,
   };
 }
 
@@ -89,8 +97,8 @@ function toPublicNews(item: StoredNewsPayload): PublicNewsItem {
     editor_en: item.editor_en || "",
     reviewer_ar: item.reviewer_ar || "",
     reviewer_en: item.reviewer_en || "",
-    publisher_ar: PUBLIC_PUBLISHER_AR,
-    publisher_en: PUBLIC_PUBLISHER_EN,
+    publisher_ar: item.publisher_ar || PUBLIC_PUBLISHER_AR,
+    publisher_en: item.publisher_en || PUBLIC_PUBLISHER_EN,
     ...seoFromRow(item),
   };
 }
@@ -156,6 +164,11 @@ type RebuildRow = {
   reviewer_name_ar: string | null;
   reviewer_name_en: string | null;
   reviewer_display: string | null;
+  publisher_name_ar: string | null;
+  publisher_name_en: string | null;
+  publisher_display: string | null;
+  publisher_role: string | null;
+  publisher_active: boolean | null;
 };
 
 /**
@@ -166,10 +179,13 @@ export async function rebuildPublicNewsJson(): Promise<{ count: number; path: st
   const result = await query<RebuildRow>(
     `SELECT c.live_payload, c.published_at,
             e.name_ar AS editor_name_ar, e.name_en AS editor_name_en, e.display_name AS editor_display,
-            r.name_ar AS reviewer_name_ar, r.name_en AS reviewer_name_en, r.display_name AS reviewer_display
+            r.name_ar AS reviewer_name_ar, r.name_en AS reviewer_name_en, r.display_name AS reviewer_display,
+            p.name_ar AS publisher_name_ar, p.name_en AS publisher_name_en, p.display_name AS publisher_display,
+            p.role AS publisher_role, p.is_active AS publisher_active
      FROM content_items c
      LEFT JOIN users e ON e.id = c.created_by
      LEFT JOIN users r ON r.id = c.review_owner_id
+     LEFT JOIN users p ON p.id = c.publisher_id
      WHERE c.content_type = 'news' AND c.live_payload IS NOT NULL
      ORDER BY NULLIF(c.live_payload->>'date', '') DESC NULLS LAST,
               c.live_at DESC NULLS LAST, c.created_at ASC`,
@@ -187,6 +203,17 @@ export async function rebuildPublicNewsJson(): Promise<{ count: number; path: st
       nameEn: row.reviewer_name_en,
       displayName: row.reviewer_display,
     });
+    const publisher = resolvePublicPublisher(
+      row.publisher_display || row.publisher_name_ar || row.publisher_name_en
+        ? {
+            nameAr: row.publisher_name_ar,
+            nameEn: row.publisher_name_en,
+            displayName: row.publisher_display,
+            role: row.publisher_role,
+            isActive: row.publisher_active,
+          }
+        : null,
+    );
     const story = resolveNewsStoryDate({
       publishedAt: row.published_at,
       liveDate: p.date,
@@ -200,8 +227,8 @@ export async function rebuildPublicNewsJson(): Promise<{ count: number; path: st
       editor_en: editor.en || p.editor_en || "",
       reviewer_ar: reviewer.ar || p.reviewer_ar || "",
       reviewer_en: reviewer.en || p.reviewer_en || "",
-      publisher_ar: PUBLIC_PUBLISHER_AR,
-      publisher_en: PUBLIC_PUBLISHER_EN,
+      publisher_ar: publisher.ar,
+      publisher_en: publisher.en,
     });
   });
 
