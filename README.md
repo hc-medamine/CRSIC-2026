@@ -807,7 +807,7 @@ Own **internal CMS + PostgreSQL** (`cms/`): authenticated users with roles and p
 **CMS deferred backlog** (do not implement without a new Approved PRD; simple → complex):
 
 1. CMS UI to reassign editor/reviewer/publisher — **Delivered** [docs/prds/2026-08-22-cms-reassign-authorship-ui.md](./docs/prds/2026-08-22-cms-reassign-authorship-ui.md)
-2. Server list pagination (~200-row trigger)
+2. Server list pagination — **Delivered** [docs/prds/2026-08-22-cms-list-load-more.md](./docs/prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more)
 3. Soft-delete recycle bin (hard-delete + ref scan already shipped)
 4. Scheduled publish
 5. Bulk ops / clone / import-export UI
@@ -826,7 +826,7 @@ Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Core spec: [d
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-08-22** (Align authorship Delivered on `main`; next deferred: server list pagination) |
+| Last updated     | **2026-08-22** (CMS list Load more Delivered on `main`; next deferred: recycle bin) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes

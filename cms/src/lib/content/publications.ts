@@ -22,6 +22,12 @@ import { notifyOnSubmit } from "@/lib/content/delegation";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
 import { normalizeSeoInput, seoSnapshotFields, type SeoInput } from "@/lib/content/seo";
 import type { ContentStatus } from "@/lib/content/news";
+import {
+  fetchContentListPage,
+  emptyContentList,
+  type ContentListQuery,
+  type ContentListResult,
+} from "@/lib/content/listPagination";
 
 async function auditPublication(
   user: SessionUser,
@@ -152,32 +158,37 @@ export async function getPublicationById(id: string): Promise<PublicationItem | 
   return result.rows[0] ?? null;
 }
 
-export async function listPublicationsForUser(user: SessionUser): Promise<PublicationItem[]> {
-  if (!(await canAccessContentType(user, "publication"))) return [];
+/** Page size for `/dashboard/publications` and `GET /api/publications`. */
+export const PUBLICATIONS_LIST_PAGE_SIZE = 20;
+
+export async function listPublicationsForUser(
+  user: SessionUser,
+  opts: ContentListQuery = {},
+): Promise<ContentListResult<PublicationItem>> {
+  if (!(await canAccessContentType(user, "publication"))) return emptyContentList(opts.page);
   if (user.role === "super_admin") {
-    const result = await query<PublicationItem>(
-      `SELECT * FROM content_items WHERE content_type = 'publication' ORDER BY updated_at DESC`,
-    );
-    return result.rows;
+    return fetchContentListPage<PublicationItem>({
+      contentType: "publication",
+      role: { kind: "all" },
+      pageSize: PUBLICATIONS_LIST_PAGE_SIZE,
+      listQuery: opts,
+    });
   }
   if (user.role === "reviewer") {
     const orgIds = await getUserOrgIds(user.id);
-    if (orgIds.length === 0) return [];
-    const result = await query<PublicationItem>(
-      `SELECT * FROM content_items
-       WHERE content_type = 'publication' AND org_unit_id = ANY($1::text[])
-       ORDER BY updated_at DESC`,
-      [orgIds],
-    );
-    return result.rows;
+    return fetchContentListPage<PublicationItem>({
+      contentType: "publication",
+      role: { kind: "orgs", orgIds },
+      pageSize: PUBLICATIONS_LIST_PAGE_SIZE,
+      listQuery: opts,
+    });
   }
-  const result = await query<PublicationItem>(
-    `SELECT * FROM content_items
-     WHERE content_type = 'publication' AND created_by = $1
-     ORDER BY updated_at DESC`,
-    [user.id],
-  );
-  return result.rows;
+  return fetchContentListPage<PublicationItem>({
+    contentType: "publication",
+    role: { kind: "author", userId: user.id },
+    pageSize: PUBLICATIONS_LIST_PAGE_SIZE,
+    listQuery: opts,
+  });
 }
 
 export async function createPublication(

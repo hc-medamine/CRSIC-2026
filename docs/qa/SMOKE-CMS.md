@@ -143,6 +143,19 @@ PRD [2026-08-22-cms-reassign-authorship-ui.md](../prds/2026-08-22-cms-reassign-a
 | Al8 | Badge shows last success time + news/event counts after a rebuild | ☐ |
 | Al9 | Unsaved desk checkboxes disable **Apply** until **Save desks**; after save the dry-run updates on the same page | ☐ |
 
+## List Load more (news / events / publications)
+
+PRD [2026-08-22-cms-list-load-more.md](../prds/2026-08-22-cms-list-load-more.md). Partners / laws / other lists stay full-fetch. No public SPA change.
+
+| # | Check | Pass? |
+|---|--------|-------|
+| Lm1 | `/dashboard/news` shows at most 20 rows; **Load more** appears only if more exist | ☐ |
+| Lm2 | Load more appends ~20 rows, skeleton shows under the table, button hides at the end; URL gains `page=` | ☐ |
+| Lm3 | Open `?page=3` (or `?page=2` if 21–40 items): first paint is pages **1–N**, not only the last page | ☐ |
+| Lm4 | Apply search or status: URL drops `page` (back to first 20 of the filter) | ☐ |
+| Lm5 | `/dashboard/partners` (or laws) still lists all allowed rows; no Load more | ☐ |
+| Lm6 | Editor does not see another editor’s news on Load more | ☐ |
+
 ## G. Gate
 
 | # | Check | Pass? |

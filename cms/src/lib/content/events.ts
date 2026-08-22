@@ -19,6 +19,12 @@ import { notifyOnSubmit } from "@/lib/content/delegation";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
 import { normalizeSeoInput, seoSnapshotFields, type SeoInput } from "@/lib/content/seo";
 import type { ContentStatus } from "@/lib/content/news";
+import {
+  fetchContentListPage,
+  emptyContentList,
+  type ContentListQuery,
+  type ContentListResult,
+} from "@/lib/content/listPagination";
 
 async function auditEvent(
   user: SessionUser,
@@ -160,32 +166,37 @@ export async function getEventById(id: string): Promise<EventItem | null> {
   return result.rows[0] ?? null;
 }
 
-export async function listEventsForUser(user: SessionUser): Promise<EventItem[]> {
-  if (!(await canAccessContentType(user, "event"))) return [];
+/** Page size for `/dashboard/events` and `GET /api/events`. */
+export const EVENTS_LIST_PAGE_SIZE = 20;
+
+export async function listEventsForUser(
+  user: SessionUser,
+  opts: ContentListQuery = {},
+): Promise<ContentListResult<EventItem>> {
+  if (!(await canAccessContentType(user, "event"))) return emptyContentList(opts.page);
   if (user.role === "super_admin") {
-    const result = await query<EventItem>(
-      `SELECT * FROM content_items WHERE content_type = 'event' ORDER BY updated_at DESC`,
-    );
-    return result.rows;
+    return fetchContentListPage<EventItem>({
+      contentType: "event",
+      role: { kind: "all" },
+      pageSize: EVENTS_LIST_PAGE_SIZE,
+      listQuery: opts,
+    });
   }
   if (user.role === "reviewer") {
     const orgIds = await getUserOrgIds(user.id);
-    if (orgIds.length === 0) return [];
-    const result = await query<EventItem>(
-      `SELECT * FROM content_items
-       WHERE content_type = 'event' AND org_unit_id = ANY($1::text[])
-       ORDER BY updated_at DESC`,
-      [orgIds],
-    );
-    return result.rows;
+    return fetchContentListPage<EventItem>({
+      contentType: "event",
+      role: { kind: "orgs", orgIds },
+      pageSize: EVENTS_LIST_PAGE_SIZE,
+      listQuery: opts,
+    });
   }
-  const result = await query<EventItem>(
-    `SELECT * FROM content_items
-     WHERE content_type = 'event' AND created_by = $1
-     ORDER BY updated_at DESC`,
-    [user.id],
-  );
-  return result.rows;
+  return fetchContentListPage<EventItem>({
+    contentType: "event",
+    role: { kind: "author", userId: user.id },
+    pageSize: EVENTS_LIST_PAGE_SIZE,
+    listQuery: opts,
+  });
 }
 
 export async function createEvent(user: SessionUser, input: EventInput): Promise<EventItem> {

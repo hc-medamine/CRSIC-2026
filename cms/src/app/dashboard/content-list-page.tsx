@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import type { CSSProperties, ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 import { t, tf } from "@/lib/i18n/labels";
-import { IconPlus } from "./cms-icons";
+import { IconPlus, IconChevron } from "./cms-icons";
 import { DeskEmptyState, DeskPageHeader } from "./desk-ui";
 import { PageBreadcrumb, StatusPill } from "./ui-bits";
 import { EnStatusBadge } from "./en-status-badge";
@@ -17,6 +17,16 @@ export type ContentListRow = {
   enStatus?: string | null;
   updatedAt: Date | string;
   meta?: string;
+};
+
+/** Opt-in Load more (news / events / publications only). */
+export type ContentListLoadMore = {
+  apiPath: "/api/news" | "/api/events" | "/api/publications";
+  itemHrefBase: "/dashboard/news" | "/dashboard/events" | "/dashboard/publications";
+  page: number;
+  hasMore: boolean;
+  q: string;
+  status: string;
 };
 
 type Props = {
@@ -33,6 +43,7 @@ type Props = {
   filtersActive?: boolean;
   /** Unfiltered list path — used by “Clear filters”. */
   listHref?: string;
+  loadMore?: ContentListLoadMore;
 };
 
 function formatUpdated(value: Date | string): string {
@@ -52,6 +63,41 @@ function NewButton({ href, label }: { href: string; label: string }) {
   );
 }
 
+function mapApiItem(
+  item: {
+    id: string;
+    title_ar?: string | null;
+    status: string;
+    en_status?: string | null;
+    updated_at: string;
+  },
+  hrefBase: ContentListLoadMore["itemHrefBase"],
+  untitled: string,
+): ContentListRow {
+  return {
+    id: item.id,
+    href: `${hrefBase}/${item.id}`,
+    title: item.title_ar || untitled,
+    status: item.status,
+    enStatus: item.en_status,
+    updatedAt: item.updated_at,
+  };
+}
+
+function replaceListPageInUrl(page: number, q: string, status: string) {
+  const url = new URL(window.location.href);
+  if (page <= 1) url.searchParams.delete("page");
+  else url.searchParams.set("page", String(page));
+  if (q) url.searchParams.set("q", q);
+  else url.searchParams.delete("q");
+  if (status) url.searchParams.set("status", status);
+  else url.searchParams.delete("status");
+  const next = `${url.pathname}${url.search}`;
+  window.history.replaceState(null, "", next);
+}
+
+const SKELETON_ROWS = 4;
+
 /** Desk content list: breadcrumb, header card, New CTA, optional toolbar, status table. */
 export function ContentListPage({
   breadcrumbs,
@@ -64,9 +110,62 @@ export function ContentListPage({
   toolbar,
   filtersActive = false,
   listHref,
+  loadMore,
 }: Props) {
   const lang = useCmsLang();
-  const filteredEmpty = items.length === 0 && filtersActive;
+  const [rows, setRows] = useState(items);
+  const [page, setPage] = useState(loadMore?.page ?? 1);
+  const [hasMore, setHasMore] = useState(Boolean(loadMore?.hasMore));
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+
+  const filteredEmpty = rows.length === 0 && filtersActive;
+
+  async function onLoadMore() {
+    if (!loadMore || loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    setLoadError(false);
+    const nextPage = page + 1;
+    const sp = new URLSearchParams();
+    sp.set("page", String(nextPage));
+    if (loadMore.q) sp.set("q", loadMore.q);
+    if (loadMore.status) sp.set("status", loadMore.status);
+    try {
+      const res = await fetch(`${loadMore.apiPath}?${sp.toString()}`);
+      const data = (await res.json()) as {
+        ok?: boolean;
+        items?: Array<{
+          id: string;
+          title_ar?: string | null;
+          status: string;
+          en_status?: string | null;
+          updated_at: string;
+        }>;
+        hasMore?: boolean;
+        page?: number;
+      };
+      if (!res.ok || !data.ok || !Array.isArray(data.items)) {
+        setLoadError(true);
+        return;
+      }
+      const untitled = t("untitled", lang);
+      setRows((prev) => {
+        const seen = new Set(prev.map((r) => r.id));
+        const extra = data.items!
+          .filter((item) => !seen.has(item.id))
+          .map((item) => mapApiItem(item, loadMore.itemHrefBase, untitled));
+        return [...prev, ...extra];
+      });
+      const resolvedPage = typeof data.page === "number" ? data.page : nextPage;
+      setPage(resolvedPage);
+      setHasMore(Boolean(data.hasMore));
+      replaceListPageInUrl(resolvedPage, loadMore.q, loadMore.status);
+    } catch {
+      setLoadError(true);
+    } finally {
+      setLoadingMore(false);
+    }
+  }
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
@@ -83,7 +182,7 @@ export function ContentListPage({
         </div>
       ) : null}
 
-      {items.length === 0 ? (
+      {rows.length === 0 ? (
         <DeskEmptyState>
           {filteredEmpty ? (
             <>
@@ -119,7 +218,7 @@ export function ContentListPage({
               </tr>
             </thead>
             <tbody className="divide-y divide-crs-border/70">
-              {items.map((item, i) => (
+              {rows.map((item, i) => (
                 <tr
                   key={item.id}
                   className="group relative cms-row-enter border-s-2 border-s-transparent transition-colors hover:border-s-crs-accent hover:bg-crs-accent/5 focus-within:border-s-crs-accent focus-within:bg-crs-accent/5"
@@ -148,11 +247,52 @@ export function ContentListPage({
                   </td>
                 </tr>
               ))}
+              {loadingMore
+                ? Array.from({ length: SKELETON_ROWS }).map((_, i) => (
+                    <tr key={`sk-${i}`} aria-hidden className="border-s-2 border-s-transparent">
+                      <td className="px-4 py-3.5">
+                        <div className="cms-skeleton h-4 w-2/5" />
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <div className="cms-skeleton h-6 w-24 rounded-full" />
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <div className="cms-skeleton h-6 w-16 rounded-full" />
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <div className="cms-skeleton h-4 w-24" />
+                      </td>
+                    </tr>
+                  ))
+                : null}
             </tbody>
           </table>
-          <div className="border-t border-crs-border/70 px-4 py-3 text-xs text-crs-muted">
-            {tf("showingResults", lang, { n: items.length })}
-          </div>
+          {loadMore && hasMore ? (
+            <div className="border-t border-crs-border/70 bg-crs-bg/50">
+              <button
+                type="button"
+                onClick={() => void onLoadMore()}
+                disabled={loadingMore}
+                aria-busy={loadingMore}
+                className="flex w-full flex-col items-center gap-1 px-4 py-3.5 text-center transition-colors hover:bg-crs-accent/10 disabled:opacity-70"
+              >
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-crs-primary">
+                  {loadingMore ? t("loadMoreLoading", lang) : t("loadMore", lang)}
+                  {loadingMore ? null : (
+                    <IconChevron className="h-3.5 w-3.5 rotate-90" />
+                  )}
+                </span>
+                <span className="text-xs text-crs-muted">{tf("showingResults", lang, { n: rows.length })}</span>
+              </button>
+              {loadError ? (
+                <p className="px-4 pb-3 text-center text-xs text-red-600">{t("loadMoreError", lang)}</p>
+              ) : null}
+            </div>
+          ) : (
+            <div className="border-t border-crs-border/70 px-4 py-3 text-xs text-crs-muted">
+              <p>{tf("showingResults", lang, { n: rows.length })}</p>
+            </div>
+          )}
         </div>
       )}
     </main>

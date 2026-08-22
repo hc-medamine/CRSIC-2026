@@ -9,22 +9,22 @@ When discussing CMS/product/roadmap work, briefly remind the stakeholder that th
 
 ## No active Approved PRD
 
-Align authorship / Desks is **Delivered** on `main` — [docs/prds/2026-08-22-cms-reassign-authorship-ui.md](docs/prds/2026-08-22-cms-reassign-authorship-ui.md).
+Load more on news / events / publications is **Delivered** on `main` — [docs/prds/2026-08-22-cms-list-load-more.md](docs/prds/2026-08-22-cms-list-load-more.md).
 
 ## Deferred (future) — simple → complex
 
 Do **not** implement these unless they explicitly start a PRD-first slice.
 
-1. Server list pagination (~200-row trigger)
-2. Soft-delete recycle bin
-3. Scheduled publish
-4. Bulk ops / clone / import-export UI
-5. Media crop / optimize / variants
-6. EN editorial body parity ([docs/audits/PARITY.md](docs/audits/PARITY.md))
-7. Static institutional pages in CMS (locales only today)
-8. Journals in CMS (OJS remains)
+1. Soft-delete recycle bin
+2. Scheduled publish
+3. Bulk ops / clone / import-export UI
+4. Media crop / optimize / variants
+5. EN editorial body parity ([docs/audits/PARITY.md](docs/audits/PARITY.md))
+6. Static institutional pages in CMS (locales only today)
+7. Journals in CMS (OJS remains)
 
 ## Already closed (do not re-open as gaps)
 
+- CMS list Load more (PRD 2026-08-22): news/events/publications page size 20.
 - Align authorship / Desks (PRD 2026-08-22): claims + Align, assignable publisher, JSON rebuild.
 - Feature-completeness audit critical/functional gaps closed on `main` via PR #17: SEO restore, partner JSON + narrative, research restore, media DELETE 409, comment deeplinks, preview ×7, SPA partner/group detail.
