@@ -12,6 +12,7 @@ import {
 import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
 import { mutateThenRebuildPublic } from "@/lib/publish/safeRebuild";
+import { unpublishMutateMaybeRebuild, shouldNotifyUnpublish, type SilentUnpublishOpts } from "@/lib/content/silentUnpublish";
 import {
   canAccessContentType,
   canAccessOrg,
@@ -506,34 +507,33 @@ export async function publishResearchProject(user: SessionUser, id: string) {
   return item;
 }
 
-export async function unpublishResearchProject(user: SessionUser, id: string) {
+export async function unpublishResearchProject(user: SessionUser, id: string, opts: SilentUnpublishOpts = {}) {
   const existing = await getResearchProjectById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
   if (existing.status !== "published") throw new Error("Item is not published");
-  const item = await mutateThenRebuildPublic({
-    itemId: id,
-    mutate: async () => {
-      const result = await query<ResearchProjectItem>(
-        `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
-          needs_post_review = FALSE, emergency_published_at = NULL,
-          emergency_published_by = NULL, emergency_reason = NULL,
-          updated_by = $2, updated_at = NOW()
-         WHERE id = $1 RETURNING *`,
-        [id, user.id],
-      );
-      return result.rows[0];
-    },
-    rebuild: rebuildPublicResearchProjectsJson,
-  });
+  const mutate = async () => {
+    const result = await query<ResearchProjectItem>(
+      `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
+        needs_post_review = FALSE, emergency_published_at = NULL,
+        emergency_published_by = NULL, emergency_reason = NULL,
+        updated_by = $2, updated_at = NOW()
+       WHERE id = $1 RETURNING *`,
+      [id, user.id],
+    );
+    return result.rows[0];
+  };
+  const item = await unpublishMutateMaybeRebuild(id, mutate, rebuildPublicResearchProjectsJson, opts);
   await addRevision(item.id, "unpublished", snapshotOf(item), user.id, "Unpublished");
-  await createNotification({
-    userId: item.created_by,
-    type: "research_project.unpublished",
-    title: "Research project unpublished",
-    body: item.title_ar,
-    linkPath: `/dashboard/research-projects/${item.id}`,
-  });
+  if (shouldNotifyUnpublish(opts)) {
+    await createNotification({
+      userId: item.created_by,
+      type: "research_project.unpublished",
+      title: "Research project unpublished",
+      body: item.title_ar,
+      linkPath: `/dashboard/research-projects/${item.id}`,
+    });
+  }
   await auditResearchProject(user, "research_project.unpublish", item, "Unpublished from research-projects.json");
   return item;
 }

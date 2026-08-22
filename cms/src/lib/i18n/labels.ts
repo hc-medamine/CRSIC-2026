@@ -1046,6 +1046,11 @@ export const LABELS: LabelMap = {
     en: "Unpublish {n} publications from the public site?",
     ar: "إلغاء نشر {n} منشورات من الموقع العام؟",
   },
+  bulkConfirmUnpublishTitleItems: { en: "Unpublish these items?", ar: "إلغاء نشر هذه العناصر؟" },
+  bulkConfirmUnpublishItems: {
+    en: "Unpublish {n} items from the public site?",
+    ar: "إلغاء نشر {n} عناصر من الموقع العام؟",
+  },
   bulkConfirmRecycleTitle: { en: "Move to recycle bin?", ar: "نقل إلى سلة المحذوفات؟" },
   bulkConfirmRecycle: {
     en: "Move {n} items to the recycle bin?",

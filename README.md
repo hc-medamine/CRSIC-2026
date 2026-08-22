@@ -809,7 +809,7 @@ Own **internal CMS + PostgreSQL** (`cms/`): authenticated users with roles and p
 1. CMS UI to reassign editor/reviewer/publisher — **Delivered** [docs/prds/2026-08-22-cms-reassign-authorship-ui.md](./docs/prds/2026-08-22-cms-reassign-authorship-ui.md)
 2. Server list pagination — **Delivered** [docs/prds/2026-08-22-cms-list-load-more.md](./docs/prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more)
 3. Soft-delete recycle bin — **Delivered** [docs/prds/2026-08-22-cms-recycle-bin.md](./docs/prds/2026-08-22-cms-recycle-bin.md) (PR #34)
-4. Bulk ops / clone / import-export UI — news list bulk on `main` (PR #36); **events + publications bulk in progress** [docs/prds/2026-08-22-cms-events-publications-bulk-actions.md](./docs/prds/2026-08-22-cms-events-publications-bulk-actions.md); clone / import-export / other types still deferred
+4. Bulk ops / clone / import-export UI — **list bulk unpublish/recycle on all CMS content types** (news PR #36; events/publications + remaining types [docs/prds/2026-08-22-cms-remaining-types-bulk-actions.md](./docs/prds/2026-08-22-cms-remaining-types-bulk-actions.md)); clone / import-export still deferred
 5. Media crop / optimize / variants
 6. EN editorial body parity
 7. Static institutional pages in CMS (locales only today)

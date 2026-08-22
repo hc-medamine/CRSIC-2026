@@ -6,11 +6,29 @@ import { FormStickyActions } from "@/app/dashboard/form-ux";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 import { t, tf, type CmsLang } from "@/lib/i18n/labels";
 
-/** Opt-in list bulk (Reviewer + Super Admin). Other type lists must not pass this. */
-export type ContentListBulkKind = "news" | "event" | "publication";
+/** Opt-in list bulk (Reviewer + Super Admin). Lists without this prop have no chrome. */
+export type ContentListBulkKind =
+  | "news"
+  | "event"
+  | "publication"
+  | "partner"
+  | "alert"
+  | "law"
+  | "platform"
+  | "research_group"
+  | "research_project";
 
 export type ContentListBulk = {
-  apiPath: "/api/news/bulk" | "/api/events/bulk" | "/api/publications/bulk";
+  apiPath:
+    | "/api/news/bulk"
+    | "/api/events/bulk"
+    | "/api/publications/bulk"
+    | "/api/partners/bulk"
+    | "/api/alerts/bulk"
+    | "/api/laws/bulk"
+    | "/api/platforms/bulk"
+    | "/api/research-groups/bulk"
+    | "/api/research-projects/bulk";
   canRecycle: boolean;
   kind: ContentListBulkKind;
 };
@@ -128,12 +146,24 @@ const UNPUBLISH_TITLE: Record<ContentListBulkKind, string> = {
   news: "bulkConfirmUnpublishTitle",
   event: "bulkConfirmUnpublishTitleEvent",
   publication: "bulkConfirmUnpublishTitlePub",
+  partner: "bulkConfirmUnpublishTitleItems",
+  alert: "bulkConfirmUnpublishTitleItems",
+  law: "bulkConfirmUnpublishTitleItems",
+  platform: "bulkConfirmUnpublishTitleItems",
+  research_group: "bulkConfirmUnpublishTitleItems",
+  research_project: "bulkConfirmUnpublishTitleItems",
 };
 
 const UNPUBLISH_BODY: Record<ContentListBulkKind, string> = {
   news: "bulkConfirmUnpublish",
   event: "bulkConfirmUnpublishEvent",
   publication: "bulkConfirmUnpublishPub",
+  partner: "bulkConfirmUnpublishItems",
+  alert: "bulkConfirmUnpublishItems",
+  law: "bulkConfirmUnpublishItems",
+  platform: "bulkConfirmUnpublishItems",
+  research_group: "bulkConfirmUnpublishItems",
+  research_project: "bulkConfirmUnpublishItems",
 };
 
 export function ContentListBulkModal({

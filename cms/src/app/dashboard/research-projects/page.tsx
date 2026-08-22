@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listResearchProjectsForUser } from "@/lib/content/researchProjects";
-import { canAccessContentType } from "@/lib/content/permissions";
+import { canAccessContentType, canReview } from "@/lib/content/permissions";
 import { listOrgUnits } from "@/lib/users";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { ContentListPage } from "@/app/dashboard/content-list-page";
@@ -28,6 +28,15 @@ export default async function ResearchProjectsListPage() {
       newHref="/dashboard/research-projects/new"
       newLabel={t("newResearchProject", lang)}
       emptyLabel={t("emptyResearchProjects", lang)}
+      bulk={
+        canReview(user)
+          ? {
+              apiPath: "/api/research-projects/bulk",
+              canRecycle: user.role === "super_admin",
+              kind: "research_project",
+            }
+          : undefined
+      }
       items={items.map((item) => ({
         id: item.id,
         href: `/dashboard/research-projects/${item.id}`,

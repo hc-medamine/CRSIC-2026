@@ -5,6 +5,18 @@ import { getEventById, unpublishEvent } from "@/lib/content/events";
 import { getPublicationById, unpublishPublication } from "@/lib/content/publications";
 import { rebuildPublicEventsJson } from "@/lib/publish/eventsJson";
 import { rebuildPublicPublicationsJson } from "@/lib/publish/publicationsJson";
+import { getPartnerById, unpublishPartner } from "@/lib/content/partners";
+import { getAlertById, unpublishAlert } from "@/lib/content/alerts";
+import { getLawById, unpublishLaw } from "@/lib/content/laws";
+import { getPlatformById, unpublishPlatform } from "@/lib/content/platforms";
+import { getResearchGroupById, unpublishResearchGroup } from "@/lib/content/researchGroups";
+import { getResearchProjectById, unpublishResearchProject } from "@/lib/content/researchProjects";
+import { rebuildPublicPartnersJson } from "@/lib/publish/partnersJson";
+import { rebuildPublicAlertsJson } from "@/lib/publish/alertsJson";
+import { rebuildPublicLawsJson } from "@/lib/publish/lawsJson";
+import { rebuildPublicPlatformsJson } from "@/lib/publish/platformsJson";
+import { rebuildPublicResearchGroupsJson } from "@/lib/publish/researchGroupsJson";
+import { rebuildPublicResearchProjectsJson } from "@/lib/publish/researchProjectsJson";
 import {
   executeNewsBulk,
   type NewsBulkAction,
@@ -82,5 +94,76 @@ export async function bulkPublicationActions(
       return { id: item.id, title: item.title_ar };
     },
     rebuild: rebuildPublicPublicationsJson,
+  });
+}
+
+function rowFrom(item: { id: string; title_ar: string; status: string } | null): LoadRow {
+  if (!item) return null;
+  return { id: item.id, title: item.title_ar, status: item.status };
+}
+
+export async function bulkPartnerActions(user: SessionUser, action: NewsBulkAction, rawIds: unknown) {
+  return bulkListActions(user, action, rawIds, {
+    load: async (id) => rowFrom(await getPartnerById(id)),
+    unpublishSilent: async (id) => {
+      const item = await unpublishPartner(user, id, { notify: false, rebuild: false });
+      return { id: item.id, title: item.title_ar };
+    },
+    rebuild: rebuildPublicPartnersJson,
+  });
+}
+
+export async function bulkAlertActions(user: SessionUser, action: NewsBulkAction, rawIds: unknown) {
+  return bulkListActions(user, action, rawIds, {
+    load: async (id) => rowFrom(await getAlertById(id)),
+    unpublishSilent: async (id) => {
+      const item = await unpublishAlert(user, id, { notify: false, rebuild: false });
+      return { id: item.id, title: item.title_ar };
+    },
+    rebuild: rebuildPublicAlertsJson,
+  });
+}
+
+export async function bulkLawActions(user: SessionUser, action: NewsBulkAction, rawIds: unknown) {
+  return bulkListActions(user, action, rawIds, {
+    load: async (id) => rowFrom(await getLawById(id)),
+    unpublishSilent: async (id) => {
+      const item = await unpublishLaw(user, id, { notify: false, rebuild: false });
+      return { id: item.id, title: item.title_ar };
+    },
+    rebuild: rebuildPublicLawsJson,
+  });
+}
+
+export async function bulkPlatformActions(user: SessionUser, action: NewsBulkAction, rawIds: unknown) {
+  return bulkListActions(user, action, rawIds, {
+    load: async (id) => rowFrom(await getPlatformById(id)),
+    unpublishSilent: async (id) => {
+      const item = await unpublishPlatform(user, id, { notify: false, rebuild: false });
+      return { id: item.id, title: item.title_ar };
+    },
+    rebuild: rebuildPublicPlatformsJson,
+  });
+}
+
+export async function bulkResearchGroupActions(user: SessionUser, action: NewsBulkAction, rawIds: unknown) {
+  return bulkListActions(user, action, rawIds, {
+    load: async (id) => rowFrom(await getResearchGroupById(id)),
+    unpublishSilent: async (id) => {
+      const item = await unpublishResearchGroup(user, id, { notify: false, rebuild: false });
+      return { id: item.id, title: item.title_ar };
+    },
+    rebuild: rebuildPublicResearchGroupsJson,
+  });
+}
+
+export async function bulkResearchProjectActions(user: SessionUser, action: NewsBulkAction, rawIds: unknown) {
+  return bulkListActions(user, action, rawIds, {
+    load: async (id) => rowFrom(await getResearchProjectById(id)),
+    unpublishSilent: async (id) => {
+      const item = await unpublishResearchProject(user, id, { notify: false, rebuild: false });
+      return { id: item.id, title: item.title_ar };
+    },
+    rebuild: rebuildPublicResearchProjectsJson,
   });
 }

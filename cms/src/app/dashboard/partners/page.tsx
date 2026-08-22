@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listPartnersForUser } from "@/lib/content/partners";
-import { canAccessContentType } from "@/lib/content/permissions";
+import { canAccessContentType, canReview } from "@/lib/content/permissions";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { ContentListPage } from "@/app/dashboard/content-list-page";
 
@@ -24,6 +24,11 @@ export default async function PartnersListPage() {
       newHref="/dashboard/partners/new"
       newLabel={t("newPartner", lang)}
       emptyLabel={t("emptyPartners", lang)}
+      bulk={
+        canReview(user)
+          ? { apiPath: "/api/partners/bulk", canRecycle: user.role === "super_admin", kind: "partner" }
+          : undefined
+      }
       items={items.map((item) => {
         const scope =
           item.partner_scope === "intl"

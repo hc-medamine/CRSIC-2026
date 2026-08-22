@@ -11,6 +11,7 @@ import {
 } from "@/lib/publish/researchGroupsJson";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
 import { mutateThenRebuildPublic } from "@/lib/publish/safeRebuild";
+import { unpublishMutateMaybeRebuild, shouldNotifyUnpublish, type SilentUnpublishOpts } from "@/lib/content/silentUnpublish";
 import {
   canAccessContentType,
   canAccessOrg,
@@ -475,34 +476,33 @@ export async function publishResearchGroup(user: SessionUser, id: string) {
   return item;
 }
 
-export async function unpublishResearchGroup(user: SessionUser, id: string) {
+export async function unpublishResearchGroup(user: SessionUser, id: string, opts: SilentUnpublishOpts = {}) {
   const existing = await getResearchGroupById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
   if (existing.status !== "published") throw new Error("Item is not published");
-  const item = await mutateThenRebuildPublic({
-    itemId: id,
-    mutate: async () => {
-      const result = await query<ResearchGroupItem>(
-        `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
-          needs_post_review = FALSE, emergency_published_at = NULL,
-          emergency_published_by = NULL, emergency_reason = NULL,
-          updated_by = $2, updated_at = NOW()
-         WHERE id = $1 RETURNING *`,
-        [id, user.id],
-      );
-      return result.rows[0];
-    },
-    rebuild: rebuildPublicResearchGroupsJson,
-  });
+  const mutate = async () => {
+    const result = await query<ResearchGroupItem>(
+      `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
+        needs_post_review = FALSE, emergency_published_at = NULL,
+        emergency_published_by = NULL, emergency_reason = NULL,
+        updated_by = $2, updated_at = NOW()
+       WHERE id = $1 RETURNING *`,
+      [id, user.id],
+    );
+    return result.rows[0];
+  };
+  const item = await unpublishMutateMaybeRebuild(id, mutate, rebuildPublicResearchGroupsJson, opts);
   await addRevision(item.id, "unpublished", snapshotOf(item), user.id, "Unpublished");
-  await createNotification({
-    userId: item.created_by,
-    type: "research_group.unpublished",
-    title: "Research group unpublished",
-    body: item.title_ar,
-    linkPath: `/dashboard/research-groups/${item.id}`,
-  });
+  if (shouldNotifyUnpublish(opts)) {
+    await createNotification({
+      userId: item.created_by,
+      type: "research_group.unpublished",
+      title: "Research group unpublished",
+      body: item.title_ar,
+      linkPath: `/dashboard/research-groups/${item.id}`,
+    });
+  }
   await auditResearchGroup(user, "research_group.unpublish", item, "Unpublished from research-groups.json");
   return item;
 }

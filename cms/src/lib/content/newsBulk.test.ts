@@ -197,7 +197,7 @@ describe("executeNewsBulk", () => {
     assert.deepEqual(pruned, ["pub1", "pub2"]);
   });
 
-  it("does not call pruneFeatured when the dep is omitted (events/publications)", async () => {
+  it("does not call pruneFeatured when the dep is omitted (non-news types)", async () => {
     const { impl, rebuilds } = deps({
       role: "reviewer",
       loadNews,
