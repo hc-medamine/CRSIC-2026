@@ -160,7 +160,7 @@ function validateEventFields(input: EventInput) {
 
 export async function getEventById(id: string): Promise<EventItem | null> {
   const result = await query<EventItem>(
-    `SELECT * FROM content_items WHERE id = $1 AND content_type = 'event'`,
+    `SELECT * FROM content_items WHERE id = $1 AND content_type = 'event' AND recycled_at IS NULL`,
     [id],
   );
   return result.rows[0] ?? null;

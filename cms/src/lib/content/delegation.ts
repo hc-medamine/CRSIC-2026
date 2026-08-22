@@ -300,7 +300,7 @@ export async function listPendingReviewOwnerProposals(): Promise<
      FROM content_items c
      LEFT JOIN users po ON po.id = c.review_owner_proposed_id
      LEFT JOIN users pb ON pb.id = c.review_owner_proposed_by
-     WHERE c.review_owner_proposed_id IS NOT NULL
+     WHERE c.review_owner_proposed_id IS NOT NULL AND c.recycled_at IS NULL
      ORDER BY c.review_owner_proposed_at DESC NULLS LAST
      LIMIT 50`,
   );

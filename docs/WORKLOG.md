@@ -19,6 +19,18 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-22 — Implementing CMS Recycle bin
+
+**Branch:** `feature/cms-recycle-bin`. **PRD:** [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md) **Approved**. SA Move to bin (unpublished/rejected, all hard-delete types); restore → draft; permanent delete + Empty bin; 90-day banner/Purge on bin open (no cron). Migration `031`. After pull: `cd cms && npm run db:migrate` (or `npm run dev`). Smoke: [qa/SMOKE-CMS.md](./qa/SMOKE-CMS.md) Rb1–Rb6.
+
+---
+
+### 2026-08-22 — PRD **Approved**: CMS Recycle bin
+
+**PRD:** [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md) — **Approved**. Soft-delete recycle bin. Scheduled publish stays deferred.
+
+---
+
 ### 2026-08-22 — CMS list Load more **Delivered** on `main`
 
 Merged `feature/cms-list-load-more` → `main`. **PRD:** [prds/2026-08-22-cms-list-load-more.md](./prds/2026-08-22-cms-list-load-more.md). News / events / publications Desk lists: page size 20, `GET /api/news?page=`, Load more appends, `?page=3` paints pages 1–3. No SPA. Next deferred item: **soft-delete recycle bin** (own PRD first).
@@ -459,7 +471,7 @@ Remind on CMS/product sessions; do **not** start without stakeholder PRD lock. O
 |---|------|----------------|
 | 1 | CMS UI to reassign editor/reviewer/publisher | **Delivered** on `main` — [prds/2026-08-22-cms-reassign-authorship-ui.md](./prds/2026-08-22-cms-reassign-authorship-ui.md) |
 | 2 | Server list pagination | **Delivered** on `main` — [prds/2026-08-22-cms-list-load-more.md](./prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more) |
-| 3 | Soft-delete recycle bin | Restore UX on top of shipped hard-delete + ref scan |
+| 3 | Soft-delete recycle bin | **Implementing** on `feature/cms-recycle-bin` — [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md) |
 | 4 | Scheduled publish | Time-based workflow; `published_at` is a stamp only today |
 | 5 | Bulk ops / clone / import-export UI | Several classic CMS surfaces |
 | 6 | Media crop / optimize / variants | Imaging pipeline + extra storage |

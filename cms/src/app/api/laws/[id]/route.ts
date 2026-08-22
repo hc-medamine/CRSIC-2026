@@ -12,8 +12,8 @@ import {
   withdrawLaw,
   type LawInput,
 } from "@/lib/content/laws";
+import { recycleContentItem } from "@/lib/content/recycleBin";
 import {
-  deleteContentItem,
   reassignAuthor,
   reopenRejected,
   restoreRevision,
@@ -103,7 +103,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         item = await getLawById(id);
         break;
       case "delete":
-        await deleteContentItem(user, id);
+        await recycleContentItem(user, id);
         return NextResponse.json({ ok: true, deleted: true });
       case "restore_revision":
         if (!body.revisionId) throw new Error("revisionId required");

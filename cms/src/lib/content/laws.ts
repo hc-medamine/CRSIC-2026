@@ -122,7 +122,7 @@ function validateLawFields(input: LawInput) {
 
 export async function getLawById(id: string): Promise<LawItem | null> {
   const result = await query<LawItem>(
-    `SELECT * FROM content_items WHERE id = $1 AND content_type = 'law'`,
+    `SELECT * FROM content_items WHERE id = $1 AND content_type = 'law' AND recycled_at IS NULL`,
     [id],
   );
   return result.rows[0] ?? null;
@@ -132,7 +132,7 @@ export async function listLawsForUser(user: SessionUser): Promise<LawItem[]> {
   if (!(await canAccessContentType(user, "law"))) return [];
   if (user.role === "super_admin") {
     const result = await query<LawItem>(
-      `SELECT * FROM content_items WHERE content_type = 'law' ORDER BY updated_at DESC`,
+      `SELECT * FROM content_items WHERE content_type = 'law' AND recycled_at IS NULL ORDER BY updated_at DESC`,
     );
     return result.rows;
   }
@@ -141,7 +141,7 @@ export async function listLawsForUser(user: SessionUser): Promise<LawItem[]> {
     if (orgIds.length === 0) return [];
     const result = await query<LawItem>(
       `SELECT * FROM content_items
-       WHERE content_type = 'law' AND org_unit_id = ANY($1::text[])
+       WHERE content_type = 'law' AND recycled_at IS NULL AND org_unit_id = ANY($1::text[])
        ORDER BY updated_at DESC`,
       [orgIds],
     );
@@ -149,7 +149,7 @@ export async function listLawsForUser(user: SessionUser): Promise<LawItem[]> {
   }
   const result = await query<LawItem>(
     `SELECT * FROM content_items
-     WHERE content_type = 'law' AND created_by = $1
+     WHERE content_type = 'law' AND recycled_at IS NULL AND created_by = $1
      ORDER BY updated_at DESC`,
     [user.id],
   );

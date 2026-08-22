@@ -83,7 +83,7 @@ const BASE_SELECT = `
 
 async function runQueue(where: string, params: unknown[], limit: number): Promise<QueueItem[]> {
   const result = await query<Row>(
-    `${BASE_SELECT} WHERE ${where} ORDER BY c.updated_at DESC LIMIT ${limit}`,
+    `${BASE_SELECT} WHERE c.recycled_at IS NULL AND ${where} ORDER BY c.updated_at DESC LIMIT ${limit}`,
     params,
   );
   return result.rows.map(toItem);

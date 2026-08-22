@@ -314,6 +314,7 @@ async function collectPlan(user: SessionUser): Promise<{
             c.review_owner_id, c.publisher_id, c.live_payload, u.email AS author_email
      FROM content_items c
      JOIN users u ON u.id = c.created_by
+     WHERE c.recycled_at IS NULL
      ORDER BY c.content_type, c.created_at`,
   );
 

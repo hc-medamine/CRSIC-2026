@@ -92,6 +92,7 @@ async function resolveLiveRefs(
      FROM content_items
      WHERE content_type = 'news'
        AND live_payload IS NOT NULL
+       AND recycled_at IS NULL
        AND id = ANY($1::uuid[])`,
     [ids],
   );
@@ -123,7 +124,7 @@ export async function listLiveNewsForFeatured(
             LEFT(COALESCE(live_payload->>'date', ''), 10) AS payload_date,
             published_at
      FROM content_items
-     WHERE content_type = 'news' AND live_payload IS NOT NULL`;
+     WHERE content_type = 'news' AND live_payload IS NOT NULL AND recycled_at IS NULL`;
   const params: unknown[] = [];
 
   if (user.role === "reviewer") {

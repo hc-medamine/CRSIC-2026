@@ -158,7 +158,7 @@ export function LawEditorForm({
   async function run(action: string, extra?: Record<string, unknown>) {
     if (!initial?.id) return;
     if (action === "delete") {
-      if (!window.confirm(t("confirmDelete", lang))) return;
+      if (!window.confirm(t("confirmRecycle", lang))) return;
     }
     setPending(true);
     setError(null);
@@ -177,8 +177,8 @@ export function LawEditorForm({
         return;
       }
       if (data.deleted) {
-        cmsToast.success(t("deletedShort", lang));
-        router.push("/dashboard");
+        cmsToast.success(t("recycledShort", lang));
+        router.push("/dashboard/recycle-bin");
         router.refresh();
         return;
       }
@@ -374,7 +374,7 @@ export function LawEditorForm({
         <button type="button" disabled={pending} className="w-fit rounded border border-amber-300 px-4 py-2 text-sm text-amber-900" onClick={() => void run("reopen_rejected")}>{t("actionReopenDraft", lang)}</button>
       ) : null}
       {mode === "edit" && canDelete && (initial?.status === "unpublished" || initial?.status === "rejected") ? (
-        <button type="button" disabled={pending} className="w-fit rounded border border-red-300 px-4 py-2 text-sm text-red-800" onClick={() => void run("delete")}>{t("actionDelete", lang)}</button>
+        <button type="button" disabled={pending} className="inline-flex min-h-11 w-fit items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60" onClick={() => void run("delete")}>{t("actionRecycle", lang)}</button>
       ) : null}
     </div>
   );

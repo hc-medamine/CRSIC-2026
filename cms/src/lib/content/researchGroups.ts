@@ -144,7 +144,7 @@ function validateResearchGroupFields(input: ResearchGroupInput) {
 
 export async function getResearchGroupById(id: string): Promise<ResearchGroupItem | null> {
   const result = await query<ResearchGroupItem>(
-    `SELECT * FROM content_items WHERE id = $1 AND content_type = 'research_group'`,
+    `SELECT * FROM content_items WHERE id = $1 AND content_type = 'research_group' AND recycled_at IS NULL`,
     [id],
   );
   return result.rows[0] ?? null;
@@ -154,7 +154,7 @@ export async function listResearchGroupsForUser(user: SessionUser): Promise<Rese
   if (!(await canAccessContentType(user, "research_group"))) return [];
   if (user.role === "super_admin") {
     const result = await query<ResearchGroupItem>(
-      `SELECT * FROM content_items WHERE content_type = 'research_group' ORDER BY updated_at DESC`,
+      `SELECT * FROM content_items WHERE content_type = 'research_group' AND recycled_at IS NULL ORDER BY updated_at DESC`,
     );
     return result.rows;
   }
@@ -163,7 +163,7 @@ export async function listResearchGroupsForUser(user: SessionUser): Promise<Rese
     if (orgIds.length === 0) return [];
     const result = await query<ResearchGroupItem>(
       `SELECT * FROM content_items
-       WHERE content_type = 'research_group' AND org_unit_id = ANY($1::text[])
+       WHERE content_type = 'research_group' AND recycled_at IS NULL AND org_unit_id = ANY($1::text[])
        ORDER BY updated_at DESC`,
       [orgIds],
     );
@@ -171,7 +171,7 @@ export async function listResearchGroupsForUser(user: SessionUser): Promise<Rese
   }
   const result = await query<ResearchGroupItem>(
     `SELECT * FROM content_items
-     WHERE content_type = 'research_group' AND created_by = $1
+     WHERE content_type = 'research_group' AND recycled_at IS NULL AND created_by = $1
      ORDER BY updated_at DESC`,
     [user.id],
   );
@@ -182,7 +182,7 @@ export async function listResearchGroupsForUser(user: SessionUser): Promise<Rese
 export async function listPublishedResearchGroupsForOrg(orgUnitId: string): Promise<ResearchGroupItem[]> {
   const result = await query<ResearchGroupItem>(
     `SELECT * FROM content_items
-     WHERE content_type = 'research_group' AND org_unit_id = $1 AND status = 'published'
+     WHERE content_type = 'research_group' AND recycled_at IS NULL AND org_unit_id = $1 AND status = 'published'
      ORDER BY title_ar ASC`,
     [orgUnitId],
   );
@@ -193,7 +193,7 @@ export async function listPublishedResearchGroupsForOrg(orgUnitId: string): Prom
 export async function listAllResearchGroupsForOrg(orgUnitId: string): Promise<ResearchGroupItem[]> {
   const result = await query<ResearchGroupItem>(
     `SELECT * FROM content_items
-     WHERE content_type = 'research_group' AND org_unit_id = $1
+     WHERE content_type = 'research_group' AND recycled_at IS NULL AND org_unit_id = $1
      ORDER BY title_ar ASC`,
     [orgUnitId],
   );
