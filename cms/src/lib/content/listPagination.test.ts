@@ -64,6 +64,7 @@ describe("buildContentListQuery", () => {
       limit: 21,
       offset: 20,
     });
+    assert.match(sql.text, /recycled_at IS NULL/);
     assert.match(sql.text, /content_type = \$1/);
     assert.match(sql.text, /created_by = \$2/);
     assert.match(sql.text, /status = \$3/);

@@ -108,7 +108,7 @@ function validateAlertFields(input: AlertInput) {
 
 export async function getAlertById(id: string): Promise<AlertItem | null> {
   const result = await query<AlertItem>(
-    `SELECT * FROM content_items WHERE id = $1 AND content_type = 'alert'`,
+    `SELECT * FROM content_items WHERE id = $1 AND content_type = 'alert' AND recycled_at IS NULL`,
     [id],
   );
   return result.rows[0] ?? null;
@@ -118,7 +118,7 @@ export async function listAlertsForUser(user: SessionUser): Promise<AlertItem[]>
   if (!(await canAccessContentType(user, "alert"))) return [];
   if (user.role === "super_admin") {
     const result = await query<AlertItem>(
-      `SELECT * FROM content_items WHERE content_type = 'alert' ORDER BY updated_at DESC`,
+      `SELECT * FROM content_items WHERE content_type = 'alert' AND recycled_at IS NULL ORDER BY updated_at DESC`,
     );
     return result.rows;
   }
@@ -127,7 +127,7 @@ export async function listAlertsForUser(user: SessionUser): Promise<AlertItem[]>
     if (orgIds.length === 0) return [];
     const result = await query<AlertItem>(
       `SELECT * FROM content_items
-       WHERE content_type = 'alert' AND org_unit_id = ANY($1::text[])
+       WHERE content_type = 'alert' AND recycled_at IS NULL AND org_unit_id = ANY($1::text[])
        ORDER BY updated_at DESC`,
       [orgIds],
     );
@@ -135,7 +135,7 @@ export async function listAlertsForUser(user: SessionUser): Promise<AlertItem[]>
   }
   const result = await query<AlertItem>(
     `SELECT * FROM content_items
-     WHERE content_type = 'alert' AND created_by = $1
+     WHERE content_type = 'alert' AND recycled_at IS NULL AND created_by = $1
      ORDER BY updated_at DESC`,
     [user.id],
   );
@@ -371,7 +371,7 @@ export async function publishAlert(user: SessionUser, id: string) {
 
   const others = await query<{ id: string; title_ar: string }>(
     `SELECT id, title_ar FROM content_items
-     WHERE content_type = 'alert' AND status = 'published' AND id <> $1`,
+     WHERE content_type = 'alert' AND status = 'published' AND recycled_at IS NULL AND id <> $1`,
     [id],
   );
 

@@ -163,7 +163,7 @@ function validateResearchProjectFields(input: ResearchProjectInput) {
 /** Verify the referenced research_group exists, is a research_group, and shares the same org unit. */
 async function assertValidResearchGroup(researchGroupId: string, orgUnitId: string): Promise<void> {
   const result = await query<{ id: string; content_type: string; org_unit_id: string }>(
-    `SELECT id, content_type, org_unit_id FROM content_items WHERE id = $1`,
+    `SELECT id, content_type, org_unit_id FROM content_items WHERE id = $1 AND recycled_at IS NULL`,
     [researchGroupId],
   );
   const group = result.rows[0];
@@ -177,7 +177,7 @@ async function assertValidResearchGroup(researchGroupId: string, orgUnitId: stri
 
 export async function getResearchProjectById(id: string): Promise<ResearchProjectItem | null> {
   const result = await query<ResearchProjectItem>(
-    `SELECT * FROM content_items WHERE id = $1 AND content_type = 'research_project'`,
+    `SELECT * FROM content_items WHERE id = $1 AND content_type = 'research_project' AND recycled_at IS NULL`,
     [id],
   );
   return result.rows[0] ?? null;
@@ -187,7 +187,7 @@ export async function listResearchProjectsForUser(user: SessionUser): Promise<Re
   if (!(await canAccessContentType(user, "research_project"))) return [];
   if (user.role === "super_admin") {
     const result = await query<ResearchProjectItem>(
-      `SELECT * FROM content_items WHERE content_type = 'research_project' ORDER BY updated_at DESC`,
+      `SELECT * FROM content_items WHERE content_type = 'research_project' AND recycled_at IS NULL ORDER BY updated_at DESC`,
     );
     return result.rows;
   }
@@ -196,7 +196,7 @@ export async function listResearchProjectsForUser(user: SessionUser): Promise<Re
     if (orgIds.length === 0) return [];
     const result = await query<ResearchProjectItem>(
       `SELECT * FROM content_items
-       WHERE content_type = 'research_project' AND org_unit_id = ANY($1::text[])
+       WHERE content_type = 'research_project' AND recycled_at IS NULL AND org_unit_id = ANY($1::text[])
        ORDER BY updated_at DESC`,
       [orgIds],
     );
@@ -204,7 +204,7 @@ export async function listResearchProjectsForUser(user: SessionUser): Promise<Re
   }
   const result = await query<ResearchProjectItem>(
     `SELECT * FROM content_items
-     WHERE content_type = 'research_project' AND created_by = $1
+     WHERE content_type = 'research_project' AND recycled_at IS NULL AND created_by = $1
      ORDER BY updated_at DESC`,
     [user.id],
   );

@@ -114,6 +114,7 @@ export function buildContentListQuery(opts: {
 
   return {
     text: `SELECT * FROM content_items WHERE ${where.join(" AND ")}
+       AND recycled_at IS NULL
        ORDER BY updated_at DESC
        LIMIT $${limitIdx} OFFSET $${offsetIdx}`,
     params,

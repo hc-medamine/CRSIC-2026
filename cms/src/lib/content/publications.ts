@@ -152,7 +152,7 @@ function validatePublicationFields(input: PublicationInput, opts?: { requireCove
 
 export async function getPublicationById(id: string): Promise<PublicationItem | null> {
   const result = await query<PublicationItem>(
-    `SELECT * FROM content_items WHERE id = $1 AND content_type = 'publication'`,
+    `SELECT * FROM content_items WHERE id = $1 AND content_type = 'publication' AND recycled_at IS NULL`,
     [id],
   );
   return result.rows[0] ?? null;

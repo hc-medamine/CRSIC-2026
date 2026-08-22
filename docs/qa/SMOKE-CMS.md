@@ -100,7 +100,7 @@ Estimated time: **~10 minutes**.
 | I6 | Reviewer/Super Admin: **Restore this revision** in revision history sets fields back + status `draft`; audit `*.restore_revision` | ☐ |
 | I7 | Super Admin/Reviewer: **Reassign author** on a draft/changes_requested/submitted item; audit `content.reassign`; new author notified | ☐ |
 | I8 | Cutover: `npm run db:import-legacy` imports current JSON as live items (idempotent; publications keep `covers.length === pubs.length`); does **not** rewrite `data/*.json` | ☐ |
-| I9 | After unpublish (or reject): item appears in **Unpublished** / **Rejected** on dashboard for author + Reviewer/SA (Editors: own or scoped). Super Admin only: **Delete permanently** on unpublished/rejected; audit `*.delete` | ☐ |
+| I9 | After unpublish (or reject): item appears in **Unpublished** / **Rejected** on dashboard for author + Reviewer/SA (Editors: own or scoped). Super Admin only: **Move to recycle bin** on unpublished/rejected; audit `*.recycle` | ☐ |
 | I10 | Detail publish: attachments list + slug on news/events/publications; published JSON includes `id`/`slug`/`summary`/`body`/`media` | ☐ |
 
 ## J. Research groups & projects
@@ -155,6 +155,19 @@ PRD [2026-08-22-cms-list-load-more.md](../prds/2026-08-22-cms-list-load-more.md)
 | Lm4 | Apply search or status: URL drops `page` (back to first 20 of the filter) | ☐ |
 | Lm5 | `/dashboard/partners` (or laws) still lists all allowed rows; no Load more | ☐ |
 | Lm6 | Editor does not see another editor’s news on Load more | ☐ |
+
+## Recycle bin
+
+PRD [2026-08-22-cms-recycle-bin.md](../prds/2026-08-22-cms-recycle-bin.md). Run `cd cms && npm run db:migrate` (`031`). Super Admin only.
+
+| # | Check | Pass? |
+|---|--------|-------|
+| Rb1 | Super Admin: unpublished or rejected item has **Move to recycle bin** (not Delete permanently). After confirm, item is gone from the type list and appears on `/dashboard/recycle-bin` | ☐ |
+| Rb2 | Recycle bin **Restore**: one click; row leaves the bin; item is a **draft** with media still attached | ☐ |
+| Rb3 | Per-row **Delete permanently**: typed confirm (`DELETE` / `حذف`); item gone; unused media file gone; a file still used by another item stays | ☐ |
+| Rb4 | **Empty bin**: confirm names the count **X** and has Cancel; then the bin is empty | ☐ |
+| Rb5 | Item older than 90 days: opening the bin shows a banner + **Purge** (does **not** auto-delete). Purge removes only those stale rows | ☐ |
+| Rb6 | Editor / Reviewer: no Recycle bin nav; `/dashboard/recycle-bin` redirects Home; `GET/POST /api/recycle-bin` is 403 | ☐ |
 
 ## G. Gate
 

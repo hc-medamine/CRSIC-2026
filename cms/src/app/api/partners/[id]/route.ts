@@ -12,8 +12,8 @@ import {
   withdrawPartner,
   type PartnerInput,
 } from "@/lib/content/partners";
+import { recycleContentItem } from "@/lib/content/recycleBin";
 import {
-  deleteContentItem,
   reassignAuthor,
   reopenRejected,
   restoreRevision,
@@ -103,7 +103,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         item = await getPartnerById(id);
         break;
       case "delete":
-        await deleteContentItem(user, id);
+        await recycleContentItem(user, id);
         return NextResponse.json({ ok: true, deleted: true });
       case "restore_revision":
         if (!body.revisionId) throw new Error("revisionId required");

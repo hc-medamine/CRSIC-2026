@@ -128,7 +128,7 @@ export function AlertEditorForm({
     if (!initial?.id) return;
     if (action === "delete") {
       const ok = window.confirm(
-        t("confirmDelete", lang),
+        t("confirmRecycle", lang),
       );
       if (!ok) return;
     }
@@ -149,8 +149,8 @@ export function AlertEditorForm({
         return;
       }
       if (data.deleted) {
-        cmsToast.success(t("deletedShort", lang));
-        router.push("/dashboard");
+        cmsToast.success(t("recycledShort", lang));
+        router.push("/dashboard/recycle-bin");
         router.refresh();
         return;
       }
@@ -376,10 +376,10 @@ export function AlertEditorForm({
         <button
           type="button"
           disabled={pending}
-          className="w-fit rounded border border-red-300 px-4 py-2 text-sm text-red-800"
+          className="inline-flex min-h-11 w-fit items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60"
           onClick={() => void run("delete")}
         >
-          {t("actionDelete", lang)}
+          {t("actionRecycle", lang)}
         </button>
       ) : null}
     </div>

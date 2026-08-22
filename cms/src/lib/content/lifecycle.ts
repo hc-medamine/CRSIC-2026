@@ -6,7 +6,6 @@ import { canReview } from "@/lib/content/permissions";
 import { getContentMeta, getRevisionById } from "@/lib/content/revisions";
 import { assertNotAwayFrozen } from "@/lib/content/ooo";
 import { SEO_SNAPSHOT_COLUMNS } from "@/lib/content/seo";
-import { pruneFeaturedNewsItem } from "@/lib/content/featuredNews";
 
 export type ContentType =
   | "news"
@@ -150,14 +149,18 @@ type ItemRow = {
   status: string;
   created_by: string;
   title_ar: string;
+  recycled_at: Date | null;
 };
 
 async function getItemRow(id: string): Promise<ItemRow | null> {
   const result = await query<ItemRow>(
-    `SELECT id, content_type, status, created_by, title_ar FROM content_items WHERE id = $1`,
+    `SELECT id, content_type, status, created_by, title_ar, recycled_at
+     FROM content_items WHERE id = $1`,
     [id],
   );
-  return result.rows[0] ?? null;
+  const row = result.rows[0];
+  if (!row || row.recycled_at) return null;
+  return row;
 }
 
 /**
@@ -269,35 +272,6 @@ export async function reopenRejected(user: SessionUser, id: string): Promise<Con
     summary: `Reopened rejected item as draft — ${item.title_ar}`,
     metadata: { title: item.title_ar },
   });
-  return item.content_type;
-}
-
-/**
- * Super Admin only: permanently delete unpublished or rejected items (and their revisions).
- */
-export async function deleteContentItem(user: SessionUser, id: string): Promise<ContentType> {
-  if (user.role !== "super_admin") {
-    throw new Error("Super Admin role required to delete content");
-  }
-  const item = await getItemRow(id);
-  if (!item) throw new Error("Not found");
-  if (!["unpublished", "rejected"].includes(item.status)) {
-    throw new Error("Only unpublished or rejected items can be deleted");
-  }
-
-  await writeAudit({
-    actor: user,
-    action: `${item.content_type}.delete`,
-    entityType: item.content_type,
-    entityId: id,
-    summary: `Deleted ${item.status} item — ${item.title_ar}`,
-    metadata: { title: item.title_ar, status: item.status },
-  });
-
-  await query(`DELETE FROM content_items WHERE id = $1`, [id]);
-  if (item.content_type === "news") {
-    await pruneFeaturedNewsItem(id);
-  }
   return item.content_type;
 }
 

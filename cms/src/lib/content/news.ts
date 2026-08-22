@@ -146,7 +146,7 @@ async function addRevision(
 
 export async function getNewsById(id: string): Promise<NewsItem | null> {
   const result = await query<NewsItem>(
-    `SELECT * FROM content_items WHERE id = $1 AND content_type = 'news'`,
+    `SELECT * FROM content_items WHERE id = $1 AND content_type = 'news' AND recycled_at IS NULL`,
     [id],
   );
   return result.rows[0] ?? null;

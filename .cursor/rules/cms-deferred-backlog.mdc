@@ -7,21 +7,20 @@ alwaysApply: true
 
 When discussing CMS/product/roadmap work, briefly remind the stakeholder that these are **deferred** (tracked in `docs/WORKLOG.md` § “Deferred backlog”). Do **not** implement them unless they explicitly start a PRD-first slice for that item.
 
-## No active Approved PRD
+## Active Approved PRD (this slice — implement)
 
-Load more on news / events / publications is **Delivered** on `main` — [docs/prds/2026-08-22-cms-list-load-more.md](docs/prds/2026-08-22-cms-list-load-more.md).
+- CMS Recycle bin — [docs/prds/2026-08-22-cms-recycle-bin.md](docs/prds/2026-08-22-cms-recycle-bin.md)
 
 ## Deferred (future) — simple → complex
 
 Do **not** implement these unless they explicitly start a PRD-first slice.
 
-1. Soft-delete recycle bin
-2. Scheduled publish
-3. Bulk ops / clone / import-export UI
-4. Media crop / optimize / variants
-5. EN editorial body parity ([docs/audits/PARITY.md](docs/audits/PARITY.md))
-6. Static institutional pages in CMS (locales only today)
-7. Journals in CMS (OJS remains)
+1. Scheduled publish
+2. Bulk ops / clone / import-export UI
+3. Media crop / optimize / variants
+4. EN editorial body parity ([docs/audits/PARITY.md](docs/audits/PARITY.md))
+5. Static institutional pages in CMS (locales only today)
+6. Journals in CMS (OJS remains)
 
 ## Already closed (do not re-open as gaps)
 

@@ -12,8 +12,8 @@ import {
   withdrawNews,
   type NewsInput,
 } from "@/lib/content/news";
+import { recycleContentItem } from "@/lib/content/recycleBin";
 import {
-  deleteContentItem,
   reassignAuthor,
   reopenRejected,
   restoreRevision,
@@ -105,7 +105,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         item = await getNewsById(id);
         break;
       case "delete":
-        await deleteContentItem(user, id);
+        await recycleContentItem(user, id);
         return NextResponse.json({ ok: true, deleted: true });
       case "restore_revision":
         if (!body.revisionId) throw new Error("revisionId required");

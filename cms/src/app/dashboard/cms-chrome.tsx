@@ -12,6 +12,7 @@ import {
   IconDoc,
   IconGlobe,
   IconHome,
+  IconInbox,
   IconMedia,
   IconSearch,
   IconShield,
@@ -221,6 +222,7 @@ export function CmsChrome({
       { key: "users", href: "/dashboard/users", icon: <IconUsers /> },
       { key: "orgUnits", href: "/dashboard/org-units", icon: <IconShield /> },
       { key: "desks", href: "/dashboard/editors", icon: <IconUsers /> },
+      { key: "recycleBin", href: "/dashboard/recycle-bin", icon: <IconInbox /> },
       { key: "audit", href: "/dashboard/audit", icon: <IconShield /> },
     );
   } else if (role === "reviewer") {

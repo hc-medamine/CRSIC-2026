@@ -456,4 +456,37 @@ export async function deleteMediaAsset(
   return { id: existing.id, publicPath: existing.public_path };
 }
 
+/**
+ * After a recycled content row is gone: delete the media asset + files
+ * only if no durable refs remain (same scan as library DELETE).
+ */
+export async function purgeMediaIfUnreferenced(
+  actor: SessionUser,
+  publicPath: string,
+): Promise<boolean> {
+  if (!publicPath.startsWith("img/cms/") && !publicPath.startsWith("img/covers/")) {
+    return false;
+  }
+  const references = await listMediaReferences(publicPath);
+  if (references.length > 0) return false;
+
+  const existing = await getMediaByPublicPath(publicPath);
+  if (existing) {
+    await query(`DELETE FROM media_assets WHERE id = $1`, [existing.id]);
+    unlinkIfExists(stagingPath(existing.id, existing.extension));
+    unlinkIfExists(absolutePublicPath(existing.public_path));
+    await writeAudit({
+      actor,
+      action: "media.delete",
+      entityType: "media",
+      entityId: existing.id,
+      summary: `Deleted unreferenced media after content purge ${existing.public_path}`,
+      metadata: { publicPath: existing.public_path, bucket: existing.bucket },
+    });
+  } else {
+    unlinkIfExists(absolutePublicPath(publicPath));
+  }
+  return true;
+}
+
 export type { ValidatedUpload };
