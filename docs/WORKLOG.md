@@ -19,6 +19,18 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-22 — Scheduled publish **cancelled** (removed from backlog)
+
+Stakeholder: skip and **delete** the idea. Confirms 2026-07-21 lock: manual Approve → Publish only; no `scheduled` status, cron, or schedule UI. Do **not** re-list it as deferred. Next remaining deferred item: **bulk ops / clone / import-export** (own PRD first).
+
+---
+
+### 2026-08-22 — CMS Recycle bin **Delivered** on `main`
+
+Merged `feature/cms-recycle-bin` → `main` ([PR #34](https://github.com/hc-medamine/CRSIC-2026/pull/34), `643dbaf`). **PRD:** [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md). SA Move to bin (unpublished/rejected); restore → draft; permanent delete + unused media; 90-day banner/Purge on bin open (no cron). Migration `031`. After pull: `cd cms && npm run db:migrate`.
+
+---
+
 ### 2026-08-22 — Implementing CMS Recycle bin
 
 **Branch:** `feature/cms-recycle-bin`. **PRD:** [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md) **Approved**. SA Move to bin (unpublished/rejected, all hard-delete types); restore → draft; permanent delete + Empty bin; 90-day banner/Purge on bin open (no cron). Migration `031`. After pull: `cd cms && npm run db:migrate` (or `npm run dev`). Smoke: [qa/SMOKE-CMS.md](./qa/SMOKE-CMS.md) Rb1–Rb6.
@@ -27,7 +39,7 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ### 2026-08-22 — PRD **Approved**: CMS Recycle bin
 
-**PRD:** [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md) — **Approved**. Soft-delete recycle bin. Scheduled publish stays deferred.
+**PRD:** [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md) — **Approved**. Soft-delete recycle bin.
 
 ---
 
@@ -471,13 +483,13 @@ Remind on CMS/product sessions; do **not** start without stakeholder PRD lock. O
 |---|------|----------------|
 | 1 | CMS UI to reassign editor/reviewer/publisher | **Delivered** on `main` — [prds/2026-08-22-cms-reassign-authorship-ui.md](./prds/2026-08-22-cms-reassign-authorship-ui.md) |
 | 2 | Server list pagination | **Delivered** on `main` — [prds/2026-08-22-cms-list-load-more.md](./prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more) |
-| 3 | Soft-delete recycle bin | **Implementing** on `feature/cms-recycle-bin` — [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md) |
-| 4 | Scheduled publish | Time-based workflow; `published_at` is a stamp only today |
-| 5 | Bulk ops / clone / import-export UI | Several classic CMS surfaces |
-| 6 | Media crop / optimize / variants | Imaging pipeline + extra storage |
-| 7 | EN editorial body parity | Schema + forms + SPA across types — see [audits/PARITY.md](./audits/PARITY.md) |
-| 8 | Static institutional pages in CMS | New types + SPA routes; locales only today |
-| 9 | Journals in CMS | Replace OJS; largest product change |
+| 3 | Soft-delete recycle bin | **Delivered** on `main` — [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md) (PR #34) |
+| — | Scheduled publish | **Cancelled** (2026-07-21, confirmed 2026-08-22). Removed from this list. Manual Approve → Publish only. |
+| 4 | Bulk ops / clone / import-export UI | Several classic CMS surfaces |
+| 5 | Media crop / optimize / variants | Imaging pipeline + extra storage |
+| 6 | EN editorial body parity | Schema + forms + SPA across types — see [audits/PARITY.md](./audits/PARITY.md) |
+| 7 | Static institutional pages in CMS | New types + SPA routes; locales only today |
+| 8 | Journals in CMS | Replace OJS; largest product change |
 
 ---
 

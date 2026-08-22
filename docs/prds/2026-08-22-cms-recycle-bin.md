@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Approved** (2026-08-22) |
+| Status | **Delivered** (2026-08-22) — `main` PR #34 |
 | Date | 2026-08-22 |
 | Author | Stakeholder + agent |
 | Owners | Product / CMS Desk |
@@ -33,7 +33,7 @@ Who feels it: Super Admin (no safety net); Editors (work disappears with no rest
 - A new `content_status` value (`deleted`).
 - Media-library recycle bin (library DELETE rules stay; content bin is the new surface).
 - Cron / scheduled jobs.
-- Scheduled publish, bulk clone, media crop, EN body parity, journals (deferred).
+- Scheduled publish (**cancelled** 2026-08-22 — do not reopen). Bulk clone, media crop, EN body parity, journals (deferred).
 
 ## 3. Users & roles
 
@@ -124,3 +124,5 @@ Who feels it: Super Admin (no safety net); Editors (work disappears with no rest
 | 2026-08-22 | Restore: one click. Permanent delete: typed/confirm, cannot undo. Empty bin: confirm with count + Cancel. |
 | 2026-08-22 | Audit on recycle/restore/delete. No notifications, no bin search, no dashboard badge this slice. |
 | 2026-08-22 | **Approved.** |
+| 2026-08-22 | **Delivered** on `main` (PR #34). |
+| 2026-08-22 | Scheduled publish **cancelled** (removed from deferred backlog; do not reopen). |

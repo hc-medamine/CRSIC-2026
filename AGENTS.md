@@ -32,7 +32,7 @@ Every `cms/` `npm test` and `db:*` script loads `.env.local` via `--env-file` �
 ## Hard workflow rules
 
 - **PRD-first** (see `.cursor/rules/prd-first-workflow.mdc`): do **not** code a product/feature slice until its PRD under `docs/prds/` is **Approved**. Small bugfixes/ops chores may skip this. When the stakeholder raises a new idea, start at workflow step 1 — don't jump to design or a todo list.
-- **CMS deferred backlog** (`.cursor/rules/cms-deferred-backlog.mdc`): do not implement deferred items (pagination, bulk ops, scheduled publish, media crop, EN body parity, …) unless a new PRD slice is explicitly started.
+- **CMS deferred backlog** (`.cursor/rules/cms-deferred-backlog.mdc`): do not implement deferred items (bulk ops, media crop, EN body parity, …) unless a new PRD slice is explicitly started. Scheduled publish is **cancelled** — do not reopen.
 - `cms/AGENTS.md`: the installed Next.js version has breaking changes vs training data — read `cms/node_modules/next/dist/docs/` before writing CMS code.
 
 ## Editing content (data/*.json)
