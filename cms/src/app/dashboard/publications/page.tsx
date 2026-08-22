@@ -6,24 +6,29 @@ import { canAccessContentType } from "@/lib/content/permissions";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { ContentListFilters } from "@/app/dashboard/content-list-filters";
 import { ContentListPage } from "@/app/dashboard/content-list-page";
-import { filterContentItems } from "@/lib/content/filter-content-items";
 
 export default async function PublicationsListPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ q?: string; status?: string }>;
+  searchParams?: Promise<{ q?: string; status?: string; page?: string }>;
 }) {
   const user = await requireUser();
   if (!(await canAccessContentType(user, "publication"))) redirect("/dashboard");
   const params = (await searchParams) ?? {};
   const q = (params.q ?? "").trim();
   const statusFilter = (params.status ?? "").trim();
-  const items = filterContentItems(await listPublicationsForUser(user), q, statusFilter);
+  const listed = await listPublicationsForUser(user, {
+    page: params.page,
+    q,
+    status: statusFilter,
+    slice: "window",
+  });
   const cookieStore = await cookies();
   const lang = normalizeLang(cookieStore.get(CMS_LANG_COOKIE)?.value);
 
   return (
     <ContentListPage
+      key={`${q}|${statusFilter}`}
       breadcrumbs={[
         { href: "/dashboard", label: t("home", lang) },
         { label: t("publications", lang) },
@@ -42,7 +47,15 @@ export default async function PublicationsListPage({
           placeholder={t("searchPublications", lang)}
         />
       }
-      items={items.map((item) => ({
+      loadMore={{
+        apiPath: "/api/publications",
+        itemHrefBase: "/dashboard/publications",
+        page: listed.page,
+        hasMore: listed.hasMore,
+        q,
+        status: statusFilter,
+      }}
+      items={listed.items.map((item) => ({
         id: item.id,
         href: `/dashboard/publications/${item.id}`,
         title: item.title_ar || t("untitled", lang),

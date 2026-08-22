@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession, sessionTimeoutMs } from "@/lib/auth/session";
-import { createNews, listNewsForUser, type NewsInput } from "@/lib/content/news";
+import { createNews, listNewsForUser, type NewsInput, type NewsItem } from "@/lib/content/news";
+import { listQueryFromSearchParams } from "@/lib/content/listPagination";
 
 export const runtime = "nodejs";
 
@@ -11,7 +12,7 @@ async function requireSessionUser() {
   return session.user;
 }
 
-function serialize(item: Awaited<ReturnType<typeof listNewsForUser>>[number]) {
+function serialize(item: NewsItem) {
   return {
     ...item,
     published_at: item.published_at?.toISOString() ?? null,
@@ -20,11 +21,16 @@ function serialize(item: Awaited<ReturnType<typeof listNewsForUser>>[number]) {
   };
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const user = await requireSessionUser();
   if (!user) return NextResponse.json({ ok: false, error: "Unauthenticated" }, { status: 401 });
-  const items = await listNewsForUser(user);
-  return NextResponse.json({ ok: true, items: items.map(serialize) });
+  const result = await listNewsForUser(user, listQueryFromSearchParams(request.nextUrl.searchParams));
+  return NextResponse.json({
+    ok: true,
+    items: result.items.map(serialize),
+    hasMore: result.hasMore,
+    page: result.page,
+  });
 }
 
 export async function POST(request: NextRequest) {

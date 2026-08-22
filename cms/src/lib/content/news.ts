@@ -19,6 +19,12 @@ import {
 import { notifyOnSubmit } from "@/lib/content/delegation";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
 import { pruneFeaturedNewsItem } from "@/lib/content/featuredNews";
+import {
+  fetchContentListPage,
+  emptyContentList,
+  type ContentListQuery,
+  type ContentListResult,
+} from "@/lib/content/listPagination";
 
 async function auditNews(
   user: SessionUser,
@@ -146,37 +152,40 @@ export async function getNewsById(id: string): Promise<NewsItem | null> {
   return result.rows[0] ?? null;
 }
 
-export async function listNewsForUser(user: SessionUser): Promise<NewsItem[]> {
-  if (!(await canAccessContentType(user, "news"))) return [];
+/** Page size for `/dashboard/news` and `GET /api/news`. */
+export const NEWS_LIST_PAGE_SIZE = 20;
+
+export async function listNewsForUser(
+  user: SessionUser,
+  opts: ContentListQuery = {},
+): Promise<ContentListResult<NewsItem>> {
+  if (!(await canAccessContentType(user, "news"))) return emptyContentList(opts.page);
 
   if (user.role === "super_admin") {
-    const result = await query<NewsItem>(
-      `SELECT * FROM content_items WHERE content_type = 'news'
-       ORDER BY updated_at DESC`,
-    );
-    return result.rows;
+    return fetchContentListPage<NewsItem>({
+      contentType: "news",
+      role: { kind: "all" },
+      pageSize: NEWS_LIST_PAGE_SIZE,
+      listQuery: opts,
+    });
   }
 
   if (user.role === "reviewer") {
     const orgIds = await getUserOrgIds(user.id);
-    if (orgIds.length === 0) return [];
-    const result = await query<NewsItem>(
-      `SELECT * FROM content_items
-       WHERE content_type = 'news' AND org_unit_id = ANY($1::text[])
-       ORDER BY updated_at DESC`,
-      [orgIds],
-    );
-    return result.rows;
+    return fetchContentListPage<NewsItem>({
+      contentType: "news",
+      role: { kind: "orgs", orgIds },
+      pageSize: NEWS_LIST_PAGE_SIZE,
+      listQuery: opts,
+    });
   }
 
-  // Editors: own items only (not peers in the same org/type).
-  const result = await query<NewsItem>(
-    `SELECT * FROM content_items
-     WHERE content_type = 'news' AND created_by = $1
-     ORDER BY updated_at DESC`,
-    [user.id],
-  );
-  return result.rows;
+  return fetchContentListPage<NewsItem>({
+    contentType: "news",
+    role: { kind: "author", userId: user.id },
+    pageSize: NEWS_LIST_PAGE_SIZE,
+    listQuery: opts,
+  });
 }
 
 export async function createNews(user: SessionUser, input: NewsInput): Promise<NewsItem> {

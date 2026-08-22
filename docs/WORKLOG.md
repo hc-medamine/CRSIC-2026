@@ -19,6 +19,18 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-22 — CMS list Load more **Delivered** on `main`
+
+Merged `feature/cms-list-load-more` → `main`. **PRD:** [prds/2026-08-22-cms-list-load-more.md](./prds/2026-08-22-cms-list-load-more.md). News / events / publications Desk lists: page size 20, `GET /api/news?page=`, Load more appends, `?page=3` paints pages 1–3. No SPA. Next deferred item: **soft-delete recycle bin** (own PRD first).
+
+---
+
+### 2026-08-22 — PRD **Approved**: CMS list Load more
+
+**PRD:** [prds/2026-08-22-cms-list-load-more.md](./prds/2026-08-22-cms-list-load-more.md) — **Approved**. Desk Load more on news / events / publications only. Recycle bin and the rest stay deferred.
+
+---
+
 ### 2026-08-22 — Align authorship **Delivered** on `main`
 
 Merged `feature/cms-align-authorship` → `main`. **PRD:** [prds/2026-08-22-cms-reassign-authorship-ui.md](./prds/2026-08-22-cms-reassign-authorship-ui.md). One **Desks** page (`/dashboard/editors`): claims + Align dry-run/Apply; `publisher_id`; JSON rebuild + notifies; rebuild status badge. Migration `030`. After pull: `cd cms && npm run db:migrate` (or `npm run dev`). Next deferred item: **server list pagination** (own PRD first).
@@ -446,7 +458,7 @@ Remind on CMS/product sessions; do **not** start without stakeholder PRD lock. O
 | # | Item | Why this rank |
 |---|------|----------------|
 | 1 | CMS UI to reassign editor/reviewer/publisher | **Delivered** on `main` — [prds/2026-08-22-cms-reassign-authorship-ui.md](./prds/2026-08-22-cms-reassign-authorship-ui.md) |
-| 2 | Server list pagination | Mechanical; trigger ~200 rows per type |
+| 2 | Server list pagination | **Delivered** on `main` — [prds/2026-08-22-cms-list-load-more.md](./prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more) |
 | 3 | Soft-delete recycle bin | Restore UX on top of shipped hard-delete + ref scan |
 | 4 | Scheduled publish | Time-based workflow; `published_at` is a stamp only today |
 | 5 | Bulk ops / clone / import-export UI | Several classic CMS surfaces |

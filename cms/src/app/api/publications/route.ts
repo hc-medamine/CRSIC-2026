@@ -4,7 +4,9 @@ import {
   createPublication,
   listPublicationsForUser,
   type PublicationInput,
+  type PublicationItem,
 } from "@/lib/content/publications";
+import { listQueryFromSearchParams } from "@/lib/content/listPagination";
 
 export const runtime = "nodejs";
 
@@ -15,7 +17,7 @@ async function requireSessionUser() {
   return session.user;
 }
 
-function serialize(item: Awaited<ReturnType<typeof listPublicationsForUser>>[number]) {
+function serialize(item: PublicationItem) {
   return {
     ...item,
     published_at: item.published_at?.toISOString() ?? null,
@@ -24,11 +26,19 @@ function serialize(item: Awaited<ReturnType<typeof listPublicationsForUser>>[num
   };
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const user = await requireSessionUser();
   if (!user) return NextResponse.json({ ok: false, error: "Unauthenticated" }, { status: 401 });
-  const items = await listPublicationsForUser(user);
-  return NextResponse.json({ ok: true, items: items.map(serialize) });
+  const result = await listPublicationsForUser(
+    user,
+    listQueryFromSearchParams(request.nextUrl.searchParams),
+  );
+  return NextResponse.json({
+    ok: true,
+    items: result.items.map(serialize),
+    hasMore: result.hasMore,
+    page: result.page,
+  });
 }
 
 export async function POST(request: NextRequest) {
