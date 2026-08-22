@@ -398,6 +398,7 @@ export function ContentListPage({
           busy={bulkBusy}
           selectedCount={selectedCount}
           publishedCount={publishedSelected}
+          kind={bulk.kind}
           onCancel={() => setBulkDialog(null)}
           onConfirm={() => void onConfirmBulk()}
           onDismiss={() => setBulkDialog(null)}

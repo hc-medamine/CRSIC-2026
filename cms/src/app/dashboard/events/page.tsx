@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listEventsForUser } from "@/lib/content/events";
-import { canAccessContentType } from "@/lib/content/permissions";
+import { canAccessContentType, canReview } from "@/lib/content/permissions";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { ContentListFilters } from "@/app/dashboard/content-list-filters";
 import { ContentListPage } from "@/app/dashboard/content-list-page";
@@ -55,6 +55,11 @@ export default async function EventsListPage({
         q,
         status: statusFilter,
       }}
+      bulk={
+        canReview(user)
+          ? { apiPath: "/api/events/bulk", canRecycle: user.role === "super_admin", kind: "event" }
+          : undefined
+      }
       items={listed.items.map((item) => ({
         id: item.id,
         href: `/dashboard/events/${item.id}`,

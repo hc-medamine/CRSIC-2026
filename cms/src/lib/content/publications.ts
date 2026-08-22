@@ -508,34 +508,51 @@ export async function publishPublication(user: SessionUser, id: string) {
   return item;
 }
 
-export async function unpublishPublication(user: SessionUser, id: string) {
+export type UnpublishPublicationOpts = {
+  /** Default true. Bulk unpublish sets false, then rebuilds publications JSON once. */
+  rebuild?: boolean;
+  /** Default true. Bulk unpublish sets false (no N in-CMS pings). */
+  notify?: boolean;
+};
+
+export async function unpublishPublication(
+  user: SessionUser,
+  id: string,
+  opts: UnpublishPublicationOpts = {},
+) {
   const existing = await getPublicationById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
   if (existing.status !== "published") throw new Error("Item is not published");
-  const item = await mutateThenRebuildPublic({
-    itemId: id,
-    mutate: async () => {
-      const result = await query<PublicationItem>(
-        `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
-          needs_post_review = FALSE, emergency_published_at = NULL,
-          emergency_published_by = NULL, emergency_reason = NULL,
-          updated_by = $2, updated_at = NOW()
-         WHERE id = $1 RETURNING *`,
-        [id, user.id],
-      );
-      return result.rows[0];
-    },
-    rebuild: rebuildPublicPublicationsJson,
-  });
+  const mutate = async () => {
+    const result = await query<PublicationItem>(
+      `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
+        needs_post_review = FALSE, emergency_published_at = NULL,
+        emergency_published_by = NULL, emergency_reason = NULL,
+        updated_by = $2, updated_at = NOW()
+       WHERE id = $1 RETURNING *`,
+      [id, user.id],
+    );
+    return result.rows[0];
+  };
+  const item =
+    opts.rebuild === false
+      ? await mutate()
+      : await mutateThenRebuildPublic({
+          itemId: id,
+          mutate,
+          rebuild: rebuildPublicPublicationsJson,
+        });
   await addRevision(item.id, "unpublished", snapshotOf(item), user.id, "Unpublished");
-  await createNotification({
-    userId: item.created_by,
-    type: "publication.unpublished",
-    title: "Publication unpublished",
-    body: item.title_ar,
-    linkPath: `/dashboard/publications/${item.id}`,
-  });
+  if (opts.notify !== false) {
+    await createNotification({
+      userId: item.created_by,
+      type: "publication.unpublished",
+      title: "Publication unpublished",
+      body: item.title_ar,
+      linkPath: `/dashboard/publications/${item.id}`,
+    });
+  }
   await auditPublication(user, "publication.unpublish", item, "Unpublished from publications.json");
   return item;
 }

@@ -500,34 +500,47 @@ export async function publishEvent(user: SessionUser, id: string) {
   return item;
 }
 
-export async function unpublishEvent(user: SessionUser, id: string) {
+export type UnpublishEventOpts = {
+  /** Default true. Bulk unpublish sets false, then rebuilds `events.json` once. */
+  rebuild?: boolean;
+  /** Default true. Bulk unpublish sets false (no N in-CMS pings). */
+  notify?: boolean;
+};
+
+export async function unpublishEvent(user: SessionUser, id: string, opts: UnpublishEventOpts = {}) {
   const existing = await getEventById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
   if (existing.status !== "published") throw new Error("Item is not published");
-  const item = await mutateThenRebuildPublic({
-    itemId: id,
-    mutate: async () => {
-      const result = await query<EventItem>(
-        `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
-          needs_post_review = FALSE, emergency_published_at = NULL,
-          emergency_published_by = NULL, emergency_reason = NULL,
-          updated_by = $2, updated_at = NOW()
-         WHERE id = $1 RETURNING *`,
-        [id, user.id],
-      );
-      return result.rows[0];
-    },
-    rebuild: rebuildPublicEventsJson,
-  });
+  const mutate = async () => {
+    const result = await query<EventItem>(
+      `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
+        needs_post_review = FALSE, emergency_published_at = NULL,
+        emergency_published_by = NULL, emergency_reason = NULL,
+        updated_by = $2, updated_at = NOW()
+       WHERE id = $1 RETURNING *`,
+      [id, user.id],
+    );
+    return result.rows[0];
+  };
+  const item =
+    opts.rebuild === false
+      ? await mutate()
+      : await mutateThenRebuildPublic({
+          itemId: id,
+          mutate,
+          rebuild: rebuildPublicEventsJson,
+        });
   await addRevision(item.id, "unpublished", snapshotOf(item), user.id, "Unpublished");
-  await createNotification({
-    userId: item.created_by,
-    type: "event.unpublished",
-    title: "Event unpublished",
-    body: item.title_ar,
-    linkPath: `/dashboard/events/${item.id}`,
-  });
+  if (opts.notify !== false) {
+    await createNotification({
+      userId: item.created_by,
+      type: "event.unpublished",
+      title: "Event unpublished",
+      body: item.title_ar,
+      linkPath: `/dashboard/events/${item.id}`,
+    });
+  }
   await auditEvent(user, "event.unpublish", item, "Unpublished from events.json");
   return item;
 }

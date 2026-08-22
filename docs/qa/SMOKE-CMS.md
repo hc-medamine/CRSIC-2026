@@ -180,7 +180,20 @@ PRD [2026-08-22-cms-news-bulk-actions.md](../prds/2026-08-22-cms-news-bulk-actio
 | Nb3 | Super Admin: **Move to recycle bin** on a mix of published + unpublished + a draft → one confirm names published-first; published unpublished then binned; unpublished binned; draft skipped; report lists each skip | ☐ |
 | Nb4 | Load more rows can be selected; header checkbox is loaded rows only (not the whole CMS). Filter change clears selection | ☐ |
 | Nb5 | Featured playlist drops unpublished/binned ids. Edit-page Unpublish / Move to recycle bin still work. No N in-CMS unpublish notifications for the bulk | ☐ |
-| Nb6 | Events / publications lists have no checkboxes | ☐ |
+| Nb6 | Partners / laws lists have no checkboxes | ☐ |
+
+## Events + publications list bulk
+
+PRD [2026-08-22-cms-events-publications-bulk-actions.md](../prds/2026-08-22-cms-events-publications-bulk-actions.md). Same news bulk flow on `/dashboard/events` and `/dashboard/publications`. No featured-playlist prune.
+
+| # | Check | Pass? |
+|---|--------|-------|
+| Ep1 | Editor: no checkboxes on events or publications. Bulk API skips with `reviewer_required` | ☐ |
+| Ep2 | Reviewer: Unpublish only on both lists; own published skipped (four-eyes); others leave `events.json` / `publications.json` after one rebuild each | ☐ |
+| Ep3 | SA mixed recycle on each list: published unpublished then binned; unpublished binned; draft skipped; report lists each skip | ☐ |
+| Ep4 | Publication bulk unpublish keeps `covers.length === pubs.length`. Home featured **news** playlist unchanged | ☐ |
+| Ep5 | Edit-page Unpublish / Move to recycle bin still work. No N in-CMS unpublish notifications for bulk | ☐ |
+| Ep6 | Partners / laws still have no bulk chrome | ☐ |
 
 ## G. Gate
 

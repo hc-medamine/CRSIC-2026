@@ -6,10 +6,13 @@ import { FormStickyActions } from "@/app/dashboard/form-ux";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 import { t, tf, type CmsLang } from "@/lib/i18n/labels";
 
-/** Opt-in news list bulk (Reviewer + Super Admin). Other type lists must not pass this. */
+/** Opt-in list bulk (Reviewer + Super Admin). Other type lists must not pass this. */
+export type ContentListBulkKind = "news" | "event" | "publication";
+
 export type ContentListBulk = {
-  apiPath: "/api/news/bulk";
+  apiPath: "/api/news/bulk" | "/api/events/bulk" | "/api/publications/bulk";
   canRecycle: boolean;
+  kind: ContentListBulkKind;
 };
 
 export type BulkAction = "unpublish" | "recycle";
@@ -121,11 +124,24 @@ export function ContentListBulkBar({
   );
 }
 
+const UNPUBLISH_TITLE: Record<ContentListBulkKind, string> = {
+  news: "bulkConfirmUnpublishTitle",
+  event: "bulkConfirmUnpublishTitleEvent",
+  publication: "bulkConfirmUnpublishTitlePub",
+};
+
+const UNPUBLISH_BODY: Record<ContentListBulkKind, string> = {
+  news: "bulkConfirmUnpublish",
+  event: "bulkConfirmUnpublishEvent",
+  publication: "bulkConfirmUnpublishPub",
+};
+
 export function ContentListBulkModal({
   dialog,
   busy,
   selectedCount,
   publishedCount,
+  kind,
   onCancel,
   onConfirm,
   onDismiss,
@@ -134,6 +150,7 @@ export function ContentListBulkModal({
   busy: boolean;
   selectedCount: number;
   publishedCount: number;
+  kind: ContentListBulkKind;
   onCancel: () => void;
   onConfirm: () => void;
   onDismiss: () => void;
@@ -155,7 +172,7 @@ export function ContentListBulkModal({
     dialog.kind === "report"
       ? t("bulkReportTitle", lang)
       : dialog.action === "unpublish"
-        ? t("bulkConfirmUnpublishTitle", lang)
+        ? t(UNPUBLISH_TITLE[kind], lang)
         : t("bulkConfirmRecycleTitle", lang);
 
   let body: ReactNode;
@@ -164,7 +181,7 @@ export function ContentListBulkModal({
       <>
         <p className="mt-2 text-sm text-crs-muted">
           {dialog.action === "unpublish"
-            ? tf("bulkConfirmUnpublish", lang, { n: selectedCount })
+            ? tf(UNPUBLISH_BODY[kind], lang, { n: selectedCount })
             : tf("bulkConfirmRecycle", lang, { n: selectedCount })}
         </p>
         {dialog.action === "recycle" && publishedCount > 0 ? (
