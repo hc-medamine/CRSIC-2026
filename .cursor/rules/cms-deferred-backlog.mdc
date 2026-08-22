@@ -9,7 +9,7 @@ When discussing CMS/product/roadmap work, briefly remind the stakeholder that th
 
 ## Active Approved PRD (this slice — implement)
 
-- CMS events + publications + remaining-types list bulk — [docs/prds/2026-08-22-cms-events-publications-bulk-actions.md](docs/prds/2026-08-22-cms-events-publications-bulk-actions.md), [docs/prds/2026-08-22-cms-remaining-types-bulk-actions.md](docs/prds/2026-08-22-cms-remaining-types-bulk-actions.md) (`feature/cms-events-publications-bulk`)
+- _(none)_
 
 ## Deferred (future) — simple → complex
 
@@ -26,6 +26,7 @@ Do **not** implement these unless they explicitly start a PRD-first slice.
 - **Scheduled publish — cancelled** (2026-07-21, confirmed 2026-08-22). Manual Approve → Publish only. No `scheduled` status, cron, or schedule UI. Do not add it back to the deferred list.
 - CMS Recycle bin (PRD 2026-08-22): SA bin unpublished/rejected; restore to draft; purge unused media. On `main` (PR #34).
 - CMS news list bulk (PRD 2026-08-22): unpublish + SA recycle; skip + report. On `main` (PR #36).
+- CMS list bulk for remaining types (PRDs 2026-08-22): events, publications, partners, alerts, laws, platforms, research groups, research projects. On `main` (PR #37).
 - CMS list Load more (PRD 2026-08-22): news/events/publications page size 20.
 - Align authorship / Desks (PRD 2026-08-22): claims + Align, assignable publisher, JSON rebuild.
 - Feature-completeness audit critical/functional gaps closed on `main` via PR #17: SEO restore, partner JSON + narrative, research restore, media DELETE 409, comment deeplinks, preview ×7, SPA partner/group detail.

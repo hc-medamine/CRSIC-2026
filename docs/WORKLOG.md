@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-22 — CMS list bulk **Delivered** on `main`
+
+Merged `feature/cms-events-publications-bulk` → `main` ([PR #37](https://github.com/hc-medamine/CRSIC-2026/pull/37), `a2c1072`). Events, publications, partners, alerts, laws, platforms, research groups, and research projects share news bulk Unpublish / Recycle (one JSON rebuild per type; no featured prune). Clone / import-export stay deferred.
+
+---
+
 ### 2026-08-22 — Implementing CMS remaining-types list bulk
 
 **Branch:** `feature/cms-events-publications-bulk` (same PR as events/publications). **PRD:** [prds/2026-08-22-cms-remaining-types-bulk-actions.md](./prds/2026-08-22-cms-remaining-types-bulk-actions.md) **Approved**. Partners, alerts, laws, platforms, research groups, and research projects get the news bulk Unpublish / Recycle flow; no featured-playlist prune; one JSON rebuild per type batch. Clone / import-export stay deferred.
@@ -527,7 +533,7 @@ Remind on CMS/product sessions; do **not** start without stakeholder PRD lock. O
 | 2 | Server list pagination | **Delivered** on `main` — [prds/2026-08-22-cms-list-load-more.md](./prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more) |
 | 3 | Soft-delete recycle bin | **Delivered** on `main` — [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md) (PR #34) |
 | — | Scheduled publish | **Cancelled** (2026-07-21, confirmed 2026-08-22). Removed from this list. Manual Approve → Publish only. |
-| 4 | Bulk ops / clone / import-export UI | **List bulk** on all CMS content types (news PR #36; events/publications + remaining types on `feature/cms-events-publications-bulk`). **Clone / import-export** still deferred. |
+| 4 | Bulk ops / clone / import-export UI | **List bulk** on all CMS content types (news PR #36; events/publications + remaining types PR #37). **Clone / import-export** still deferred. |
 | 5 | Media crop / optimize / variants | Imaging pipeline + extra storage |
 | 6 | EN editorial body parity | Schema + forms + SPA across types — see [audits/PARITY.md](./audits/PARITY.md) |
 | 7 | Static institutional pages in CMS | New types + SPA routes; locales only today |
