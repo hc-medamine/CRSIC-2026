@@ -808,13 +808,14 @@ Own **internal CMS + PostgreSQL** (`cms/`): authenticated users with roles and p
 
 1. CMS UI to reassign editor/reviewer/publisher — **Delivered** [docs/prds/2026-08-22-cms-reassign-authorship-ui.md](./docs/prds/2026-08-22-cms-reassign-authorship-ui.md)
 2. Server list pagination — **Delivered** [docs/prds/2026-08-22-cms-list-load-more.md](./docs/prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more)
-3. Soft-delete recycle bin — **Implementing** [docs/prds/2026-08-22-cms-recycle-bin.md](./docs/prds/2026-08-22-cms-recycle-bin.md) (`feature/cms-recycle-bin`)
-4. Scheduled publish
-5. Bulk ops / clone / import-export UI
-6. Media crop / optimize / variants
-7. EN editorial body parity
-8. Static institutional pages in CMS (locales only today)
-9. Journals in CMS (OJS remains)
+3. Soft-delete recycle bin — **Delivered** [docs/prds/2026-08-22-cms-recycle-bin.md](./docs/prds/2026-08-22-cms-recycle-bin.md) (PR #34)
+4. Bulk ops / clone / import-export UI
+5. Media crop / optimize / variants
+6. EN editorial body parity
+7. Static institutional pages in CMS (locales only today)
+8. Journals in CMS (OJS remains)
+
+**Cancelled (do not re-open):** scheduled / timed auto-publish (2026-07-21, confirmed 2026-08-22). Publish stays manual Approve → Publish.
 
 See [docs/WORKLOG.md](./docs/WORKLOG.md) § Deferred backlog.
 
@@ -826,7 +827,7 @@ Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Core spec: [d
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-08-22** (Recycle bin implementing on `feature/cms-recycle-bin`) |
+| Last updated     | **2026-08-22** (Recycle bin on `main` PR #34; scheduled publish cancelled) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes
