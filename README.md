@@ -809,7 +809,7 @@ Own **internal CMS + PostgreSQL** (`cms/`): authenticated users with roles and p
 1. CMS UI to reassign editor/reviewer/publisher — **Delivered** [docs/prds/2026-08-22-cms-reassign-authorship-ui.md](./docs/prds/2026-08-22-cms-reassign-authorship-ui.md)
 2. Server list pagination — **Delivered** [docs/prds/2026-08-22-cms-list-load-more.md](./docs/prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more)
 3. Soft-delete recycle bin — **Delivered** [docs/prds/2026-08-22-cms-recycle-bin.md](./docs/prds/2026-08-22-cms-recycle-bin.md) (PR #34)
-4. Bulk ops / clone / import-export UI
+4. Bulk ops / clone / import-export UI — **news list bulk in progress** [docs/prds/2026-08-22-cms-news-bulk-actions.md](./docs/prds/2026-08-22-cms-news-bulk-actions.md); clone / import-export / other types still deferred
 5. Media crop / optimize / variants
 6. EN editorial body parity
 7. Static institutional pages in CMS (locales only today)
@@ -827,7 +827,7 @@ Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Core spec: [d
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-08-22** (Recycle bin on `main` PR #34; scheduled publish cancelled) |
+| Last updated     | **2026-08-22** (News list bulk PRD Approved; Recycle bin on `main` PR #34; scheduled publish cancelled) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes

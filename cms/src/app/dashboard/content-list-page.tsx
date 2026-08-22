@@ -8,6 +8,16 @@ import { IconPlus, IconChevron } from "./cms-icons";
 import { DeskEmptyState, DeskPageHeader } from "./desk-ui";
 import { PageBreadcrumb, StatusPill } from "./ui-bits";
 import { EnStatusBadge } from "./en-status-badge";
+import {
+  ContentListBulkBar,
+  ContentListBulkModal,
+  DeskListCheckbox,
+  postNewsBulk,
+  toastBulkNetworkError,
+  type BulkAction,
+  type BulkDialog,
+  type ContentListBulk,
+} from "./content-list-bulk";
 
 export type ContentListRow = {
   id: string;
@@ -44,6 +54,8 @@ type Props = {
   /** Unfiltered list path — used by “Clear filters”. */
   listHref?: string;
   loadMore?: ContentListLoadMore;
+  /** Opt-in news list bulk (Reviewer / SA). Do not pass on other type lists. */
+  bulk?: ContentListBulk;
 };
 
 function formatUpdated(value: Date | string): string {
@@ -111,6 +123,7 @@ export function ContentListPage({
   filtersActive = false,
   listHref,
   loadMore,
+  bulk,
 }: Props) {
   const lang = useCmsLang();
   const [rows, setRows] = useState(items);
@@ -118,8 +131,43 @@ export function ContentListPage({
   const [hasMore, setHasMore] = useState(Boolean(loadMore?.hasMore));
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadError, setLoadError] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(() => new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkDialog, setBulkDialog] = useState<BulkDialog | null>(null);
 
   const filteredEmpty = rows.length === 0 && filtersActive;
+  const selectedCount = selected.size;
+  const allLoadedSelected = rows.length > 0 && selectedCount === rows.length;
+  const someLoadedSelected = selectedCount > 0 && selectedCount < rows.length;
+  const publishedSelected = rows.filter((r) => selected.has(r.id) && r.status === "published").length;
+
+  function toggleOne(id: string, checked: boolean) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (checked) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  }
+
+  function toggleLoaded(checked: boolean) {
+    setSelected(checked ? new Set(rows.map((r) => r.id)) : new Set());
+  }
+
+  function applyBulkToRows(action: BulkAction, doneIds: Set<string>) {
+    const publishedFilter = loadMore?.status === "published";
+    setRows((prev) => {
+      if (action === "recycle") return prev.filter((r) => !doneIds.has(r.id));
+      return prev
+        .map((r) => (doneIds.has(r.id) ? { ...r, status: "unpublished" } : r))
+        .filter((r) => !(publishedFilter && doneIds.has(r.id)));
+    });
+    setSelected((prev) => {
+      const next = new Set(prev);
+      for (const id of doneIds) next.delete(id);
+      return next;
+    });
+  }
 
   async function onLoadMore() {
     if (!loadMore || loadingMore || !hasMore) return;
@@ -167,6 +215,23 @@ export function ContentListPage({
     }
   }
 
+  async function onConfirmBulk() {
+    if (!bulk || !bulkDialog || bulkDialog.kind !== "confirm") return;
+    const action = bulkDialog.action;
+    const ids = rows.filter((r) => selected.has(r.id)).map((r) => r.id);
+    if (ids.length === 0) return;
+    setBulkBusy(true);
+    try {
+      const result = await postNewsBulk(bulk.apiPath, action, ids, t("actionFailed", lang));
+      applyBulkToRows(action, new Set(result.done.map((d) => d.id)));
+      setBulkDialog({ kind: "report", action, done: result.done, skipped: result.skipped });
+    } catch (err) {
+      toastBulkNetworkError(err instanceof Error ? err.message : t("actionFailed", lang));
+    } finally {
+      setBulkBusy(false);
+    }
+  }
+
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
       <PageBreadcrumb items={breadcrumbs} />
@@ -211,6 +276,16 @@ export function ContentListPage({
           <table className="w-full min-w-[640px] text-start text-sm">
             <thead className="border-b border-crs-border bg-crs-bg/80 text-xs uppercase tracking-wide text-crs-muted">
               <tr>
+                {bulk ? (
+                  <th className="w-12 px-2 py-3.5">
+                    <DeskListCheckbox
+                      checked={allLoadedSelected}
+                      indeterminate={someLoadedSelected}
+                      onChange={toggleLoaded}
+                      label={t("bulkSelectLoaded", lang)}
+                    />
+                  </th>
+                ) : null}
                 <th className="px-4 py-3.5 font-semibold">{t("colTitle", lang)}</th>
                 <th className="px-4 py-3.5 font-semibold">{t("colStatus", lang)}</th>
                 <th className="px-4 py-3.5 font-semibold">{t("colEn", lang)}</th>
@@ -224,6 +299,15 @@ export function ContentListPage({
                   className="group relative cms-row-enter border-s-2 border-s-transparent transition-colors hover:border-s-crs-accent hover:bg-crs-accent/5 focus-within:border-s-crs-accent focus-within:bg-crs-accent/5"
                   style={{ "--row-delay": `${Math.min(i, 11) * 45}ms` } as CSSProperties}
                 >
+                  {bulk ? (
+                    <td className="relative z-10 w-12 px-2 py-3.5">
+                      <DeskListCheckbox
+                        checked={selected.has(item.id)}
+                        onChange={(checked) => toggleOne(item.id, checked)}
+                        label={`${t("bulkSelectRow", lang)}: ${item.title || t("untitled", lang)}`}
+                      />
+                    </td>
+                  ) : null}
                   <td className="px-4 py-3.5">
                     <Link
                       href={item.href}
@@ -250,6 +334,7 @@ export function ContentListPage({
               {loadingMore
                 ? Array.from({ length: SKELETON_ROWS }).map((_, i) => (
                     <tr key={`sk-${i}`} aria-hidden className="border-s-2 border-s-transparent">
+                      {bulk ? <td className="px-2 py-3.5" /> : null}
                       <td className="px-4 py-3.5">
                         <div className="cms-skeleton h-4 w-2/5" />
                       </td>
@@ -295,6 +380,29 @@ export function ContentListPage({
           )}
         </div>
       )}
+
+      {bulk ? (
+        <ContentListBulkBar
+          selectedCount={selectedCount}
+          canRecycle={bulk.canRecycle}
+          busy={bulkBusy}
+          onClear={() => setSelected(new Set())}
+          onUnpublish={() => setBulkDialog({ kind: "confirm", action: "unpublish" })}
+          onRecycle={() => setBulkDialog({ kind: "confirm", action: "recycle" })}
+        />
+      ) : null}
+
+      {bulk && bulkDialog ? (
+        <ContentListBulkModal
+          dialog={bulkDialog}
+          busy={bulkBusy}
+          selectedCount={selectedCount}
+          publishedCount={publishedSelected}
+          onCancel={() => setBulkDialog(null)}
+          onConfirm={() => void onConfirmBulk()}
+          onDismiss={() => setBulkDialog(null)}
+        />
+      ) : null}
     </main>
   );
 }
