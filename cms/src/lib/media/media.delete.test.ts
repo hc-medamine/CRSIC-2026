@@ -3,7 +3,7 @@
  * Run: npm test  (from cms/, requires DATABASE_URL)
  */
 import assert from "node:assert/strict";
-import { existsSync } from "node:fs";
+import { existsSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { after, before, describe, it } from "node:test";
 import { query } from "@/lib/db";
@@ -18,8 +18,16 @@ import { listMediaReferences } from "@/lib/media/references";
 import { createNews, updateNewsDraft } from "@/lib/content/news";
 
 const ORG = "centre_wide";
-const createdMediaIds: string[] = [];
+const createdMedia: { id: string; publicPath: string; extension: string }[] = [];
 const createdNewsIds: string[] = [];
+
+function unlinkIfExists(absPath: string): void {
+  try {
+    if (existsSync(absPath)) unlinkSync(absPath);
+  } catch {
+    /* best-effort leftover cleanup */
+  }
+}
 
 /** Minimal valid 1×1 PNG */
 function tinyPngFile(name = "test.png"): File {
@@ -63,18 +71,16 @@ describe("media delete", () => {
     for (const id of createdNewsIds) {
       await query(`DELETE FROM content_items WHERE id = $1`, [id]);
     }
-    for (const id of createdMediaIds) {
-      try {
-        await query(`DELETE FROM media_assets WHERE id = $1`, [id]);
-      } catch {
-        /* already deleted */
-      }
+    for (const asset of createdMedia) {
+      unlinkIfExists(join(process.cwd(), "uploads", `${asset.id}.${asset.extension}`));
+      unlinkIfExists(join(process.cwd(), "..", ...asset.publicPath.split("/")));
+      await query(`DELETE FROM media_assets WHERE id = $1`, [asset.id]);
     }
   });
 
   it("deletes unreferenced asset (row + both files)", async () => {
     const asset = await createMediaUpload(sa, tinyPngFile("orphan.png"), "news");
-    createdMediaIds.push(asset.id);
+    createdMedia.push({ id: asset.id, publicPath: asset.public_path, extension: asset.extension });
 
     const staging = join(process.cwd(), "uploads", `${asset.id}.${asset.extension}`);
     const publicAbs = join(process.cwd(), "..", ...asset.public_path.split("/"));
@@ -90,7 +96,7 @@ describe("media delete", () => {
 
   it("blocks delete when image_path / attachments reference the asset", async () => {
     const asset = await createMediaUpload(sa, tinyPngFile("used.png"), "news");
-    createdMediaIds.push(asset.id);
+    createdMedia.push({ id: asset.id, publicPath: asset.public_path, extension: asset.extension });
 
     const news = await createNews(sa, {
       orgUnitId: ORG,
@@ -121,7 +127,7 @@ describe("media delete", () => {
 
   it("blocks delete when only a revision snapshot still references the path", async () => {
     const asset = await createMediaUpload(sa, tinyPngFile("rev.png"), "news");
-    createdMediaIds.push(asset.id);
+    createdMedia.push({ id: asset.id, publicPath: asset.public_path, extension: asset.extension });
 
     const news = await createNews(sa, {
       orgUnitId: ORG,
