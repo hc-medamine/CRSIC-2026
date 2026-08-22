@@ -75,6 +75,7 @@ export type NewsItem = {
   published_at: Date | null;
   created_at: Date;
   updated_at: Date;
+  publisher_id?: string | null;
 };
 
 export type NewsInput = {

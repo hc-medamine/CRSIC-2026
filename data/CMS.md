@@ -8,7 +8,7 @@ When `CONTENT_BASE_URL` is set (e.g. `https://cdn.example.com/crsic/`), the app 
 
 | Path | Shape |
 |------|--------|
-| `news.json` | `{ "news": object[] }` — `id`, `slug`, `date`, `title`, `label`, `summary`, `body`, `img`, `media[]`, bylines (`editor_*`, `reviewer_*`, `publisher_*`), optional SEO |
+| `news.json` | `{ "news": object[] }` — `id`, `slug`, `date`, `title`, `label`, `summary`, `body`, `img`, `media[]`, bylines (`editor_*` from author, `reviewer_*` from review owner, `publisher_*` from CMS `publisher_id` or Boufatah fallback), optional SEO |
 | `featured-news.json` | `{ "ids": string[] }` — ordered public news ids for `#home-feat-carousel`, max 10. Empty or all missing → SPA shows 3 newest news. CMS: `/dashboard/featured-news` |
 | `events.json` | `{ "intl": object[], "nat": object[] }` — detail + `status` (`upcoming` \| `ongoing` \| `done`) + bylines + optional SEO |
 | `publications.json` | `{ "covers": string[], "pubs": object[] }` — SPA uses each pub’s `media[]`; keep `covers.length === pubs.length` |

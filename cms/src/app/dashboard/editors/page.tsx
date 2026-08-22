@@ -5,16 +5,18 @@ import {
   listOrgUnits,
   requireReviewerOrSuperAdmin,
 } from "@/lib/users";
+import { previewAlign, serializeAlignPreview } from "@/lib/content/alignAuthorship";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { AdminPageShell } from "@/app/dashboard/desk-ui";
-import { EditorsScopeManager } from "./editors-scope-manager";
+import { DesksClient } from "./desks-client";
 
 export default async function EditorsPage() {
   const user = await requireReviewerOrSuperAdmin();
-  const [editors, orgUnits, claims] = await Promise.all([
+  const [editors, orgUnits, claims, align] = await Promise.all([
     listAssignedEditors(user),
     listOrgUnits(),
     listEditorContentTypeClaims(),
+    previewAlign(user),
   ]);
   const cookieStore = await cookies();
   const lang = normalizeLang(cookieStore.get(CMS_LANG_COOKIE)?.value);
@@ -23,16 +25,17 @@ export default async function EditorsPage() {
     <AdminPageShell
       breadcrumbs={[
         { href: "/dashboard", label: t("home", lang) },
-        { label: t("editors", lang) },
+        { label: t("desks", lang) },
       ]}
-      title={t("editors", lang)}
-      subtitle={t("pageDescEditors", lang)}
+      title={t("desks", lang)}
+      subtitle={t("pageDescDesks", lang)}
     >
-      <EditorsScopeManager
+      <DesksClient
         initialEditors={editors}
         initialOrgUnits={orgUnits}
         initialClaims={claims}
         actorRole={user.role === "super_admin" ? "super_admin" : "reviewer"}
+        initialAlign={serializeAlignPreview(align)}
       />
     </AdminPageShell>
   );

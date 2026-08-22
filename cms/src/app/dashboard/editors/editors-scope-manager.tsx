@@ -26,7 +26,22 @@ type Props = {
   initialOrgUnits: OrgUnit[];
   initialClaims: EditorContentTypeClaim[];
   actorRole: "reviewer" | "super_admin";
+  onDirtyChange?: (dirty: boolean) => void;
+  onSaved?: () => void | Promise<void>;
 };
+
+function typesEqual(a: ContentType[], b: ContentType[]): boolean {
+  const left = [...a].sort();
+  const right = [...b].sort();
+  return left.length === right.length && left.every((v, i) => v === right[i]);
+}
+
+function computeDirty(
+  editors: ManagedUser[],
+  draft: Record<string, ContentType[]>,
+): boolean {
+  return editors.some((ed) => !typesEqual(draft[ed.id] ?? [], ed.content_types));
+}
 
 function catalogUnion(orgIds: string[], units: OrgUnit[]): Set<ContentType> {
   const set = new Set<ContentType>();
@@ -46,6 +61,8 @@ export function EditorsScopeManager({
   initialOrgUnits,
   initialClaims,
   actorRole,
+  onDirtyChange,
+  onSaved,
 }: Props) {
   const lang = useCmsLang();
   const router = useRouter();
@@ -114,6 +131,8 @@ export function EditorsScopeManager({
       setMessage(t("editorsSaved", lang));
       cmsToast.success(t("editorsSaved", lang));
       await refresh();
+      onDirtyChange?.(false);
+      await onSaved?.();
     } finally {
       setPending(false);
     }
@@ -187,12 +206,14 @@ export function EditorsScopeManager({
                             onChange={(e) => {
                               setDraftTypes((prev) => {
                                 const cur = prev[ed.id] ?? [];
-                                return {
+                                const next = {
                                   ...prev,
                                   [ed.id]: e.target.checked
                                     ? [...cur, ct]
                                     : cur.filter((x) => x !== ct),
                                 };
+                                onDirtyChange?.(computeDirty(editors, next));
+                                return next;
                               });
                             }}
                           />

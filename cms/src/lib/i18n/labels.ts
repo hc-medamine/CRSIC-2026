@@ -268,6 +268,14 @@ export const LABELS: LabelMap = {
     ar: "تعليق جديد على محتواكم",
   },
   notifTitleAssigned: { en: "Item assigned to you", ar: "أُسند إليكم عنصر" },
+  notifTitleDeskAligned: {
+    en: "Items aligned to your desk",
+    ar: "وُئمت عناصر مع مكتبكم",
+  },
+  notifTitleDeskAlignRan: {
+    en: "Reviewer ran Align authorship",
+    ar: "شغّل المراجع مواءمة التأليف",
+  },
   notifTitleReviewOwnerProposal: {
     en: "Review owner proposal needs confirmation",
     ar: "اقتراح مسؤول المراجعة بانتظار التأكيد",
@@ -505,17 +513,101 @@ export const LABELS: LabelMap = {
   },
   orgUnits: { en: "Organisation units", ar: "الوحدات التنظيمية" },
   editors: { en: "Editors", ar: "المحررون" },
+  desks: { en: "Desks", ar: "المكاتب" },
+  pageDescDesks: {
+    en: "Assign who owns each content type, then apply that chart to existing items. Saving desks does not move articles until you Apply below. This does not publish or unpublish.",
+    ar: "عيّنوا من يملك كل نوع محتوى، ثم طبّقوا ذلك على العناصر الحالية. حفظ المكاتب لا ينقل المقالات حتى تضغطوا تطبيق أدناه. هذا لا ينشر ولا يلغي النشر.",
+  },
+  desksSectionDesks: { en: "Who owns what", ar: "من يملك ماذا" },
+  desksSectionAlign: { en: "Update existing items", ar: "تحديث العناصر الحالية" },
+  desksSectionDesksHint: {
+    en: "Save the org chart. Articles do not move yet.",
+    ar: "احفظوا مخطط المكاتب. المقالات لا تنتقل بعد.",
+  },
+  desksSectionAlignHint: {
+    en: "Then apply that chart to items already in the CMS.",
+    ar: "ثم طبّقوا المخطط على العناصر الموجودة في النظام.",
+  },
+  alignSaveDesksFirst: {
+    en: "Save desk changes first. Apply uses the last saved chart, not unsaved checkboxes.",
+    ar: "احفظوا تغييرات المكاتب أولاً. التطبيق يستخدم آخر مخطط محفوظ، لا الخانات غير المحفوظة.",
+  },
+  authorship: { en: "Align authorship", ar: "مواءمة التأليف" },
+  pageDescAuthorship: {
+    en: "Preview then apply desk claims to item editors, review owners, and public publisher. This does not publish or unpublish; it only moves ownership and refreshes live news/event bylines.",
+    ar: "عاينوا ثم طبّقوا إسنادات المكاتب على المحررين ومسؤولي المراجعة والناشر العلني. هذا لا ينشر ولا يلغي النشر؛ ينقل الملكية ويحدّث بيانات بطاقات الأخبار والفعاليات المنشورة.",
+  },
+  alignDisclaimer: {
+    en: "Review the dry-run, then Apply. That writes ownership and rebuilds published news and events JSON.",
+    ar: "راجعوا المعاينة ثم اضغطوا تطبيق. ذلك يكتب الملكية ويعيد بناء JSON الأخبار والفعاليات المنشورة.",
+  },
+  alignClaimMap: { en: "Current desks", ar: "المكاتب الحالية" },
+  alignEditorClaims: { en: "Editor claims", ar: "إسنادات المحررين" },
+  alignReviewerClaims: { en: "Reviewer claims", ar: "إسنادات المراجعين" },
+  alignDryRun: { en: "Dry-run", ar: "معاينة" },
+  alignScanned: { en: "Scanned", ar: "الممسوح" },
+  alignAlready: { en: "Already aligned", ar: "متوافق سلفًا" },
+  alignWouldMove: { en: "To update", ar: "للتحديث" },
+  alignSkipped: { en: "Skipped (no editor claim)", ar: "متجاوز (لا إسناد محرر)" },
+  alignPublisherSet: { en: "Publisher to set", ar: "ناشر سيُعيَّن" },
+  alignPublisherKept: { en: "Publisher kept", ar: "ناشر مُبقى" },
+  alignCovers: { en: "Cover uploads", ar: "رفع الأغلفة" },
+  alignCoversOutOfScope: { en: "Not in your scope", ar: "خارج نطاقكم" },
+  alignColType: { en: "Type", ar: "النوع" },
+  alignColTitle: { en: "Title", ar: "العنوان" },
+  alignColFrom: { en: "From", ar: "من" },
+  alignColTo: { en: "To", ar: "إلى" },
+  alignColPublisher: { en: "Publisher", ar: "الناشر" },
+  alignPublisherActionSet: { en: "Set to org Reviewer", ar: "تعيين مراجع الوحدة" },
+  alignPublisherActionKeep: { en: "Keep", ar: "إبقاء" },
+  alignPublisherActionNone: { en: "—", ar: "—" },
+  alignMoreMoves: { en: "{n} more not listed", ar: "{n} أخرى غير معروضة" },
+  alignApply: { en: "Apply", ar: "تطبيق" },
+  alignApplied: { en: "Authorship aligned.", ar: "تمت مواءمة التأليف." },
+  alignNothingToDo: { en: "Nothing to apply.", ar: "لا شيء للتطبيق." },
+  alignFailed: { en: "Align failed.", ar: "تعذّرت المواءمة." },
+  alignRetryRebuild: { en: "Retry JSON rebuild", ar: "إعادة بناء JSON" },
+  alignRebuildRetryOk: { en: "Public JSON rebuilt.", ar: "أُعيد بناء JSON العلني." },
+  alignRebuildBadge: { en: "Rebuild status", ar: "حالة إعادة البناء" },
+  alignRebuildNever: { en: "No successful Align rebuild yet.", ar: "لا إعادة بناء ناجحة بعد." },
+  alignRebuildOk: {
+    en: "Last success: {news} news, {events} events.",
+    ar: "آخر نجاح: {news} أخبار، {events} فعاليات.",
+  },
+  alignRebuildSkipped: {
+    en: "Last success: no public rebuild needed.",
+    ar: "آخر نجاح: لم يلزم إعادة بناء علني.",
+  },
+  alignRebuildStale: {
+    en: "Last rebuild failed — public bylines may be stale.",
+    ar: "فشل آخر إعادة بناء — قد تكون البيانات العلنية قديمة.",
+  },
+  publisherTitle: { en: "Public publisher", ar: "الناشر العلني" },
+  publisherHint: {
+    en: "Name on the public news/event card (النشر). Must be a Reviewer who claims this organisation. Empty uses فريحة بوفاتح / Fariha Boufatah.",
+    ar: "الاسم على بطاقة الخبر/الفعالية (النشر). يجب أن يكون مراجعًا يدّعي هذه الوحدة. الفراغ يستخدم فريحة بوفاتح.",
+  },
+  publisherCurrent: { en: "Current", ar: "الحالي" },
+  publisherFallbackName: { en: "Fariha Boufatah (fallback)", ar: "فريحة بوفاتح (افتراضي)" },
+  publisherEmptyEligible: {
+    en: "Public card will show Boufatah until a scoped Reviewer is assigned.",
+    ar: "ستظهر البطاقة العلنية بوفاتح حتى يُعيَّن مراجع ضمن النطاق.",
+  },
+  publisherUseFallback: { en: "Institutional default (Boufatah)", ar: "الافتراضي المؤسسي (بوفاتح)" },
+  publisherSave: { en: "Save publisher", ar: "حفظ الناشر" },
+  publisherSaved: { en: "Publisher saved.", ar: "تم حفظ الناشر." },
+  publisherSaveFailed: { en: "Could not save publisher.", ar: "تعذّر حفظ الناشر." },
   pageDescEditors: {
     en: "Assign which content types each editor may work on. Each type can belong to only one editor.",
     ar: "عيّنوا أنواع المحتوى التي يعمل عليها كل محرر. يُسند كل نوع إلى محرر واحد فقط.",
   },
   editorsHintReviewer: {
-    en: "Editors in your organisation units. Assign content types here; account and unit access are managed on Users.",
-    ar: "المحررون ضمن وحداتكم التنظيمية. عيّنوا أنواع المحتوى هنا؛ تُدار الحسابات ووصول الوحدات من صفحة المستخدمين.",
+    en: "Editors in your organisation units. Assign content types here; accounts stay on Users (Super Admin). After you save, review the dry-run below and Apply.",
+    ar: "المحررون ضمن وحداتكم التنظيمية. عيّنوا أنواع المحتوى هنا؛ تبقى الحسابات في صفحة المستخدمين (المدير). بعد الحفظ راجعوا المعاينة أدناه ثم طبّقوا.",
   },
   editorsHintSa: {
-    en: "All editors. Use Users for accounts and organisation-unit access; use this page for content-type assignments.",
-    ar: "كل المحررين. استخدموا صفحة المستخدمين للحسابات ووصول الوحدات؛ وهذه الصفحة لإسناد أنواع المحتوى.",
+    en: "All editors. Use Users for accounts and organisation-unit access. After you save desks, review the dry-run below and Apply to move existing items.",
+    ar: "كل المحررين. استخدموا صفحة المستخدمين للحسابات ووصول الوحدات. بعد حفظ المكاتب راجعوا المعاينة أدناه ثم طبّقوا لنقل العناصر الحالية.",
   },
   editorsEmpty: {
     en: "No editors assigned yet.",
@@ -582,6 +674,8 @@ export const LABELS: LabelMap = {
   auditActionMediaReplace: { en: "Media replaced", ar: "استبدال وسائط" },
   auditActionMediaDelete: { en: "Media deleted", ar: "حذف وسائط" },
   auditActionContentReassign: { en: "Author reassigned", ar: "إعادة إسناد المؤلف" },
+  auditActionBulkAlign: { en: "Authorship aligned to desks", ar: "مواءمة التأليف مع المكاتب" },
+  auditActionPublisherSet: { en: "Public publisher set", ar: "تعيين الناشر العلني" },
   auditActionReviewOwnerProposed: {
     en: "Review owner proposed",
     ar: "اقتراح مسؤول المراجعة",
@@ -1431,6 +1525,8 @@ const AUDIT_ACTION_KEYS: Record<string, string> = {
   "media.replace": "auditActionMediaReplace",
   "media.delete": "auditActionMediaDelete",
   "content.reassign": "auditActionContentReassign",
+  "content.bulk_reassign_to_claims": "auditActionBulkAlign",
+  "content.publisher_set": "auditActionPublisherSet",
   "content.review_owner_proposed": "auditActionReviewOwnerProposed",
   "content.review_owner_set": "auditActionReviewOwnerSet",
   "content.review_owner_rejected": "auditActionReviewOwnerRejected",
@@ -1550,6 +1646,8 @@ const NOTIF_TITLE_KEYS: Record<string, string> = {
   "New comment on content": "notifTitleNewComment",
   "New comment on your content": "notifTitleNewCommentYours",
   "Item assigned to you": "notifTitleAssigned",
+  "Items aligned to your desk": "notifTitleDeskAligned",
+  "Reviewer ran Align authorship": "notifTitleDeskAlignRan",
   "Review owner proposal needs confirmation": "notifTitleReviewOwnerProposal",
   "You are the review owner": "notifTitleYouAreReviewOwner",
   "Content escalated": "notifTitleEscalated",
@@ -1576,6 +1674,7 @@ export function notificationTypeLabel(type: string, lang: CmsLang): string {
   if (action === "unpublished") return t("notifActionUnpublished", lang);
   if (action === "comment") return t("notifActionComment", lang);
   if (action === "reassigned") return t("notifActionReassigned", lang);
+  if (action === "desk_aligned" || action === "desk_align_ran") return t("notifActionReassigned", lang);
   if (action === "escalated" || action.includes("escalat")) return t("notifActionEscalated", lang);
   if (action === "away_set") return t("notifActionAway", lang);
   if (action.includes("review_owner")) return t("notifActionReviewOwner", lang);

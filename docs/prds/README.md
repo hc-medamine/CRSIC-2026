@@ -31,6 +31,7 @@ Product specs for CRSIC live here. **New feature slices follow the PRD-first wor
 | [2026-08-21-spa-news-event-card-byline.md](./2026-08-21-spa-news-event-card-byline.md) | **Delivered** (2026-08-21) | News+event cards: date, editor, reviewer, publisher (Boufatah); news sorted by story date |
 | [2026-08-21-home-news-carousel.md](./2026-08-21-home-news-carousel.md) | **Delivered** (2026-08-21) | Home Center News: 3-card paged autoplay, pause, swipe/keyboard; `#news` unchanged |
 | [2026-08-21-home-featured-news-playlist.md](./2026-08-21-home-featured-news-playlist.md) | **Delivered** (2026-08-21) | Home featured strip: curated news playlist max 10, four-eyes; empty → 3 newest |
+| [2026-08-22-cms-reassign-authorship-ui.md](./2026-08-22-cms-reassign-authorship-ui.md) | **Approved** (2026-08-22) | One Desks page (claims + Align); assignable scoped publisher; JSON rebuild + notifies; rebuild status badge |
 
 ## Related
 

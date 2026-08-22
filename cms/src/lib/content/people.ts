@@ -7,13 +7,17 @@ export type PersonRef = {
   nameEn: string | null;
   email: string;
   role: string;
+  isActive?: boolean;
 };
 
 export type ItemPeopleMeta = {
   editor: PersonRef | null;
   reviewer: PersonRef | null;
+  /** Last CMS publish actor (workflow). */
   publisher: PersonRef | null;
   reviewOwner: PersonRef | null;
+  /** Stored public publisher credit (`publisher_id`). */
+  publicPublisher: PersonRef | null;
 };
 
 type UserRow = {
@@ -23,6 +27,7 @@ type UserRow = {
   name_en: string | null;
   email: string;
   role: string;
+  is_active?: boolean;
 };
 
 function toPerson(row: UserRow | null | undefined): PersonRef | null {
@@ -34,13 +39,14 @@ function toPerson(row: UserRow | null | undefined): PersonRef | null {
     nameEn: row.name_en,
     email: row.email,
     role: row.role,
+    isActive: row.is_active,
   };
 }
 
 async function userById(id: string | null): Promise<PersonRef | null> {
   if (!id) return null;
   const result = await query<UserRow>(
-    `SELECT id, display_name, name_ar, name_en, email, role FROM users WHERE id = $1`,
+    `SELECT id, display_name, name_ar, name_en, email, role, is_active FROM users WHERE id = $1`,
     [id],
   );
   return toPerson(result.rows[0]);
@@ -64,7 +70,7 @@ async function lastActorForActions(
   if (row.actor_user_id) return userById(row.actor_user_id);
   if (row.actor_email) {
     const byEmail = await query<UserRow>(
-      `SELECT id, display_name, name_ar, name_en, email, role FROM users WHERE email = $1`,
+      `SELECT id, display_name, name_ar, name_en, email, role, is_active FROM users WHERE email = $1`,
       [row.actor_email],
     );
     if (byEmail.rows[0]) return toPerson(byEmail.rows[0]);
@@ -92,13 +98,20 @@ export async function getItemPeopleMeta(contentItemId: string): Promise<ItemPeop
     created_by: string;
     content_type: string;
     review_owner_id: string | null;
+    publisher_id: string | null;
   }>(
-    `SELECT created_by, content_type, review_owner_id FROM content_items WHERE id = $1`,
+    `SELECT created_by, content_type, review_owner_id, publisher_id FROM content_items WHERE id = $1`,
     [contentItemId],
   );
   const row = item.rows[0];
   if (!row) {
-    return { editor: null, reviewer: null, publisher: null, reviewOwner: null };
+    return {
+      editor: null,
+      reviewer: null,
+      publisher: null,
+      reviewOwner: null,
+      publicPublisher: null,
+    };
   }
 
   const t = row.content_type;
@@ -110,7 +123,8 @@ export async function getItemPeopleMeta(contentItemId: string): Promise<ItemPeop
   ]);
   const publisher = await lastActorForActions(contentItemId, [`${t}.publish`]);
   const reviewOwner = await userById(row.review_owner_id);
+  const publicPublisher = await userById(row.publisher_id);
   const reviewer = lastReviewer ?? reviewOwner;
 
-  return { editor, reviewer, publisher, reviewOwner };
+  return { editor, reviewer, publisher, reviewOwner, publicPublisher };
 }

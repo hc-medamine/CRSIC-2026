@@ -27,19 +27,53 @@ export function personPublicNames(person: PersonNameInput): { ar: string; en: st
   return { ar, en: en || ar };
 }
 
+export type PublisherPersonInput = PersonNameInput & {
+  role?: string | null;
+  isActive?: boolean | null;
+};
+
+/**
+ * Public publisher names (F1): assigned active Reviewer names, else Boufatah.
+ * Never emit a blank publisher line on news/event cards.
+ */
+export function resolvePublicPublisher(person: PublisherPersonInput): {
+  ar: string;
+  en: string;
+} {
+  if (!person) {
+    return { ar: PUBLIC_PUBLISHER_AR, en: PUBLIC_PUBLISHER_EN };
+  }
+  if (person.isActive === false) {
+    return { ar: PUBLIC_PUBLISHER_AR, en: PUBLIC_PUBLISHER_EN };
+  }
+  if (person.role && person.role !== "reviewer") {
+    return { ar: PUBLIC_PUBLISHER_AR, en: PUBLIC_PUBLISHER_EN };
+  }
+  const names = personPublicNames(person);
+  if (!names.ar && !names.en) {
+    return { ar: PUBLIC_PUBLISHER_AR, en: PUBLIC_PUBLISHER_EN };
+  }
+  return {
+    ar: names.ar || PUBLIC_PUBLISHER_AR,
+    en: names.en || names.ar || PUBLIC_PUBLISHER_EN,
+  };
+}
+
 export function publicBylineFromPeople(
   editor: PersonNameInput,
   reviewer: PersonNameInput,
+  publisher?: PublisherPersonInput,
 ): PublicBylineFields {
   const e = personPublicNames(editor);
   const r = personPublicNames(reviewer);
+  const p = resolvePublicPublisher(publisher ?? null);
   return {
     editor_ar: e.ar,
     editor_en: e.en,
     reviewer_ar: r.ar,
     reviewer_en: r.en,
-    publisher_ar: PUBLIC_PUBLISHER_AR,
-    publisher_en: PUBLIC_PUBLISHER_EN,
+    publisher_ar: p.ar,
+    publisher_en: p.en,
   };
 }
 
@@ -82,5 +116,17 @@ export function resolveNewsStoryDate(input: {
 export async function loadPublicByline(contentItemId: string): Promise<PublicBylineFields> {
   const meta = await getItemPeopleMeta(contentItemId);
   const reviewer = meta.reviewOwner ?? meta.reviewer;
-  return publicBylineFromPeople(meta.editor as PersonRef | null, reviewer as PersonRef | null);
+  return publicBylineFromPeople(
+    meta.editor as PersonRef | null,
+    reviewer as PersonRef | null,
+    meta.publicPublisher
+      ? {
+          nameAr: meta.publicPublisher.nameAr,
+          nameEn: meta.publicPublisher.nameEn,
+          displayName: meta.publicPublisher.displayName,
+          role: meta.publicPublisher.role,
+          isActive: meta.publicPublisher.isActive,
+        }
+      : null,
+  );
 }

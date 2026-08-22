@@ -14,6 +14,7 @@ import {
   PUBLIC_PUBLISHER_AR,
   PUBLIC_PUBLISHER_EN,
   personPublicNames,
+  resolvePublicPublisher,
   type PublicBylineFields,
 } from "@/lib/publish/publicByline";
 
@@ -95,8 +96,8 @@ export function buildEventPayload(
       editor_en: (row.editor_en || "").trim(),
       reviewer_ar: (row.reviewer_ar || "").trim(),
       reviewer_en: (row.reviewer_en || "").trim(),
-      publisher_ar: PUBLIC_PUBLISHER_AR,
-      publisher_en: PUBLIC_PUBLISHER_EN,
+      publisher_ar: (row.publisher_ar || "").trim() || PUBLIC_PUBLISHER_AR,
+      publisher_en: (row.publisher_en || "").trim() || PUBLIC_PUBLISHER_EN,
     },
     row,
   );
@@ -140,13 +141,21 @@ export async function rebuildPublicEventsJson(): Promise<{
     reviewer_name_ar: string | null;
     reviewer_name_en: string | null;
     reviewer_display: string | null;
+    publisher_name_ar: string | null;
+    publisher_name_en: string | null;
+    publisher_display: string | null;
+    publisher_role: string | null;
+    publisher_active: boolean | null;
   }>(
     `SELECT c.live_payload,
             e.name_ar AS editor_name_ar, e.name_en AS editor_name_en, e.display_name AS editor_display,
-            r.name_ar AS reviewer_name_ar, r.name_en AS reviewer_name_en, r.display_name AS reviewer_display
+            r.name_ar AS reviewer_name_ar, r.name_en AS reviewer_name_en, r.display_name AS reviewer_display,
+            p.name_ar AS publisher_name_ar, p.name_en AS publisher_name_en, p.display_name AS publisher_display,
+            p.role AS publisher_role, p.is_active AS publisher_active
      FROM content_items c
      LEFT JOIN users e ON e.id = c.created_by
      LEFT JOIN users r ON r.id = c.review_owner_id
+     LEFT JOIN users p ON p.id = c.publisher_id
      WHERE c.content_type = 'event' AND c.live_payload IS NOT NULL
      ORDER BY c.live_at DESC NULLS LAST, c.created_at ASC`,
   );
@@ -167,6 +176,17 @@ export async function rebuildPublicEventsJson(): Promise<{
       nameEn: row.reviewer_name_en,
       displayName: row.reviewer_display,
     });
+    const publisher = resolvePublicPublisher(
+      row.publisher_display || row.publisher_name_ar || row.publisher_name_en
+        ? {
+            nameAr: row.publisher_name_ar,
+            nameEn: row.publisher_name_en,
+            displayName: row.publisher_display,
+            role: row.publisher_role,
+            isActive: row.publisher_active,
+          }
+        : null,
+    );
     const publicItem: PublicEventItem = {
       id: item.id || `legacy-event-${item.slug || slugifyTitle(item.title || "item")}`,
       slug: item.slug || slugifyTitle(item.title || "item"),
@@ -188,8 +208,8 @@ export async function rebuildPublicEventsJson(): Promise<{
       editor_en: editor.en || item.editor_en || "",
       reviewer_ar: reviewer.ar || item.reviewer_ar || "",
       reviewer_en: reviewer.en || item.reviewer_en || "",
-      publisher_ar: PUBLIC_PUBLISHER_AR,
-      publisher_en: PUBLIC_PUBLISHER_EN,
+      publisher_ar: publisher.ar,
+      publisher_en: publisher.en,
       ...seoFromRow(item),
     };
     const primary = primaryImageSrc(media) ?? item.img;
