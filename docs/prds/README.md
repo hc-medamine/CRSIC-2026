@@ -34,7 +34,9 @@ Product specs for CRSIC live here. **New feature slices follow the PRD-first wor
 | [2026-08-22-cms-reassign-authorship-ui.md](./2026-08-22-cms-reassign-authorship-ui.md) | **Delivered** (2026-08-22) | One Desks page (claims + Align); assignable scoped publisher; JSON rebuild + notifies; rebuild status badge |
 | [2026-08-22-cms-list-load-more.md](./2026-08-22-cms-list-load-more.md) | **Delivered** (2026-08-22) | CMS news/events/publications Load more (page size 20); SPA and other lists unchanged |
 | [2026-08-22-cms-recycle-bin.md](./2026-08-22-cms-recycle-bin.md) | **Delivered** (2026-08-22) | SA Recycle bin (unpublished/rejected); restore to draft; purge >90 days on bin open; PR #34 |
-| [2026-08-22-cms-news-bulk-actions.md](./2026-08-22-cms-news-bulk-actions.md) | **Approved** (2026-08-22) | News list bulk unpublish + SA recycle (unpublish-then-bin); skip + per-item report. Implementing on `feature/cms-news-bulk-actions`. |
+| [2026-08-22-cms-news-bulk-actions.md](./2026-08-22-cms-news-bulk-actions.md) | **Approved** (2026-08-22) | News list bulk unpublish + SA recycle (unpublish-then-bin); skip + per-item report. On `main` (PR #36). |
+| [2026-08-22-cms-events-publications-bulk-actions.md](./2026-08-22-cms-events-publications-bulk-actions.md) | **Approved** (2026-08-22) | Events + publications list bulk; copy news gates; no featured-playlist prune. Shipping with remaining-types bulk on `feature/cms-events-publications-bulk`. |
+| [2026-08-22-cms-remaining-types-bulk-actions.md](./2026-08-22-cms-remaining-types-bulk-actions.md) | **Approved** (2026-08-22) | Partners, alerts, laws, platforms, research groups, research projects list bulk; same gates; no featured prune. Same branch as events/publications. |
 
 ## Related
 

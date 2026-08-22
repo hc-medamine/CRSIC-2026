@@ -19,6 +19,36 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-22 — Implementing CMS remaining-types list bulk
+
+**Branch:** `feature/cms-events-publications-bulk` (same PR as events/publications). **PRD:** [prds/2026-08-22-cms-remaining-types-bulk-actions.md](./prds/2026-08-22-cms-remaining-types-bulk-actions.md) **Approved**. Partners, alerts, laws, platforms, research groups, and research projects get the news bulk Unpublish / Recycle flow; no featured-playlist prune; one JSON rebuild per type batch. Clone / import-export stay deferred.
+
+---
+
+### 2026-08-22 — PRD **Approved**: CMS remaining-types list bulk
+
+Stakeholder: treat [prds/2026-08-22-cms-remaining-types-bulk-actions.md](./prds/2026-08-22-cms-remaining-types-bulk-actions.md) as **Approved**. Copy news gates; no playlist prune.
+
+---
+
+### 2026-08-22 — Implementing CMS events + publications list bulk
+
+**Branch:** `feature/cms-events-publications-bulk`. **PRD:** [prds/2026-08-22-cms-events-publications-bulk-actions.md](./prds/2026-08-22-cms-events-publications-bulk-actions.md) **Approved**. Same news bulk flow on `/dashboard/events` and `/dashboard/publications`; no featured-playlist prune. Remaining types ride the same branch. Clone / import-export stay deferred.
+
+---
+
+### 2026-08-22 — PRD **Approved**: CMS events + publications list bulk
+
+Stakeholder approved [prds/2026-08-22-cms-events-publications-bulk-actions.md](./prds/2026-08-22-cms-events-publications-bulk-actions.md). Copy news gates verbatim; featured-playlist prune is news-only.
+
+---
+
+### 2026-08-22 — PRD **Draft**: CMS events + publications list bulk
+
+[prds/2026-08-22-cms-events-publications-bulk-actions.md](./prds/2026-08-22-cms-events-publications-bulk-actions.md). Copy news bulk Unpublish / Recycle onto both lists; same gates; no featured-playlist prune. **Do not implement until Approved.**
+
+---
+
 ### 2026-08-22 — Implementing CMS news list bulk unpublish / recycle
 
 **Branch:** `feature/cms-news-bulk-actions`. **PRD:** [prds/2026-08-22-cms-news-bulk-actions.md](./prds/2026-08-22-cms-news-bulk-actions.md) **Approved**. News list checkboxes (Reviewer + SA); Unpublish; SA recycle of published = unpublish-then-bin in one confirm; skip ineligible + per-item report; one `news.json` rebuild per bulk unpublish. Visual: existing Desk list / checkbox / sticky bar / modal. Clone and import/export stay follow-on PRDs.
@@ -497,7 +527,7 @@ Remind on CMS/product sessions; do **not** start without stakeholder PRD lock. O
 | 2 | Server list pagination | **Delivered** on `main` — [prds/2026-08-22-cms-list-load-more.md](./prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more) |
 | 3 | Soft-delete recycle bin | **Delivered** on `main` — [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md) (PR #34) |
 | — | Scheduled publish | **Cancelled** (2026-07-21, confirmed 2026-08-22). Removed from this list. Manual Approve → Publish only. |
-| 4 | Bulk ops / clone / import-export UI | **News list bulk** — Approved PRD, implementing on `feature/cms-news-bulk-actions`. Clone / import-export / other types still deferred. |
+| 4 | Bulk ops / clone / import-export UI | **List bulk** on all CMS content types (news PR #36; events/publications + remaining types on `feature/cms-events-publications-bulk`). **Clone / import-export** still deferred. |
 | 5 | Media crop / optimize / variants | Imaging pipeline + extra storage |
 | 6 | EN editorial body parity | Schema + forms + SPA across types — see [audits/PARITY.md](./audits/PARITY.md) |
 | 7 | Static institutional pages in CMS | New types + SPA routes; locales only today |

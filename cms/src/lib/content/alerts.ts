@@ -14,6 +14,7 @@ import {
 } from "@/lib/content/permissions";
 import { notifyOnSubmit } from "@/lib/content/delegation";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
+import { shouldNotifyUnpublish, type SilentUnpublishOpts } from "@/lib/content/silentUnpublish";
 import { normalizeSeoInput, seoSnapshotFields, type SeoInput } from "@/lib/content/seo";
 import type { ContentStatus } from "@/lib/content/news";
 
@@ -427,35 +428,45 @@ export async function publishAlert(user: SessionUser, id: string) {
   }
 }
 
-export async function unpublishAlert(user: SessionUser, id: string) {
+export async function unpublishAlert(user: SessionUser, id: string, opts: SilentUnpublishOpts = {}) {
   const existing = await getAlertById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
   if (existing.status !== "published") throw new Error("Item is not published");
-  const before = await captureLiveState(id);
-  const result = await query<AlertItem>(
-    `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
-      needs_post_review = FALSE, emergency_published_at = NULL,
-      emergency_published_by = NULL, emergency_reason = NULL,
-      updated_by = $2, updated_at = NOW()
-     WHERE id = $1 RETURNING *`,
-    [id, user.id],
-  );
-  const item = result.rows[0];
-  try {
-    await rebuildPublicAlertsJson();
-  } catch (err) {
-    await restoreLiveState(id, before);
-    throw err;
+  const mutate = async () => {
+    const result = await query<AlertItem>(
+      `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
+        needs_post_review = FALSE, emergency_published_at = NULL,
+        emergency_published_by = NULL, emergency_reason = NULL,
+        updated_by = $2, updated_at = NOW()
+       WHERE id = $1 RETURNING *`,
+      [id, user.id],
+    );
+    return result.rows[0];
+  };
+  let item: AlertItem;
+  if (opts.rebuild === false) {
+    item = await mutate();
+  } else {
+    const before = await captureLiveState(id);
+    item = await mutate();
+    try {
+      await rebuildPublicAlertsJson();
+    } catch (err) {
+      await restoreLiveState(id, before);
+      throw err;
+    }
   }
   await addRevision(item.id, "unpublished", snapshotOf(item), user.id, "Unpublished");
-  await createNotification({
-    userId: item.created_by,
-    type: "alert.unpublished",
-    title: "Alert unpublished",
-    body: item.title_ar,
-    linkPath: `/dashboard/alerts/${item.id}`,
-  });
+  if (shouldNotifyUnpublish(opts)) {
+    await createNotification({
+      userId: item.created_by,
+      type: "alert.unpublished",
+      title: "Alert unpublished",
+      body: item.title_ar,
+      linkPath: `/dashboard/alerts/${item.id}`,
+    });
+  }
   await auditAlert(user, "alert.unpublish", item, "Unpublished from alerts.json");
   return item;
 }

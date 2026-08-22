@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listAlertsForUser } from "@/lib/content/alerts";
-import { canAccessContentType } from "@/lib/content/permissions";
+import { canAccessContentType, canReview } from "@/lib/content/permissions";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { ContentListPage } from "@/app/dashboard/content-list-page";
 
@@ -24,6 +24,11 @@ export default async function AlertsListPage() {
       newHref="/dashboard/alerts/new"
       newLabel={t("newAlert", lang)}
       emptyLabel={t("emptyAlerts", lang)}
+      bulk={
+        canReview(user)
+          ? { apiPath: "/api/alerts/bulk", canRecycle: user.role === "super_admin", kind: "alert" }
+          : undefined
+      }
       items={items.map((item) => ({
         id: item.id,
         href: `/dashboard/alerts/${item.id}`,

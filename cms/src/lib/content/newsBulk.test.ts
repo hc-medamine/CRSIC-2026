@@ -197,6 +197,16 @@ describe("executeNewsBulk", () => {
     assert.deepEqual(pruned, ["pub1", "pub2"]);
   });
 
+  it("does not call pruneFeatured when the dep is omitted (non-news types)", async () => {
+    const { impl, rebuilds } = deps({
+      role: "reviewer",
+      loadNews,
+    });
+    assert.equal(impl.pruneFeatured, undefined);
+    await executeNewsBulk("unpublish", ["pub1"], impl);
+    assert.equal(rebuilds.n, 1);
+  });
+
   it("does not rebuild when SA recycles only unpublished/rejected rows", async () => {
     const recycled: string[] = [];
     const { impl, rebuilds } = deps({

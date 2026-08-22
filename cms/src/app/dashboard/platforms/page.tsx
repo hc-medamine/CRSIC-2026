@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listPlatformsForUser } from "@/lib/content/platforms";
-import { canAccessContentType } from "@/lib/content/permissions";
+import { canAccessContentType, canReview } from "@/lib/content/permissions";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { ContentListPage } from "@/app/dashboard/content-list-page";
 
@@ -24,6 +24,11 @@ export default async function PlatformsListPage() {
       newHref="/dashboard/platforms/new"
       newLabel={t("newPlatform", lang)}
       emptyLabel={t("emptyPlatforms", lang)}
+      bulk={
+        canReview(user)
+          ? { apiPath: "/api/platforms/bulk", canRecycle: user.role === "super_admin", kind: "platform" }
+          : undefined
+      }
       items={items.map((item) => ({
         id: item.id,
         href: `/dashboard/platforms/${item.id}`,

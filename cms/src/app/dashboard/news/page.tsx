@@ -60,7 +60,7 @@ export default async function NewsListPage({
       }}
       bulk={
         canReview(user)
-          ? { apiPath: "/api/news/bulk", canRecycle: user.role === "super_admin" }
+          ? { apiPath: "/api/news/bulk", canRecycle: user.role === "super_admin", kind: "news" }
           : undefined
       }
       items={listed.items.map((item) => ({

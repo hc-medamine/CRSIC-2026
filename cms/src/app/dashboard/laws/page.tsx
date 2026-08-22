@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listLawsForUser } from "@/lib/content/laws";
-import { canAccessContentType } from "@/lib/content/permissions";
+import { canAccessContentType, canReview } from "@/lib/content/permissions";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { ContentListPage } from "@/app/dashboard/content-list-page";
 
@@ -24,6 +24,11 @@ export default async function LawsListPage() {
       newHref="/dashboard/laws/new"
       newLabel={t("newLaw", lang)}
       emptyLabel={t("emptyLaws", lang)}
+      bulk={
+        canReview(user)
+          ? { apiPath: "/api/laws/bulk", canRecycle: user.role === "super_admin", kind: "law" }
+          : undefined
+      }
       items={items.map((item) => ({
         id: item.id,
         href: `/dashboard/laws/${item.id}`,

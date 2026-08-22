@@ -15,6 +15,7 @@ import {
 } from "@/lib/content/permissions";
 import { notifyOnSubmit } from "@/lib/content/delegation";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
+import { unpublishMutateMaybeRebuild, shouldNotifyUnpublish, type SilentUnpublishOpts } from "@/lib/content/silentUnpublish";
 import { normalizeSeoInput, seoSnapshotFields, type SeoInput } from "@/lib/content/seo";
 import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 import type { ContentStatus } from "@/lib/content/news";
@@ -441,34 +442,33 @@ export async function publishPartner(user: SessionUser, id: string) {
   return item;
 }
 
-export async function unpublishPartner(user: SessionUser, id: string) {
+export async function unpublishPartner(user: SessionUser, id: string, opts: SilentUnpublishOpts = {}) {
   const existing = await getPartnerById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
   if (existing.status !== "published") throw new Error("Item is not published");
-  const item = await mutateThenRebuildPublic({
-    itemId: id,
-    mutate: async () => {
-      const result = await query<PartnerItem>(
-        `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
-          needs_post_review = FALSE, emergency_published_at = NULL,
-          emergency_published_by = NULL, emergency_reason = NULL,
-          updated_by = $2, updated_at = NOW()
-         WHERE id = $1 RETURNING *`,
-        [id, user.id],
-      );
-      return result.rows[0];
-    },
-    rebuild: rebuildPublicPartnersJson,
-  });
+  const mutate = async () => {
+    const result = await query<PartnerItem>(
+      `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
+        needs_post_review = FALSE, emergency_published_at = NULL,
+        emergency_published_by = NULL, emergency_reason = NULL,
+        updated_by = $2, updated_at = NOW()
+       WHERE id = $1 RETURNING *`,
+      [id, user.id],
+    );
+    return result.rows[0];
+  };
+  const item = await unpublishMutateMaybeRebuild(id, mutate, rebuildPublicPartnersJson, opts);
   await addRevision(item.id, "unpublished", snapshotOf(item), user.id, "Unpublished");
-  await createNotification({
-    userId: item.created_by,
-    type: "partner.unpublished",
-    title: "Partner unpublished",
-    body: item.title_ar,
-    linkPath: `/dashboard/partners/${item.id}`,
-  });
+  if (shouldNotifyUnpublish(opts)) {
+    await createNotification({
+      userId: item.created_by,
+      type: "partner.unpublished",
+      title: "Partner unpublished",
+      body: item.title_ar,
+      linkPath: `/dashboard/partners/${item.id}`,
+    });
+  }
   await auditPartner(user, "partner.unpublish", item, "Unpublished from partners.json");
   return item;
 }
