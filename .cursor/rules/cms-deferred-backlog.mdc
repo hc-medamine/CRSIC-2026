@@ -7,9 +7,9 @@ alwaysApply: true
 
 When discussing CMS/product/roadmap work, briefly remind the stakeholder that these are **deferred** (tracked in `docs/WORKLOG.md` § “Deferred backlog”). Do **not** implement them unless they explicitly start a PRD-first slice for that item.
 
-## Active Approved PRD (this slice — implement)
+## No active Approved PRD
 
-- CMS UI to reassign editor / reviewer / publisher — [docs/prds/2026-08-22-cms-reassign-authorship-ui.md](docs/prds/2026-08-22-cms-reassign-authorship-ui.md)
+Align authorship / Desks is **Delivered** on `main` — [docs/prds/2026-08-22-cms-reassign-authorship-ui.md](docs/prds/2026-08-22-cms-reassign-authorship-ui.md).
 
 ## Deferred (future) — simple → complex
 
@@ -26,4 +26,5 @@ Do **not** implement these unless they explicitly start a PRD-first slice.
 
 ## Already closed (do not re-open as gaps)
 
-Feature-completeness audit critical/functional gaps closed on `main` via PR #17: SEO restore, partner JSON + narrative, research restore, media DELETE 409, comment deeplinks, preview ×7, SPA partner/group detail.
+- Align authorship / Desks (PRD 2026-08-22): claims + Align, assignable publisher, JSON rebuild.
+- Feature-completeness audit critical/functional gaps closed on `main` via PR #17: SEO restore, partner JSON + narrative, research restore, media DELETE 409, comment deeplinks, preview ×7, SPA partner/group detail.

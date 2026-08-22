@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Approved** (2026-08-22) |
+| Status | **Delivered** (2026-08-22) |
 | Date | 2026-08-22 |
 | Author | Stakeholder + agent |
 | Owners | Product / CMS + public news/event bylines |
@@ -152,3 +152,4 @@ None — product lock 2026-08-22. Implementation questions stay in the decision 
 | 2026-08-22 | **Approved.** |
 | 2026-08-22 | Implemented on `feature/cms-align-authorship`. Public publisher is no longer hardcoded when `publisher_id` is a usable Reviewer (F1 still Boufatah). |
 | 2026-08-22 | **One Desks page:** Editors claims + Align dry-run/Apply on `/dashboard/editors`. Users stays separate. Unsaved desks disable Apply. |
+| 2026-08-22 | **Delivered** on `main` (`feature/cms-align-authorship`). |

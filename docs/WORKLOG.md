@@ -19,9 +19,9 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
-### 2026-08-22 — Implementing Align authorship UI
+### 2026-08-22 — Align authorship **Delivered** on `main`
 
-**Branch:** `feature/cms-align-authorship`. **PRD:** [prds/2026-08-22-cms-reassign-authorship-ui.md](./prds/2026-08-22-cms-reassign-authorship-ui.md) **Approved**. One **Desks** page (`/dashboard/editors`): claims + Align dry-run/Apply. Users stays separate. `publisher_id`, JSON rebuild + notifies, rebuild status badge. Migration `030`.
+Merged `feature/cms-align-authorship` → `main`. **PRD:** [prds/2026-08-22-cms-reassign-authorship-ui.md](./prds/2026-08-22-cms-reassign-authorship-ui.md). One **Desks** page (`/dashboard/editors`): claims + Align dry-run/Apply; `publisher_id`; JSON rebuild + notifies; rebuild status badge. Migration `030`. After pull: `cd cms && npm run db:migrate` (or `npm run dev`). Next deferred item: **server list pagination** (own PRD first).
 
 ---
 
@@ -445,7 +445,7 @@ Remind on CMS/product sessions; do **not** start without stakeholder PRD lock. O
 
 | # | Item | Why this rank |
 |---|------|----------------|
-| 1 | CMS UI to reassign editor/reviewer/publisher | **Approved PRD** [prds/2026-08-22-cms-reassign-authorship-ui.md](./prds/2026-08-22-cms-reassign-authorship-ui.md) — implement this slice; not future |
+| 1 | CMS UI to reassign editor/reviewer/publisher | **Delivered** on `main` — [prds/2026-08-22-cms-reassign-authorship-ui.md](./prds/2026-08-22-cms-reassign-authorship-ui.md) |
 | 2 | Server list pagination | Mechanical; trigger ~200 rows per type |
 | 3 | Soft-delete recycle bin | Restore UX on top of shipped hard-delete + ref scan |
 | 4 | Scheduled publish | Time-based workflow; `published_at` is a stamp only today |
