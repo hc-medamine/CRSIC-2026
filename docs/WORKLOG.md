@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-23 — PRD **Approved**: CMS clone Cut 1
+
+[prds/2026-08-22-cms-clone-import-export.md](./prds/2026-08-22-cms-clone-import-export.md). Duplicate any visible non-recycled item to a new draft (confirm; stay on source; Open / Cancel clone / Close). Keep source org; empty media; stacked ` (نسخة)` OK. **Branch:** `feature/cms-clone-cut-1`. Import/export later cuts stay unimplemented.
+
+---
+
 ### 2026-08-22 — PRD **Draft**: CMS clone + JSON import/export
 
 [prds/2026-08-22-cms-clone-import-export.md](./prds/2026-08-22-cms-clone-import-export.md). Cut 1 = duplicate to a new draft (all list types; empty media; suffix). JSON import/export later in the same PRD. **Do not implement until Approved.**
@@ -539,7 +545,7 @@ Remind on CMS/product sessions; do **not** start without stakeholder PRD lock. O
 | 2 | Server list pagination | **Delivered** on `main` — [prds/2026-08-22-cms-list-load-more.md](./prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more) |
 | 3 | Soft-delete recycle bin | **Delivered** on `main` — [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md) (PR #34) |
 | — | Scheduled publish | **Cancelled** (2026-07-21, confirmed 2026-08-22). Removed from this list. Manual Approve → Publish only. |
-| 4 | Bulk ops / clone / import-export UI | **List bulk** on all CMS content types (news PR #36; events/publications + remaining types PR #37). **Clone / import-export** still deferred. |
+| 4 | Bulk ops / clone / import-export UI | **List bulk** on all CMS content types (news PR #36; events/publications + remaining types PR #37). **Clone Cut 1 Approved** — [prds/2026-08-22-cms-clone-import-export.md](./prds/2026-08-22-cms-clone-import-export.md). JSON import/export still deferred. |
 | 5 | Media crop / optimize / variants | Imaging pipeline + extra storage |
 | 6 | EN editorial body parity | Schema + forms + SPA across types — see [audits/PARITY.md](./audits/PARITY.md) |
 | 7 | Static institutional pages in CMS | New types + SPA routes; locales only today |

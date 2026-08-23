@@ -18,6 +18,7 @@ import {
   type BulkDialog,
   type ContentListBulk,
 } from "./content-list-bulk";
+import { CloneDialogs, CloneItemButton, postClone, postCloneUndo, type CloneResult } from "./clone-ui";
 
 export type ContentListRow = {
   id: string;
@@ -134,6 +135,10 @@ export function ContentListPage({
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
   const [bulkBusy, setBulkBusy] = useState(false);
   const [bulkDialog, setBulkDialog] = useState<BulkDialog | null>(null);
+  const [cloneBusy, setCloneBusy] = useState(false);
+  const [cloneDialog, setCloneDialog] = useState<
+    { kind: "confirm"; sourceId: string } | { kind: "result"; clone: CloneResult } | null
+  >(null);
 
   const filteredEmpty = rows.length === 0 && filtersActive;
   const selectedCount = selected.size;
@@ -152,6 +157,33 @@ export function ContentListPage({
 
   function toggleLoaded(checked: boolean) {
     setSelected(checked ? new Set(rows.map((r) => r.id)) : new Set());
+  }
+
+  function listHrefBase(): string {
+    if (loadMore) return loadMore.itemHrefBase;
+    const sample = rows[0]?.href ?? items[0]?.href ?? "";
+    return sample.replace(/\/[^/]+$/, "");
+  }
+
+  function prependCloneRow(clone: { id: string; title: string; href?: string }) {
+    const href = clone.href ?? `${listHrefBase()}/${clone.id}`;
+    setRows((prev) => {
+      if (prev.some((r) => r.id === clone.id)) return prev;
+      return [
+        {
+          id: clone.id,
+          href,
+          title: clone.title,
+          status: "draft",
+          updatedAt: new Date(),
+        },
+        ...prev,
+      ];
+    });
+  }
+
+  function removeCloneRow(id: string) {
+    setRows((prev) => prev.filter((r) => r.id !== id));
   }
 
   function applyBulkToRows(action: BulkAction, doneIds: Set<string>) {
@@ -223,12 +255,46 @@ export function ContentListPage({
     setBulkBusy(true);
     try {
       const result = await postNewsBulk(bulk.apiPath, action, ids, t("actionFailed", lang));
-      applyBulkToRows(action, new Set(result.done.map((d) => d.id)));
+      if (action === "clone") {
+        for (const row of result.done) prependCloneRow(row);
+        setSelected(new Set());
+      } else {
+        applyBulkToRows(action, new Set(result.done.map((d) => d.id)));
+      }
       setBulkDialog({ kind: "report", action, done: result.done, skipped: result.skipped });
     } catch (err) {
       toastBulkNetworkError(err instanceof Error ? err.message : t("actionFailed", lang));
     } finally {
       setBulkBusy(false);
+    }
+  }
+
+  async function onConfirmRowClone() {
+    if (!cloneDialog || cloneDialog.kind !== "confirm") return;
+    setCloneBusy(true);
+    try {
+      const clone = await postClone(cloneDialog.sourceId, t("actionFailed", lang));
+      prependCloneRow(clone);
+      setCloneDialog({ kind: "result", clone });
+    } catch (err) {
+      toastBulkNetworkError(err instanceof Error ? err.message : t("actionFailed", lang));
+      setCloneDialog(null);
+    } finally {
+      setCloneBusy(false);
+    }
+  }
+
+  async function onUndoRowClone() {
+    if (!cloneDialog || cloneDialog.kind !== "result") return;
+    setCloneBusy(true);
+    try {
+      await postCloneUndo(cloneDialog.clone.id, t("actionFailed", lang));
+      removeCloneRow(cloneDialog.clone.id);
+      setCloneDialog(null);
+    } catch (err) {
+      toastBulkNetworkError(err instanceof Error ? err.message : t("actionFailed", lang));
+    } finally {
+      setCloneBusy(false);
     }
   }
 
@@ -290,6 +356,7 @@ export function ContentListPage({
                 <th className="px-4 py-3.5 font-semibold">{t("colStatus", lang)}</th>
                 <th className="px-4 py-3.5 font-semibold">{t("colEn", lang)}</th>
                 <th className="px-4 py-3.5 font-semibold">{t("colUpdated", lang)}</th>
+                <th className="px-4 py-3.5 font-semibold">{t("colActions", lang)}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-crs-border/70">
@@ -329,6 +396,19 @@ export function ContentListPage({
                   <td className="relative whitespace-nowrap px-4 py-3.5 text-crs-muted pointer-events-none">
                     {formatUpdated(item.updatedAt)}
                   </td>
+                  <td className="relative z-10 px-4 py-3.5">
+                    <button
+                      type="button"
+                      className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-1.5 text-xs font-medium text-crs-ink hover:bg-crs-bg"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setCloneDialog({ kind: "confirm", sourceId: item.id });
+                      }}
+                    >
+                      {t("actionDuplicate", lang)}
+                    </button>
+                  </td>
                 </tr>
               ))}
               {loadingMore
@@ -346,6 +426,9 @@ export function ContentListPage({
                       </td>
                       <td className="px-4 py-3.5">
                         <div className="cms-skeleton h-4 w-24" />
+                      </td>
+                      <td className="px-4 py-3.5">
+                        <div className="cms-skeleton h-8 w-16" />
                       </td>
                     </tr>
                   ))
@@ -389,6 +472,7 @@ export function ContentListPage({
           onClear={() => setSelected(new Set())}
           onUnpublish={() => setBulkDialog({ kind: "confirm", action: "unpublish" })}
           onRecycle={() => setBulkDialog({ kind: "confirm", action: "recycle" })}
+          onDuplicate={() => setBulkDialog({ kind: "confirm", action: "clone" })}
         />
       ) : null}
 
@@ -404,6 +488,18 @@ export function ContentListPage({
           onDismiss={() => setBulkDialog(null)}
         />
       ) : null}
+
+      <CloneDialogs
+        dialog={cloneDialog}
+        busy={cloneBusy}
+        onCancel={() => setCloneDialog(null)}
+        onConfirm={() => void onConfirmRowClone()}
+        onOpenDraft={() => {
+          if (cloneDialog?.kind === "result") window.location.assign(cloneDialog.clone.href);
+        }}
+        onUndo={() => void onUndoRowClone()}
+        onClose={() => setCloneDialog(null)}
+      />
     </main>
   );
 }
@@ -414,10 +510,18 @@ type EditShellProps = {
   subtitle?: string;
   children: ReactNode;
   wide?: boolean;
+  cloneItemId?: string;
 };
 
 /** Desk create/edit page shell. */
-export function EditPageShell({ breadcrumbs, title, subtitle, children, wide }: EditShellProps) {
+export function EditPageShell({
+  breadcrumbs,
+  title,
+  subtitle,
+  children,
+  wide,
+  cloneItemId,
+}: EditShellProps) {
   return (
     <main
       className={`mx-auto flex w-full flex-col gap-6 px-6 py-8 font-sans lg:px-10 ${
@@ -425,7 +529,11 @@ export function EditPageShell({ breadcrumbs, title, subtitle, children, wide }: 
       }`}
     >
       <PageBreadcrumb items={breadcrumbs} />
-      <DeskPageHeader title={title} subtitle={subtitle} />
+      <DeskPageHeader
+        title={title}
+        subtitle={subtitle}
+        actions={cloneItemId ? <CloneItemButton itemId={cloneItemId} /> : undefined}
+      />
       {children}
     </main>
   );

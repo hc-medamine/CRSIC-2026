@@ -3,4 +3,4 @@ import { bulkAlertActions } from "@/lib/content/eventsPublicationsBulk";
 
 export const runtime = "nodejs";
 
-export const POST = createBulkPostHandler(bulkAlertActions);
+export const POST = createBulkPostHandler(bulkAlertActions, "alert");

@@ -33,6 +33,7 @@ describe("isNewsBulkAction", () => {
   it("accepts unpublish and recycle only", () => {
     assert.equal(isNewsBulkAction("unpublish"), true);
     assert.equal(isNewsBulkAction("recycle"), true);
+    assert.equal(isNewsBulkAction("clone"), false);
     assert.equal(isNewsBulkAction("publish"), false);
     assert.equal(isNewsBulkAction(""), false);
   });

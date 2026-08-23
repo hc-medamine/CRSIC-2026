@@ -88,6 +88,7 @@ export default async function NewsDetailPage({ params }: Props) {
       title={t("editReview", lang)}
       subtitle={item.title_ar || undefined}
       wide
+      cloneItemId={item.id}
     >
       {!reviewer && canReview(user) && item.created_by === user.id ? (
         <p className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
