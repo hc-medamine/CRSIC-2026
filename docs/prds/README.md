@@ -37,6 +37,7 @@ Product specs for CRSIC live here. **New feature slices follow the PRD-first wor
 | [2026-08-22-cms-news-bulk-actions.md](./2026-08-22-cms-news-bulk-actions.md) | **Delivered** (2026-08-22) | News list bulk unpublish + SA recycle (unpublish-then-bin); skip + per-item report. On `main` (PR #36). |
 | [2026-08-22-cms-events-publications-bulk-actions.md](./2026-08-22-cms-events-publications-bulk-actions.md) | **Delivered** (2026-08-22) | Events + publications list bulk; copy news gates; no featured-playlist prune. On `main` (PR #37). |
 | [2026-08-22-cms-remaining-types-bulk-actions.md](./2026-08-22-cms-remaining-types-bulk-actions.md) | **Delivered** (2026-08-22) | Partners, alerts, laws, platforms, research groups, research projects list bulk; same gates; no featured prune. On `main` (PR #37). |
+| [2026-08-22-cms-clone-import-export.md](./2026-08-22-cms-clone-import-export.md) | **Draft** (2026-08-22) | Cut 1: clone to new draft (empty media, all types). Later: JSON import/export as drafts. **Do not implement until Approved.** |
 
 ## Related
 
