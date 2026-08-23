@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-22 — PRD **Draft**: CMS clone + JSON import/export
+
+[prds/2026-08-22-cms-clone-import-export.md](./prds/2026-08-22-cms-clone-import-export.md). Cut 1 = duplicate to a new draft (all list types; empty media; suffix). JSON import/export later in the same PRD. **Do not implement until Approved.**
+
+---
+
 ### 2026-08-22 — CMS list bulk **Delivered** on `main`
 
 Merged `feature/cms-events-publications-bulk` → `main` ([PR #37](https://github.com/hc-medamine/CRSIC-2026/pull/37), `a2c1072`). Events, publications, partners, alerts, laws, platforms, research groups, and research projects share news bulk Unpublish / Recycle (one JSON rebuild per type; no featured prune). Clone / import-export stay deferred.
