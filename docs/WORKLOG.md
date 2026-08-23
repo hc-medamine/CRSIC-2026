@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-23 — CMS Desk interiors I2 walkthrough **passed**
+
+Stakeholder signed off I2 (forms, admin, login) on `:3000` AR+EN. I2 code was already on `main` (`071abc9`). PRD [prds/2026-08-20-cms-desk-interiors.md](./prds/2026-08-20-cms-desk-interiors.md) is **Delivered** (I1 + I2). Clone / import-export stays Draft.
+
+---
+
 ### 2026-08-22 — PRD **Draft**: CMS clone + JSON import/export
 
 [prds/2026-08-22-cms-clone-import-export.md](./prds/2026-08-22-cms-clone-import-export.md). Cut 1 = duplicate to a new draft (all list types; empty media; suffix). JSON import/export later in the same PRD. **Do not implement until Approved.**
