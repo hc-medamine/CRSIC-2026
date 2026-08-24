@@ -6,6 +6,7 @@ import {
   isExportableType,
   listExportPicker,
 } from "@/lib/content/importExport";
+import { parseExportPickerSort } from "@/lib/content/headerSort";
 import { ALL_CONTENT_TYPES } from "@/lib/content-types";
 
 export const runtime = "nodejs";
@@ -26,8 +27,23 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "Unknown content type" }, { status: 400 });
   }
   const q = request.nextUrl.searchParams.get("q") || "";
-  const [items, count] = await Promise.all([listExportPicker(type, q), countExportable(type)]);
-  return NextResponse.json({ ok: true, types: ALL_CONTENT_TYPES, items, count });
+  const page = request.nextUrl.searchParams.get("page");
+  const sort = parseExportPickerSort(
+    request.nextUrl.searchParams.get("sort"),
+    request.nextUrl.searchParams.get("dir"),
+  );
+  const [picker, count] = await Promise.all([
+    listExportPicker(type, { q, page, sort }),
+    countExportable(type),
+  ]);
+  return NextResponse.json({
+    ok: true,
+    types: ALL_CONTENT_TYPES,
+    items: picker.items,
+    count,
+    hasMore: picker.hasMore,
+    page: picker.page,
+  });
 }
 
 export async function POST(request: NextRequest) {

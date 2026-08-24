@@ -7,6 +7,9 @@ export type HeaderSort = { key: string; dir: SortDir };
 export const CONTENT_LIST_SORT_KEYS = ["title", "status", "en", "updated"] as const;
 export type ContentListSortKey = (typeof CONTENT_LIST_SORT_KEYS)[number];
 
+export const EXPORT_PICKER_SORT_KEYS = ["title", "status", "updated"] as const;
+export type ExportPickerSortKey = (typeof EXPORT_PICKER_SORT_KEYS)[number];
+
 export const CONTENT_STATUS_ORDER = [
   "draft",
   "submitted",
@@ -48,6 +51,17 @@ export function parseContentListSort(
   rawDir: string | null | undefined,
 ): HeaderSort | null {
   const key = CONTENT_LIST_SORT_KEYS.find((k) => k === rawKey);
+  if (!key) return null;
+  const kind = contentListSortKind(key);
+  const dir = rawDir === "asc" || rawDir === "desc" ? rawDir : naturalDir(kind);
+  return { key, dir };
+}
+
+export function parseExportPickerSort(
+  rawKey: string | null | undefined,
+  rawDir: string | null | undefined,
+): HeaderSort | null {
+  const key = EXPORT_PICKER_SORT_KEYS.find((k) => k === rawKey);
   if (!key) return null;
   const kind = contentListSortKind(key);
   const dir = rawDir === "asc" || rawDir === "desc" ? rawDir : naturalDir(kind);

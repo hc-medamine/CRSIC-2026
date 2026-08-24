@@ -16,19 +16,32 @@ import {
   importAlwaysDraft,
   isExportableType,
   parseManifest,
+  remainingExportIds,
   resolveImportAuthor,
+  selectedExportError,
   shouldExportRow,
+  uniqueExportIds,
   zipFileNameForPath,
   CMS_ZIP_FORMAT,
   CMS_ZIP_VERSION,
+  EXPORT_PAGE_SIZE,
+  EXPORT_SELECT_REQUIRED,
   type CmsZipItem,
   type CmsZipManifest,
   type ImportReport,
   type ExportPickerRow,
 } from "@/lib/content/importExportLogic";
+import { contentListSqlOrderBy, type HeaderSort } from "@/lib/content/headerSort";
+import { paginationBounds, parseListPage, trimHasMore } from "@/lib/content/listPagination";
 
 export type { ImportReport, ImportReportItem, ExportPickerRow } from "@/lib/content/importExportLogic";
-export { EXPORT_COUNT_WARN, isExportableType } from "@/lib/content/importExportLogic";
+export {
+  EXPORT_COUNT_WARN,
+  EXPORT_NONE_REMAINING,
+  EXPORT_PAGE_SIZE,
+  EXPORT_SELECT_REQUIRED,
+  isExportableType,
+} from "@/lib/content/importExportLogic";
 
 type ExportRow = CmsZipItem & {
   recycled_at: Date | null;
@@ -81,10 +94,28 @@ function toZipItem(row: ExportRow): CmsZipItem {
   return item;
 }
 
-async function loadExportRows(type: ContentType, id?: string): Promise<ExportRow[]> {
-  if (id) {
+async function loadExportRows(
+  type: ContentType,
+  opts?: { itemId?: string; ids?: string[] },
+): Promise<ExportRow[]> {
+  if (opts?.ids && opts.ids.length > 0) {
+    const ids = uniqueExportIds(opts.ids);
+    if (ids.length === 0) return [];
+    const result = await query<ExportRow>(
+      `${SELECT_EXPORT} WHERE ci.content_type = $1 AND ci.id = ANY($2::uuid[])`,
+      [type, ids],
+    );
+    const byId = new Map(result.rows.map((row) => [row.source_id.toLowerCase(), row]));
+    return remainingExportIds(
+      ids,
+      result.rows.map((row) => row.source_id),
+    )
+      .map((id) => byId.get(id))
+      .filter((row): row is ExportRow => Boolean(row));
+  }
+  if (opts?.itemId) {
     const result = await query<ExportRow>(`${SELECT_EXPORT} WHERE ci.id = $1 AND ci.content_type = $2`, [
-      id,
+      opts.itemId,
       type,
     ]);
     return result.rows;
@@ -100,29 +131,31 @@ async function loadExportRows(type: ContentType, id?: string): Promise<ExportRow
 
 export async function listExportPicker(
   type: ContentType,
-  q: string,
-): Promise<ExportPickerRow[]> {
-  const needle = q.trim();
-  if (needle) {
-    const result = await query<ExportPickerRow>(
-      `SELECT id, title_ar AS "titleAr", status
-       FROM content_items
-       WHERE content_type = $1 AND recycled_at IS NULL AND title_ar ILIKE $2
-       ORDER BY updated_at DESC
-       LIMIT 80`,
-      [type, `%${needle}%`],
-    );
-    return result.rows;
+  opts: { q?: string; page?: number | string | null; sort?: HeaderSort | null } = {},
+): Promise<{ items: ExportPickerRow[]; hasMore: boolean; page: number }> {
+  const q = (opts.q ?? "").trim();
+  const bounds = paginationBounds(parseListPage(opts.page), EXPORT_PAGE_SIZE, "page");
+  const orderBy = contentListSqlOrderBy(opts.sort ?? null);
+  const params: unknown[] = [type];
+  let where = `content_type = $1 AND recycled_at IS NULL`;
+  if (q) {
+    params.push(`%${q}%`);
+    where += ` AND title_ar ILIKE $${params.length}`;
   }
+  params.push(bounds.limit);
+  const limitIdx = params.length;
+  params.push(bounds.offset);
+  const offsetIdx = params.length;
   const result = await query<ExportPickerRow>(
-    `SELECT id, title_ar AS "titleAr", status
+    `SELECT id, title_ar AS "titleAr", status, updated_at AS "updatedAt"
      FROM content_items
-     WHERE content_type = $1 AND recycled_at IS NULL
-     ORDER BY updated_at DESC
-     LIMIT 80`,
-    [type],
+     WHERE ${where}
+     ${orderBy}
+     LIMIT $${limitIdx} OFFSET $${offsetIdx}`,
+    params,
   );
-  return result.rows;
+  const trimmed = trimHasMore(result.rows, bounds.take);
+  return { ...trimmed, page: bounds.page };
 }
 
 export async function countExportable(type: ContentType): Promise<number> {
@@ -137,13 +170,24 @@ export async function countExportable(type: ContentType): Promise<number> {
 export async function buildExportZip(
   user: SessionUser,
   type: ContentType,
-  itemId?: string,
+  opts?: { itemId?: string; ids?: string[] },
 ): Promise<{ filename: string; buffer: Buffer; count: number }> {
   if (user.role !== "super_admin") throw new Error("Super Admin role required");
   if (!isExportableType(type)) throw new Error("Unknown content type");
 
-  const rows = (await loadExportRows(type, itemId)).filter((row) => shouldExportRow(row.recycled_at));
-  if (itemId && rows.length === 0) throw new Error("Not found");
+  const selectedIds = opts?.ids ? uniqueExportIds(opts.ids) : undefined;
+  if (opts?.ids && selectedIds && selectedIds.length === 0) {
+    throw new Error(EXPORT_SELECT_REQUIRED);
+  }
+
+  const rows = (await loadExportRows(type, { itemId: opts?.itemId, ids: selectedIds })).filter((row) =>
+    shouldExportRow(row.recycled_at),
+  );
+  if (opts?.itemId && rows.length === 0) throw new Error("Not found");
+  if (selectedIds) {
+    const remainingErr = selectedExportError(rows.length);
+    if (remainingErr) throw new Error(remainingErr);
+  }
 
   const items = rows.map(toZipItem);
   const fileMap = new Map<string, Buffer>();
@@ -174,15 +218,24 @@ export async function buildExportZip(
   ];
   const buffer = packZip(entries);
   const stamp = new Date().toISOString().slice(0, 10);
-  const filename = itemId ? `crsic-${type}-item-${stamp}.zip` : `crsic-${type}-${stamp}.zip`;
+  const filename = selectedIds
+    ? `crsic-${type}-selected-${stamp}.zip`
+    : opts?.itemId
+      ? `crsic-${type}-item-${stamp}.zip`
+      : `crsic-${type}-${stamp}.zip`;
 
   await writeAudit({
     actor: user,
     action: `${type}.export`,
     entityType: type,
-    entityId: itemId ?? type,
+    entityId: opts?.itemId ?? type,
     summary: `Exported ${items.length} ${type} item(s) as zip`,
-    metadata: { count: items.length, itemId: itemId ?? null, bytes: buffer.length },
+    metadata: {
+      count: items.length,
+      itemId: opts?.itemId ?? null,
+      selected: Boolean(selectedIds),
+      bytes: buffer.length,
+    },
   });
 
   return { filename, buffer, count: items.length };

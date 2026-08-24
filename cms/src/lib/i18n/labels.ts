@@ -636,12 +636,14 @@ export const LABELS: LabelMap = {
   recycleBin: { en: "Recycle bin", ar: "سلة المحذوفات" },
   importExport: { en: "Import / Export", ar: "استيراد / تصدير" },
   pageDescImportExport: {
-    en: "Download a type or one item as a zip (Desk records + files). Import creates new drafts only — nothing goes live until four-eyes publish.",
-    ar: "نزّلوا نوعًا أو عنصرًا كملف مضغوط (سجلات المكتب والملفات). الاستيراد ينشئ مسودات جديدة فقط — لا شيء يُنشر قبل المراجعة.",
+    en: "Download a type, selected items, or one item as a zip (Desk records + files). Import creates new drafts only — nothing goes live until four-eyes publish.",
+    ar: "نزّلوا نوعًا أو عناصر محددة أو عنصرًا كملف مضغوط (سجلات المكتب والملفات). الاستيراد ينشئ مسودات جديدة فقط — لا شيء يُنشر قبل المراجعة.",
   },
   fieldContentType: { en: "Content type", ar: "نوع المحتوى" },
   exportThisType: { en: "Export this type", ar: "تصدير هذا النوع" },
   exportThisItem: { en: "Export this item", ar: "تصدير هذا العنصر" },
+  exportSelected: { en: "Export selected", ar: "تصدير المحدد" },
+  exportPickerHeading: { en: "Items of this type", ar: "عناصر هذا النوع" },
   exportTypeCount: { en: "{n} items will be in the zip.", ar: "سيضم الملف {n} عنصرًا." },
   exportTypeEmpty: { en: "Nothing to export for this type.", ar: "لا شيء للتصدير في هذا النوع." },
   exportTypeLargeWarn: {
@@ -671,6 +673,14 @@ export const LABELS: LabelMap = {
     ar: "هذا النوع فيه عناصر كثيرة. تصديرها كلها في ملف واحد؟ إن كان الملف كبيرًا جدًا، صدّروا عنصرًا واحدًا.",
   },
   confirmExportItem: { en: "Export “{title}” as a zip?", ar: "تصدير «{title}» كملف مضغوط؟" },
+  confirmExportSelected: {
+    en: "Export {n} selected items as one zip?",
+    ar: "تصدير {n} عنصر محدد في ملف مضغوط واحد؟",
+  },
+  confirmExportSelectedLarge: {
+    en: "This is a large export ({n} items). Continue? If the zip is too large, export fewer items.",
+    ar: "هذا تصدير كبير ({n} عنصر). المتابعة؟ إن كان الملف كبيرًا جدًا، صدّروا عناصر أقل.",
+  },
   confirmImportZip: {
     en: "Import this zip as new drafts? Nothing will be published.",
     ar: "استيراد هذا الملف كمسودات جديدة؟ لن يُنشر شيء.",

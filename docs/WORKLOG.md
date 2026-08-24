@@ -19,6 +19,36 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-24 — I/E picker bulk export + header sort **Delivered**
+
+[prds/2026-08-24-cms-import-export-bulk-sort.md](./prds/2026-08-24-cms-import-export-bulk-sort.md). Ie5–Ie8 walked: publications Load more + Title sort (no URL `sort=`/`page=`); events header checkbox = 20 loaded of 21; **Export selected** confirm; news list still Duplicate only. Editor I/E API 403.
+
+---
+
+### 2026-08-24 — I/E picker bulk export + header sort **implementing**
+
+[prds/2026-08-24-cms-import-export-bulk-sort.md](./prds/2026-08-24-cms-import-export-bulk-sort.md). Super Admin Import/Export table: Load more 20, header sort this visit, **Export selected** as one zip. Keep type zip and per-row item zip. Type lists unchanged.
+
+---
+
+### 2026-08-24 — I/E picker bulk export + header sort **Approved** (implement)
+
+[prds/2026-08-24-cms-import-export-bulk-sort.md](./prds/2026-08-24-cms-import-export-bulk-sort.md). Super Admin Import/Export page only: table with Load more (20), header sort this visit, **Export selected** as one zip. Keep type zip and per-row item zip. Type lists unchanged.
+
+---
+
+### 2026-08-24 — PRD **Draft**: I/E picker bulk export + header sort
+
+Locked via Q&A. [prds/2026-08-24-cms-import-export-bulk-sort.md](./prds/2026-08-24-cms-import-export-bulk-sort.md). Super Admin Import/Export page only: checkboxes, Load more (20), header sort this visit, **Export selected** as one zip. Keep type zip and per-row item zip. Type lists unchanged. **Superseded same day — Approved (entry above).**
+
+---
+
+### 2026-08-24 — CMS Desk production boost **Delivered** (PR #44)
+
+[prds/2026-08-24-cms-desk-production-boost.md](./prds/2026-08-24-cms-desk-production-boost.md). SA zip I/E, cover crop + `img_card`, EN when ready. [PR #44](https://github.com/hc-medamine/CRSIC-2026/pull/44).
+
+---
+
 ### 2026-08-24 — CMS Desk production boost **implementing**
 
 [prds/2026-08-24-cms-desk-production-boost.md](./prds/2026-08-24-cms-desk-production-boost.md). SA `/dashboard/import-export` (CMS zip, new drafts only); edit-form cover crop + `img_card`; public EN for news/events/publications/partners when `en_status` is ready.
@@ -625,8 +655,8 @@ Remind on CMS/product sessions; do **not** start without stakeholder PRD lock. O
 | 2 | Server list pagination | **Delivered** on `main` — [prds/2026-08-22-cms-list-load-more.md](./prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more) |
 | 3 | Soft-delete recycle bin | **Delivered** on `main` — [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md) (PR #34) |
 | — | Scheduled publish | **Cancelled** (2026-07-21, confirmed 2026-08-22). Removed from this list. Manual Approve → Publish only. |
-| 4 | Bulk ops / clone / import-export UI | **List bulk** on all CMS content types (news PR #36; events/publications + remaining types PR #37). **Clone Cut 1 Delivered** — [prds/2026-08-22-cms-clone-import-export.md](./prds/2026-08-22-cms-clone-import-export.md) (PR #42). JSON import/export still deferred. |
-| 5 | Media crop / optimize / variants | Imaging pipeline + extra storage |
+| 4 | Bulk ops / clone / import-export UI | **List bulk** on all CMS content types (news PR #36; events/publications + remaining types PR #37). **Clone Cut 1 Delivered** — [prds/2026-08-22-cms-clone-import-export.md](./prds/2026-08-22-cms-clone-import-export.md) (PR #42). **JSON zip I/E Delivered** (PR #44). Picker bulk + sort: [prds/2026-08-24-cms-import-export-bulk-sort.md](./prds/2026-08-24-cms-import-export-bulk-sort.md) (**Delivered**). |
+| 5 | Media crop / optimize / variants | **Cover crop + card Delivered** (PR #44). Extra optimize still later. |
 | 6 | EN editorial body parity | Schema + forms + SPA across types — see [audits/PARITY.md](./audits/PARITY.md) |
 | 7 | Static institutional pages in CMS | New types + SPA routes; locales only today |
 | 8 | Journals in CMS | Replace OJS; largest product change |
