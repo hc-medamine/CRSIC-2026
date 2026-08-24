@@ -175,12 +175,12 @@ PRD [2026-08-23-cms-editor-recycle.md](../prds/2026-08-23-cms-editor-recycle.md)
 
 | # | Check | Pass? |
 |---|--------|-------|
-| Er1 | Editor lists (all nine types): checkboxes + **Recycle** (no Unpublish). Select own drafts + one rejected + one submitted → confirm → submitted skipped; others leave the list | ☐ |
-| Er2 | Editor edit page: **Move to recycle bin** on own draft and rejected; hidden on submitted / published | ☐ |
-| Er3 | Editor Recycle bin nav; `/dashboard/recycle-bin` shows **only that Editor’s** binned rows. Restore returns them as drafts. No Permanently delete / Empty / Purge | ☐ |
-| Er4 | Editor cannot recycle or restore another author’s row (API skip / 400). `POST /api/recycle-bin` purge/empty/purge-stale is 403 | ☐ |
-| Er5 | Reviewer recycle still skipped (`not_sa`). Super Admin still bins unpublished (not drafts) | ☐ |
-| Er6 | Public `data/*.json` unchanged after Editor recycle (drafts/rejected were not live) | ☐ |
+| Er1 | Editor lists (all nine types): checkboxes + **Recycle** (no Unpublish). Select own drafts + one rejected + one submitted → confirm → submitted skipped; others leave the list | ☑ 2026-08-24 |
+| Er2 | Editor edit page: **Move to recycle bin** on own draft and rejected; hidden on submitted / published | ☑ 2026-08-24 |
+| Er3 | Editor Recycle bin nav; `/dashboard/recycle-bin` shows **only that Editor’s** binned rows. Restore returns them as drafts. No Permanently delete / Empty / Purge | ☑ 2026-08-24 |
+| Er4 | Editor cannot recycle or restore another author’s row (API skip / 400). `POST /api/recycle-bin` purge/empty/purge-stale is 403 | ☑ 2026-08-24 |
+| Er5 | Reviewer recycle still skipped (`not_sa`). Super Admin still bins unpublished (not drafts) | ☑ 2026-08-24 |
+| Er6 | Public `data/*.json` unchanged after Editor recycle (drafts/rejected were not live) | ☑ 2026-08-24 |
 
 ## News list bulk (unpublish / recycle)
 

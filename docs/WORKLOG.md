@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-24 — CMS Editor recycle smoke Er1–Er6
+
+Walkthrough on `feature/cms-editor-recycle`: Er1–Er6 passed (Editor Iman partners/events; Reviewer skip `not_sa`; SA draft recycle skipped `wrong_status`; public JSON hashes unchanged). [SMOKE-CMS.md](./qa/SMOKE-CMS.md) Er1–Er6 ticked. Walkthrough `Er-walk` partners withdrawn then recycled (left the list). Clone Cut 1 PR still **wait**.
+
+---
+
 ### 2026-08-23 — Implementing CMS Editor recycle
 
 **Branch:** `feature/cms-editor-recycle`. **PRD:** [prds/2026-08-23-cms-editor-recycle.md](./prds/2026-08-23-cms-editor-recycle.md) **Approved**. Editors: bulk + edit-page Recycle on own draft/rejected; bin page own scoped rows + Restore. SA unpublished recycle and purge unchanged. Reviewer unchanged. Clone PR still **wait**.
