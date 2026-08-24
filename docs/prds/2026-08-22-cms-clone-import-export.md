@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Cut 1 Delivered** on `main` (2026-08-24). Import/export later cuts stay in this PRD, not Approved for implementation |
+| Status | **Cut 1 Delivered** on `main` (PR #42, 2026-08-24). Import/export later cuts stay in this PRD, not Approved for implementation |
 | Date | 2026-08-22 |
 | Author | Stakeholder + agent |
 | Owners | Product / CMS Desk |
@@ -110,4 +110,4 @@ Later import/export must not bypass sanitize/allowlists or four-eyes.
 | 2026-08-22 | Later cuts: JSON export one item or one type; import as drafts; no WP UI. |
 | 2026-08-22 | Defaults: no comments/revisions/live JSON/featured copy; cloner = author; publisher cleared; bin has no clone; bulk max 200; no notify flood. |
 | 2026-08-23 | Stakeholder **Approved cut 1**. Any visible non-recycled status. Confirm before clone. After single clone: stay on source; window = Open draft / Cancel clone (delete that draft) / Close (keep, stay). Clone-of-clone stacked suffix OK. Keep source `org_unit_id`; cloner = author; clear `review_owner_id` and `publisher_id`. |
-| 2026-08-24 | Cut 1 smoke Cl1–Cl8 passed. Editors keep Recycle (no Unpublish) plus row/edit Duplicate; bulk Duplicate is Reviewer/SA only. |
+| 2026-08-24 | Cut 1 smoke Cl1–Cl8 passed. Editors keep Recycle (no Unpublish) plus row/edit Duplicate; bulk Duplicate is Reviewer/SA only. Shipped on `main` (PR #42). |

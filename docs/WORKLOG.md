@@ -21,7 +21,7 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ### 2026-08-24 — CMS clone Cut 1 smoke Cl1–Cl8
 
-Walkthrough on `feature/cms-clone-cut-1`: Cl1–Cl8 passed (Reviewer Fariha news edit/list/bulk Duplicate; Editor Iman partners/events row+edit Duplicate + Recycle, no Unpublish/bulk Duplicate; bin has no Duplicate; four-eyes on own copy). [SMOKE-CMS.md](./qa/SMOKE-CMS.md) Cl1–Cl8 ticked. Walk clone drafts cancelled (left the news list). Public JSON hashes unchanged. JSON import/export still later.
+Walkthrough on `feature/cms-clone-cut-1`: Cl1–Cl8 passed (Reviewer Fariha news edit/list/bulk Duplicate; Editor Iman partners/events row+edit Duplicate + Recycle, no Unpublish/bulk Duplicate; bin has no Duplicate; four-eyes on own copy). [SMOKE-CMS.md](./qa/SMOKE-CMS.md) Cl1–Cl8 ticked. Walk clone drafts cancelled (left the news list). Public JSON hashes unchanged. Merged to `main` as PR #42. JSON import/export still later.
 
 ---
 
@@ -583,7 +583,7 @@ Remind on CMS/product sessions; do **not** start without stakeholder PRD lock. O
 | 2 | Server list pagination | **Delivered** on `main` — [prds/2026-08-22-cms-list-load-more.md](./prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more) |
 | 3 | Soft-delete recycle bin | **Delivered** on `main` — [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md) (PR #34) |
 | — | Scheduled publish | **Cancelled** (2026-07-21, confirmed 2026-08-22). Removed from this list. Manual Approve → Publish only. |
-| 4 | Bulk ops / clone / import-export UI | **List bulk** on all CMS content types (news PR #36; events/publications + remaining types PR #37). **Clone Cut 1 Delivered** — [prds/2026-08-22-cms-clone-import-export.md](./prds/2026-08-22-cms-clone-import-export.md). JSON import/export still deferred. |
+| 4 | Bulk ops / clone / import-export UI | **List bulk** on all CMS content types (news PR #36; events/publications + remaining types PR #37). **Clone Cut 1 Delivered** — [prds/2026-08-22-cms-clone-import-export.md](./prds/2026-08-22-cms-clone-import-export.md) (PR #42). JSON import/export still deferred. |
 | 5 | Media crop / optimize / variants | Imaging pipeline + extra storage |
 | 6 | EN editorial body parity | Schema + forms + SPA across types — see [audits/PARITY.md](./audits/PARITY.md) |
 | 7 | Static institutional pages in CMS | New types + SPA routes; locales only today |
