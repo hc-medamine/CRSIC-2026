@@ -1,7 +1,8 @@
 /**
  * Publication card — safe DOM builder (no innerHTML).
  */
-import { coverSrcFromPub } from '../data.js';
+import { pubCardImageSrc } from '../data.js';
+import { editorialCardAttrs, editorialField } from '../editorial.js';
 import { t } from '../i18n.js';
 import { el, safeImageSrc } from '../utils.js';
 
@@ -11,14 +12,16 @@ import { el, safeImageSrc } from '../utils.js';
  * @returns {HTMLElement}
  */
 export function createPubCard(p, i) {
-  const cover = safeImageSrc(coverSrcFromPub(p, i));
+  const cover = safeImageSrc(pubCardImageSrc(p, i));
   const badge = p.type === 'collective' ? t('badge_collective') : t('badge_individual');
+  const title = editorialField(p, 'title');
+  const dept = editorialField(p, 'label');
 
   const img = cover
     ? el('img', {
         attrs: {
           src: cover,
-          alt: p.t || '',
+          alt: title || '',
           loading: 'lazy',
         },
         style: {
@@ -38,6 +41,7 @@ export function createPubCard(p, i) {
       'data-pub-index': i,
       role: 'button',
       tabindex: 0,
+      ...editorialCardAttrs(p),
       ...(slug
         ? {
             'data-lightbox-type': 'publication',
@@ -56,11 +60,11 @@ export function createPubCard(p, i) {
       el('div', {
         className: 'pub-meta',
         children: [
-          el('div', { className: 'pub-meta-title', text: p.t || '' }),
+          el('div', { className: 'pub-meta-title', text: title || '' }),
           el('div', {
             className: 'pub-meta-bottom',
             children: [
-              el('span', { className: 'pub-meta-dept', text: p.dept || '' }),
+              el('span', { className: 'pub-meta-dept', text: dept || '' }),
             ],
           }),
         ],

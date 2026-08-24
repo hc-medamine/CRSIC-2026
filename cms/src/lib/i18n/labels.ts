@@ -634,6 +634,55 @@ export const LABELS: LabelMap = {
   },
   audit: { en: "Audit log", ar: "سجل التدقيق" },
   recycleBin: { en: "Recycle bin", ar: "سلة المحذوفات" },
+  importExport: { en: "Import / Export", ar: "استيراد / تصدير" },
+  pageDescImportExport: {
+    en: "Download a type or one item as a zip (Desk records + files). Import creates new drafts only — nothing goes live until four-eyes publish.",
+    ar: "نزّلوا نوعًا أو عنصرًا كملف مضغوط (سجلات المكتب والملفات). الاستيراد ينشئ مسودات جديدة فقط — لا شيء يُنشر قبل المراجعة.",
+  },
+  fieldContentType: { en: "Content type", ar: "نوع المحتوى" },
+  exportThisType: { en: "Export this type", ar: "تصدير هذا النوع" },
+  exportThisItem: { en: "Export this item", ar: "تصدير هذا العنصر" },
+  exportTypeCount: { en: "{n} items will be in the zip.", ar: "سيضم الملف {n} عنصرًا." },
+  exportTypeEmpty: { en: "Nothing to export for this type.", ar: "لا شيء للتصدير في هذا النوع." },
+  exportTypeLargeWarn: {
+    en: "This is a large export — confirm before continuing.",
+    ar: "هذا تصدير كبير — أكّدوا قبل المتابعة.",
+  },
+  exportItemEmpty: { en: "No matching items.", ar: "لا عناصر مطابقة." },
+  searchExportItem: { en: "Search by Arabic title…", ar: "بحث بالعنوان العربي…" },
+  importZip: { en: "Import zip", ar: "استيراد ملف مضغوط" },
+  importZipHint: {
+    en: "Creates new drafts. Live public JSON is not touched.",
+    ar: "ينشئ مسودات جديدة. ملفات الموقع العامة لا تُمس.",
+  },
+  importReport: { en: "Import report", ar: "تقرير الاستيراد" },
+  importReportShort: { en: "Imported {n} draft(s).", ar: "اُستوردت {n} مسودة." },
+  importReportCounts: {
+    en: "{imported} imported as drafts, {skipped} skipped.",
+    ar: "{imported} مسودة، وتُخطّي {skipped}.",
+  },
+  exportReady: { en: "Export downloaded.", ar: "تم تنزيل التصدير." },
+  confirmExportType: {
+    en: "Export every non-recycled item of this type as a zip?",
+    ar: "تصدير كل عناصر هذا النوع غير المنقولة للسلة كملف مضغوط؟",
+  },
+  confirmExportTypeLarge: {
+    en: "This type has many items. Export them all as one zip? If the zip is too large, export one item instead.",
+    ar: "هذا النوع فيه عناصر كثيرة. تصديرها كلها في ملف واحد؟ إن كان الملف كبيرًا جدًا، صدّروا عنصرًا واحدًا.",
+  },
+  confirmExportItem: { en: "Export “{title}” as a zip?", ar: "تصدير «{title}» كملف مضغوط؟" },
+  confirmImportZip: {
+    en: "Import this zip as new drafts? Nothing will be published.",
+    ar: "استيراد هذا الملف كمسودات جديدة؟ لن يُنشر شيء.",
+  },
+  actionConfirm: { en: "Confirm", ar: "تأكيد" },
+  cropImage: { en: "Crop", ar: "قص" },
+  cropApply: { en: "Apply crop", ar: "تطبيق القص" },
+  cropHint: {
+    en: "Drag the box, then apply. Cancel keeps the current file.",
+    ar: "اسحبوا الإطار ثم طبّقوا. الإلغاء يُبقي الملف الحالي.",
+  },
+
   pageDescRecycleBin: {
     en: "Restore a binned item as a draft, or delete it for good. Opening this page never deletes by itself.",
     ar: "استعيدوا العنصر كمسودة، أو احذفوه نهائيًا. فتح هذه الصفحة لا يحذف شيئًا تلقائيًا.",

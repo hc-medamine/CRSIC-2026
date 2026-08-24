@@ -90,10 +90,12 @@ describe("collectMediaPaths", () => {
   it("collects image_path, og_image, and attachment src", () => {
     const paths = collectMediaPaths({
       image_path: "img/cms/news/a.png",
+      image_card_path: "img/cms/news/a-card.jpg",
       og_image: "img/cms/news/a.png",
       attachments: [{ kind: "image", src: "img/cms/news/b.jpg" }, { kind: "pdf", src: "img/cms/news/c.pdf" }],
     });
     assert.deepEqual(paths.sort(), [
+      "img/cms/news/a-card.jpg",
       "img/cms/news/a.png",
       "img/cms/news/b.jpg",
       "img/cms/news/c.pdf",

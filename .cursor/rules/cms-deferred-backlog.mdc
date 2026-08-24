@@ -9,17 +9,14 @@ When discussing CMS/product/roadmap work, briefly remind the stakeholder that th
 
 ## Active Approved PRD (this slice — implement)
 
-None. Wait for the next PRD-first slice.
+- CMS Desk production boost — [docs/prds/2026-08-24-cms-desk-production-boost.md](docs/prds/2026-08-24-cms-desk-production-boost.md) (**Approved** 2026-08-24). SA JSON zip + cover crop/card variant + EN show-when-ready. One build, one walk.
 
 ## Deferred (future) — simple → complex
 
 Do **not** implement these unless they explicitly start a PRD-first slice.
 
-1. JSON import/export (later cuts of the clone PRD)
-2. Media crop / optimize / variants
-3. EN editorial body parity ([docs/audits/PARITY.md](docs/audits/PARITY.md))
-4. Static institutional pages in CMS (locales only today)
-5. Journals in CMS (OJS remains)
+1. Static institutional pages in CMS (locales only today)
+2. Journals in CMS (OJS remains)
 
 ## Already closed (do not re-open as gaps)
 

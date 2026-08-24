@@ -3,6 +3,8 @@
  * Empty / all missing → newest fallback (PRD 2026-08-21-home-featured-news-playlist).
  */
 
+import { editorialField } from './editorial.js';
+
 export const FEATURED_NEWS_MAX = 10;
 export const FEATURED_NEWS_FALLBACK = 3;
 
@@ -57,14 +59,16 @@ export function resolveFeaturedNews(news, ids, fallbackLimit = FEATURED_NEWS_FAL
 }
 
 /**
+ * Featured news teaser: summary, then stripped body. Respects EN-when-ready.
  * @param {object} item
+ * @param {string} [lang]
  * @returns {string}
  */
-export function newsResume(item) {
-  const summary = String((item && item.summary) || '').trim();
+export function newsResume(item, lang) {
+  const summary = editorialField(item, 'summary', lang);
   if (summary) return summary;
 
-  const body = String((item && item.body) || '')
+  const body = String(editorialField(item, 'body', lang) || '')
     .replace(/\\n/g, '\n')
     .replace(/<[^>]+>/g, ' ')
     .replace(/\s+/g, ' ')
@@ -73,7 +77,7 @@ export function newsResume(item) {
     return body.length > 320 ? `${body.slice(0, 320).trim()}…` : body;
   }
 
-  const label = String((item && item.label) || '').trim();
+  const label = editorialField(item, 'label', lang);
   const date = String((item && item.date) || '').trim();
   return [label, date].filter(Boolean).join(' — ');
 }

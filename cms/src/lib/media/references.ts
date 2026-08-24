@@ -3,6 +3,7 @@ import { contentPathSegment, type ContentType } from "@/lib/content/lifecycle";
 
 export type MediaReferenceSource =
   | "image_path"
+  | "image_card_path"
   | "og_image"
   | "attachments"
   | "live_payload"
@@ -87,6 +88,12 @@ export async function listMediaReferencesForPaths(
 
       UNION ALL
       SELECT ci.id, ci.content_type, ci.title_ar, ci.status,
+             'image_card_path', NULL, NULL, ci.image_card_path
+      FROM content_items ci
+      WHERE ci.image_card_path = ANY($1::text[])
+
+      UNION ALL
+      SELECT ci.id, ci.content_type, ci.title_ar, ci.status,
              'og_image', NULL, NULL, ci.og_image
       FROM content_items ci
       WHERE ci.og_image = ANY($1::text[])
@@ -107,6 +114,7 @@ export async function listMediaReferencesForPaths(
         AND (
           ci.live_payload->>'img' = path.p
           OR ci.live_payload->>'cover' = path.p
+          OR ci.live_payload->>'img_card' = path.p
           OR ci.live_payload->>'og_image' = path.p
           OR EXISTS (
             SELECT 1
@@ -122,6 +130,7 @@ export async function listMediaReferencesForPaths(
       JOIN content_items ci ON ci.id = r.content_item_id
       CROSS JOIN path
       WHERE r.snapshot->>'image_path' = path.p
+         OR r.snapshot->>'image_card_path' = path.p
          OR r.snapshot->>'og_image' = path.p
          OR EXISTS (
            SELECT 1

@@ -19,6 +19,24 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-24 — CMS Desk production boost **implementing**
+
+[prds/2026-08-24-cms-desk-production-boost.md](./prds/2026-08-24-cms-desk-production-boost.md). SA `/dashboard/import-export` (CMS zip, new drafts only); edit-form cover crop + `img_card`; public EN for news/events/publications/partners when `en_status` is ready.
+
+---
+
+### 2026-08-24 — CMS Desk production boost **Approved** (implement)
+
+[prds/2026-08-24-cms-desk-production-boost.md](./prds/2026-08-24-cms-desk-production-boost.md). Super Admin zip import/export (CMS items + files → new drafts), cover crop + card variant, EN stories show when ready. Static pages, journals, scheduled publish stay out.
+
+---
+
+### 2026-08-24 — PRD **Draft**: CMS Desk production boost
+
+Locked via Q&A. [prds/2026-08-24-cms-desk-production-boost.md](./prds/2026-08-24-cms-desk-production-boost.md). One PRD for leftover production work: Super Admin zip import/export (CMS items + files → new drafts), cover crop + card variant, EN stories show when ready. Static pages, journals, scheduled publish stay out. Clone Cut 1 unchanged; clone later I/E cuts superseded when this PRD is Approved. **Do not implement until Approved.**
+
+---
+
 ### 2026-08-24 — CMS table header sort **Delivered** (PR #43)
 
 Hs1–Hs4 passed (Hs2 on two junk news rows in the bin). [PR #43](https://github.com/hc-medamine/CRSIC-2026/pull/43). Sort is this visit only; no URL `?sort=`.

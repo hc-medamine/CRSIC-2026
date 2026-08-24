@@ -30,6 +30,7 @@ type ItemRow = {
   status: string;
   title_ar: string;
   image_path: string | null;
+  image_card_path: string | null;
   og_image: string | null;
   attachments: unknown;
   recycled_at: Date | null;
@@ -75,11 +76,12 @@ export function isStaleRecycled(recycledAt: Date, now = new Date()): boolean {
 
 export function collectMediaPaths(item: {
   image_path?: string | null;
+  image_card_path?: string | null;
   og_image?: string | null;
   attachments?: unknown;
 }): string[] {
   const out = new Set<string>();
-  for (const p of [item.image_path, item.og_image]) {
+  for (const p of [item.image_path, item.image_card_path, item.og_image]) {
     if (p && typeof p === "string" && p.startsWith("img/")) out.add(p);
   }
   if (Array.isArray(item.attachments)) {
@@ -100,7 +102,7 @@ function assertSuperAdmin(user: SessionUser) {
 
 async function loadItem(id: string): Promise<ItemRow | null> {
   const result = await query<ItemRow>(
-    `SELECT id, content_type, status, title_ar, image_path, og_image, attachments,
+    `SELECT id, content_type, status, title_ar, image_path, image_card_path, og_image, attachments,
             recycled_at, recycled_from_status, created_by
      FROM content_items WHERE id = $1`,
     [id],

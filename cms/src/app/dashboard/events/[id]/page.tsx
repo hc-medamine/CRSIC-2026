@@ -112,6 +112,7 @@ export default async function EventDetailPage({ params }: Props) {
           bodyAr: item.body_ar ?? "",
           bodyEn: item.body_en ?? "",
           imagePath: item.image_path ?? "",
+          imageCardPath: item.image_card_path ?? "",
           imageMediaId: media?.id ?? null,
           imageAltAr: item.image_alt_ar ?? "",
           imageAltEn: item.image_alt_en ?? "",

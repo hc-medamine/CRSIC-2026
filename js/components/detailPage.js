@@ -19,6 +19,7 @@ import {
 } from '../data.js';
 import { applyItemSeoHead, restoreSiteSeoHead } from '../seoHead.js';
 import { createContentByline } from './contentByline.js';
+import { editorialField, editorialLangAttrs } from '../editorial.js';
 
 /**
  * @param {object[]} media
@@ -159,26 +160,26 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
   if (item && opts.isPreview) {
     if (type === 'news') {
       backPage = 'news';
-      title = item.title || '';
-      metaLine = item.label || '';
-      summary = item.summary || '';
-      body = item.body || '';
+      title = editorialField(item, 'title');
+      metaLine = editorialField(item, 'label');
+      summary = editorialField(item, 'summary');
+      body = editorialField(item, 'body');
       media = item.media || (item.img ? [{ kind: 'image', src: item.img }] : []);
     } else if (type === 'event') {
       backPage = 'events';
-      title = item.title || '';
-      metaLine = [item.type, [item.day, item.month, item.year].filter(Boolean).join(' ')]
+      title = editorialField(item, 'title');
+      metaLine = [editorialField(item, 'label'), [item.day, item.month, item.year].filter(Boolean).join(' ')]
         .filter(Boolean)
         .join(' · ');
-      summary = item.summary || '';
-      body = item.body || '';
+      summary = editorialField(item, 'summary');
+      body = editorialField(item, 'body');
       media = item.media || (item.img ? [{ kind: 'image', src: item.img }] : []);
     } else if (type === 'publication') {
       backPage = 'publications';
-      title = item.t || item.title || '';
-      metaLine = [item.dept, item.type].filter(Boolean).join(' · ');
-      summary = item.summary || item.desc || '';
-      body = item.body || '';
+      title = editorialField(item, 'title');
+      metaLine = [editorialField(item, 'label'), item.type].filter(Boolean).join(' · ');
+      summary = editorialField(item, 'summary');
+      body = editorialField(item, 'body');
       const cover = item.cover || item.img || '';
       media =
         item.media && item.media.length
@@ -191,22 +192,22 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
     item = findNewsByKey(slugOrId);
     backPage = 'news';
     if (item) {
-      title = item.title || '';
-      metaLine = item.label || '';
-      summary = item.summary || '';
-      body = item.body || '';
+      title = editorialField(item, 'title');
+      metaLine = editorialField(item, 'label');
+      summary = editorialField(item, 'summary');
+      body = editorialField(item, 'body');
       media = item.media || (item.img ? [{ kind: 'image', src: item.img }] : []);
     }
   } else if (type === 'event') {
     item = findEventByKey(slugOrId);
     backPage = 'events';
     if (item) {
-      title = item.title || '';
-      metaLine = [item.type, [item.day, item.month, item.year].filter(Boolean).join(' ')]
+      title = editorialField(item, 'title');
+      metaLine = [editorialField(item, 'label'), [item.day, item.month, item.year].filter(Boolean).join(' ')]
         .filter(Boolean)
         .join(' · ');
-      summary = item.summary || '';
-      body = item.body || '';
+      summary = editorialField(item, 'summary');
+      body = editorialField(item, 'body');
       media = item.media || (item.img ? [{ kind: 'image', src: item.img }] : []);
     }
   } else if (type === 'publication') {
@@ -215,10 +216,10 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
     const cover = found ? getCoverForPub(found.index) : '';
     backPage = 'publications';
     if (item) {
-      title = item.t || '';
-      metaLine = [item.dept, item.type].filter(Boolean).join(' · ');
-      summary = item.summary || item.desc || '';
-      body = item.body || '';
+      title = editorialField(item, 'title');
+      metaLine = [editorialField(item, 'label'), item.type].filter(Boolean).join(' · ');
+      summary = editorialField(item, 'summary');
+      body = editorialField(item, 'body');
       media =
         item.media && item.media.length
           ? item.media
@@ -250,7 +251,7 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
 
   applyItemSeoHead(item, type);
 
-  const langAttrs = getLang() === 'en' ? { lang: 'ar' } : {};
+  const langAttrs = editorialLangAttrs(item);
   const mediaEl = buildMediaStage(media, title);
   const children = [
     el('a', {
@@ -420,17 +421,10 @@ function renderPartnerDetail(host, slugOrId, opts = {}) {
   }
 
   applyItemSeoHead(item, 'partner');
-  const lang = getLang();
-  const title = item.name || '';
+  const title = editorialField(item, 'name');
   const metaLine = [item.country, item.date].filter(Boolean).join(' · ');
-  const summary =
-    lang === 'en' && item.summary_en
-      ? item.summary_en
-      : item.summary_ar || item.summary_en || '';
-  const bodyHtml =
-    lang === 'en' && item.body_en
-      ? item.body_en
-      : item.body_ar || item.body_en || '';
+  const summary = editorialField(item, 'summary');
+  const bodyHtml = editorialField(item, 'body');
   const imgSrc = safeImageSrc(item.img || item.og_image || '');
   const children = [];
   if (opts.isPreview) {

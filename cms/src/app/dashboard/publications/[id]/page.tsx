@@ -113,6 +113,7 @@ export default async function PublicationDetailPage({ params }: Props) {
           descAr: item.summary_ar ?? "",
           descEn: item.summary_en ?? "",
           coverPath: item.image_path ?? "",
+          imageCardPath: item.image_card_path ?? "",
           coverMediaId: media?.id ?? null,
           imageAltAr: item.image_alt_ar ?? "",
           imageAltEn: item.image_alt_en ?? "",

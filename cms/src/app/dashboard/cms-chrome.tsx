@@ -226,6 +226,7 @@ export function CmsChrome({
       { key: "orgUnits", href: "/dashboard/org-units", icon: <IconShield /> },
       { key: "desks", href: "/dashboard/editors", icon: <IconUsers /> },
       { key: "recycleBin", href: "/dashboard/recycle-bin", icon: <IconInbox /> },
+      { key: "importExport", href: "/dashboard/import-export", icon: <IconDoc /> },
       { key: "audit", href: "/dashboard/audit", icon: <IconShield /> },
     );
   } else if (role === "reviewer") {

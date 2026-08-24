@@ -32,6 +32,7 @@ const SNAPSHOT_COLUMNS = [
   "body_ar",
   "body_en",
   "image_path",
+  "image_card_path",
   "image_alt_ar",
   "image_alt_en",
   "attachments",

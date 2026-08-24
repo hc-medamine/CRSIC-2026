@@ -1,7 +1,8 @@
 /**
  * Featured home news carousel (curated playlist, max 10) — CRSIC brand, vanilla JS.
  */
-import { cmsItemImageSrc, getFeaturedNewsIds, getNews } from '../data.js';
+import { cmsCardImageSrc, getFeaturedNewsIds, getNews } from '../data.js';
+import { editorialCardAttrs, editorialField } from '../editorial.js';
 import { newsResume, resolveFeaturedNews } from '../featuredNews.js';
 import { t } from '../i18n.js';
 import { el, replaceChildren, safeImageSrc, prefersReducedMotion } from '../utils.js';
@@ -53,7 +54,7 @@ function setControl(btn, name, label) {
  * @returns {string}
  */
 function newsImageSrc(item, i) {
-  const fromCms = safeImageSrc(cmsItemImageSrc(item));
+  const fromCms = safeImageSrc(cmsCardImageSrc(item));
   if (fromCms) return fromCms;
   return safeImageSrc(HOLDER[i % HOLDER.length] || '');
 }
@@ -115,7 +116,7 @@ export function mountFeaturedCarousel(root) {
   });
   const slides = items.map((item, i) => {
     const imgSrc = slideImages[i] || '';
-    const title = item.title || '';
+    const title = editorialField(item, 'title');
     const summary = newsResume(item);
     const slug = item.slug || item.id || '';
     const slide = el('div', {
@@ -123,6 +124,7 @@ export function mountFeaturedCarousel(root) {
       attrs: {
         role: 'listitem',
         'aria-hidden': i === 0 ? 'false' : 'true',
+        ...editorialCardAttrs(item),
       },
     });
     if (imgSrc) {

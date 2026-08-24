@@ -247,6 +247,21 @@ PRD [2026-08-22-cms-clone-import-export.md](../prds/2026-08-22-cms-clone-import-
 | Cl7 | Recycle bin has no Duplicate | ☑ 2026-08-24 |
 | Cl8 | Cloner cannot approve/publish their own copy (four-eyes) | ☑ 2026-08-24 |
 
+## Desk production boost (JSON zip + crop + EN when ready)
+
+PRD [2026-08-24-cms-desk-production-boost.md](../prds/2026-08-24-cms-desk-production-boost.md). Super Admin only for zip. Run `cd cms && npm run db:migrate` (`032` `image_card_path`). Public JSON hashes stay unchanged until a four-eyes publish. Walk AR + EN.
+
+| # | Check | Pass? |
+|---|--------|-------|
+| Ie1 | Super Admin: nav **Import / Export** → `/dashboard/import-export`. Editor/Reviewer: no nav; URL redirects Home | ☐ |
+| Ie2 | Export this type (news): zip downloads; confirm; recycled rows absent. Import same zip: **new drafts**, files in library, original Editors restored by email (or SA + report). `news.json` hash unchanged | ☐ |
+| Ie3 | Export this item: one-id zip. Empty type: Export type disabled with a reason. Count > 200: warn + confirm. Oversized zip: clear “export one item” message | ☐ |
+| Ie4 | Editor/Reviewer: no I/E API (`403`). Duplicate still works. Import never publishes/submits | ☐ |
+| Cr1 | News (or event/pub/partner) edit: Crop on the primary image. Cancel leaves uncropped. Save keeps master + card variant. Media library has no Crop | ☐ |
+| Cr2 | After four-eyes publish: list/Home **card** uses `img_card`; detail/lightbox uses master `img`. OG unchanged | ☐ |
+| En1 | Published news with EN filled + **ready** + four-eyes publish: English locale shows EN body, **no** AR-only notice on that story’s list/detail. Pending item still Arabic + notice | ☐ |
+| En2 | Ready item with empty `title_en`: English title falls back to Arabic (no invented text). Preview token matches live EN/`img_card` rules | ☐ |
+
 ## G. Gate
 
 | # | Check | Pass? |

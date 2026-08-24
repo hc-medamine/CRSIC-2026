@@ -4,10 +4,12 @@ import { query } from "@/lib/db";
 import {
   buildMediaList,
   primaryImageSrc,
+  type PublicMediaItem,
 } from "@/lib/publish/media";
 import { slugifyTitle, uniqueSlug } from "@/lib/publish/slug";
 import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
 import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
+import { withPublicStoryFields, type StoryEnFields } from "@/lib/publish/storyPublic";
 
 export type PublicPubItem = {
   id: string;
@@ -19,7 +21,8 @@ export type PublicPubItem = {
   summary: string;
   body: string;
   media: PublicMediaItem[];
-} & PublicSeoFields;
+} & PublicSeoFields &
+  StoryEnFields & { img_card?: string };
 
 /** Public item plus its cover (kept alongside so covers.length === pubs.length on rebuild). */
 export type StoredPubPayload = PublicPubItem & { cover: string };
@@ -40,6 +43,12 @@ type PayloadSource = {
   meta_description_ar?: string | null;
   meta_description_en?: string | null;
   og_image?: string | null;
+  en_status?: string | null;
+  title_en?: string | null;
+  summary_en?: string | null;
+  body_en?: string | null;
+  label_en?: string | null;
+  image_card_path?: string | null;
 };
 
 /** Public object for a publication row (persisted to content_items.live_payload). */
@@ -53,19 +62,29 @@ export function buildPublicationPayload(
   const slug = usedSlugs ? uniqueSlug(base, usedSlugs) : base;
   if (usedSlugs) usedSlugs.add(slug);
   const summary = row.summary_ar?.trim() || "";
-  const publicBase = withPublicSeo(
+  const publicBase = withPublicStoryFields(
+    withPublicSeo(
+      {
+        id: row.id,
+        slug,
+        t: row.title_ar.trim(),
+        type: row.pub_kind === "individual" ? ("individual" as const) : ("collective" as const),
+        dept: row.label_ar?.trim() || "",
+        desc: summary,
+        summary,
+        body: sanitizeBodyHtml(row.body_ar) || "",
+        media,
+      },
+      row,
+    ),
     {
-      id: row.id,
-      slug,
-      t: row.title_ar.trim(),
-      type: row.pub_kind === "individual" ? ("individual" as const) : ("collective" as const),
-      dept: row.label_ar?.trim() || "",
-      desc: summary,
-      summary,
-      body: sanitizeBodyHtml(row.body_ar) || "",
-      media,
+      en_status: row.en_status,
+      title_en: row.title_en,
+      summary_en: row.summary_en,
+      body_en: sanitizeBodyHtml(row.body_en) || null,
+      label_en: row.label_en,
+      image_card_path: row.image_card_path,
     },
-    row,
   );
   return { ...publicBase, cover };
 }
@@ -96,18 +115,23 @@ export async function rebuildPublicPublicationsJson(): Promise<{
     const media = buildMediaList(p.media, p.cover, undefined);
     const cover = primaryImageSrc(media)?.trim() || p.cover?.trim() || "";
     const summary = p.summary?.trim() || p.desc?.trim() || "";
-    pubs.push({
-      id: p.id || `legacy-publication-${p.slug || slugifyTitle(p.t || "item")}`,
-      slug: p.slug || slugifyTitle(p.t || "item"),
-      t: (p.t ?? "").trim(),
-      type: p.type === "individual" ? "individual" : "collective",
-      dept: p.dept?.trim() || "",
-      desc: summary,
-      summary,
-      body: p.body?.trim() || "",
-      media,
-      ...seoFromRow(p),
-    });
+    pubs.push(
+      withPublicStoryFields(
+        {
+          id: p.id || `legacy-publication-${p.slug || slugifyTitle(p.t || "item")}`,
+          slug: p.slug || slugifyTitle(p.t || "item"),
+          t: (p.t ?? "").trim(),
+          type: p.type === "individual" ? "individual" : "collective",
+          dept: p.dept?.trim() || "",
+          desc: summary,
+          summary,
+          body: p.body?.trim() || "",
+          media,
+          ...seoFromRow(p),
+        },
+        p,
+      ),
+    );
     covers.push(cover);
   }
 

@@ -17,6 +17,7 @@ import {
   resolvePublicPublisher,
   type PublicBylineFields,
 } from "@/lib/publish/publicByline";
+import { withPublicStoryFields, type StoryEnFields } from "@/lib/publish/storyPublic";
 
 export type PublicEventItem = {
   id: string;
@@ -37,7 +38,8 @@ export type PublicEventItem = {
   reviewer_en: string;
   publisher_ar: string;
   publisher_en: string;
-} & PublicSeoFields;
+} & PublicSeoFields &
+  StoryEnFields & { img_card?: string; type_en?: string };
 
 /** Public item plus the scope used to bucket it into intl/nat on rebuild. */
 export type StoredEventPayload = PublicEventItem & { scope: "intl" | "nat" };
@@ -62,6 +64,12 @@ type PayloadSource = {
   meta_description_ar?: string | null;
   meta_description_en?: string | null;
   og_image?: string | null;
+  en_status?: string | null;
+  title_en?: string | null;
+  summary_en?: string | null;
+  body_en?: string | null;
+  event_type_en?: string | null;
+  image_card_path?: string | null;
 } & Partial<PublicBylineFields>;
 
 /** Public object for an event row (persisted to content_items.live_payload). */
@@ -74,32 +82,42 @@ export function buildEventPayload(
   const slug = usedSlugs ? uniqueSlug(base, usedSlugs) : base;
   if (usedSlugs) usedSlugs.add(slug);
   const primary = primaryImageSrc(media) ?? row.image_path ?? undefined;
-  const publicBase = withPublicSeo(
+  const publicBase = withPublicStoryFields(
+    withPublicSeo(
+      {
+        id: row.id,
+        slug,
+        day: row.event_day?.trim() || "01",
+        month: row.event_month?.trim() || "",
+        year: row.event_year?.trim() || "",
+        title: row.title_ar.trim(),
+        type: row.event_type_ar?.trim() || "فعالية",
+        status:
+          row.event_display_status === "done"
+            ? ("done" as const)
+            : row.event_display_status === "ongoing"
+              ? ("ongoing" as const)
+              : ("upcoming" as const),
+        summary: row.summary_ar?.trim() || "",
+        body: sanitizeBodyHtml(row.body_ar) || "",
+        media,
+        editor_ar: (row.editor_ar || "").trim(),
+        editor_en: (row.editor_en || "").trim(),
+        reviewer_ar: (row.reviewer_ar || "").trim(),
+        reviewer_en: (row.reviewer_en || "").trim(),
+        publisher_ar: (row.publisher_ar || "").trim() || PUBLIC_PUBLISHER_AR,
+        publisher_en: (row.publisher_en || "").trim() || PUBLIC_PUBLISHER_EN,
+      },
+      row,
+    ),
     {
-      id: row.id,
-      slug,
-      day: row.event_day?.trim() || "01",
-      month: row.event_month?.trim() || "",
-      year: row.event_year?.trim() || "",
-      title: row.title_ar.trim(),
-      type: row.event_type_ar?.trim() || "فعالية",
-      status:
-        row.event_display_status === "done"
-          ? ("done" as const)
-          : row.event_display_status === "ongoing"
-            ? ("ongoing" as const)
-            : ("upcoming" as const),
-      summary: row.summary_ar?.trim() || "",
-      body: sanitizeBodyHtml(row.body_ar) || "",
-      media,
-      editor_ar: (row.editor_ar || "").trim(),
-      editor_en: (row.editor_en || "").trim(),
-      reviewer_ar: (row.reviewer_ar || "").trim(),
-      reviewer_en: (row.reviewer_en || "").trim(),
-      publisher_ar: (row.publisher_ar || "").trim() || PUBLIC_PUBLISHER_AR,
-      publisher_en: (row.publisher_en || "").trim() || PUBLIC_PUBLISHER_EN,
+      en_status: row.en_status,
+      title_en: row.title_en,
+      summary_en: row.summary_en,
+      body_en: sanitizeBodyHtml(row.body_en) || null,
+      image_card_path: row.image_card_path,
     },
-    row,
+    { typeEn: row.event_type_en },
   );
   const item: StoredEventPayload = {
     ...publicBase,
@@ -187,31 +205,35 @@ export async function rebuildPublicEventsJson(): Promise<{
           }
         : null,
     );
-    const publicItem: PublicEventItem = {
-      id: item.id || `legacy-event-${item.slug || slugifyTitle(item.title || "item")}`,
-      slug: item.slug || slugifyTitle(item.title || "item"),
-      day: item.day?.trim() || "01",
-      month: item.month?.trim() || "",
-      year: item.year?.trim() || "",
-      title: (item.title ?? "").trim(),
-      type: item.type?.trim() || "فعالية",
-      status:
-        item.status === "done"
-          ? "done"
-          : item.status === "ongoing"
-            ? "ongoing"
-            : "upcoming",
-      summary: item.summary?.trim() || "",
-      body: item.body?.trim() || "",
-      media,
-      editor_ar: editor.ar || item.editor_ar || "",
-      editor_en: editor.en || item.editor_en || "",
-      reviewer_ar: reviewer.ar || item.reviewer_ar || "",
-      reviewer_en: reviewer.en || item.reviewer_en || "",
-      publisher_ar: publisher.ar,
-      publisher_en: publisher.en,
-      ...seoFromRow(item),
-    };
+    const publicItem: PublicEventItem = withPublicStoryFields(
+      {
+        id: item.id || `legacy-event-${item.slug || slugifyTitle(item.title || "item")}`,
+        slug: item.slug || slugifyTitle(item.title || "item"),
+        day: item.day?.trim() || "01",
+        month: item.month?.trim() || "",
+        year: item.year?.trim() || "",
+        title: (item.title ?? "").trim(),
+        type: item.type?.trim() || "فعالية",
+        status:
+          item.status === "done"
+            ? "done"
+            : item.status === "ongoing"
+              ? "ongoing"
+              : "upcoming",
+        summary: item.summary?.trim() || "",
+        body: item.body?.trim() || "",
+        media,
+        editor_ar: editor.ar || item.editor_ar || "",
+        editor_en: editor.en || item.editor_en || "",
+        reviewer_ar: reviewer.ar || item.reviewer_ar || "",
+        reviewer_en: reviewer.en || item.reviewer_en || "",
+        publisher_ar: publisher.ar,
+        publisher_en: publisher.en,
+        ...seoFromRow(item),
+      },
+      item,
+      { typeEn: item.type_en },
+    );
     const primary = primaryImageSrc(media) ?? item.img;
     if (primary) publicItem.img = primary;
     if (scope === "nat") nat.push(publicItem);
