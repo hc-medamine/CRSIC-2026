@@ -8,7 +8,6 @@ import { SortableTh } from "@/app/dashboard/sortable-th";
 import type { ContentType, ManagedUser, OrgUnit, UserRole } from "@/lib/users";
 import { ALL_CONTENT_TYPES } from "@/lib/content-types";
 import { sortRows, toggleHeaderSort, type HeaderSort } from "@/lib/content/headerSort";
-import { ALL_CONTENT_TYPES } from "@/lib/content-types";
 import {
   contentTypeLabel,
   localizedDisplayName,

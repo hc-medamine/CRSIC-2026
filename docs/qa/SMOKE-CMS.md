@@ -162,10 +162,10 @@ PRD [2026-08-24-cms-table-header-sort.md](../prds/2026-08-24-cms-table-header-so
 
 | # | Check | Pass? |
 |---|--------|-------|
-| Hs1 | `/dashboard/news`: click Title → A→Z (desk language); Load more continues that order; URL has no `sort=` | ☐ |
-| Hs2 | Recycle bin: Title / Type / Status / Binned at sort; Actions is not a sort control | ☐ |
-| Hs3 | Users or org units: data headers sort; Actions does not. Org-units Sort number does not write `sort_order` | ☐ |
-| Hs4 | Leave the list (Home) or refresh: default order (newest updated) again | ☐ |
+| Hs1 | `/dashboard/news`: click Title → A→Z (desk language); Load more continues that order; URL has no `sort=` | ☑ 2026-08-24 |
+| Hs2 | Recycle bin: Title / Type / Status / Binned at sort; Actions is not a sort control | ☐ empty bin this walk |
+| Hs3 | Users or org units: data headers sort; Actions does not. Org-units Sort number does not write `sort_order` | ☑ 2026-08-24 |
+| Hs4 | Leave the list (Home) or refresh: default order (newest updated) again | ☑ 2026-08-24 |
 
 ## Recycle bin
 

@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-24 — CMS table header sort smoke Hs1, Hs3, Hs4
+
+Walk on `feature/cms-table-header-sort`: Hs1 news Title A→Z (no `?sort=`); Load more order checked on events (21 rows). Hs3 org-units Sort reverse is view-only (`sort_order` unchanged in API). Hs4 leave news → Home → back = newest first. Hs2 skipped — recycle bin empty. Duplicate `ALL_CONTENT_TYPES` import in users manager fixed during the walk.
+
+---
+
 ### 2026-08-24 — CMS table header sort **Approved** (implement)
 
 [prds/2026-08-24-cms-table-header-sort.md](./prds/2026-08-24-cms-table-header-sort.md). Click data headers on CMS `<table>`s (nine content lists, recycle bin, users, org units, Home editor matrix). This visit only — no URL, no `localStorage`. Load more keeps the active ORDER BY. Checkbox/Actions and revision-history stay unsorted.
