@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listEventsForUser } from "@/lib/content/events";
-import { canAccessContentType, canReview } from "@/lib/content/permissions";
+import { canAccessContentType, listBulkChrome } from "@/lib/content/permissions";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { ContentListFilters } from "@/app/dashboard/content-list-filters";
 import { ContentListPage } from "@/app/dashboard/content-list-page";
@@ -14,6 +14,7 @@ export default async function EventsListPage({
 }) {
   const user = await requireUser();
   if (!(await canAccessContentType(user, "event"))) redirect("/dashboard");
+  const bulkChrome = listBulkChrome(user);
   const params = (await searchParams) ?? {};
   const q = (params.q ?? "").trim();
   const statusFilter = (params.status ?? "").trim();
@@ -56,8 +57,8 @@ export default async function EventsListPage({
         status: statusFilter,
       }}
       bulk={
-        canReview(user)
-          ? { apiPath: "/api/events/bulk", canRecycle: user.role === "super_admin", kind: "event" }
+        bulkChrome
+          ? { apiPath: "/api/events/bulk", kind: "event", ...bulkChrome }
           : undefined
       }
       items={listed.items.map((item) => ({

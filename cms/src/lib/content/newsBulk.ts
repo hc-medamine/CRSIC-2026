@@ -16,6 +16,7 @@ export type NewsBulkSkipReason =
   | "away"
   | "reviewer_required"
   | "not_sa"
+  | "not_author"
   | "wrong_status"
   | "already_binned"
   | "too_many"
@@ -45,7 +46,8 @@ export type NewsBulkDeps = {
   pruneFeatured?: (id: string) => Promise<void>;
 };
 
-const RECYCLE_ELIGIBLE = new Set(["unpublished", "rejected"]);
+const SA_RECYCLE_ELIGIBLE = new Set(["unpublished", "rejected"]);
+const EDITOR_RECYCLE_ELIGIBLE = new Set(["draft", "rejected"]);
 
 export function isNewsBulkAction(value: unknown): value is NewsBulkAction {
   return value === "unpublish" || value === "recycle";
@@ -57,9 +59,11 @@ export function skipReasonFromError(err: unknown): { reason: NewsBulkSkipReason;
   if (detail.includes("Away (OOO)")) return { reason: "away", detail };
   if (detail === "Reviewer role required") return { reason: "reviewer_required", detail };
   if (detail === "Super Admin role required") return { reason: "not_sa", detail };
+  if (detail.includes("Only the author")) return { reason: "not_author", detail };
   if (detail === "Item is not published") return { reason: "not_published", detail };
   if (detail.includes("already in the recycle bin")) return { reason: "already_binned", detail };
   if (detail.includes("Only unpublished or rejected")) return { reason: "wrong_status", detail };
+  if (detail.includes("Only draft or rejected")) return { reason: "wrong_status", detail };
   if (detail === "Not found") return { reason: "not_found", detail };
   return { reason: "other", detail };
 }
@@ -105,10 +109,35 @@ export async function executeNewsBulk(
     return { done, skipped };
   }
 
-  if (action === "recycle" && deps.role !== "super_admin") {
+  if (action === "recycle" && deps.role === "reviewer") {
     for (const id of ids) {
       const row = await deps.loadNews(id);
       skipped.push({ id, title: row?.title ?? "", reason: "not_sa" });
+    }
+    return { done, skipped };
+  }
+
+  if (action === "recycle" && deps.role === "editor") {
+    const toRecycle: NewsBulkItemRef[] = [];
+    for (const id of ids) {
+      const row = await deps.loadNews(id);
+      if (!row) {
+        skipped.push({ id, title: "", reason: "not_found" });
+        continue;
+      }
+      if (EDITOR_RECYCLE_ELIGIBLE.has(row.status)) {
+        toRecycle.push({ id: row.id, title: row.title });
+        continue;
+      }
+      skipped.push({ id, title: row.title, reason: "wrong_status" });
+    }
+    for (const item of toRecycle) {
+      try {
+        await deps.recycle(item.id);
+        done.push(item);
+      } catch (err) {
+        skipped.push({ id: item.id, title: item.title, ...skipReasonFromError(err) });
+      }
     }
     return { done, skipped };
   }
@@ -148,7 +177,7 @@ export async function executeNewsBulk(
       }
       continue;
     }
-    if (RECYCLE_ELIGIBLE.has(row.status)) {
+    if (SA_RECYCLE_ELIGIBLE.has(row.status)) {
       toRecycle.push({ id: row.id, title: row.title });
       continue;
     }

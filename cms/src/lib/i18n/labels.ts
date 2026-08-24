@@ -638,10 +638,19 @@ export const LABELS: LabelMap = {
     en: "Restore a binned item as a draft, or delete it for good. Opening this page never deletes by itself.",
     ar: "استعيدوا العنصر كمسودة، أو احذفوه نهائيًا. فتح هذه الصفحة لا يحذف شيئًا تلقائيًا.",
   },
+  pageDescRecycleBinEditor: {
+    en: "Restore your own binned items as drafts. Super Admin can delete permanently.",
+    ar: "استعيدوا عناصرَكم كمسودات. الحذف النهائي للمدير الأعلى فقط.",
+  },
   recycleBinEmpty: { en: "Recycle bin is empty.", ar: "سلة المحذوفات فارغة." },
+  recycleBinEmptyOwn: { en: "No items in your recycle bin.", ar: "لا عناصر في سلة محذوفاتكم." },
   recycleBinEmptyHint: {
     en: "Unpublished or rejected items you move here can be restored as drafts.",
     ar: "العناصر غير المنشورة أو المرفوضة التي تُنقل هنا يمكن استعادتها كمسودات.",
+  },
+  recycleBinEmptyHintEditor: {
+    en: "Drafts and rejected items you move here can be restored as drafts.",
+    ar: "المسودات والعناصر المرفوضة التي تُنقل هنا يمكن استعادتها كمسودات.",
   },
   actionRestore: { en: "Restore", ar: "استعادة" },
   actionEmptyBin: { en: "Empty bin", ar: "إفراغ السلة" },
@@ -1083,6 +1092,7 @@ export const LABELS: LabelMap = {
   },
   bulkSkipReviewer: { en: "Reviewer role required", ar: "يلزم دور المراجع" },
   bulkSkipNotSa: { en: "Super Admin only", ar: "للمدير الأعلى فقط" },
+  bulkSkipNotAuthor: { en: "Only the author", ar: "للمؤلف فقط" },
   bulkSkipWrongStatus: { en: "Status is not eligible", ar: "الحالة غير مؤهلة" },
   bulkSkipAlreadyBinned: { en: "Already in the recycle bin", ar: "موجود أصلاً في سلة المحذوفات" },
   bulkSkipTooMany: { en: "Over the 200-item batch limit", ar: "تجاوز حد الدفعة (200)" },

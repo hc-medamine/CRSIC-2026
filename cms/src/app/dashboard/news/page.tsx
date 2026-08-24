@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listNewsForUser } from "@/lib/content/news";
-import { canAccessContentType, canReview } from "@/lib/content/permissions";
+import { canAccessContentType, listBulkChrome } from "@/lib/content/permissions";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { ContentListFilters } from "@/app/dashboard/content-list-filters";
 import { ContentListPage } from "@/app/dashboard/content-list-page";
@@ -16,6 +16,7 @@ export default async function NewsListPage({
   if (!(await canAccessContentType(user, "news"))) {
     redirect("/dashboard");
   }
+  const bulkChrome = listBulkChrome(user);
   const params = (await searchParams) ?? {};
   const q = (params.q ?? "").trim();
   const statusFilter = (params.status ?? "").trim();
@@ -59,8 +60,8 @@ export default async function NewsListPage({
         status: statusFilter,
       }}
       bulk={
-        canReview(user)
-          ? { apiPath: "/api/news/bulk", canRecycle: user.role === "super_admin", kind: "news" }
+        bulkChrome
+          ? { apiPath: "/api/news/bulk", kind: "news", ...bulkChrome }
           : undefined
       }
       items={listed.items.map((item) => ({

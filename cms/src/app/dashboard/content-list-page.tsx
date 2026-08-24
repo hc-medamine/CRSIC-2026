@@ -54,7 +54,7 @@ type Props = {
   /** Unfiltered list path — used by “Clear filters”. */
   listHref?: string;
   loadMore?: ContentListLoadMore;
-  /** Opt-in news list bulk (Reviewer / SA). Do not pass on other type lists. */
+  /** Opt-in list bulk (Editor Recycle / Reviewer Unpublish / SA both). */
   bulk?: ContentListBulk;
 };
 
@@ -385,6 +385,7 @@ export function ContentListPage({
         <ContentListBulkBar
           selectedCount={selectedCount}
           canRecycle={bulk.canRecycle}
+          canUnpublish={bulk.canUnpublish !== false}
           busy={bulkBusy}
           onClear={() => setSelected(new Set())}
           onUnpublish={() => setBulkDialog({ kind: "confirm", action: "unpublish" })}
@@ -399,6 +400,7 @@ export function ContentListPage({
           selectedCount={selectedCount}
           publishedCount={publishedSelected}
           kind={bulk.kind}
+          canUnpublish={bulk.canUnpublish !== false}
           onCancel={() => setBulkDialog(null)}
           onConfirm={() => void onConfirmBulk()}
           onDismiss={() => setBulkDialog(null)}

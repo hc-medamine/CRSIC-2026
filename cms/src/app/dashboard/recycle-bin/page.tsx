@@ -1,15 +1,17 @@
-import { requireSuperAdmin } from "@/lib/users";
-import { listRecycleBin, toRecycleBinClientRows } from "@/lib/content/recycleBin";
+import { requireEditorOrSuperAdmin } from "@/lib/users";
+import { canManageRecycleBin, listRecycleBin, toRecycleBinClientRows } from "@/lib/content/recycleBin";
 import { RecycleBinClient } from "./recycle-bin-client";
 
 export default async function RecycleBinPage() {
-  const user = await requireSuperAdmin();
+  const user = await requireEditorOrSuperAdmin();
   const listed = await listRecycleBin(user);
+  const canManage = canManageRecycleBin(user);
 
   return (
     <RecycleBinClient
       initialItems={toRecycleBinClientRows(listed.items)}
-      initialStaleIds={listed.staleIds}
+      initialStaleIds={canManage ? listed.staleIds : []}
+      canManageBin={canManage}
     />
   );
 }

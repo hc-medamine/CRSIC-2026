@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession, sessionTimeoutMs } from "@/lib/auth/session";
+import { getSession, sessionTimeoutMs, type SessionUser } from "@/lib/auth/session";
 import {
+  canManageRecycleBin,
+  canOpenRecycleBin,
   emptyRecycleBin,
   listRecycleBin,
   purgeRecycledItem,
@@ -11,11 +13,12 @@ import {
 
 export const runtime = "nodejs";
 
-async function requireSuperAdminApi() {
+async function requireBinUser(): Promise<SessionUser | null> {
   const session = await getSession();
   const user = session.user;
-  if (!user || user.role !== "super_admin" || !session.lastActivityAt) return null;
+  if (!user || !session.lastActivityAt) return null;
   if (Date.now() - session.lastActivityAt > sessionTimeoutMs()) return null;
+  if (!canOpenRecycleBin(user)) return null;
   return user;
 }
 
@@ -28,12 +31,12 @@ function payloadFrom(items: Awaited<ReturnType<typeof listRecycleBin>>) {
 }
 
 export async function GET() {
-  const admin = await requireSuperAdminApi();
-  if (!admin) {
+  const user = await requireBinUser();
+  if (!user) {
     return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
   }
   try {
-    const listed = await listRecycleBin(admin);
+    const listed = await listRecycleBin(user);
     return NextResponse.json(payloadFrom(listed));
   } catch (err) {
     const message = err instanceof Error ? err.message : "List failed";
@@ -42,8 +45,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const admin = await requireSuperAdminApi();
-  if (!admin) {
+  const user = await requireBinUser();
+  if (!user) {
     return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
   }
 
@@ -52,22 +55,27 @@ export async function POST(request: NextRequest) {
     switch (body.action) {
       case "restore":
         if (!body.id) throw new Error("id required");
-        await restoreRecycledItem(admin, body.id);
+        await restoreRecycledItem(user, body.id);
         break;
       case "purge":
-        if (!body.id) throw new Error("id required");
-        await purgeRecycledItem(admin, body.id);
-        break;
       case "empty":
-        await emptyRecycleBin(admin);
-        break;
       case "purge-stale":
-        await purgeStaleRecycleBin(admin);
+        if (!canManageRecycleBin(user)) {
+          return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
+        }
+        if (body.action === "purge") {
+          if (!body.id) throw new Error("id required");
+          await purgeRecycledItem(user, body.id);
+        } else if (body.action === "empty") {
+          await emptyRecycleBin(user);
+        } else {
+          await purgeStaleRecycleBin(user);
+        }
         break;
       default:
         throw new Error("Unknown action");
     }
-    const listed = await listRecycleBin(admin);
+    const listed = await listRecycleBin(user);
     return NextResponse.json(payloadFrom(listed));
   } catch (err) {
     const message = err instanceof Error ? err.message : "Update failed";

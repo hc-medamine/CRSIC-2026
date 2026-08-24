@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listPublicationsForUser } from "@/lib/content/publications";
-import { canAccessContentType, canReview } from "@/lib/content/permissions";
+import { canAccessContentType, listBulkChrome } from "@/lib/content/permissions";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { ContentListFilters } from "@/app/dashboard/content-list-filters";
 import { ContentListPage } from "@/app/dashboard/content-list-page";
@@ -14,6 +14,7 @@ export default async function PublicationsListPage({
 }) {
   const user = await requireUser();
   if (!(await canAccessContentType(user, "publication"))) redirect("/dashboard");
+  const bulkChrome = listBulkChrome(user);
   const params = (await searchParams) ?? {};
   const q = (params.q ?? "").trim();
   const statusFilter = (params.status ?? "").trim();
@@ -56,12 +57,8 @@ export default async function PublicationsListPage({
         status: statusFilter,
       }}
       bulk={
-        canReview(user)
-          ? {
-              apiPath: "/api/publications/bulk",
-              canRecycle: user.role === "super_admin",
-              kind: "publication",
-            }
+        bulkChrome
+          ? { apiPath: "/api/publications/bulk", kind: "publication", ...bulkChrome }
           : undefined
       }
       items={listed.items.map((item) => ({

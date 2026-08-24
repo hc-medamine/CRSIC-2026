@@ -371,8 +371,7 @@ export function AlertEditorForm({
       ) : null}
 
       {mode === "edit" &&
-      canDelete &&
-      (initial?.status === "unpublished" || initial?.status === "rejected") ? (
+      canDelete ? (
         <button
           type="button"
           disabled={pending}
