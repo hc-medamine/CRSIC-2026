@@ -221,6 +221,21 @@ PRD [2026-08-22-cms-remaining-types-bulk-actions.md](../prds/2026-08-22-cms-rema
 | Ot5 | Edit-page Unpublish / Move to recycle bin still work. No N in-CMS unpublish notifications for bulk | ☐ |
 | Ot6 | Clone / import-export still absent. Header checkbox selects all on-screen rows (the full list for these types) | ☐ |
 
+## Desk clone Cut 1
+
+PRD [2026-08-22-cms-clone-import-export.md](../prds/2026-08-22-cms-clone-import-export.md). Walk AR + EN. Import/export is out of this cut.
+
+| # | Check | Pass? |
+|---|--------|-------|
+| Cl1 | Edit a news item → Duplicate → confirm → stay on source; window offers Open draft / Cancel clone / Close | ☑ 2026-08-24 |
+| Cl2 | New row is `draft`, title has ` (نسخة)` / ` (copy)`, media empty, new slug; source unchanged; featured playlist unchanged | ☑ 2026-08-24 |
+| Cl3 | Cancel clone deletes only that new draft; Close keeps it; Open draft goes to the copy | ☑ 2026-08-24 |
+| Cl4 | List row Duplicate does not open the source row; same confirm + window | ☑ 2026-08-24 |
+| Cl5 | Reviewer/SA bulk Duplicate on checkboxes: confirm → report; no public JSON change; cap 200 | ☑ 2026-08-24 |
+| Cl6 | Editor has row + edit Duplicate and Recycle (no Unpublish, no bulk Duplicate) | ☑ 2026-08-24 |
+| Cl7 | Recycle bin has no Duplicate | ☑ 2026-08-24 |
+| Cl8 | Cloner cannot approve/publish their own copy (four-eyes) | ☑ 2026-08-24 |
+
 ## G. Gate
 
 | # | Check | Pass? |

@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Draft** (2026-08-22) |
+| Status | **Cut 1 Delivered** on `main` (PR #42, 2026-08-24). Import/export later cuts stay in this PRD, not Approved for implementation |
 | Date | 2026-08-22 |
 | Author | Stakeholder + agent |
 | Owners | Product / CMS Desk |
@@ -45,14 +45,17 @@ Who feels it: Editors (repeat programmes, similar announcements), Reviewers/SA (
 
 1. **Surfaces:** Duplicate on the item edit page; Duplicate on each list row; bulk Duplicate in the list bar where checkboxes already exist. All CMS list types: news, events, publications, partners, alerts, laws, platforms, research groups, research projects.
 2. **Who:** Same gate as **create** for that type (not “SA only”). Four-eyes on the **new** row: cloner is author and cannot approve/publish their own duplicate.
-3. **Result:** Always a **new draft** (`status = draft`). Never published, never submitted, no `live_payload`. New `id`. New `public_slug` (resolved unique from the new title).
-4. **Fields:** Copy all editorial fields (AR/EN titles and bodies, summaries, labels, SEO, dates, type-specific fields such as partner scope, research members, group link, external URLs). **Blank media:** `image_path`, `og_image`, attachments/media arrays empty.
-5. **Title:** Append a visible suffix: Arabic ` (نسخة)` and English ` (copy)` when an EN title exists. List must distinguish source vs duplicate.
-6. **Do not copy:** comments, revisions, workflow history, recycle metadata, featured-playlist membership, in-CMS notifications, publisher assignment (clear `publisher_id`).
-7. **Bulk clone:** Max **200** ids (same cap as list bulk). Skip ineligible + per-item report. No notification flood. No public JSON rebuild (drafts are not live).
-8. **Alerts:** Clone is a draft; one-live-alert exclusivity stays on **publish**.
-9. **i18n:** AR+EN keys in sync for Duplicate, confirms, skip reasons, report.
-10. **Audit:** one `*.clone` (or equivalent) per successful item; actor = logged-in user.
+3. **Source status:** Any **visible** non-recycled row (draft, submitted, changes_requested, approved, published, unpublished, rejected). Recycle bin: no Duplicate.
+4. **Result:** Always a **new draft** (`status = draft`). Never published, never submitted, no `live_payload`. New `id`. New `public_slug` (resolved unique from the new title).
+5. **Fields:** Copy all editorial fields (AR/EN titles and bodies, summaries, labels, SEO, dates, type-specific fields such as partner scope, research members, group link, external URLs). **Keep source `org_unit_id`.** **Blank media:** `image_path`, image alts, `og_image`, attachments/media arrays empty.
+6. **Title:** Append a visible suffix: Arabic ` (نسخة)` and English ` (copy)` when an EN title exists. Clone-of-clone may stack suffixes. List must distinguish source vs duplicate.
+7. **Do not copy:** comments, revisions, workflow history, recycle metadata, featured-playlist membership, in-CMS notifications, `publisher_id`, `review_owner_id` (and review-owner proposal / escalate / emergency fields).
+8. **Author:** cloner = `created_by`. Clear `publisher_id` and `review_owner_id`.
+9. **Confirm then stay:** Single Duplicate always **confirms first**. After success, stay on the source (edit page or list). A window offers **Open draft** (go to the new item), **Cancel clone** (delete that new draft; stay), or **Close** (keep the draft; stay). Bulk: confirm → report on the list (no per-row travel window).
+10. **Bulk clone:** Reviewer + Super Admin only (existing checkboxes). Max **200** ids. Skip ineligible + per-item report. No notification flood. No public JSON rebuild (drafts are not live). Editors do not gain Unpublish chrome.
+11. **Alerts:** Clone is a draft; one-live-alert exclusivity stays on **publish**.
+12. **i18n:** AR+EN keys in sync for Duplicate, confirms, skip reasons, report.
+13. **Audit:** one `*.clone` per successful item; actor = logged-in user. Cancel clone writes `*.clone_undo`.
 
 ### Should have (later cuts, same PRD)
 
@@ -61,7 +64,7 @@ Who feels it: Editors (repeat programmes, similar announcements), Reviewers/SA (
 
 ### Nice to have
 
-1. After clone, land on the new draft’s edit page (single clone). After bulk clone, stay on the list and show the report.
+1. After bulk clone, stay on the list and show the report (locked). Single-clone travel is opt-in via the result window, not automatic.
 
 ## 5. Content / data impact
 
@@ -72,7 +75,7 @@ Later import/export must not bypass sanitize/allowlists or four-eyes.
 ## 6. UX notes
 
 - Desk-native: same list chrome, sticky bar, confirm → report → dismiss as bulk unpublish.
-- Row Duplicate does not navigate as a row click; it clones (confirm if needed) then optional jump to the new draft.
+- Row Duplicate does not navigate as a row click. Confirm first; then the three-action window. Do not auto-navigate.
 - Empty / filtered list: no bulk Duplicate.
 - Recycle bin page: no Duplicate.
 
@@ -106,3 +109,5 @@ Later import/export must not bypass sanitize/allowlists or four-eyes.
 | 2026-08-22 | All nine list types in cut 1. |
 | 2026-08-22 | Later cuts: JSON export one item or one type; import as drafts; no WP UI. |
 | 2026-08-22 | Defaults: no comments/revisions/live JSON/featured copy; cloner = author; publisher cleared; bin has no clone; bulk max 200; no notify flood. |
+| 2026-08-23 | Stakeholder **Approved cut 1**. Any visible non-recycled status. Confirm before clone. After single clone: stay on source; window = Open draft / Cancel clone (delete that draft) / Close (keep, stay). Clone-of-clone stacked suffix OK. Keep source `org_unit_id`; cloner = author; clear `review_owner_id` and `publisher_id`. |
+| 2026-08-24 | Cut 1 smoke Cl1–Cl8 passed. Editors keep Recycle (no Unpublish) plus row/edit Duplicate; bulk Duplicate is Reviewer/SA only. Shipped on `main` (PR #42). |

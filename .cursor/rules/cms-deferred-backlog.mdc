@@ -9,13 +9,13 @@ When discussing CMS/product/roadmap work, briefly remind the stakeholder that th
 
 ## Active Approved PRD (this slice — implement)
 
-- [docs/prds/2026-08-23-cms-editor-recycle.md](docs/prds/2026-08-23-cms-editor-recycle.md) — Editor recycle of own draft/rejected; scoped bin + restore
+None. Wait for the next Approved PRD before coding a product slice.
 
 ## Deferred (future) — simple → complex
 
 Do **not** implement these unless they explicitly start a PRD-first slice.
 
-1. Clone / import-export UI
+1. JSON import/export (later cuts of the clone PRD)
 2. Media crop / optimize / variants
 3. EN editorial body parity ([docs/audits/PARITY.md](docs/audits/PARITY.md))
 4. Static institutional pages in CMS (locales only today)
@@ -25,6 +25,8 @@ Do **not** implement these unless they explicitly start a PRD-first slice.
 
 - **Scheduled publish — cancelled** (2026-07-21, confirmed 2026-08-22). Manual Approve → Publish only. No `scheduled` status, cron, or schedule UI. Do not add it back to the deferred list.
 - CMS Recycle bin (PRD 2026-08-22): SA bin unpublished/rejected; restore to draft; purge unused media. On `main` (PR #34).
+- CMS Editor recycle (PRD 2026-08-23): Editors bin own draft/rejected; scoped bin + restore. On `main` (PR #41).
+- CMS clone Cut 1 (PRD 2026-08-22): Duplicate → new draft (edit + list row; bulk Reviewer/SA). On `main` (PR #42).
 - CMS news list bulk (PRD 2026-08-22): unpublish + SA recycle; skip + report. On `main` (PR #36).
 - CMS list bulk for remaining types (PRDs 2026-08-22): events, publications, partners, alerts, laws, platforms, research groups, research projects. On `main` (PR #37).
 - CMS list Load more (PRD 2026-08-22): news/events/publications page size 20.

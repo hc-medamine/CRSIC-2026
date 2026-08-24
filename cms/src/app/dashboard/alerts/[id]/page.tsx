@@ -65,6 +65,7 @@ export default async function AlertDetailPage({ params }: Props) {
       title={t("editReview", lang)}
       subtitle={item.title_ar || undefined}
       wide
+      cloneItemId={item.id}
     >
 
       {!reviewer && canReview(user) && item.created_by === user.id ? (

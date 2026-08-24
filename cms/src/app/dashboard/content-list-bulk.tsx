@@ -35,7 +35,7 @@ export type ContentListBulk = {
   kind: ContentListBulkKind;
 };
 
-export type BulkAction = "unpublish" | "recycle";
+export type BulkAction = "unpublish" | "recycle" | "clone";
 
 export type BulkDone = { id: string; title: string };
 export type BulkSkip = { id: string; title: string; reason: string; detail?: string };
@@ -55,6 +55,8 @@ const SKIP_KEYS: Record<string, string> = {
   wrong_status: "bulkSkipWrongStatus",
   already_binned: "bulkSkipAlreadyBinned",
   too_many: "bulkSkipTooMany",
+  no_create: "bulkSkipNoCreate",
+  wrong_type: "bulkSkipWrongType",
   other: "bulkSkipOther",
 };
 
@@ -103,6 +105,7 @@ export function ContentListBulkBar({
   onClear,
   onUnpublish,
   onRecycle,
+  onDuplicate,
 }: {
   selectedCount: number;
   canRecycle: boolean;
@@ -111,6 +114,7 @@ export function ContentListBulkBar({
   onClear: () => void;
   onUnpublish: () => void;
   onRecycle: () => void;
+  onDuplicate: () => void;
 }) {
   const lang = useCmsLang();
   if (selectedCount < 1) return null;
@@ -128,6 +132,16 @@ export function ContentListBulkBar({
       >
         {t("bulkClear", lang)}
       </button>
+      {canUnpublish ? (
+        <button
+          type="button"
+          disabled={busy}
+          className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-50"
+          onClick={onDuplicate}
+        >
+          {t("actionDuplicate", lang)}
+        </button>
+      ) : null}
       {canRecycle ? (
         <button type="button" disabled={busy} className={recycleClass} onClick={onRecycle}>
           {t("actionRecycle", lang)}
@@ -210,7 +224,9 @@ export function ContentListBulkModal({
       ? t("bulkReportTitle", lang)
       : dialog.action === "unpublish"
         ? t(UNPUBLISH_TITLE[kind], lang)
-        : t("bulkConfirmRecycleTitle", lang);
+        : dialog.action === "clone"
+          ? t("bulkConfirmCloneTitle", lang)
+          : t("bulkConfirmRecycleTitle", lang);
 
   let body: ReactNode;
   if (dialog.kind === "confirm") {
@@ -219,7 +235,9 @@ export function ContentListBulkModal({
         <p className="mt-2 text-sm text-crs-muted">
           {dialog.action === "unpublish"
             ? tf(UNPUBLISH_BODY[kind], lang, { n: selectedCount })
-            : tf("bulkConfirmRecycle", lang, { n: selectedCount })}
+            : dialog.action === "clone"
+              ? tf("bulkConfirmClone", lang, { n: selectedCount })
+              : tf("bulkConfirmRecycle", lang, { n: selectedCount })}
         </p>
         {dialog.action === "recycle" && canUnpublish && publishedCount > 0 ? (
           <p className="mt-2 text-sm text-crs-muted">
@@ -229,7 +247,12 @@ export function ContentListBulkModal({
       </>
     );
   } else {
-    const summaryKey = dialog.action === "unpublish" ? "bulkReportUnpublish" : "bulkReportRecycle";
+    const summaryKey =
+      dialog.action === "unpublish"
+        ? "bulkReportUnpublish"
+        : dialog.action === "clone"
+          ? "bulkReportClone"
+          : "bulkReportRecycle";
     body = (
       <>
         <p className="mt-2 text-sm text-crs-muted">
@@ -283,7 +306,11 @@ export function ContentListBulkModal({
                 disabled={busy || selectedCount < 1}
                 onClick={onConfirm}
               >
-                {dialog.action === "unpublish" ? t("actionUnpublish", lang) : t("actionRecycle", lang)}
+                {dialog.action === "unpublish"
+                  ? t("actionUnpublish", lang)
+                  : dialog.action === "clone"
+                    ? t("actionDuplicate", lang)
+                    : t("actionRecycle", lang)}
               </button>
             </>
           ) : (

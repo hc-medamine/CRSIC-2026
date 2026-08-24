@@ -3,4 +3,4 @@ import { bulkLawActions } from "@/lib/content/eventsPublicationsBulk";
 
 export const runtime = "nodejs";
 
-export const POST = createBulkPostHandler(bulkLawActions);
+export const POST = createBulkPostHandler(bulkLawActions, "law");

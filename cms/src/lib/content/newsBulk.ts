@@ -20,6 +20,8 @@ export type NewsBulkSkipReason =
   | "wrong_status"
   | "already_binned"
   | "too_many"
+  | "no_create"
+  | "wrong_type"
   | "other";
 
 export type NewsBulkItemRef = { id: string; title: string };
