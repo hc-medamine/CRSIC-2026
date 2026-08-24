@@ -82,6 +82,17 @@ export function canReview(user: SessionUser): boolean {
   return user.role === "reviewer" || user.role === "super_admin";
 }
 
+/** List bulk chrome: Editors get Recycle only; Reviewers Unpublish only; SA both. */
+export function listBulkChrome(user: SessionUser): {
+  canRecycle: boolean;
+  canUnpublish: boolean;
+} | undefined {
+  if (user.role === "editor") return { canRecycle: true, canUnpublish: false };
+  if (user.role === "reviewer") return { canRecycle: false, canUnpublish: true };
+  if (user.role === "super_admin") return { canRecycle: true, canUnpublish: true };
+  return undefined;
+}
+
 export function canEditAsAuthor(user: SessionUser): boolean {
   return user.role === "editor" || user.role === "super_admin" || user.role === "reviewer";
 }

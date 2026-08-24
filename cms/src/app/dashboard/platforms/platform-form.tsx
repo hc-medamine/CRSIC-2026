@@ -384,7 +384,7 @@ export function PlatformEditorForm({
       {mode === "edit" && isAuthor && initial?.status === "rejected" ? (
         <button type="button" disabled={pending} className="w-fit rounded border border-amber-300 px-4 py-2 text-sm text-amber-900" onClick={() => void run("reopen_rejected")}>{t("actionReopenDraft", lang)}</button>
       ) : null}
-      {mode === "edit" && canDelete && (initial?.status === "unpublished" || initial?.status === "rejected") ? (
+      {mode === "edit" && canDelete ? (
         <button type="button" disabled={pending} className="inline-flex min-h-11 w-fit items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60" onClick={() => void run("delete")}>{t("actionRecycle", lang)}</button>
       ) : null}
     </div>

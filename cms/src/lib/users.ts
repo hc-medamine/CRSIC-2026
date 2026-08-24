@@ -81,6 +81,15 @@ export async function requireReviewerOrSuperAdmin(): Promise<SessionUser> {
   return user;
 }
 
+/** Editor or Super Admin may open the Recycle bin. */
+export async function requireEditorOrSuperAdmin(): Promise<SessionUser> {
+  const user = await requireUser();
+  if (user.role !== "editor" && user.role !== "super_admin") {
+    redirect("/dashboard");
+  }
+  return user;
+}
+
 export async function listOrgUnits(): Promise<OrgUnit[]> {
   const result = await query<{
     id: string;

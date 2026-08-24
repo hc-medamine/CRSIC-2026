@@ -2,18 +2,73 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   RECYCLE_STALE_DAYS,
+  canManageRecycleBin,
+  canOpenRecycleBin,
+  canRecycleFromEditPage,
+  canRestoreRecycledRow,
   collectMediaPaths,
+  isEditorRecycleEligibleStatus,
   isRecycleEligibleStatus,
   isStaleRecycled,
 } from "./recycleBin";
 
+function user(
+  role: "super_admin" | "editor" | "reviewer",
+  id = "u1",
+): { id: string; email: string; displayName: string; role: typeof role } {
+  return { id, email: `${id}@crs.dz`, displayName: id, role };
+}
+
 describe("isRecycleEligibleStatus", () => {
-  it("allows unpublished and rejected only", () => {
+  it("allows unpublished and rejected only (SA set)", () => {
     assert.equal(isRecycleEligibleStatus("unpublished"), true);
     assert.equal(isRecycleEligibleStatus("rejected"), true);
     assert.equal(isRecycleEligibleStatus("draft"), false);
     assert.equal(isRecycleEligibleStatus("published"), false);
     assert.equal(isRecycleEligibleStatus("submitted"), false);
+  });
+});
+
+describe("isEditorRecycleEligibleStatus", () => {
+  it("allows draft and rejected only", () => {
+    assert.equal(isEditorRecycleEligibleStatus("draft"), true);
+    assert.equal(isEditorRecycleEligibleStatus("rejected"), true);
+    assert.equal(isEditorRecycleEligibleStatus("submitted"), false);
+    assert.equal(isEditorRecycleEligibleStatus("unpublished"), false);
+    assert.equal(isEditorRecycleEligibleStatus("published"), false);
+    assert.equal(isEditorRecycleEligibleStatus("changes_requested"), false);
+  });
+});
+
+describe("recycle role gates", () => {
+  it("edit-page Recycle: Editor own draft/rejected; SA unpublished/rejected", () => {
+    const editor = user("editor", "ed");
+    const sa = user("super_admin", "sa");
+    const reviewer = user("reviewer", "rv");
+    assert.equal(canRecycleFromEditPage(editor, { created_by: "ed", status: "draft" }), true);
+    assert.equal(canRecycleFromEditPage(editor, { created_by: "ed", status: "rejected" }), true);
+    assert.equal(canRecycleFromEditPage(editor, { created_by: "ed", status: "submitted" }), false);
+    assert.equal(canRecycleFromEditPage(editor, { created_by: "other", status: "draft" }), false);
+    assert.equal(canRecycleFromEditPage(sa, { created_by: "ed", status: "unpublished" }), true);
+    assert.equal(canRecycleFromEditPage(sa, { created_by: "ed", status: "draft" }), false);
+    assert.equal(canRecycleFromEditPage(reviewer, { created_by: "rv", status: "draft" }), false);
+  });
+
+  it("bin page: Editor and SA may open; Reviewer may not; purge is SA only", () => {
+    assert.equal(canOpenRecycleBin(user("editor")), true);
+    assert.equal(canOpenRecycleBin(user("super_admin")), true);
+    assert.equal(canOpenRecycleBin(user("reviewer")), false);
+    assert.equal(canManageRecycleBin(user("editor")), false);
+    assert.equal(canManageRecycleBin(user("super_admin")), true);
+    assert.equal(canManageRecycleBin(user("reviewer")), false);
+  });
+
+  it("restore: Editor own rows only; SA any; Reviewer none", () => {
+    const editor = user("editor", "ed");
+    assert.equal(canRestoreRecycledRow(editor, "ed"), true);
+    assert.equal(canRestoreRecycledRow(editor, "other"), false);
+    assert.equal(canRestoreRecycledRow(user("super_admin"), "ed"), true);
+    assert.equal(canRestoreRecycledRow(user("reviewer"), "ed"), false);
   });
 });
 

@@ -158,7 +158,7 @@ PRD [2026-08-22-cms-list-load-more.md](../prds/2026-08-22-cms-list-load-more.md)
 
 ## Recycle bin
 
-PRD [2026-08-22-cms-recycle-bin.md](../prds/2026-08-22-cms-recycle-bin.md). Run `cd cms && npm run db:migrate` (`031`). Super Admin only.
+PRD [2026-08-22-cms-recycle-bin.md](../prds/2026-08-22-cms-recycle-bin.md). Run `cd cms && npm run db:migrate` (`031`). Super Admin keeps unpublished/rejected recycle, Restore, Permanently delete, Empty, Purge. Editors: see [Editor recycle](#editor-recycle-draft--rejected).
 
 | # | Check | Pass? |
 |---|--------|-------|
@@ -167,15 +167,28 @@ PRD [2026-08-22-cms-recycle-bin.md](../prds/2026-08-22-cms-recycle-bin.md). Run 
 | Rb3 | Per-row **Delete permanently**: typed confirm (`DELETE` / `حذف`); item gone; unused media file gone; a file still used by another item stays | ☐ |
 | Rb4 | **Empty bin**: confirm names the count **X** and has Cancel; then the bin is empty | ☐ |
 | Rb5 | Item older than 90 days: opening the bin shows a banner + **Purge** (does **not** auto-delete). Purge removes only those stale rows | ☐ |
-| Rb6 | Editor / Reviewer: no Recycle bin nav; `/dashboard/recycle-bin` redirects Home; `GET/POST /api/recycle-bin` is 403 | ☐ |
+| Rb6 | Reviewer: no Recycle bin nav; `/dashboard/recycle-bin` redirects Home; `GET/POST /api/recycle-bin` is 403 | ☐ |
 
-## News list bulk (unpublish / recycle)
+## Editor recycle (draft + rejected)
 
-PRD [2026-08-22-cms-news-bulk-actions.md](../prds/2026-08-22-cms-news-bulk-actions.md). Reviewer + Super Admin on `/dashboard/news` only. Same list chrome (checkbox, sticky bar, Desk modal).
+PRD [2026-08-23-cms-editor-recycle.md](../prds/2026-08-23-cms-editor-recycle.md). Editors bin **own** `draft` / `rejected` only. No Unpublish. No JSON rebuild. Super Admin unpublished recycle and purge stay.
 
 | # | Check | Pass? |
 |---|--------|-------|
-| Nb1 | Editor: no checkboxes or bulk bar on `/dashboard/news`. `POST /api/news/bulk` unpublish returns skipped `reviewer_required` (does not abort without a report) | ☐ |
+| Er1 | Editor lists (all nine types): checkboxes + **Recycle** (no Unpublish). Select own drafts + one rejected + one submitted → confirm → submitted skipped; others leave the list | ☐ |
+| Er2 | Editor edit page: **Move to recycle bin** on own draft and rejected; hidden on submitted / published | ☐ |
+| Er3 | Editor Recycle bin nav; `/dashboard/recycle-bin` shows **only that Editor’s** binned rows. Restore returns them as drafts. No Permanently delete / Empty / Purge | ☐ |
+| Er4 | Editor cannot recycle or restore another author’s row (API skip / 400). `POST /api/recycle-bin` purge/empty/purge-stale is 403 | ☐ |
+| Er5 | Reviewer recycle still skipped (`not_sa`). Super Admin still bins unpublished (not drafts) | ☐ |
+| Er6 | Public `data/*.json` unchanged after Editor recycle (drafts/rejected were not live) | ☐ |
+
+## News list bulk (unpublish / recycle)
+
+PRD [2026-08-22-cms-news-bulk-actions.md](../prds/2026-08-22-cms-news-bulk-actions.md). Reviewer + Super Admin unpublish; Super Admin recycle unpublished; **Editors recycle own draft/rejected** (see Er1). Same list chrome (checkbox, sticky bar, Desk modal).
+
+| # | Check | Pass? |
+|---|--------|-------|
+| Nb1 | Editor: checkboxes + **Recycle** only (no Unpublish) on `/dashboard/news`. `POST /api/news/bulk` unpublish returns skipped `reviewer_required` (does not abort without a report) | ☐ |
 | Nb2 | Reviewer: checkboxes + **Unpublish** only (no recycle). Select mixed published (not own) + own story → confirm count → own is skipped (four-eyes); others leave `news.json`; one rebuild | ☐ |
 | Nb3 | Super Admin: **Move to recycle bin** on a mix of published + unpublished + a draft → one confirm names published-first; published unpublished then binned; unpublished binned; draft skipped; report lists each skip | ☐ |
 | Nb4 | Load more rows can be selected; header checkbox is loaded rows only (not the whole CMS). Filter change clears selection | ☐ |
@@ -188,7 +201,7 @@ PRD [2026-08-22-cms-events-publications-bulk-actions.md](../prds/2026-08-22-cms-
 
 | # | Check | Pass? |
 |---|--------|-------|
-| Ep1 | Editor: no checkboxes on events or publications. Bulk API skips with `reviewer_required` | ☐ |
+| Ep1 | Editor: checkboxes + Recycle (no Unpublish) on events and publications. Bulk API unpublish skips with `reviewer_required` | ☐ |
 | Ep2 | Reviewer: Unpublish only on both lists; own published skipped (four-eyes); others leave `events.json` / `publications.json` after one rebuild each | ☐ |
 | Ep3 | SA mixed recycle on each list: published unpublished then binned; unpublished binned; draft skipped; report lists each skip | ☐ |
 | Ep4 | Publication bulk unpublish keeps `covers.length === pubs.length`. Home featured **news** playlist unchanged | ☐ |
@@ -201,7 +214,7 @@ PRD [2026-08-22-cms-remaining-types-bulk-actions.md](../prds/2026-08-22-cms-rema
 
 | # | Check | Pass? |
 |---|--------|-------|
-| Ot1 | Editor: no checkboxes on those six lists. Each `POST /api/{type}/bulk` unpublish skips `reviewer_required` | ☐ |
+| Ot1 | Editor: checkboxes + Recycle (no Unpublish) on those six lists. Each `POST /api/{type}/bulk` unpublish skips `reviewer_required` | ☐ |
 | Ot2 | Reviewer: Unpublish only; own published skipped (four-eyes); others leave that type’s public JSON after **one** rebuild | ☐ |
 | Ot3 | SA mixed recycle on each list: published unpublished then binned; unpublished binned; draft skipped; report lists each skip | ☐ |
 | Ot4 | Partners rebuild keeps `{ intl, nat }`. Alerts: at most one live banner after rebuild. Research: recycling a group does not delete its projects. Home featured **news** playlist unchanged | ☐ |

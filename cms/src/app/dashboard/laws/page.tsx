@@ -2,13 +2,14 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listLawsForUser } from "@/lib/content/laws";
-import { canAccessContentType, canReview } from "@/lib/content/permissions";
+import { canAccessContentType, listBulkChrome } from "@/lib/content/permissions";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { ContentListPage } from "@/app/dashboard/content-list-page";
 
 export default async function LawsListPage() {
   const user = await requireUser();
   if (!(await canAccessContentType(user, "law"))) redirect("/dashboard");
+  const bulkChrome = listBulkChrome(user);
   const items = await listLawsForUser(user);
   const cookieStore = await cookies();
   const lang = normalizeLang(cookieStore.get(CMS_LANG_COOKIE)?.value);
@@ -25,8 +26,8 @@ export default async function LawsListPage() {
       newLabel={t("newLaw", lang)}
       emptyLabel={t("emptyLaws", lang)}
       bulk={
-        canReview(user)
-          ? { apiPath: "/api/laws/bulk", canRecycle: user.role === "super_admin", kind: "law" }
+        bulkChrome
+          ? { apiPath: "/api/laws/bulk", kind: "law", ...bulkChrome }
           : undefined
       }
       items={items.map((item) => ({

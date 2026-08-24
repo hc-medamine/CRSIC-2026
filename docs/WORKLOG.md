@@ -19,6 +19,18 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-23 — Implementing CMS Editor recycle
+
+**Branch:** `feature/cms-editor-recycle`. **PRD:** [prds/2026-08-23-cms-editor-recycle.md](./prds/2026-08-23-cms-editor-recycle.md) **Approved**. Editors: bulk + edit-page Recycle on own draft/rejected; bin page own scoped rows + Restore. SA unpublished recycle and purge unchanged. Reviewer unchanged. Clone PR still **wait**.
+
+---
+
+### 2026-08-23 — PRD **Approved**: CMS Editor recycle (draft + rejected)
+
+Stakeholder: start implementation. [prds/2026-08-23-cms-editor-recycle.md](./prds/2026-08-23-cms-editor-recycle.md). Editors recycle own draft/rejected; scoped bin + restore. SA only: permanent delete / Empty / Purge. Reviewer unchanged. Clone PR still **wait**.
+
+---
+
 ### 2026-08-22 — PRD **Draft**: CMS clone + JSON import/export
 
 [prds/2026-08-22-cms-clone-import-export.md](./prds/2026-08-22-cms-clone-import-export.md). Cut 1 = duplicate to a new draft (all list types; empty media; suffix). JSON import/export later in the same PRD. **Do not implement until Approved.**

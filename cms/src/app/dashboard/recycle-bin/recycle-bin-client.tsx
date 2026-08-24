@@ -13,6 +13,7 @@ import type { RecycleBinClientRow } from "@/lib/content/recycleBinTypes";
 type Props = {
   initialItems: RecycleBinClientRow[];
   initialStaleIds: string[];
+  canManageBin: boolean;
 };
 
 type Dialog =
@@ -21,7 +22,7 @@ type Dialog =
   | { kind: "stale" }
   | null;
 
-export function RecycleBinClient({ initialItems, initialStaleIds }: Props) {
+export function RecycleBinClient({ initialItems, initialStaleIds, canManageBin }: Props) {
   const lang = useCmsLang();
   const [items, setItems] = useState(initialItems);
   const [staleIds, setStaleIds] = useState(initialStaleIds);
@@ -85,7 +86,7 @@ export function RecycleBinClient({ initialItems, initialStaleIds }: Props) {
   }
 
   const emptyBinButton =
-    items.length > 0 ? (
+    canManageBin && items.length > 0 ? (
       <button
         type="button"
         disabled={busy}
@@ -103,10 +104,10 @@ export function RecycleBinClient({ initialItems, initialStaleIds }: Props) {
         { label: t("recycleBin", lang) },
       ]}
       title={t("recycleBin", lang)}
-      subtitle={t("pageDescRecycleBin", lang)}
+      subtitle={t(canManageBin ? "pageDescRecycleBin" : "pageDescRecycleBinEditor", lang)}
       actions={emptyBinButton}
     >
-      {staleIds.length > 0 ? (
+      {canManageBin && staleIds.length > 0 ? (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 shadow-[var(--crs-shadow-soft)]">
           <p>{tf("recycleStaleBanner", lang, { n: staleIds.length })}</p>
           <button
@@ -126,8 +127,12 @@ export function RecycleBinClient({ initialItems, initialStaleIds }: Props) {
             <IconInbox className="h-5 w-5" />
           </span>
           <div>
-            <p className="text-sm font-medium text-crs-ink">{t("recycleBinEmpty", lang)}</p>
-            <p className="mt-1 text-sm text-crs-muted">{t("recycleBinEmptyHint", lang)}</p>
+            <p className="text-sm font-medium text-crs-ink">
+              {t(canManageBin ? "recycleBinEmpty" : "recycleBinEmptyOwn", lang)}
+            </p>
+            <p className="mt-1 text-sm text-crs-muted">
+              {t(canManageBin ? "recycleBinEmptyHint" : "recycleBinEmptyHintEditor", lang)}
+            </p>
           </div>
         </DeskEmptyState>
       ) : (
@@ -193,17 +198,19 @@ export function RecycleBinClient({ initialItems, initialStaleIds }: Props) {
                         >
                           {t("actionRestore", lang)}
                         </button>
-                        <button
-                          type="button"
-                          disabled={rowBusy}
-                          className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-red-700 hover:border-red-300 hover:bg-red-50 disabled:opacity-50"
-                          onClick={() => {
-                            setTypedWord("");
-                            setDialog({ kind: "purge", item });
-                          }}
-                        >
-                          {t("actionDelete", lang)}
-                        </button>
+                        {canManageBin ? (
+                          <button
+                            type="button"
+                            disabled={rowBusy}
+                            className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-red-700 hover:border-red-300 hover:bg-red-50 disabled:opacity-50"
+                            onClick={() => {
+                              setTypedWord("");
+                              setDialog({ kind: "purge", item });
+                            }}
+                          >
+                            {t("actionDelete", lang)}
+                          </button>
+                        ) : null}
                       </div>
                     </td>
                   </tr>
