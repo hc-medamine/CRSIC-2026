@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-24 — CMS table header sort **Delivered** (PR #43)
+
+Hs1–Hs4 passed (Hs2 on two junk news rows in the bin). [PR #43](https://github.com/hc-medamine/CRSIC-2026/pull/43). Sort is this visit only; no URL `?sort=`.
+
+---
+
 ### 2026-08-24 — CMS table header sort smoke Hs1, Hs3, Hs4
 
 Walk on `feature/cms-table-header-sort`: Hs1 news Title A→Z (no `?sort=`); Load more order checked on events (21 rows). Hs3 org-units Sort reverse is view-only (`sort_order` unchanged in API). Hs4 leave news → Home → back = newest first. Hs2 skipped — recycle bin empty. Duplicate `ALL_CONTENT_TYPES` import in users manager fixed during the walk.

@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Approved** |
+| Status | **Delivered** on `main` (PR #43, 2026-08-24) |
 | Date | 2026-08-24 |
 | Author | Stakeholder + agent |
 | Owners | Product / CMS Desk |
@@ -101,7 +101,7 @@ Who feels it: Editors, Reviewers, Super Admin on every list they use.
 
 ## 9. Open questions
 
-None. Stakeholder locked 2026-08-24. **Approved** 2026-08-24 — implement.
+None. Stakeholder locked 2026-08-24. **Approved** 2026-08-24. **Delivered** on `main` (PR #43) after Hs1–Hs4.
 
 ## 10. Decision log
 
@@ -117,3 +117,4 @@ None. Stakeholder locked 2026-08-24. **Approved** 2026-08-24 — implement.
 | 2026-08-24 | Selected ids survive sort. Titles follow desk language; status is workflow order; dates/counts numeric. |
 | 2026-08-24 | First click = natural direction; second = reverse; no Reset; no URL. Stakeholder **lock** → Draft PRD. |
 | 2026-08-24 | Stakeholder **Approved**. Implement as specified. |
+| 2026-08-24 | Hs1–Hs4 passed. **Delivered** on `main` (PR #43). |

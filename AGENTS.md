@@ -52,7 +52,7 @@ Every `cms/` `npm test` and `db:*` script loads `.env.local` via `--env-file` �
 ## Git & docs
 
 - **Mandatory — never commit directly to `main`.** All work happens on `feature/` | `fix/` | `content/` | `docs/` branches. Merge to `main` only when the work is complete, verified, and **validated by the stakeholder**. Never force-push `main`.
-- Current `main` includes WordPress cutover, bylines, Home news pager, featured playlist, Editor recycle (PR #41), and CMS clone Cut 1 (PR #42).
+- Current `main` includes WordPress cutover, bylines, Home news pager, featured playlist, Editor recycle (PR #41), CMS clone Cut 1 (PR #42), and table header sort (PR #43).
 - Before merging, run the smoke checklist in `docs/qa/SMOKE.md` (~5 min; no merge without sections A–D). CMS: `docs/qa/SMOKE-CMS.md`.
 - Conventional Commits: `feat:` `fix:` `content:` (data) `style:` `refactor:` `docs:` `chore:`.
 - `docs/WORKLOG.md`: append new entries **at the top** after meaningful changes.

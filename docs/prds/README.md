@@ -39,7 +39,7 @@ Product specs for CRSIC live here. **New feature slices follow the PRD-first wor
 | [2026-08-22-cms-remaining-types-bulk-actions.md](./2026-08-22-cms-remaining-types-bulk-actions.md) | **Delivered** (2026-08-22) | Partners, alerts, laws, platforms, research groups, research projects list bulk; same gates; no featured prune. On `main` (PR #37). |
 | [2026-08-22-cms-clone-import-export.md](./2026-08-22-cms-clone-import-export.md) | **Cut 1 Delivered** on `main` (PR #42) | Duplicate → new draft (empty media, all list types). Import/export later — do not implement those cuts yet. |
 | [2026-08-23-cms-editor-recycle.md](./2026-08-23-cms-editor-recycle.md) | **Delivered** on `main` (PR #41) | Editors recycle own draft/rejected; scoped bin + restore. SA keeps unpublished recycle and purge. |
-| [2026-08-24-cms-table-header-sort.md](./2026-08-24-cms-table-header-sort.md) | **Approved** (2026-08-24) | Click data column headers to sort CMS tables; this visit only. No URL `?sort=`. |
+| [2026-08-24-cms-table-header-sort.md](./2026-08-24-cms-table-header-sort.md) | **Delivered** on `main` (PR #43) | Click data column headers to sort CMS tables; this visit only. No URL `?sort=`. |
 
 ## Related
 
