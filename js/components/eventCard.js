@@ -1,6 +1,7 @@
 /**
  * Event list / year-group / home teaser — safe DOM builders (no innerHTML).
  */
+import { editorialCardAttrs, editorialField } from '../editorial.js';
 import { t } from '../i18n.js';
 import { el } from '../utils.js';
 import { createContentByline } from './contentByline.js';
@@ -42,8 +43,8 @@ function formatHomeEventDate(e) {
  * @returns {HTMLElement}
  */
 export function createHomeEventCard(e, i = 0) {
-  const title = (e && e.title) || '';
-  const type = (e && e.type) || '';
+  const title = editorialField(e, 'title');
+  const type = editorialField(e, 'label');
   const status = (e && e.status) || 'upcoming';
   const badgeClass =
     status === 'ongoing'
@@ -66,8 +67,9 @@ export function createHomeEventCard(e, i = 0) {
           tabindex: 0,
           'data-lightbox-type': 'event',
           'data-lightbox-slug': e.slug || e.id,
+          ...editorialCardAttrs(e),
         }
-      : {},
+      : editorialCardAttrs(e),
     children: [
       el('div', {
         className: 'event-row-date',
@@ -134,8 +136,9 @@ export function createEvCard(e) {
           tabindex: 0,
           'data-lightbox-type': 'event',
           'data-lightbox-slug': slug,
+          ...editorialCardAttrs(e),
         }
-      : {},
+      : editorialCardAttrs(e),
     children: [
       el('div', {
         className: 'ev-date',
@@ -148,8 +151,8 @@ export function createEvCard(e) {
       el('div', {
         className: 'ev-body',
         children: [
-          el('div', { className: 'ev-type', text: e.type || '' }),
-          el('div', { className: 'ev-title', text: e.title || '' }),
+          el('div', { className: 'ev-type', text: editorialField(e, 'label') }),
+          el('div', { className: 'ev-title', text: editorialField(e, 'title') }),
           createContentByline(e, { includeDate: false }),
           pill,
         ],

@@ -18,6 +18,7 @@ import {
   resolvePublicPublisher,
   type PublicBylineFields,
 } from "@/lib/publish/publicByline";
+import { withPublicStoryFields, type StoryEnFields } from "@/lib/publish/storyPublic";
 
 export type PublicNewsItem = {
   id: string;
@@ -35,7 +36,8 @@ export type PublicNewsItem = {
   reviewer_en: string;
   publisher_ar: string;
   publisher_en: string;
-} & PublicSeoFields;
+} & PublicSeoFields &
+  StoryEnFields & { img_card?: string };
 
 /** live_payload may keep source flags that public JSON does not emit. */
 export type StoredNewsPayload = PublicNewsItem & {
@@ -61,6 +63,12 @@ type PayloadSource = {
   published_at?: Date | string | null;
   live_payload?: Partial<StoredNewsPayload> | null;
   wp_date?: string | null;
+  en_status?: string | null;
+  title_en?: string | null;
+  summary_en?: string | null;
+  body_en?: string | null;
+  label_en?: string | null;
+  image_card_path?: string | null;
 } & Partial<PublicBylineFields>;
 
 function bylineFromRow(row: PayloadSource): PublicBylineFields {
@@ -83,24 +91,27 @@ function bylineFromRow(row: PayloadSource): PublicBylineFields {
 
 function toPublicNews(item: StoredNewsPayload): PublicNewsItem {
   const media = buildMediaList(item.media, item.img, undefined);
-  return {
-    id: item.id || `legacy-news-${item.slug || slugifyTitle(item.title || "item")}`,
-    slug: item.slug || slugifyTitle(item.title || "item"),
-    img: primaryImageSrc(media) ?? item.img ?? null,
-    label: item.label?.trim() || "خبر",
-    title: (item.title ?? "").trim(),
-    summary: item.summary?.trim() || "",
-    body: item.body?.trim() || "",
-    media,
-    date: item.date || "",
-    editor_ar: item.editor_ar || "",
-    editor_en: item.editor_en || "",
-    reviewer_ar: item.reviewer_ar || "",
-    reviewer_en: item.reviewer_en || "",
-    publisher_ar: item.publisher_ar || PUBLIC_PUBLISHER_AR,
-    publisher_en: item.publisher_en || PUBLIC_PUBLISHER_EN,
-    ...seoFromRow(item),
-  };
+  return withPublicStoryFields(
+    {
+      id: item.id || `legacy-news-${item.slug || slugifyTitle(item.title || "item")}`,
+      slug: item.slug || slugifyTitle(item.title || "item"),
+      img: primaryImageSrc(media) ?? item.img ?? null,
+      label: item.label?.trim() || "خبر",
+      title: (item.title ?? "").trim(),
+      summary: item.summary?.trim() || "",
+      body: item.body?.trim() || "",
+      media,
+      date: item.date || "",
+      editor_ar: item.editor_ar || "",
+      editor_en: item.editor_en || "",
+      reviewer_ar: item.reviewer_ar || "",
+      reviewer_en: item.reviewer_en || "",
+      publisher_ar: item.publisher_ar || PUBLIC_PUBLISHER_AR,
+      publisher_en: item.publisher_en || PUBLIC_PUBLISHER_EN,
+      ...seoFromRow(item),
+    },
+    item,
+  );
 }
 
 /** Public object for a news row (persisted to content_items.live_payload). */
@@ -118,20 +129,30 @@ export function buildNewsPayload(row: PayloadSource, usedSlugs?: Set<string>): S
     wpDate: row.wp_date,
   });
   const byline = bylineFromRow(row);
-  const publicBase = withPublicSeo(
+  const publicBase = withPublicStoryFields(
+    withPublicSeo(
+      {
+        id: row.id,
+        slug,
+        img: primaryImageSrc(media) ?? row.image_path ?? null,
+        label: row.label_ar?.trim() || "خبر",
+        title: row.title_ar.trim(),
+        summary: row.summary_ar?.trim() || "",
+        body: sanitizeBodyHtml(row.body_ar) || "",
+        media,
+        date: story.date,
+        ...byline,
+      },
+      row,
+    ),
     {
-      id: row.id,
-      slug,
-      img: primaryImageSrc(media) ?? row.image_path ?? null,
-      label: row.label_ar?.trim() || "خبر",
-      title: row.title_ar.trim(),
-      summary: row.summary_ar?.trim() || "",
-      body: sanitizeBodyHtml(row.body_ar) || "",
-      media,
-      date: story.date,
-      ...byline,
+      en_status: row.en_status,
+      title_en: row.title_en,
+      summary_en: row.summary_en,
+      body_en: sanitizeBodyHtml(row.body_en) || null,
+      label_en: row.label_en,
+      image_card_path: row.image_card_path,
     },
-    row,
   );
   const stored: StoredNewsPayload = {
     ...publicBase,

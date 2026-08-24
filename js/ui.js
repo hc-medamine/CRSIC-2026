@@ -21,6 +21,7 @@ import {
   getDirector,
 } from './data.js';
 import { t, getLang } from './i18n.js';
+import { editorialField, isEditorialEnReady } from './editorial.js';
 import {
   prefersReducedMotion,
   el,
@@ -609,9 +610,27 @@ function createContentLocaleNotice() {
   });
 }
 
+const STORY_NOTICE_HOSTS = new Set([
+  'home-pub-grid',
+  'home-events-grid',
+  'home-news-grid',
+  'news-grid',
+  'pub-grid',
+  'ev-intl-list',
+  'ev-nat-list',
+  'nat-partners',
+  'intl-partners',
+]);
+
+function storyGridNeedsEnNotice(grid) {
+  const marked = grid.querySelectorAll('[data-en-ready]');
+  if (!marked.length) return true;
+  return Array.from(marked).some((node) => node.getAttribute('data-en-ready') !== '1');
+}
+
 /**
  * Show/hide English notices above sections fed by Arabic-only JSON.
- * Content remains visible with lang="ar" on cards (intentional product decision).
+ * Story lists (news/events/pubs/partners): hide when every visible item is EN-ready.
  */
 export function updateContentLocaleNotices() {
   const hosts = [
@@ -628,12 +647,14 @@ export function updateContentLocaleNotices() {
     'laws-grid',
     'platforms-grid',
   ];
-  const show = getLang() === 'en';
+  const langIsEn = getLang() === 'en';
   hosts.forEach((id) => {
     const grid = document.getElementById(id);
     if (!grid || !grid.parentElement) return;
     const parent = grid.parentElement;
     let notice = parent.querySelector(`:scope > .content-locale-notice[data-for="${id}"]`);
+    const isStory = STORY_NOTICE_HOSTS.has(id);
+    const show = langIsEn && (!isStory || storyGridNeedsEnNotice(grid));
     if (show) {
       if (!notice) {
         notice = createContentLocaleNotice();
@@ -645,12 +666,17 @@ export function updateContentLocaleNotices() {
         if (text) text.textContent = t('content_ar_only_notice');
         if (btn) btn.textContent = t('content_ar_only_switch');
       }
-      grid.setAttribute('lang', 'ar');
+      if (!isStory) grid.setAttribute('lang', 'ar');
+      else grid.removeAttribute('lang');
     } else {
       if (notice) notice.remove();
       grid.removeAttribute('lang');
     }
   });
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('crsic:content-locale', () => updateContentLocaleNotices());
 }
 
 /* ── LIGHTBOX (news / event / publication teaser) ───── */
@@ -688,11 +714,12 @@ function resolveLightboxContent(type, slug, index) {
     return {
       type: 'publication',
       slug: pub.slug || pub.id || '',
-      title: pub.t || '',
-      badge: pub.dept || '',
+      title: editorialField(pub, 'title'),
+      badge: editorialField(pub, 'label'),
       meta: pub.type === 'collective' ? t('badge_collective') : t('badge_individual'),
-      summary: pub.summary || pub.desc || '',
+      summary: editorialField(pub, 'summary'),
       cover: getCoverForPub(idx) || '',
+      item: pub,
     };
   }
 
@@ -704,10 +731,10 @@ function resolveLightboxContent(type, slug, index) {
     return {
       type: 'news',
       slug: item.slug || item.id || '',
-      title: item.title || '',
-      badge: item.label || '',
+      title: editorialField(item, 'title'),
+      badge: editorialField(item, 'label'),
       meta: formatNewsDate(item.date) || '',
-      summary: item.summary || '',
+      summary: editorialField(item, 'summary'),
       cover: mediaImg || '',
       item,
     };
@@ -724,10 +751,10 @@ function resolveLightboxContent(type, slug, index) {
     return {
       type: 'event',
       slug: item.slug || item.id || '',
-      title: item.title || '',
-      badge: item.type || '',
+      title: editorialField(item, 'title'),
+      badge: editorialField(item, 'label'),
       meta: [dateLine, statusLabel].filter(Boolean).join(' · '),
-      summary: item.summary || '',
+      summary: editorialField(item, 'summary'),
       cover: mediaImg || LB_HOLDER_FALLBACK[0],
       item,
     };
@@ -813,14 +840,15 @@ export function openLightbox(optsOrIndex, triggerEl) {
   const titleEl = document.getElementById('lb-title');
   const descEl = document.getElementById('lb-desc');
   const deptEl = document.getElementById('lb-dept');
+  const readyEn = getLang() === 'en' && isEditorialEnReady(content.item);
   [titleEl, descEl, deptEl].forEach((node) => {
     if (!node) return;
-    if (getLang() === 'en') node.setAttribute('lang', 'ar');
+    if (getLang() === 'en' && !readyEn) node.setAttribute('lang', 'ar');
     else node.removeAttribute('lang');
   });
 
   let lbNotice = overlay.querySelector('.content-locale-notice');
-  if (getLang() === 'en') {
+  if (getLang() === 'en' && !readyEn) {
     if (!lbNotice && body) {
       lbNotice = createContentLocaleNotice();
       body.insertBefore(lbNotice, body.firstChild);

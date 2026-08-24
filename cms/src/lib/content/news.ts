@@ -4,6 +4,7 @@ import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { appendWorkflowComment } from "@/lib/content/comments";
 import { buildNewsPayloadForItem, rebuildPublicNewsJson } from "@/lib/publish/newsJson";
+import { persistImageCardPath } from "@/lib/content/imageCard";
 import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 import { normalizeAttachments, type PublicMediaItem } from "@/lib/publish/media";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
@@ -67,6 +68,7 @@ export type NewsItem = {
   body_ar: string | null;
   body_en: string | null;
   image_path: string | null;
+  image_card_path?: string | null;
   image_alt_ar: string | null;
   image_alt_en: string | null;
   attachments: PublicMediaItem[] | unknown;
@@ -95,6 +97,7 @@ export type NewsInput = {
   bodyAr?: string;
   bodyEn?: string;
   imagePath?: string | null;
+  imageCardPath?: string | null;
   imageAltAr?: string;
   imageAltEn?: string;
   attachments?: PublicMediaItem[];
@@ -116,6 +119,7 @@ function snapshotOf(row: NewsItem) {
     body_ar: row.body_ar,
     body_en: row.body_en,
     image_path: row.image_path,
+    image_card_path: row.image_card_path ?? null,
     image_alt_ar: row.image_alt_ar,
     image_alt_en: row.image_alt_en,
     attachments: normalizeAttachments(row.attachments),
@@ -244,6 +248,8 @@ export async function createNews(user: SessionUser, input: NewsInput): Promise<N
     ],
   );
   const item = result.rows[0];
+  await persistImageCardPath(item.id, input.imageCardPath);
+  item.image_card_path = input.imageCardPath?.trim() || null;
   await addRevision(item.id, "draft", snapshotOf(item), user.id, "Created");
   await auditNews(user, "news.create", item);
   return item;
@@ -334,6 +340,8 @@ export async function updateNewsDraft(
     ],
   );
   const item = result.rows[0];
+  await persistImageCardPath(item.id, input.imageCardPath);
+  item.image_card_path = input.imageCardPath?.trim() || null;
   await addRevision(item.id, item.status, snapshotOf(item), user.id, "Edited");
   return item;
 }

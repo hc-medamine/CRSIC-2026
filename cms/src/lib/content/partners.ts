@@ -17,6 +17,7 @@ import { notifyOnSubmit } from "@/lib/content/delegation";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
 import { unpublishMutateMaybeRebuild, shouldNotifyUnpublish, type SilentUnpublishOpts } from "@/lib/content/silentUnpublish";
 import { normalizeSeoInput, seoSnapshotFields, type SeoInput } from "@/lib/content/seo";
+import { persistImageCardPath } from "@/lib/content/imageCard";
 import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 import type { ContentStatus } from "@/lib/content/news";
 
@@ -55,6 +56,7 @@ export type PartnerItem = {
   partner_date: string | null;
   partner_emoji: string | null;
   image_path: string | null;
+  image_card_path?: string | null;
   checklist_confirmed: boolean;
   review_note: string | null;
   public_slug: string | null;
@@ -83,6 +85,7 @@ export type PartnerInput = {
   partnerDate: string;
   partnerEmoji?: string;
   imagePath?: string | null;
+  imageCardPath?: string | null;
 } & SeoInput;
 
 function snapshotOf(row: PartnerItem) {
@@ -102,6 +105,7 @@ function snapshotOf(row: PartnerItem) {
     partner_date: row.partner_date,
     partner_emoji: row.partner_emoji,
     image_path: row.image_path,
+    image_card_path: row.image_card_path ?? null,
     ...seoSnapshotFields(row),
   };
 }
@@ -215,6 +219,7 @@ export async function createPartner(user: SessionUser, input: PartnerInput): Pro
     ],
   );
   const item = result.rows[0];
+  await persistImageCardPath(item.id, input.imageCardPath);
   await addRevision(item.id, "draft", snapshotOf(item), user.id, "Created");
   await auditPartner(user, "partner.create", item);
   return item;
@@ -271,6 +276,7 @@ export async function updatePartnerDraft(user: SessionUser, id: string, input: P
     ],
   );
   const item = result.rows[0];
+  await persistImageCardPath(item.id, input.imageCardPath);
   await addRevision(item.id, item.status, snapshotOf(item), user.id, "Edited");
   return item;
 }

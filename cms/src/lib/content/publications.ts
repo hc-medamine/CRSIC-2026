@@ -7,6 +7,7 @@ import {
   buildPublicationPayload,
   rebuildPublicPublicationsJson,
 } from "@/lib/publish/publicationsJson";
+import { persistImageCardPath } from "@/lib/content/imageCard";
 import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 import { normalizeAttachments, type PublicMediaItem } from "@/lib/publish/media";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
@@ -61,6 +62,7 @@ export type PublicationItem = {
   body_ar: string | null;
   body_en: string | null;
   image_path: string | null;
+  image_card_path?: string | null;
   image_alt_ar: string | null;
   image_alt_en: string | null;
   attachments: PublicMediaItem[] | unknown;
@@ -89,6 +91,7 @@ export type PublicationInput = {
   bodyAr?: string;
   bodyEn?: string;
   coverPath: string;
+  imageCardPath?: string | null;
   imageAltAr?: string;
   imageAltEn?: string;
   attachments?: PublicMediaItem[];
@@ -112,6 +115,7 @@ function snapshotOf(row: PublicationItem) {
     body_en: row.body_en,
     pub_kind: row.pub_kind,
     image_path: row.image_path,
+    image_card_path: row.image_card_path ?? null,
     attachments: normalizeAttachments(row.attachments),
     public_slug: row.public_slug,
     ...seoSnapshotFields(row),
@@ -246,6 +250,7 @@ export async function createPublication(
     ],
   );
   const item = result.rows[0];
+  await persistImageCardPath(item.id, input.imageCardPath);
   await addRevision(item.id, "draft", snapshotOf(item), user.id, "Created");
   await auditPublication(user, "publication.create", item);
   return item;
@@ -318,6 +323,7 @@ export async function updatePublicationDraft(
     ],
   );
   const item = result.rows[0];
+  await persistImageCardPath(item.id, input.imageCardPath);
   await addRevision(item.id, item.status, snapshotOf(item), user.id, "Edited");
   return item;
 }

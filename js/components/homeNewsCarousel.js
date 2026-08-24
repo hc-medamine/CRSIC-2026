@@ -1,7 +1,7 @@
 /**
  * Home Center News — paged autoplay carousel (PRD 2026-08-21).
  */
-import { cmsItemImageSrc } from '../data.js';
+import { cmsCardImageSrc } from '../data.js';
 import { t } from '../i18n.js';
 import { replaceChildren, safeImageSrc, prefersReducedMotion } from '../utils.js';
 import { createNewsCard } from './newsCard.js';
@@ -54,7 +54,7 @@ function setPauseButton(btn, name) {
  */
 function prefetchImages(items) {
   items.forEach((n) => {
-    const src = safeImageSrc(cmsItemImageSrc(n));
+    const src = safeImageSrc(cmsCardImageSrc(n));
     if (!src) return;
     const img = new Image();
     img.decoding = 'async';
@@ -111,6 +111,7 @@ export function mountHomeNewsCarousel(grid, news) {
       grid,
       list.slice(0, HOME_NEWS_PAGE_SIZE).map((n, i) => createNewsCard(n, i)),
     );
+    window.dispatchEvent(new Event('crsic:content-locale'));
     return;
   }
 
@@ -139,6 +140,7 @@ export function mountHomeNewsCarousel(grid, news) {
       grid,
       slice.map((n, i) => createNewsCard(n, base + i)),
     );
+    window.dispatchEvent(new Event('crsic:content-locale'));
   }
 
   function prefetchNext() {

@@ -3,22 +3,18 @@
  * Falls back to site-wide i18n head when fields are empty or on leave-detail.
  */
 import { getLang, t } from './i18n.js';
+import { editorialField } from './editorial.js';
 
 /**
  * @param {object|null|undefined} item
- * @param {'news'|'event'|'publication'} type
+ * @param {'news'|'event'|'publication'|'partner'} type
  */
 export function applyItemSeoHead(item, type) {
   if (!item) return;
   const lang = getLang();
   const displayTitle =
-    type === 'publication'
-      ? item.t || ''
-      : item.title || '';
-  const displaySummary =
-    type === 'publication'
-      ? item.summary || item.desc || ''
-      : item.summary || '';
+    type === 'partner' ? editorialField(item, 'name') : editorialField(item, 'title');
+  const displaySummary = editorialField(item, 'summary');
   const displayImg =
     (Array.isArray(item.media) && item.media.find((m) => m && m.kind === 'image' && m.src)?.src) ||
     item.img ||

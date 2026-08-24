@@ -191,6 +191,17 @@ export function cmsItemImageSrc(item) {
 }
 
 /**
+ * Card/carousel image: cropped 16:9 variant when published, else the master.
+ * @param {object|undefined} item
+ * @returns {string}
+ */
+export function cmsCardImageSrc(item) {
+  if (!item) return '';
+  const card = String(item.img_card || '').trim();
+  return card || cmsItemImageSrc(item);
+}
+
+/**
  * Cover for a CMS-published publication: item fields first, then legacy `covers[i]`.
  * @param {object|undefined} pub
  * @param {number} [index]
@@ -201,6 +212,18 @@ export function coverSrcFromPub(pub, index) {
   if (fromItem) return fromItem;
   const fromCovers = Number.isInteger(index) ? covers[index] : '';
   return String(fromCovers || '').trim();
+}
+
+/**
+ * Publication card image: img_card, else master cover.
+ * @param {object|undefined} pub
+ * @param {number} [index]
+ * @returns {string}
+ */
+export function pubCardImageSrc(pub, index) {
+  const card = String(pub?.img_card || '').trim();
+  if (card) return card;
+  return coverSrcFromPub(pub, index);
 }
 
 /** @param {number} i */

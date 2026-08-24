@@ -33,6 +33,7 @@ type Initial = {
   descAr: string;
   descEn: string;
   coverPath: string;
+  imageCardPath?: string;
   coverMediaId?: string | null;
   imageAltAr: string;
   imageAltEn: string;
@@ -86,6 +87,7 @@ export function PublicationEditorForm({
   const [descAr, setDescAr] = useState(initial?.descAr ?? "");
   const [descEn, setDescEn] = useState(initial?.descEn ?? "");
   const [coverPath, setCoverPath] = useState(initial?.coverPath ?? "");
+  const [imageCardPath, setImageCardPath] = useState(initial?.imageCardPath ?? "");
   const [coverMediaId, setCoverMediaId] = useState(initial?.coverMediaId ?? null);
   const [imageAltAr, setImageAltAr] = useState(initial?.imageAltAr ?? "");
   const [imageAltEn, setImageAltEn] = useState(initial?.imageAltEn ?? "");
@@ -137,6 +139,7 @@ export function PublicationEditorForm({
       bodyAr,
       bodyEn,
       coverPath: primary,
+      imageCardPath: imageCardPath.trim() || null,
       imageAltAr,
       imageAltEn,
       attachments: media,
@@ -324,9 +327,11 @@ export function PublicationEditorForm({
             disabled={!editable}
             imagesOnly
             label={t("fieldCoverImage", lang)}
-            onUploaded={({ publicPath, mediaId }) => {
+            enableCrop
+            onUploaded={({ publicPath, mediaId, cardPath }) => {
               setCoverPath(publicPath);
               setCoverMediaId(mediaId);
+              if (cardPath !== undefined) setImageCardPath(cardPath ?? "");
               setAttachments((prev) => [
                 { kind: "image", src: publicPath },
                 ...prev.filter((a) => a.src !== coverPath),

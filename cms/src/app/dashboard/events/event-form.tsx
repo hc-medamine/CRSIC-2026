@@ -33,6 +33,7 @@ type Initial = {
   bodyAr: string;
   bodyEn: string;
   imagePath: string;
+  imageCardPath?: string;
   imageMediaId?: string | null;
   imageAltAr: string;
   imageAltEn: string;
@@ -90,6 +91,7 @@ export function EventEditorForm({
   const [bodyAr, setBodyAr] = useState(initial?.bodyAr ?? "");
   const [bodyEn, setBodyEn] = useState(initial?.bodyEn ?? "");
   const [imagePath, setImagePath] = useState(initial?.imagePath ?? "");
+  const [imageCardPath, setImageCardPath] = useState(initial?.imageCardPath ?? "");
   const [imageMediaId, setImageMediaId] = useState(initial?.imageMediaId ?? null);
   const [imageAltAr, setImageAltAr] = useState(initial?.imageAltAr ?? "");
   const [imageAltEn, setImageAltEn] = useState(initial?.imageAltEn ?? "");
@@ -142,6 +144,7 @@ export function EventEditorForm({
       bodyAr,
       bodyEn,
       imagePath: primary,
+      imageCardPath: imageCardPath.trim() || null,
       imageAltAr,
       imageAltEn,
       attachments: media,
@@ -349,9 +352,11 @@ export function EventEditorForm({
             disabled={!editable}
             imagesOnly
             label={t("fieldEventImage", lang)}
-            onUploaded={({ publicPath, mediaId }) => {
+            enableCrop
+            onUploaded={({ publicPath, mediaId, cardPath }) => {
               setImagePath(publicPath);
               setImageMediaId(mediaId);
+              if (cardPath !== undefined) setImageCardPath(cardPath ?? "");
               setAttachments((prev) => [{ kind: "image", src: publicPath }, ...prev.filter((a) => a.src !== imagePath)]);
             }}
           />

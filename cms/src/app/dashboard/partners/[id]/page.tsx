@@ -97,6 +97,7 @@ export default async function PartnerDetailPage({ params }: Props) {
           bodyAr: item.body_ar ?? "",
           bodyEn: item.body_en ?? "",
           imagePath: item.image_path ?? "",
+          imageCardPath: item.image_card_path ?? "",
           status: item.status,
           reviewNote: item.review_note,
           editor: personProp(people.editor),

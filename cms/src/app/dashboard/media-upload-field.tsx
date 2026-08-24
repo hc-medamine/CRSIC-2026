@@ -5,8 +5,12 @@ import type { MediaBucket } from "@/lib/media/config";
 import { cmsMediaSrc } from "@/lib/media/cms-src";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { MediaLightbox } from "./media-lightbox";
+import { ImageCropModal } from "./image-crop-modal";
+import { cardFileFromImage, loadImage, variantsFromCrop } from "./image-variants";
 import { t } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
+
+type UploadInfo = { publicPath: string; mediaId: string; cardPath?: string | null };
 
 type Props = {
   bucket: MediaBucket;
@@ -17,7 +21,9 @@ type Props = {
   label?: string;
   /** When replacing a file that is already on the public site, confirm first. */
   liveReplaceConfirm?: boolean;
-  onUploaded: (info: { publicPath: string; mediaId: string }) => void;
+  /** Optional cover crop + card variant. Off for media library / director. */
+  enableCrop?: boolean;
+  onUploaded: (info: UploadInfo) => void;
 };
 
 export function MediaUploadField({
@@ -28,6 +34,7 @@ export function MediaUploadField({
   imagesOnly = true,
   label,
   liveReplaceConfirm = false,
+  enableCrop = false,
   onUploaded,
 }: Props) {
   const lang = useCmsLang();
@@ -38,6 +45,9 @@ export function MediaUploadField({
   const [dragOver, setDragOver] = useState(false);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const [pendingReplaceFile, setPendingReplaceFile] = useState<File | null>(null);
+  const [cropOpen, setCropOpen] = useState(false);
+
+  const cropEnabled = enableCrop && imagesOnly;
 
   const accept = imagesOnly
     ? "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
@@ -69,14 +79,38 @@ export function MediaUploadField({
           cmsToast.error(msg);
           return;
         }
-        onUploaded({ publicPath: data.asset.publicPath, mediaId: data.asset.id });
+        let cardPath: string | null = null;
+        if (cropEnabled) {
+          try {
+            const objectUrl = URL.createObjectURL(file);
+            try {
+              const img = await loadImage(objectUrl);
+              const card = await cardFileFromImage(img);
+              const cardForm = new FormData();
+              cardForm.set("file", card);
+              cardForm.set("bucket", bucket);
+              cardForm.set("imagesOnly", "1");
+              const cardRes = await fetch("/api/media", { method: "POST", body: cardForm });
+              const cardData = (await cardRes.json()) as {
+                ok: boolean;
+                asset?: { publicPath: string };
+              };
+              if (cardRes.ok && cardData.ok && cardData.asset) cardPath = cardData.asset.publicPath;
+            } finally {
+              URL.revokeObjectURL(objectUrl);
+            }
+          } catch {
+            /* card is optional if the browser cannot decode */
+          }
+        }
+        onUploaded({ publicPath: data.asset.publicPath, mediaId: data.asset.id, cardPath });
         cmsToast.success(t("uploadedShort", lang));
       } finally {
         setPending(false);
         if (inputRef.current) inputRef.current.value = "";
       }
     },
-    [bucket, imagesOnly, lang, mediaId, onUploaded],
+    [bucket, cropEnabled, imagesOnly, lang, mediaId, onUploaded],
   );
 
   const uploadFile = useCallback(
@@ -159,6 +193,16 @@ export function MediaUploadField({
             Current: <code className="text-crs-ink">{publicPath}</code>
             {mediaId ? " · replace keeps the same URL" : ""}
           </p>
+          {cropEnabled && previewSrc && !isPdf ? (
+            <button
+              type="button"
+              disabled={disabled || pending}
+              className="inline-flex min-h-11 items-center rounded-xl border border-crs-border px-3 text-sm font-medium hover:bg-crs-bg disabled:opacity-60"
+              onClick={() => setCropOpen(true)}
+            >
+              {t("cropImage", lang)}
+            </button>
+          ) : null}
         </div>
       ) : null}
       {error ? <p className="text-xs text-red-600">{error}</p> : null}
@@ -203,6 +247,28 @@ export function MediaUploadField({
         </div>
       ) : null}
       <MediaLightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />
+      {cropOpen && previewSrc ? (
+        <ImageCropModal
+          src={previewSrc}
+          onCancel={() => setCropOpen(false)}
+          onApply={(crop) => {
+            const imgEl = new Image();
+            imgEl.onload = () => {
+              void variantsFromCrop(imgEl, crop)
+                .then(({ master }) => {
+                  setCropOpen(false);
+                  return postFile(master);
+                })
+                .catch((err) => {
+                  const msg = err instanceof Error ? err.message : t("actionFailed", lang);
+                  setError(msg);
+                  cmsToast.error(msg);
+                });
+            };
+            imgEl.src = previewSrc;
+          }}
+        />
+      ) : null}
     </div>
   );
 }

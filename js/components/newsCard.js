@@ -1,7 +1,8 @@
 /**
  * News card — safe DOM builder (no innerHTML).
  */
-import { cmsItemImageSrc } from '../data.js';
+import { cmsCardImageSrc } from '../data.js';
+import { editorialCardAttrs, editorialField } from '../editorial.js';
 import { el, safeImageSrc } from '../utils.js';
 import { createContentByline } from './contentByline.js';
 
@@ -48,13 +49,15 @@ function createPlaceholderSvg() {
  */
 export function createNewsCard(n, i) {
   let mediaChild;
-  const src = safeImageSrc(cmsItemImageSrc(n));
+  const title = editorialField(n, 'title');
+  const label = editorialField(n, 'label');
+  const src = safeImageSrc(cmsCardImageSrc(n));
   if (src) {
     mediaChild = el('img', {
       className: 'news-thumb',
       attrs: {
         src,
-        alt: n.title || '',
+        alt: title || '',
         loading: 'lazy',
       },
     });
@@ -68,11 +71,12 @@ export function createNewsCard(n, i) {
 
   const slug = n.slug || n.id || '';
   const year = String(n.date || '').slice(0, 4);
-  const haystack = [n.title, n.label, n.summary, n.editor_ar, n.editor_en, n.reviewer_ar, n.date]
+  const haystack = [title, label, editorialField(n, 'summary'), n.editor_ar, n.editor_en, n.reviewer_ar, n.date]
     .filter(Boolean)
     .join(' ')
     .toLowerCase();
   const byline = createContentByline(n, { includeDate: true });
+  const cardAttrs = editorialCardAttrs(n);
   return el('article', {
     className: 'news-card news-card--link',
     attrs: slug
@@ -83,18 +87,20 @@ export function createNewsCard(n, i) {
           'data-lightbox-slug': slug,
           'data-year': /^\d{4}$/.test(year) ? year : '',
           'data-q': haystack,
+          ...cardAttrs,
         }
       : {
           'data-year': /^\d{4}$/.test(year) ? year : '',
           'data-q': haystack,
+          ...cardAttrs,
         },
     children: [
       el('div', { className: 'card-media', children: [mediaChild] }),
       el('div', {
         className: 'news-body',
         children: [
-          el('div', { className: 'news-label', text: n.label || '' }),
-          el('div', { className: 'news-title card-title', text: n.title || '' }),
+          el('div', { className: 'news-label', text: label || '' }),
+          el('div', { className: 'news-title card-title', text: title || '' }),
           byline,
         ].filter(Boolean),
       }),

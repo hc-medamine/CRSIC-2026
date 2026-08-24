@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
 import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
 import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
+import { withPublicStoryFields, type StoryEnFields } from "@/lib/publish/storyPublic";
 
 export type PublicPartnerItem = {
   id: string;
@@ -16,7 +17,8 @@ export type PublicPartnerItem = {
   summary_en?: string;
   body_ar?: string;
   body_en?: string;
-} & PublicSeoFields;
+} & PublicSeoFields &
+  StoryEnFields & { img_card?: string };
 
 /** Public item plus the scope used to bucket it into intl/nat on rebuild. */
 export type StoredPartnerPayload = PublicPartnerItem & { scope: "intl" | "nat" };
@@ -39,6 +41,9 @@ type PayloadSource = {
   meta_description_ar?: string | null;
   meta_description_en?: string | null;
   og_image?: string | null;
+  en_status?: string | null;
+  title_en?: string | null;
+  image_card_path?: string | null;
 };
 
 function narrativeFromRow(row: {
@@ -60,16 +65,24 @@ function narrativeFromRow(row: {
 /** Public object for a partner row (persisted to content_items.live_payload). */
 export function buildPartnerPayload(row: PayloadSource): StoredPartnerPayload {
   const img = row.image_path?.trim() || row.og_image?.trim() || "";
-  const publicBase = withPublicSeo(
+  const publicBase = withPublicStoryFields(
+    withPublicSeo(
+      {
+        id: row.id,
+        slug: row.public_slug?.trim() || row.id,
+        name: row.title_ar.trim(),
+        country: row.label_ar?.trim() || "",
+        date: row.partner_date?.trim() || "",
+        ...narrativeFromRow(row),
+      },
+      row,
+    ),
     {
-      id: row.id,
-      slug: row.public_slug?.trim() || row.id,
-      name: row.title_ar.trim(),
-      country: row.label_ar?.trim() || "",
-      date: row.partner_date?.trim() || "",
-      ...narrativeFromRow(row),
+      en_status: row.en_status,
+      title_en: row.title_en,
+      image_card_path: row.image_card_path,
     },
-    row,
+    { nameEn: true },
   );
   const item: StoredPartnerPayload = {
     ...publicBase,
@@ -102,15 +115,19 @@ export async function rebuildPublicPartnersJson(): Promise<{
 
   for (const row of result.rows) {
     const { scope, ...item } = row.live_payload;
-    const publicItem: PublicPartnerItem = {
-      id: item.id || "",
-      slug: item.slug || item.id || "",
-      name: (item.name ?? "").trim(),
-      country: item.country?.trim() || "",
-      date: item.date?.trim() || "",
-      ...seoFromRow(item),
-      ...narrativeFromRow(item),
-    };
+    const publicItem: PublicPartnerItem = withPublicStoryFields(
+      {
+        id: item.id || "",
+        slug: item.slug || item.id || "",
+        name: (item.name ?? "").trim(),
+        country: item.country?.trim() || "",
+        date: item.date?.trim() || "",
+        ...seoFromRow(item),
+        ...narrativeFromRow(item),
+      },
+      item,
+      { nameEn: true },
+    );
     if (item.emoji?.trim()) publicItem.emoji = item.emoji.trim();
     if (item.img?.trim()) publicItem.img = item.img.trim();
     if (scope === "nat") nat.push(publicItem);

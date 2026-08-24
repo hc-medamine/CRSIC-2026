@@ -38,6 +38,7 @@ type Initial = {
   partnerDate: string;
   partnerEmoji: string;
   imagePath?: string;
+  imageCardPath?: string;
   status?: string;
   reviewNote?: string | null;
   editor?: PersonDisplay;
@@ -85,6 +86,7 @@ export function PartnerEditorForm({
   const [bodyAr, setBodyAr] = useState(initial?.bodyAr ?? "");
   const [bodyEn, setBodyEn] = useState(initial?.bodyEn ?? "");
   const [imagePath, setImagePath] = useState(initial?.imagePath ?? "");
+  const [imageCardPath, setImageCardPath] = useState(initial?.imageCardPath ?? "");
   const [seo, setSeo] = useState<SeoFormState>(() => ({
     ...emptySeoFormState(),
     metaTitleAr: initial?.metaTitleAr ?? "",
@@ -118,6 +120,7 @@ export function PartnerEditorForm({
       partnerDate,
       partnerEmoji,
       imagePath: imagePath.trim() || null,
+      imageCardPath: imageCardPath.trim() || null,
       metaTitleAr: seo.metaTitleAr,
       metaTitleEn: seo.metaTitleEn,
       metaDescriptionAr: seo.metaDescriptionAr,
@@ -295,9 +298,13 @@ export function PartnerEditorForm({
             bucket="partners"
             publicPath={imagePath}
             imagesOnly
-            label={t("fieldLogoImage", lang)}
             disabled={!editable}
-            onUploaded={({ publicPath }) => setImagePath(publicPath)}
+            label={t("fieldLogoImage", lang)}
+            enableCrop
+            onUploaded={({ publicPath, cardPath }) => {
+              setImagePath(publicPath);
+              if (cardPath !== undefined) setImageCardPath(cardPath ?? "");
+            }}
           />
         </FormSection>
 

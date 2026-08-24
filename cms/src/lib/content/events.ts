@@ -4,6 +4,7 @@ import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { appendWorkflowComment } from "@/lib/content/comments";
 import { buildEventPayloadForItem, rebuildPublicEventsJson } from "@/lib/publish/eventsJson";
+import { persistImageCardPath } from "@/lib/content/imageCard";
 import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 import { normalizeAttachments, type PublicMediaItem } from "@/lib/publish/media";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
@@ -56,6 +57,7 @@ export type EventItem = {
   body_ar: string | null;
   body_en: string | null;
   image_path: string | null;
+  image_card_path?: string | null;
   image_alt_ar: string | null;
   image_alt_en: string | null;
   attachments: PublicMediaItem[] | unknown;
@@ -89,6 +91,7 @@ export type EventInput = {
   bodyAr?: string;
   bodyEn?: string;
   imagePath?: string | null;
+  imageCardPath?: string | null;
   imageAltAr?: string;
   imageAltEn?: string;
   attachments?: PublicMediaItem[];
@@ -120,6 +123,7 @@ function snapshotOf(row: EventItem) {
     event_type_en: row.event_type_en,
     event_display_status: row.event_display_status,
     image_path: row.image_path,
+    image_card_path: row.image_card_path ?? null,
     attachments: normalizeAttachments(row.attachments),
     public_slug: row.public_slug,
     ...seoSnapshotFields(row),
@@ -255,6 +259,7 @@ export async function createEvent(user: SessionUser, input: EventInput): Promise
     ],
   );
   const item = result.rows[0];
+  await persistImageCardPath(item.id, input.imageCardPath);
   await addRevision(item.id, "draft", snapshotOf(item), user.id, "Created");
   await auditEvent(user, "event.create", item);
   return item;
@@ -327,6 +332,7 @@ export async function updateEventDraft(user: SessionUser, id: string, input: Eve
     ],
   );
   const item = result.rows[0];
+  await persistImageCardPath(item.id, input.imageCardPath);
   await addRevision(item.id, item.status, snapshotOf(item), user.id, "Edited");
   return item;
 }

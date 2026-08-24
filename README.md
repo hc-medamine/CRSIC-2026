@@ -248,7 +248,10 @@ erDiagram
 | ------------- | -------------- | --------------------------------------------- | ---------- |
 | `covers`      | `string[]`     | Paths like `img/covers/c00.jpg`               |
 | `pubs`        | `object[]`     | **Must** keep `covers.length === pubs.length` |
-| `pubs[].t`    | string         | Title                                         |
+| `pubs[].t`    | string         | Arabic title                                  |
+| `pubs[].title_en`, `summary_en`, `body_en`, `label_en` | optional | EN when `en_status` is `ready` |
+| `pubs[].en_status` | `pending` \| `ready` | missing = not ready |
+| `pubs[].img_card` | optional path | SPA cards; `covers[]` stay master paths |
 | `pubs[].type` | `"collective"` | `"individual"`                                | Filter key |
 | `pubs[].dept` | string         | Department label (Arabic in current data)     |
 | `pubs[].desc` | string         | Plain text only                               |
@@ -259,9 +262,11 @@ erDiagram
 |-------|------|--------|
 | `intl` / `nat` | `object[]` | International vs national |
 | `day`, `month`, `year` | string | Display fragments (month often abbreviated Arabic) |
-| `title`, `type` | string | Title and event kind label |
+| `title`, `type` | string | Arabic title and event kind label |
+| `en_status`, `title_en`, `summary_en`, `body_en`, `type_en` | optional | EN when ready; missing `en_status` = not ready |
 | `status` | `"upcoming"` \| `"ongoing"` \| `"done"` | Badge on SPA cards |
-| `img` | string (optional) | Teaser photo; CMS publish uses `img/cms/events/`; if omitted, Holders `0`–`5` cycle |
+| `img` | string (optional) | Detail master; CMS publish uses `img/cms/events/`; if omitted, Holders `0`–`5` cycle |
+| `img_card` | string (optional) | SPA cards when present |
 | `editor_ar` / `editor_en`, `reviewer_ar` / `reviewer_en`, `publisher_ar` / `publisher_en` | display names | Card byline (publisher line is Fariha Boufatah; identical reviewer+publisher collapse to one line) |
 
 Home teaser `#home-events-grid` uses `getHomeEvents(3)` (intl + nat merged, newest first). Full events page still lists all items by year. The Home **featured** strip (`#home-feat-carousel`) is **news**, not events.
@@ -272,7 +277,9 @@ Home teaser `#home-events-grid` uses `getHomeEvents(3)` (intl + nat merged, newe
 |-------|------|
 | `nat` / `intl` | `object[]` |
 | `name`, `country`, `date`, `emoji` | strings |
-| `summary_ar` / `summary_en`, `body_ar` / `body_en` | optional narrative (SPA card teaser + expandable detail) |
+| `en_status`, `name_en` / `title_en` | optional; EN name when ready |
+| `img_card` | optional card image |
+| `summary_ar` / `summary_en`, `body_ar` / `body_en` | optional narrative (SPA uses EN only when `en_status` is `ready`) |
 
 #### `journals.json`
 
@@ -288,8 +295,11 @@ Home teaser `#home-events-grid` uses `getHomeEvents(3)` (intl + nat merged, newe
 |-------|------|
 | `news[]` | objects, **story-date descending** (`date`) |
 | `id`, `slug` | public identity; deep link `#news/{slug}` |
-| `img` | path string or `null` (CMS: `img/cms/news/`) |
-| `label`, `title` | strings |
+| `img` | path string or `null` (CMS: `img/cms/news/`) — detail / lightbox master |
+| `img_card` | optional card-sized 16:9 path; SPA cards use this when present, else `img` |
+| `label`, `title` | Arabic strings |
+| `en_status` | `pending` \| `ready` (missing = not ready; old JSON) |
+| `title_en`, `summary_en`, `body_en`, `label_en` | optional; public EN only when `en_status` is `ready` (per-field Arabic fallback) |
 | `summary`, `body` | plain text or sanitized HTML allowlist |
 | `date` | `YYYY-MM-DD` or `""` (story date; not CMS `live_at`) |
 | `editor_ar` / `editor_en`, `reviewer_ar` / `reviewer_en`, `publisher_ar` / `publisher_en` | display names only (no emails/ids) |
