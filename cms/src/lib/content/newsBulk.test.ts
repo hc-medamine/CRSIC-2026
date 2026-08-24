@@ -76,6 +76,14 @@ describe("skipReasonFromError", () => {
       skipReasonFromError(new Error("Only unpublished or rejected items can be moved to the recycle bin")).reason,
       "wrong_status",
     );
+    assert.equal(
+      skipReasonFromError(new Error("Only draft or rejected items can be moved to the recycle bin")).reason,
+      "wrong_status",
+    );
+    assert.equal(
+      skipReasonFromError(new Error("Only the author can move this item to the recycle bin")).reason,
+      "not_author",
+    );
     assert.equal(skipReasonFromError(new Error("Item is already in the recycle bin")).reason, "already_binned");
     assert.equal(skipReasonFromError(new Error("disk full")).reason, "other");
   });
@@ -106,6 +114,46 @@ describe("executeNewsBulk", () => {
     const result = await executeNewsBulk("recycle", ["off", "pub1"], impl);
     assert.equal(result.done.length, 0);
     assert.ok(result.skipped.every((s) => s.reason === "not_sa"));
+    assert.equal(rebuilds.n, 0);
+  });
+
+  it("Editor recycles own draft and rejected, skips submitted and unpublished, no rebuild", async () => {
+    const editorCatalog: Record<string, NewsBulkRow> = {
+      draft: { id: "draft", title: "WIP", status: "draft" },
+      rej: { id: "rej", title: "No", status: "rejected" },
+      sub: { id: "sub", title: "Waiting", status: "submitted" },
+      off: { id: "off", title: "Taken down", status: "unpublished" },
+    };
+    const recycled: string[] = [];
+    const { impl, rebuilds } = deps({
+      role: "editor",
+      loadNews: async (id) => editorCatalog[id] ?? null,
+      recycle: async (id) => {
+        recycled.push(id);
+      },
+    });
+    const result = await executeNewsBulk("recycle", ["draft", "rej", "sub", "off"], impl);
+    assert.deepEqual(recycled, ["draft", "rej"]);
+    assert.deepEqual(
+      result.done.map((d) => d.id),
+      ["draft", "rej"],
+    );
+    assert.equal(result.skipped.length, 2);
+    assert.ok(result.skipped.every((s) => s.reason === "wrong_status"));
+    assert.equal(rebuilds.n, 0);
+  });
+
+  it("Editor recycle skips another author's draft as not_author", async () => {
+    const { impl, rebuilds } = deps({
+      role: "editor",
+      loadNews: async (id) => ({ id, title: "Theirs", status: "draft" }),
+      recycle: async () => {
+        throw new Error("Only the author can move this item to the recycle bin");
+      },
+    });
+    const result = await executeNewsBulk("recycle", ["theirs"], impl);
+    assert.equal(result.done.length, 0);
+    assert.equal(result.skipped[0].reason, "not_author");
     assert.equal(rebuilds.n, 0);
   });
 

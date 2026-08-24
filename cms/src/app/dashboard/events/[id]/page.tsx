@@ -4,6 +4,7 @@ import { CMS_LANG_COOKIE, normalizeLang, t, localizedDisplayName } from "@/lib/i
 import { requireUser } from "@/lib/auth/session";
 import { getEventById } from "@/lib/content/events";
 import { canAccessContentType, canReview } from "@/lib/content/permissions";
+import { canRecycleFromEditPage } from "@/lib/content/recycleBin";
 import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 import { getMediaByPublicPath } from "@/lib/media/store";
 import { listSelectableOrgUnits } from "@/lib/users";
@@ -100,7 +101,7 @@ export default async function EventDetailPage({ params }: Props) {
         isAuthor={isAuthor}
         canSubmit={isAuthor && ["draft", "changes_requested"].includes(item.status)}
         canReview={reviewer}
-        canDelete={user.role === "super_admin"}
+        canDelete={canRecycleFromEditPage(user, item)}
         initial={{
           id: item.id,
           orgUnitId: item.org_unit_id,

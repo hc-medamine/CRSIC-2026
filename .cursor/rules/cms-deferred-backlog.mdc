@@ -25,6 +25,7 @@ Do **not** implement these unless they explicitly start a PRD-first slice.
 
 - **Scheduled publish — cancelled** (2026-07-21, confirmed 2026-08-22). Manual Approve → Publish only. No `scheduled` status, cron, or schedule UI. Do not add it back to the deferred list.
 - CMS Recycle bin (PRD 2026-08-22): SA bin unpublished/rejected; restore to draft; purge unused media. On `main` (PR #34).
+- CMS Editor recycle (PRD 2026-08-23): Editors bin own draft/rejected; scoped bin + restore. On `main` (PR #41).
 - CMS news list bulk (PRD 2026-08-22): unpublish + SA recycle; skip + report. On `main` (PR #36).
 - CMS list bulk for remaining types (PRDs 2026-08-22): events, publications, partners, alerts, laws, platforms, research groups, research projects. On `main` (PR #37).
 - CMS list Load more (PRD 2026-08-22): news/events/publications page size 20.

@@ -5,6 +5,7 @@ import { requireUser } from "@/lib/auth/session";
 import { getResearchGroupById } from "@/lib/content/researchGroups";
 import { normalizeResearchMembers } from "@/lib/publish/researchGroupsJson";
 import { canAccessContentType, canReview } from "@/lib/content/permissions";
+import { canRecycleFromEditPage } from "@/lib/content/recycleBin";
 import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 import { listSelectableOrgUnits } from "@/lib/users";
 import { getItemPeopleMeta } from "@/lib/content/people";
@@ -85,7 +86,7 @@ export default async function ResearchGroupDetailPage({ params }: Props) {
         isAuthor={isAuthor}
         canSubmit={isAuthor && ["draft", "changes_requested"].includes(item.status)}
         canReview={reviewer}
-        canDelete={user.role === "super_admin"}
+        canDelete={canRecycleFromEditPage(user, item)}
         initial={{
           id: item.id,
           orgUnitId: item.org_unit_id,

@@ -208,6 +208,9 @@ export function CmsChrome({
 
   const utility: NavItem[] = [];
   if (showMedia) utility.push({ key: "media", href: "/dashboard/media", icon: <IconMedia /> });
+  if (role === "editor") {
+    utility.push({ key: "recycleBin", href: "/dashboard/recycle-bin", icon: <IconInbox /> });
+  }
   utility.push(
     { key: "notifications", href: "/dashboard/notifications", badge: unread, icon: <IconBell /> },
     { key: "profile", href: "/dashboard/profile", icon: <IconUser /> },

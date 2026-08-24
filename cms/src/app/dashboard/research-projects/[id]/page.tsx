@@ -6,6 +6,7 @@ import { getResearchProjectById } from "@/lib/content/researchProjects";
 import { getResearchGroupById } from "@/lib/content/researchGroups";
 import { normalizeResearchEntries } from "@/lib/publish/researchProjectsJson";
 import { canAccessContentType, canReview } from "@/lib/content/permissions";
+import { canRecycleFromEditPage } from "@/lib/content/recycleBin";
 import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 import { listSelectableOrgUnits } from "@/lib/users";
 import { getItemPeopleMeta } from "@/lib/content/people";
@@ -85,7 +86,7 @@ export default async function ResearchProjectDetailPage({ params }: Props) {
         isAuthor={isAuthor}
         canSubmit={isAuthor && ["draft", "changes_requested"].includes(item.status)}
         canReview={reviewer}
-        canDelete={user.role === "super_admin"}
+        canDelete={canRecycleFromEditPage(user, item)}
         initialGroupOption={
           currentGroup
             ? { id: currentGroup.id, title_ar: currentGroup.title_ar, title_en: currentGroup.title_en }

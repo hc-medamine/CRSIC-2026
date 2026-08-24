@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { listResearchGroupsForUser } from "@/lib/content/researchGroups";
-import { canAccessContentType, canReview } from "@/lib/content/permissions";
+import { canAccessContentType, listBulkChrome } from "@/lib/content/permissions";
 import { listOrgUnits } from "@/lib/users";
 import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { ContentListPage } from "@/app/dashboard/content-list-page";
@@ -10,6 +10,7 @@ import { ContentListPage } from "@/app/dashboard/content-list-page";
 export default async function ResearchGroupsListPage() {
   const user = await requireUser();
   if (!(await canAccessContentType(user, "research_group"))) redirect("/dashboard");
+  const bulkChrome = listBulkChrome(user);
   const [items, orgUnits] = await Promise.all([listResearchGroupsForUser(user), listOrgUnits()]);
   const cookieStore = await cookies();
   const lang = normalizeLang(cookieStore.get(CMS_LANG_COOKIE)?.value);
@@ -29,11 +30,11 @@ export default async function ResearchGroupsListPage() {
       newLabel={t("newResearchGroup", lang)}
       emptyLabel={t("emptyResearchGroups", lang)}
       bulk={
-        canReview(user)
+        bulkChrome
           ? {
               apiPath: "/api/research-groups/bulk",
-              canRecycle: user.role === "super_admin",
               kind: "research_group",
+              ...bulkChrome,
             }
           : undefined
       }

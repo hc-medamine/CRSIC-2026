@@ -4,6 +4,7 @@ import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { requireUser } from "@/lib/auth/session";
 import { getPlatformById } from "@/lib/content/platforms";
 import { canAccessContentType, canReview } from "@/lib/content/permissions";
+import { canRecycleFromEditPage } from "@/lib/content/recycleBin";
 import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 import { listSelectableOrgUnits } from "@/lib/users";
 import { getItemPeopleMeta } from "@/lib/content/people";
@@ -79,7 +80,7 @@ export default async function PlatformDetailPage({ params }: Props) {
         isAuthor={isAuthor}
         canSubmit={isAuthor && ["draft", "changes_requested"].includes(item.status)}
         canReview={reviewer}
-        canDelete={user.role === "super_admin"}
+        canDelete={canRecycleFromEditPage(user, item)}
         initial={{
           id: item.id,
           orgUnitId: item.org_unit_id,

@@ -6,7 +6,7 @@ import { FormStickyActions } from "@/app/dashboard/form-ux";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 import { t, tf, type CmsLang } from "@/lib/i18n/labels";
 
-/** Opt-in list bulk (Reviewer + Super Admin). Lists without this prop have no chrome. */
+/** Opt-in list bulk (Editor Recycle, Reviewer Unpublish, Super Admin both). Lists without this prop have no chrome. */
 export type ContentListBulkKind =
   | "news"
   | "event"
@@ -30,6 +30,8 @@ export type ContentListBulk = {
     | "/api/research-groups/bulk"
     | "/api/research-projects/bulk";
   canRecycle: boolean;
+  /** When false (Editors), the Unpublish button is hidden. Default true. */
+  canUnpublish?: boolean;
   kind: ContentListBulkKind;
 };
 
@@ -49,6 +51,7 @@ const SKIP_KEYS: Record<string, string> = {
   away: "bulkSkipAway",
   reviewer_required: "bulkSkipReviewer",
   not_sa: "bulkSkipNotSa",
+  not_author: "bulkSkipNotAuthor",
   wrong_status: "bulkSkipWrongStatus",
   already_binned: "bulkSkipAlreadyBinned",
   too_many: "bulkSkipTooMany",
@@ -97,6 +100,7 @@ export function DeskListCheckbox({
 export function ContentListBulkBar({
   selectedCount,
   canRecycle,
+  canUnpublish = true,
   busy,
   onClear,
   onUnpublish,
@@ -105,6 +109,7 @@ export function ContentListBulkBar({
 }: {
   selectedCount: number;
   canRecycle: boolean;
+  canUnpublish?: boolean;
   busy: boolean;
   onClear: () => void;
   onUnpublish: () => void;
@@ -113,6 +118,9 @@ export function ContentListBulkBar({
 }) {
   const lang = useCmsLang();
   if (selectedCount < 1) return null;
+  const recycleClass = canUnpublish
+    ? "inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-50"
+    : "inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-crs-secondary disabled:opacity-50";
   return (
     <FormStickyActions>
       <p className="me-auto text-sm text-crs-ink">{tf("bulkSelected", lang, { n: selectedCount })}</p>
@@ -124,32 +132,31 @@ export function ContentListBulkBar({
       >
         {t("bulkClear", lang)}
       </button>
-      <button
-        type="button"
-        disabled={busy}
-        className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-50"
-        onClick={onDuplicate}
-      >
-        {t("actionDuplicate", lang)}
-      </button>
-      {canRecycle ? (
+      {canUnpublish ? (
         <button
           type="button"
           disabled={busy}
           className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-50"
-          onClick={onRecycle}
+          onClick={onDuplicate}
         >
+          {t("actionDuplicate", lang)}
+        </button>
+      ) : null}
+      {canRecycle ? (
+        <button type="button" disabled={busy} className={recycleClass} onClick={onRecycle}>
           {t("actionRecycle", lang)}
         </button>
       ) : null}
-      <button
-        type="button"
-        disabled={busy}
-        className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-crs-secondary disabled:opacity-50"
-        onClick={onUnpublish}
-      >
-        {t("actionUnpublish", lang)}
-      </button>
+      {canUnpublish ? (
+        <button
+          type="button"
+          disabled={busy}
+          className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-crs-secondary disabled:opacity-50"
+          onClick={onUnpublish}
+        >
+          {t("actionUnpublish", lang)}
+        </button>
+      ) : null}
     </FormStickyActions>
   );
 }
@@ -184,6 +191,7 @@ export function ContentListBulkModal({
   selectedCount,
   publishedCount,
   kind,
+  canUnpublish = true,
   onCancel,
   onConfirm,
   onDismiss,
@@ -193,6 +201,7 @@ export function ContentListBulkModal({
   selectedCount: number;
   publishedCount: number;
   kind: ContentListBulkKind;
+  canUnpublish?: boolean;
   onCancel: () => void;
   onConfirm: () => void;
   onDismiss: () => void;
@@ -230,7 +239,7 @@ export function ContentListBulkModal({
               ? tf("bulkConfirmClone", lang, { n: selectedCount })
               : tf("bulkConfirmRecycle", lang, { n: selectedCount })}
         </p>
-        {dialog.action === "recycle" && publishedCount > 0 ? (
+        {dialog.action === "recycle" && canUnpublish && publishedCount > 0 ? (
           <p className="mt-2 text-sm text-crs-muted">
             {tf("bulkConfirmRecyclePublished", lang, { n: publishedCount })}
           </p>
