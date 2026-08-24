@@ -9,7 +9,7 @@ When discussing CMS/product/roadmap work, briefly remind the stakeholder that th
 
 ## Active Approved PRD (this slice — implement)
 
-- CMS Import/Export picker bulk + sort — [docs/prds/2026-08-24-cms-import-export-bulk-sort.md](docs/prds/2026-08-24-cms-import-export-bulk-sort.md) (**Approved** 2026-08-24). I/E page only: Load more 20, header sort, **Export selected**. Type lists unchanged.
+_(none)_
 
 ## Deferred (future) — simple → complex
 
@@ -26,6 +26,7 @@ Do **not** implement these unless they explicitly start a PRD-first slice.
 - CMS clone Cut 1 (PRD 2026-08-22): Duplicate → new draft (edit + list row; bulk Reviewer/SA). On `main` (PR #42).
 - CMS table header sort (PRD 2026-08-24): click data headers; this visit only; no URL `?sort=`. On `main` (PR #43).
 - CMS Desk production boost (PRD 2026-08-24): SA JSON zip + cover crop/card + EN when ready. On `main` (PR #44).
+- CMS Import/Export picker bulk + sort (PRD 2026-08-24): Load more 20, header sort, **Export selected**. Type lists unchanged.
 - CMS news list bulk (PRD 2026-08-22): unpublish + SA recycle; skip + report. On `main` (PR #36).
 - CMS list bulk for remaining types (PRDs 2026-08-22): events, publications, partners, alerts, laws, platforms, research groups, research projects. On `main` (PR #37).
 - CMS list Load more (PRD 2026-08-22): news/events/publications page size 20.

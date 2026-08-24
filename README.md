@@ -819,7 +819,7 @@ Own **internal CMS + PostgreSQL** (`cms/`): authenticated users with roles and p
 1. CMS UI to reassign editor/reviewer/publisher — **Delivered** [docs/prds/2026-08-22-cms-reassign-authorship-ui.md](./docs/prds/2026-08-22-cms-reassign-authorship-ui.md)
 2. Server list pagination — **Delivered** [docs/prds/2026-08-22-cms-list-load-more.md](./docs/prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more)
 3. Soft-delete recycle bin — **Delivered** [docs/prds/2026-08-22-cms-recycle-bin.md](./docs/prds/2026-08-22-cms-recycle-bin.md) (PR #34)
-4. Bulk ops / clone / import-export UI — **list bulk unpublish/recycle on all CMS content types** (news PR #36; events/publications + remaining types PR #37). **Clone Cut 1 Delivered** ([PRD](./docs/prds/2026-08-22-cms-clone-import-export.md), PR #42). **JSON zip I/E Delivered** (PR #44). Picker bulk + sort: [PRD](./docs/prds/2026-08-24-cms-import-export-bulk-sort.md) (**Approved** 2026-08-24)
+4. Bulk ops / clone / import-export UI — **list bulk unpublish/recycle on all CMS content types** (news PR #36; events/publications + remaining types PR #37). **Clone Cut 1 Delivered** ([PRD](./docs/prds/2026-08-22-cms-clone-import-export.md), PR #42). **JSON zip I/E Delivered** (PR #44). Picker bulk + sort: [PRD](./docs/prds/2026-08-24-cms-import-export-bulk-sort.md) (**Delivered**)
 5. Media crop / optimize / variants — **cover crop + card Delivered** (PR #44); extra optimize still later
 6. EN editorial body parity
 7. Static institutional pages in CMS (locales only today)

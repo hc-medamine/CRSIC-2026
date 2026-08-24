@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Approved** |
+| Status | **Delivered** |
 | Date | 2026-08-24 |
 | Author | Stakeholder + agent |
 | Owners | Product / CMS Desk |
@@ -115,3 +115,4 @@ None blocking. Stakeholder locked 2026-08-24 via Q&A.
 | 2026-08-24 | Type / search / page / sort / selection are **this visit only** (no URL, no `localStorage`). Type change clears selection, sort, search, pages. Search keeps sort, resets to first 20. |
 | 2026-08-24 | Stakeholder **lock**. Draft this PRD. **Do not implement until Approved.** |
 | 2026-08-24 | Stakeholder **Approved**. Implement on `feature/cms-import-export-bulk-sort`. |
+| 2026-08-24 | **Delivered** after Ie5–Ie8 walk (header checkbox = loaded rows; type lists unchanged). |
