@@ -9,7 +9,7 @@ When discussing CMS/product/roadmap work, briefly remind the stakeholder that th
 
 ## Active Approved PRD (this slice — implement)
 
-None. Wait for the next Approved PRD before coding a product slice.
+- CMS table header sort — [docs/prds/2026-08-24-cms-table-header-sort.md](docs/prds/2026-08-24-cms-table-header-sort.md) (**Approved** 2026-08-24). Click data headers; this visit only. Do **not** add `?sort=` to the page URL.
 
 ## Deferred (future) — simple → complex
 

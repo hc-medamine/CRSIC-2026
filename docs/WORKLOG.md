@@ -19,6 +19,18 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-24 — CMS table header sort **Approved** (implement)
+
+[prds/2026-08-24-cms-table-header-sort.md](./prds/2026-08-24-cms-table-header-sort.md). Click data headers on CMS `<table>`s (nine content lists, recycle bin, users, org units, Home editor matrix). This visit only — no URL, no `localStorage`. Load more keeps the active ORDER BY. Checkbox/Actions and revision-history stay unsorted.
+
+---
+
+### 2026-08-24 — PRD **Draft**: CMS table header sort
+
+Locked with stakeholder. [prds/2026-08-24-cms-table-header-sort.md](./prds/2026-08-24-cms-table-header-sort.md). Click data headers on every CMS `<table>` (nine content lists, recycle bin, users, org units, Home editor matrix). This visit only. Load more keeps the sort. Checkbox/Actions and revision-history out. **Superseded same day — Approved (entry above).**
+
+---
+
 ### 2026-08-24 — CMS clone Cut 1 smoke Cl1–Cl8
 
 Walkthrough on `feature/cms-clone-cut-1`: Cl1–Cl8 passed (Reviewer Fariha news edit/list/bulk Duplicate; Editor Iman partners/events row+edit Duplicate + Recycle, no Unpublish/bulk Duplicate; bin has no Duplicate; four-eyes on own copy). [SMOKE-CMS.md](./qa/SMOKE-CMS.md) Cl1–Cl8 ticked. Walk clone drafts cancelled (left the news list). Public JSON hashes unchanged. Merged to `main` as PR #42. JSON import/export still later.
@@ -29,7 +41,7 @@ Walkthrough on `feature/cms-clone-cut-1`: Cl1–Cl8 passed (Reviewer Fariha news
 
 **Workflow step 1 (idea only).** Stakeholder: clicking a CMS table **column header** (the header title) should sort the rows by the values in that column. Not developed, no PRD, no code.
 
-**Next:** wait until stakeholder wants step 2 (develop).
+**Next:** superseded same day — lock + Draft PRD (entry above).
 
 ---
 

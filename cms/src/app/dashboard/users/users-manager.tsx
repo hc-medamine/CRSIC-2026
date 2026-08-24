@@ -4,7 +4,10 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cmsToast } from "@/app/dashboard/cms-toast";
+import { SortableTh } from "@/app/dashboard/sortable-th";
 import type { ContentType, ManagedUser, OrgUnit, UserRole } from "@/lib/users";
+import { ALL_CONTENT_TYPES } from "@/lib/content-types";
+import { sortRows, toggleHeaderSort, type HeaderSort } from "@/lib/content/headerSort";
 import { ALL_CONTENT_TYPES } from "@/lib/content-types";
 import {
   contentTypeLabel,
@@ -74,6 +77,7 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
   const [scopeEditId, setScopeEditId] = useState<string | null>(null);
   const [scopeOrgs, setScopeOrgs] = useState<string[]>([]);
   const [scopeTypes, setScopeTypes] = useState<ContentType[]>([]);
+  const [sort, setSort] = useState<HeaderSort | null>(null);
 
   const showOrgScopes = role === "editor" || role === "reviewer";
   const showContentTypes = role === "editor";
@@ -223,6 +227,32 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
     );
     return (ids: string[]) => ids.map((id) => map.get(id) ?? id).join(", ") || "—";
   }, [orgUnits, lang]);
+
+  const visibleUsers = useMemo(() => {
+    return sortRows(
+      users,
+      sort,
+      (u, key) => {
+        if (key === "role") return roleLabel(u.role, lang);
+        if (key === "access") {
+          const types =
+            u.content_types.length > 0
+              ? u.content_types.map((ct) => contentTypeLabel(ct, lang)).join(", ")
+              : "—";
+          return `${orgLabel(u.org_unit_ids)} ${types}`;
+        }
+        if (key === "status") {
+          return u.is_active ? t("usersStatusActive", lang) : t("usersStatusInactive", lang);
+        }
+        return localizedDisplayName(
+          { displayName: u.display_name, nameAr: u.name_ar, nameEn: u.name_en },
+          lang,
+        );
+      },
+      () => "text",
+      lang,
+    );
+  }, [users, sort, lang, orgLabel]);
 
   /** Global editor content-type claims derived from current users. */
   const claimByType = useMemo(() => {
@@ -407,15 +437,47 @@ export function UsersManager({ initialUsers, orgUnits: initialOrgUnits }: Props)
         <table className="min-w-full text-start text-sm">
           <thead className="border-b bg-crs-bg text-crs-muted">
             <tr>
-              <th className="px-3 py-2">{t("usersColUser", lang)}</th>
-              <th className="px-3 py-2">{t("usersColRole", lang)}</th>
-              <th className="px-3 py-2">{t("usersColAccess", lang)}</th>
-              <th className="px-3 py-2">{t("usersColStatus", lang)}</th>
+              <SortableTh
+                label={t("usersColUser", lang)}
+                sortKey="user"
+                kind="text"
+                sort={sort}
+                lang={lang}
+                className="px-3 py-2"
+                onToggle={(key, kind) => setSort(toggleHeaderSort(sort, key, kind))}
+              />
+              <SortableTh
+                label={t("usersColRole", lang)}
+                sortKey="role"
+                kind="text"
+                sort={sort}
+                lang={lang}
+                className="px-3 py-2"
+                onToggle={(key, kind) => setSort(toggleHeaderSort(sort, key, kind))}
+              />
+              <SortableTh
+                label={t("usersColAccess", lang)}
+                sortKey="access"
+                kind="text"
+                sort={sort}
+                lang={lang}
+                className="px-3 py-2"
+                onToggle={(key, kind) => setSort(toggleHeaderSort(sort, key, kind))}
+              />
+              <SortableTh
+                label={t("usersColStatus", lang)}
+                sortKey="status"
+                kind="text"
+                sort={sort}
+                lang={lang}
+                className="px-3 py-2"
+                onToggle={(key, kind) => setSort(toggleHeaderSort(sort, key, kind))}
+              />
               <th className="px-3 py-2">{t("usersColActions", lang)}</th>
             </tr>
           </thead>
           <tbody>
-            {users.map((u) => (
+            {visibleUsers.map((u) => (
               <tr key={u.id} className="border-b last:border-0">
                 <td className="px-3 py-3 align-top">
                   <div className="font-medium text-crs-ink">

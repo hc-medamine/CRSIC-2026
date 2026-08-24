@@ -29,7 +29,6 @@ export default async function EventsListPage({
 
   return (
     <ContentListPage
-      key={`${q}|${statusFilter}`}
       breadcrumbs={[
         { href: "/dashboard", label: t("home", lang) },
         { label: t("events", lang) },

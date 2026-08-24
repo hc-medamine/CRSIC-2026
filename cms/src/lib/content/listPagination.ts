@@ -1,4 +1,5 @@
 import { query } from "@/lib/db";
+import { contentListSqlOrderBy, parseContentListSort, type HeaderSort } from "@/lib/content/headerSort";
 
 /** Shared OFFSET/LIMIT + hasMore math for CMS news/events/publications lists. */
 
@@ -13,6 +14,9 @@ export type ContentListQuery = {
   status?: string | null;
   /** `window` = first page×size rows (SSR). `page` = one page (Load more API). */
   slice?: ListSlice;
+  /** Load-more / API only — not written to the page URL. */
+  sort?: string | null;
+  dir?: string | null;
 };
 
 export function listQueryFromSearchParams(sp: {
@@ -22,6 +26,8 @@ export function listQueryFromSearchParams(sp: {
     page: sp.get("page"),
     q: sp.get("q"),
     status: sp.get("status"),
+    sort: sp.get("sort"),
+    dir: sp.get("dir"),
     slice: "page",
   };
 }
@@ -48,12 +54,14 @@ export function normalizeListQuery(opts: ContentListQuery = {}): {
   q: string;
   status: string;
   slice: ListSlice;
+  sort: HeaderSort | null;
 } {
   return {
     page: parseListPage(opts.page),
     q: (opts.q ?? "").trim(),
     status: (opts.status ?? "").trim(),
     slice: opts.slice === "page" ? "page" : "window",
+    sort: parseContentListSort(opts.sort, opts.dir),
   };
 }
 
@@ -80,6 +88,7 @@ export function buildContentListQuery(opts: {
   status: string;
   limit: number;
   offset: number;
+  sort?: HeaderSort | null;
 }): { text: string; params: unknown[] } {
   const params: unknown[] = [opts.contentType];
   const where = ["content_type = $1"];
@@ -115,7 +124,7 @@ export function buildContentListQuery(opts: {
   return {
     text: `SELECT * FROM content_items WHERE ${where.join(" AND ")}
        AND recycled_at IS NULL
-       ORDER BY updated_at DESC
+       ${contentListSqlOrderBy(opts.sort ?? null)}
        LIMIT $${limitIdx} OFFSET $${offsetIdx}`,
     params,
   };
@@ -139,6 +148,7 @@ export async function fetchContentListPage<T extends import("pg").QueryResultRow
     status: qn.status,
     limit: bounds.limit,
     offset: bounds.offset,
+    sort: qn.sort,
   });
   const result = await query<T>(sql.text, sql.params);
   const trimmed = trimHasMore(result.rows, bounds.take);

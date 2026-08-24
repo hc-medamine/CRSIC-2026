@@ -29,7 +29,6 @@ export default async function PublicationsListPage({
 
   return (
     <ContentListPage
-      key={`${q}|${statusFilter}`}
       breadcrumbs={[
         { href: "/dashboard", label: t("home", lang) },
         { label: t("publications", lang) },

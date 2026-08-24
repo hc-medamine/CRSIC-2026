@@ -1,10 +1,12 @@
 "use client";
 
-import { FormEvent, useState, type CSSProperties } from "react";
+import { FormEvent, useMemo, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { cmsToast } from "@/app/dashboard/cms-toast";
+import { SortableTh } from "@/app/dashboard/sortable-th";
 import type { ContentType, OrgUnit } from "@/lib/users";
 import { RESEARCH_CONTENT_TYPES, SPA_CONTENT_TYPES } from "@/lib/content-types";
+import { sortRows, toggleHeaderSort, type HeaderSort } from "@/lib/content/headerSort";
 import { t, tf } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 
@@ -42,6 +44,21 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
   const [editNameEn, setEditNameEn] = useState("");
   const [editKind, setEditKind] = useState<"centre_wide" | "research_dept">("research_dept");
   const [editSort, setEditSort] = useState(0);
+  const [sort, setSort] = useState<HeaderSort | null>(null);
+
+  const visibleOrgUnits = useMemo(() => {
+    return sortRows(
+      orgUnits,
+      sort,
+      (row, key) => {
+        if (key === "kind") return kindLabel(row.kind, lang);
+        if (key === "nav") return row.sort_order;
+        return displayName(row, lang);
+      },
+      (key) => (key === "nav" ? "number" : "text"),
+      lang,
+    );
+  }, [orgUnits, sort, lang]);
 
   async function refresh() {
     const res = await fetch("/api/org-units");
@@ -259,14 +276,38 @@ export function OrgUnitsManager({ initialOrgUnits }: Props) {
         <table className="min-w-full text-start text-sm">
           <thead className="border-b bg-crs-bg text-crs-muted">
             <tr>
-              <th className="px-3 py-2">{t("orgColName", lang)}</th>
-              <th className="px-3 py-2">{t("orgColKind", lang)}</th>
-              <th className="px-3 py-2">{t("orgColSort", lang)}</th>
+              <SortableTh
+                label={t("orgColName", lang)}
+                sortKey="name"
+                kind="text"
+                sort={sort}
+                lang={lang}
+                className="px-3 py-2"
+                onToggle={(key, kind) => setSort(toggleHeaderSort(sort, key, kind))}
+              />
+              <SortableTh
+                label={t("orgColKind", lang)}
+                sortKey="kind"
+                kind="text"
+                sort={sort}
+                lang={lang}
+                className="px-3 py-2"
+                onToggle={(key, kind) => setSort(toggleHeaderSort(sort, key, kind))}
+              />
+              <SortableTh
+                label={t("orgColSort", lang)}
+                sortKey="nav"
+                kind="number"
+                sort={sort}
+                lang={lang}
+                className="px-3 py-2"
+                onToggle={(key, kind) => setSort(toggleHeaderSort(sort, key, kind, "asc"))}
+              />
               <th className="px-3 py-2">{t("orgColActions", lang)}</th>
             </tr>
           </thead>
           <tbody>
-            {orgUnits.map((o, i) => (
+            {visibleOrgUnits.map((o, i) => (
               <tr
                 key={o.id}
                 className="cms-row-enter border-b last:border-0 align-top"

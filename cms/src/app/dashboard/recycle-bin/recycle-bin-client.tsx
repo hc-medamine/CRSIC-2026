@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { AdminPageShell, DeskEmptyState, HonestyCount } from "@/app/dashboard/desk-ui";
 import { StatusPill, relativeShort } from "@/app/dashboard/ui-bits";
@@ -9,6 +9,8 @@ import { formatDateTime } from "@/lib/format-datetime";
 import { contentTypeLabel, t, tf } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 import type { RecycleBinClientRow } from "@/lib/content/recycleBinTypes";
+import { sortRows, toggleHeaderSort, type HeaderSort } from "@/lib/content/headerSort";
+import { SortableTh } from "@/app/dashboard/sortable-th";
 
 type Props = {
   initialItems: RecycleBinClientRow[];
@@ -29,10 +31,31 @@ export function RecycleBinClient({ initialItems, initialStaleIds, canManageBin }
   const [pending, setPending] = useState<string | null>(null);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [typedWord, setTypedWord] = useState("");
+  const [sort, setSort] = useState<HeaderSort | null>(null);
 
   const staleSet = new Set(staleIds);
   const busy = pending !== null;
   const confirmWord = t("recycleConfirmWord", lang);
+
+  const visibleItems = useMemo(() => {
+    const untitled = t("untitled", lang);
+    return sortRows(
+      items,
+      sort,
+      (row, key) => {
+        if (key === "type") return contentTypeLabel(row.contentType, lang);
+        if (key === "status") return row.recycledFromStatus;
+        if (key === "binnedAt") return row.recycledAt;
+        return row.titleAr || untitled;
+      },
+      (key) => {
+        if (key === "status") return "status";
+        if (key === "binnedAt") return "date";
+        return "text";
+      },
+      lang,
+    );
+  }, [items, sort, lang]);
 
   useEffect(() => {
     if (!dialog) return;
@@ -141,17 +164,45 @@ export function RecycleBinClient({ initialItems, initialStaleIds, canManageBin }
           <table className="w-full min-w-[720px] text-start text-sm">
             <thead className="border-b border-crs-border bg-crs-bg/80 text-xs uppercase tracking-wide text-crs-muted">
               <tr>
-                <th className="px-4 py-3.5 font-semibold">{t("colTitle", lang)}</th>
-                <th className="px-4 py-3.5 font-semibold">{t("colType", lang)}</th>
-                <th className="px-4 py-3.5 font-semibold">{t("colStatus", lang)}</th>
-                <th className="px-4 py-3.5 font-semibold">{t("colBinnedAt", lang)}</th>
+                <SortableTh
+                  label={t("colTitle", lang)}
+                  sortKey="title"
+                  kind="text"
+                  sort={sort}
+                  lang={lang}
+                  onToggle={(key, kind) => setSort(toggleHeaderSort(sort, key, kind))}
+                />
+                <SortableTh
+                  label={t("colType", lang)}
+                  sortKey="type"
+                  kind="text"
+                  sort={sort}
+                  lang={lang}
+                  onToggle={(key, kind) => setSort(toggleHeaderSort(sort, key, kind))}
+                />
+                <SortableTh
+                  label={t("colStatus", lang)}
+                  sortKey="status"
+                  kind="status"
+                  sort={sort}
+                  lang={lang}
+                  onToggle={(key, kind) => setSort(toggleHeaderSort(sort, key, kind))}
+                />
+                <SortableTh
+                  label={t("colBinnedAt", lang)}
+                  sortKey="binnedAt"
+                  kind="date"
+                  sort={sort}
+                  lang={lang}
+                  onToggle={(key, kind) => setSort(toggleHeaderSort(sort, key, kind))}
+                />
                 <th className="px-4 py-3.5 font-semibold">
                   <span className="sr-only">{t("sectionActions", lang)}</span>
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-crs-border/70">
-              {items.map((item, i) => {
+              {visibleItems.map((item, i) => {
                 const stale = staleSet.has(item.id);
                 const rowBusy = busy && (pending === item.id || pending === "empty" || pending === "purge-stale");
                 return (

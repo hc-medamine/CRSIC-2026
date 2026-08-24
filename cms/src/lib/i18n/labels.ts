@@ -1033,6 +1033,7 @@ export const LABELS: LabelMap = {
   colStatus: { en: "Status", ar: "الحالة" },
   colEn: { en: "EN", ar: "EN" },
   colUpdated: { en: "Updated", ar: "آخر تحديث" },
+  sortByColumn: { en: "Sort by {col}", ar: "ترتيب حسب {col}" },
   untitled: { en: "(untitled)", ar: "(بدون عنوان)" },
   showingResults: { en: "Showing {n} result(s)", ar: "عرض {n} نتيجة" },
   listTruncatedHint: {
