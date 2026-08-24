@@ -6,6 +6,7 @@ import {
   contentListSqlOrderBy,
   naturalDir,
   parseContentListSort,
+  parseExportPickerSort,
   sortRows,
   statusRank,
   toggleHeaderSort,
@@ -90,5 +91,13 @@ describe("parseContentListSort + SQL", () => {
 
   it("default SQL stays newest updated", () => {
     assert.match(contentListSqlOrderBy(null), /updated_at DESC/);
+  });
+
+  it("I/E picker sort ignores EN and keeps Load more ORDER BY", () => {
+    assert.equal(parseExportPickerSort("en", "asc"), null);
+    assert.equal(parseExportPickerSort("drop", "desc"), null);
+    const title = parseExportPickerSort("title", "asc");
+    assert.deepEqual(title, { key: "title", dir: "asc" });
+    assert.match(contentListSqlOrderBy(title), /title_ar ASC/);
   });
 });

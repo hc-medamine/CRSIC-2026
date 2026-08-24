@@ -262,6 +262,17 @@ PRD [2026-08-24-cms-desk-production-boost.md](../prds/2026-08-24-cms-desk-produc
 | En1 | Published news with EN filled + **ready** + four-eyes publish: English locale shows EN body, **no** AR-only notice on that story’s list/detail. Pending item still Arabic + notice | ☐ |
 | En2 | Ready item with empty `title_en`: English title falls back to Arabic (no invented text). Preview token matches live EN/`img_card` rules | ☐ |
 
+## Import/Export picker bulk + header sort
+
+PRD [2026-08-24-cms-import-export-bulk-sort.md](../prds/2026-08-24-cms-import-export-bulk-sort.md). Super Admin `/dashboard/import-export` only. Type lists unchanged. Walk AR + EN.
+
+| # | Check | Pass? |
+|---|--------|-------|
+| Ie5 | Picker is a table (Title / Status / Updated). First paint ≤20 rows; **Load more** if more exist. URL has no `type=` / `page=` / `sort=` | ☑ 2026-08-24 |
+| Ie6 | Click Title: A→Z; Load more continues that order. Type change clears sort, search, selection, pages. Search keeps sort and resets to first 20 | ☑ 2026-08-24 |
+| Ie7 | Check 3 news → **Export selected** → one zip → import = 3 new drafts; `news.json` hash unchanged. Header checkbox = loaded rows only | ☑ 2026-08-24 API zip + header=20/21 events; import skipped (no extra drafts) |
+| Ie8 | **Export this type** and per-row **Export this item** still work. News list has no Export. N>200 warns and does not drop extras | ☑ 2026-08-24 |
+
 ## G. Gate
 
 | # | Check | Pass? |

@@ -12,6 +12,23 @@ async function requireSuperAdmin() {
   return session.user;
 }
 
+function zipResponse(zip: { filename: string; buffer: Buffer; count: number }) {
+  return new NextResponse(new Uint8Array(zip.buffer), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/zip",
+      "Content-Disposition": `attachment; filename="${zip.filename}"`,
+      "X-Export-Count": String(zip.count),
+    },
+  });
+}
+
+function exportErrorResponse(err: unknown) {
+  const message = err instanceof Error ? err.message : "Export failed";
+  const status = message === "Not found" ? 404 : 400;
+  return NextResponse.json({ ok: false, error: message }, { status });
+}
+
 export async function GET(request: NextRequest) {
   const user = await requireSuperAdmin();
   if (!user) return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
@@ -21,18 +38,30 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "Unknown content type" }, { status: 400 });
   }
   try {
-    const zip = await buildExportZip(user, type, id || undefined);
-    return new NextResponse(new Uint8Array(zip.buffer), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/zip",
-        "Content-Disposition": `attachment; filename="${zip.filename}"`,
-        "X-Export-Count": String(zip.count),
-      },
-    });
+    const zip = await buildExportZip(user, type, { itemId: id || undefined });
+    return zipResponse(zip);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Export failed";
-    const status = message === "Not found" ? 404 : 400;
-    return NextResponse.json({ ok: false, error: message }, { status });
+    return exportErrorResponse(err);
+  }
+}
+
+export async function POST(request: NextRequest) {
+  const user = await requireSuperAdmin();
+  if (!user) return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
+  let body: { type?: unknown; ids?: unknown };
+  try {
+    body = (await request.json()) as { type?: unknown; ids?: unknown };
+  } catch {
+    return NextResponse.json({ ok: false, error: "Invalid request" }, { status: 400 });
+  }
+  const type = typeof body.type === "string" ? body.type : "";
+  if (!isExportableType(type)) {
+    return NextResponse.json({ ok: false, error: "Unknown content type" }, { status: 400 });
+  }
+  try {
+    const zip = await buildExportZip(user, type, { ids: Array.isArray(body.ids) ? (body.ids as string[]) : [] });
+    return zipResponse(zip);
+  } catch (err) {
+    return exportErrorResponse(err);
   }
 }

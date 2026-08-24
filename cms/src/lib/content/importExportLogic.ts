@@ -3,6 +3,12 @@ import { ALL_CONTENT_TYPES, type ContentType } from "@/lib/content-types";
 export const CMS_ZIP_FORMAT = "crsic-cms-item-zip";
 export const CMS_ZIP_VERSION = 1;
 export const EXPORT_COUNT_WARN = 200;
+export const EXPORT_PAGE_SIZE = 20;
+export const EXPORT_NONE_REMAINING = "None of the selected items can be exported";
+export const EXPORT_SELECT_REQUIRED = "Select at least one item";
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export type CmsZipManifest = {
   format: typeof CMS_ZIP_FORMAT;
@@ -88,7 +94,70 @@ export type ExportPickerRow = {
   id: string;
   titleAr: string;
   status: string;
+  updatedAt: string;
 };
+
+/** Unique UUID strings in request order. Does not cap at 200. */
+export function uniqueExportIds(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const value of raw) {
+    if (typeof value !== "string") continue;
+    const id = value.trim().toLowerCase();
+    if (!id || !UUID_RE.test(id) || seen.has(id)) continue;
+    seen.add(id);
+    out.push(id);
+  }
+  return out;
+}
+
+export function remainingExportIds(
+  requested: readonly string[],
+  exportableIds: readonly string[],
+): string[] {
+  const ok = new Set(exportableIds.map((id) => id.toLowerCase()));
+  return uniqueExportIds([...requested]).filter((id) => ok.has(id));
+}
+
+export function selectedExportError(remainingCount: number): string | null {
+  if (remainingCount < 1) return EXPORT_NONE_REMAINING;
+  return null;
+}
+
+export function shouldWarnLargeExport(n: number): boolean {
+  return n > EXPORT_COUNT_WARN;
+}
+
+/** Header checkbox touches loaded rows only; other selected ids stay. */
+export function applyHeaderCheckbox(
+  loadedIds: readonly string[],
+  selected: ReadonlySet<string>,
+  checked: boolean,
+): Set<string> {
+  const next = new Set(selected);
+  if (checked) {
+    for (const id of loadedIds) next.add(id);
+  } else {
+    for (const id of loadedIds) next.delete(id);
+  }
+  return next;
+}
+
+export function headerCheckboxState(
+  loadedIds: readonly string[],
+  selected: ReadonlySet<string>,
+): { checked: boolean; indeterminate: boolean } {
+  if (loadedIds.length === 0) return { checked: false, indeterminate: false };
+  let n = 0;
+  for (const id of loadedIds) {
+    if (selected.has(id)) n += 1;
+  }
+  return {
+    checked: n === loadedIds.length,
+    indeterminate: n > 0 && n < loadedIds.length,
+  };
+}
 
 export function isExportableType(value: string): value is ContentType {
   return (ALL_CONTENT_TYPES as string[]).includes(value);
