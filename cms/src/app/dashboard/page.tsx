@@ -12,11 +12,11 @@ import {
   normalizeLang,
   t,
   localizedDisplayName,
-  statusLabel,
 } from "@/lib/i18n/labels";
 import type { ContentType } from "@/lib/users";
 import { HomeOnboarding } from "./home-onboarding";
 import { CreateContentMenu } from "./create-content-menu";
+import { EditorStatsTable } from "./editor-stats-table";
 import { IconArrow, IconDoc, IconGlobe, IconInbox } from "./cms-icons";
 import { QueueCard, StatCard } from "./ui-bits";
 
@@ -30,16 +30,6 @@ const CREATE_LABEL_KEY: Record<ContentType, string> = {
   research_project: "researchProjects",
   law: "laws",
   platform: "platforms",
-};
-
-/** Status → badge/dot colour pairs for the content-by-editor stats table. */
-const STATUS_STYLES: Record<string, { badge: string; dot: string }> = {
-  draft: { badge: "bg-amber-100 text-amber-800", dot: "bg-amber-500" },
-  submitted: { badge: "bg-sky-100 text-sky-800", dot: "bg-sky-500" },
-  changes_requested: { badge: "bg-violet-100 text-violet-800", dot: "bg-violet-500" },
-  approved: { badge: "bg-teal-100 text-teal-800", dot: "bg-teal-500" },
-  published: { badge: "bg-emerald-100 text-emerald-800", dot: "bg-emerald-500" },
-  rejected: { badge: "bg-rose-100 text-rose-800", dot: "bg-rose-500" },
 };
 
 export default async function DashboardPage() {
@@ -186,77 +176,7 @@ export default async function DashboardPage() {
             <h2 className="text-sm font-semibold text-crs-ink">{t("statsSubmittedTitle", lang)}</h2>
           </div>
           {queues.editorStats.length > 0 ? (
-            <div className="cms-card-lift mt-3 overflow-hidden rounded-2xl border border-crs-border bg-crs-surface shadow-[0_1px_3px_rgba(26,46,38,0.06)]">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-crs-border/70 text-left text-xs text-crs-muted">
-                      <th className="px-4 py-3 font-medium">{t("roleEditor", lang)}</th>
-                      {STATUS_ORDER_COLUMNS.map((status) => {
-                        const style = STATUS_STYLES[status] ?? { badge: "", dot: "bg-crs-border" };
-                        return (
-                          <th key={status} className="px-3 py-3 text-center font-medium">
-                            <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-                              <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} aria-hidden />
-                              {statusLabel(status, lang)}
-                            </span>
-                          </th>
-                        );
-                      })}
-                      <th className="px-4 py-3 text-right font-medium">{t("statsEditorTotal", lang)}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {queues.editorStats.map((editor, rowIndex) => (
-                      <tr
-                        key={editor.editorId}
-                        className="cms-stat-row cms-row-enter border-b border-crs-border/40 last:border-b-0"
-                        style={{ "--row-delay": `${Math.min(rowIndex, 11) * 45}ms` } as React.CSSProperties}
-                      >
-                        <td className="px-4 py-3 font-medium text-crs-ink" dir="auto">
-                          {localizedDisplayName(
-                            {
-                              displayName: editor.editorName,
-                              nameAr: editor.editorNameAr,
-                              nameEn: editor.editorNameEn,
-                            },
-                            lang,
-                          )}
-                        </td>
-                        {STATUS_ORDER_COLUMNS.map((status) => {
-                          const count =
-                            status === "published"
-                              ? editor.publishedCount
-                              : (editor.counts[status] ?? 0);
-                          const style = STATUS_STYLES[status] ?? { badge: "", dot: "" };
-                          return (
-                            <td key={status} className="px-3 py-3 text-center">
-                              {count > 0 ? (
-                                <span
-                                  className={`cms-stat-cell cms-stat-badge ${style.badge}`}
-                                  style={
-                                    { "--row-delay": `${Math.min(rowIndex, 11) * 45}ms` } as React.CSSProperties
-                                  }
-                                >
-                                  {count}
-                                </span>
-                              ) : (
-                                <span className="text-crs-border">·</span>
-                              )}
-                            </td>
-                          );
-                        })}
-                        <td className="px-4 py-3 text-right">
-                          <span className="cms-count-pop text-base font-semibold text-crs-ink">
-                            {editor.total}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <EditorStatsTable editors={queues.editorStats} columns={STATUS_ORDER_COLUMNS} lang={lang} />
           ) : (
             <p className="mt-3 text-sm text-crs-muted">{t("statsSubmittedEmpty", lang)}</p>
           )}

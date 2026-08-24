@@ -32,7 +32,6 @@ export default async function NewsListPage({
 
   return (
     <ContentListPage
-      key={`${q}|${statusFilter}`}
       breadcrumbs={[
         { href: "/dashboard", label: t("home", lang) },
         { label: t("news", lang) },

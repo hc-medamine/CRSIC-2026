@@ -1,10 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 import { t, tf } from "@/lib/i18n/labels";
+import {
+  contentListSortKind,
+  sortRows,
+  toggleHeaderSort,
+  type ContentListSortKey,
+  type HeaderSort,
+  type SortKind,
+} from "@/lib/content/headerSort";
 import { IconPlus, IconChevron } from "./cms-icons";
+import { SortableTh } from "./sortable-th";
 import { DeskEmptyState, DeskPageHeader } from "./desk-ui";
 import { PageBreadcrumb, StatusPill } from "./ui-bits";
 import { EnStatusBadge } from "./en-status-badge";
@@ -127,6 +136,7 @@ export function ContentListPage({
   bulk,
 }: Props) {
   const lang = useCmsLang();
+  const filterKey = `${loadMore?.q ?? ""}|${loadMore?.status ?? ""}`;
   const [rows, setRows] = useState(items);
   const [page, setPage] = useState(loadMore?.page ?? 1);
   const [hasMore, setHasMore] = useState(Boolean(loadMore?.hasMore));
@@ -139,6 +149,10 @@ export function ContentListPage({
   const [cloneDialog, setCloneDialog] = useState<
     { kind: "confirm"; sourceId: string } | { kind: "result"; clone: CloneResult } | null
   >(null);
+  const [sort, setSort] = useState<HeaderSort | null>(null);
+  const [seenFilterKey, setSeenFilterKey] = useState(filterKey);
+  const [seenItems, setSeenItems] = useState(items);
+  const fetchGen = useRef(0);
 
   const filteredEmpty = rows.length === 0 && filtersActive;
   const selectedCount = selected.size;
@@ -158,6 +172,129 @@ export function ContentListPage({
   function toggleLoaded(checked: boolean) {
     setSelected(checked ? new Set(rows.map((r) => r.id)) : new Set());
   }
+
+  if (seenFilterKey !== filterKey) {
+    setSeenFilterKey(filterKey);
+    if (loadMore && sort) {
+      setLoadingMore(true);
+      setLoadError(false);
+    } else {
+      setRows(items);
+      setPage(loadMore?.page ?? 1);
+      setHasMore(Boolean(loadMore?.hasMore));
+    }
+  }
+  if (!loadMore && items !== seenItems) {
+    setSeenItems(items);
+    setRows(items);
+  }
+
+  const visibleRows = useMemo(() => {
+    return sortRows(
+      rows,
+      sort,
+      (row, key) => {
+        if (key === "status") return row.status;
+        if (key === "en") return row.enStatus ?? "";
+        if (key === "updated") {
+          return typeof row.updatedAt === "string" ? row.updatedAt : row.updatedAt.toISOString();
+        }
+        return row.title;
+      },
+      (key) => contentListSortKind(key as ContentListSortKey),
+      lang,
+    );
+  }, [rows, sort, lang]);
+
+  async function fetchListPage(nextPage: number, nextSort: HeaderSort | null) {
+    if (!loadMore) return null;
+    const sp = new URLSearchParams();
+    sp.set("page", String(nextPage));
+    if (loadMore.q) sp.set("q", loadMore.q);
+    if (loadMore.status) sp.set("status", loadMore.status);
+    if (nextSort) {
+      sp.set("sort", nextSort.key);
+      sp.set("dir", nextSort.dir);
+    }
+    const res = await fetch(`${loadMore.apiPath}?${sp.toString()}`);
+    const data = (await res.json()) as {
+      ok?: boolean;
+      items?: Array<{
+        id: string;
+        title_ar?: string | null;
+        status: string;
+        en_status?: string | null;
+        updated_at: string;
+      }>;
+      hasMore?: boolean;
+      page?: number;
+    };
+    if (!res.ok || !data.ok || !Array.isArray(data.items)) return null;
+    const untitled = t("untitled", lang);
+    return {
+      extra: data.items.map((item) => mapApiItem(item, loadMore.itemHrefBase, untitled)),
+      hasMore: Boolean(data.hasMore),
+      page: typeof data.page === "number" ? data.page : nextPage,
+    };
+  }
+
+  function onToggleSort(key: string, kind: SortKind) {
+    const next = toggleHeaderSort(sort, key, kind);
+    if (!loadMore) {
+      setSort(next);
+      return;
+    }
+    setLoadingMore(true);
+    setLoadError(false);
+    const gen = ++fetchGen.current;
+    void fetchListPage(1, next)
+      .then((result) => {
+        if (gen !== fetchGen.current) return;
+        if (!result) {
+          setLoadError(true);
+          return;
+        }
+        setSort(next);
+        setRows(result.extra);
+        setPage(1);
+        setHasMore(result.hasMore);
+        replaceListPageInUrl(1, loadMore.q, loadMore.status);
+      })
+      .catch(() => {
+        if (gen !== fetchGen.current) return;
+        setLoadError(true);
+      })
+      .finally(() => {
+        if (gen === fetchGen.current) setLoadingMore(false);
+      });
+  }
+
+  useEffect(() => {
+    fetchGen.current += 1;
+    if (!loadMore || !sort) return;
+    const gen = fetchGen.current;
+    void fetchListPage(1, sort)
+      .then((result) => {
+        if (gen !== fetchGen.current) return;
+        if (!result) {
+          setLoadError(true);
+          setLoadingMore(false);
+          return;
+        }
+        setRows(result.extra);
+        setPage(1);
+        setHasMore(result.hasMore);
+        replaceListPageInUrl(1, loadMore.q, loadMore.status);
+        setLoadingMore(false);
+      })
+      .catch(() => {
+        if (gen !== fetchGen.current) return;
+        setLoadError(true);
+        setLoadingMore(false);
+      });
+    // Page-1 refetch when the filter changes while sort is already on.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterKey]);
 
   function listHrefBase(): string {
     if (loadMore) return loadMore.itemHrefBase;
@@ -206,40 +343,19 @@ export function ContentListPage({
     setLoadingMore(true);
     setLoadError(false);
     const nextPage = page + 1;
-    const sp = new URLSearchParams();
-    sp.set("page", String(nextPage));
-    if (loadMore.q) sp.set("q", loadMore.q);
-    if (loadMore.status) sp.set("status", loadMore.status);
     try {
-      const res = await fetch(`${loadMore.apiPath}?${sp.toString()}`);
-      const data = (await res.json()) as {
-        ok?: boolean;
-        items?: Array<{
-          id: string;
-          title_ar?: string | null;
-          status: string;
-          en_status?: string | null;
-          updated_at: string;
-        }>;
-        hasMore?: boolean;
-        page?: number;
-      };
-      if (!res.ok || !data.ok || !Array.isArray(data.items)) {
+      const result = await fetchListPage(nextPage, sort);
+      if (!result) {
         setLoadError(true);
         return;
       }
-      const untitled = t("untitled", lang);
       setRows((prev) => {
         const seen = new Set(prev.map((r) => r.id));
-        const extra = data.items!
-          .filter((item) => !seen.has(item.id))
-          .map((item) => mapApiItem(item, loadMore.itemHrefBase, untitled));
-        return [...prev, ...extra];
+        return [...prev, ...result.extra.filter((item) => !seen.has(item.id))];
       });
-      const resolvedPage = typeof data.page === "number" ? data.page : nextPage;
-      setPage(resolvedPage);
-      setHasMore(Boolean(data.hasMore));
-      replaceListPageInUrl(resolvedPage, loadMore.q, loadMore.status);
+      setPage(result.page);
+      setHasMore(result.hasMore);
+      replaceListPageInUrl(result.page, loadMore.q, loadMore.status);
     } catch {
       setLoadError(true);
     } finally {
@@ -352,15 +468,43 @@ export function ContentListPage({
                     />
                   </th>
                 ) : null}
-                <th className="px-4 py-3.5 font-semibold">{t("colTitle", lang)}</th>
-                <th className="px-4 py-3.5 font-semibold">{t("colStatus", lang)}</th>
-                <th className="px-4 py-3.5 font-semibold">{t("colEn", lang)}</th>
-                <th className="px-4 py-3.5 font-semibold">{t("colUpdated", lang)}</th>
+                <SortableTh
+                  label={t("colTitle", lang)}
+                  sortKey="title"
+                  kind="text"
+                  sort={sort}
+                  lang={lang}
+                  onToggle={onToggleSort}
+                />
+                <SortableTh
+                  label={t("colStatus", lang)}
+                  sortKey="status"
+                  kind="status"
+                  sort={sort}
+                  lang={lang}
+                  onToggle={onToggleSort}
+                />
+                <SortableTh
+                  label={t("colEn", lang)}
+                  sortKey="en"
+                  kind="enStatus"
+                  sort={sort}
+                  lang={lang}
+                  onToggle={onToggleSort}
+                />
+                <SortableTh
+                  label={t("colUpdated", lang)}
+                  sortKey="updated"
+                  kind="date"
+                  sort={sort}
+                  lang={lang}
+                  onToggle={onToggleSort}
+                />
                 <th className="px-4 py-3.5 font-semibold">{t("colActions", lang)}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-crs-border/70">
-              {rows.map((item, i) => (
+              {visibleRows.map((item, i) => (
                 <tr
                   key={item.id}
                   className="group relative cms-row-enter border-s-2 border-s-transparent transition-colors hover:border-s-crs-accent hover:bg-crs-accent/5 focus-within:border-s-crs-accent focus-within:bg-crs-accent/5"

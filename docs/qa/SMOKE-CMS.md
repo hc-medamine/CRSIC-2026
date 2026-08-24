@@ -156,6 +156,17 @@ PRD [2026-08-22-cms-list-load-more.md](../prds/2026-08-22-cms-list-load-more.md)
 | Lm5 | `/dashboard/partners` (or laws) still lists all allowed rows; no Load more | ☐ |
 | Lm6 | Editor does not see another editor’s news on Load more | ☐ |
 
+## Table header sort
+
+PRD [2026-08-24-cms-table-header-sort.md](../prds/2026-08-24-cms-table-header-sort.md). Data column headers only. Sort lasts this visit; no `?sort=` on the page URL. Walk AR or EN.
+
+| # | Check | Pass? |
+|---|--------|-------|
+| Hs1 | `/dashboard/news`: click Title → A→Z (desk language); Load more continues that order; URL has no `sort=` | ☑ 2026-08-24 |
+| Hs2 | Recycle bin: Title / Type / Status / Binned at sort; Actions is not a sort control | ☑ 2026-08-24 |
+| Hs3 | Users or org units: data headers sort; Actions does not. Org-units Sort number does not write `sort_order` | ☑ 2026-08-24 |
+| Hs4 | Leave the list (Home) or refresh: default order (newest updated) again | ☑ 2026-08-24 |
+
 ## Recycle bin
 
 PRD [2026-08-22-cms-recycle-bin.md](../prds/2026-08-22-cms-recycle-bin.md). Run `cd cms && npm run db:migrate` (`031`). Super Admin keeps unpublished/rejected recycle, Restore, Permanently delete, Empty, Purge. Editors: see [Editor recycle](#editor-recycle-draft--rejected).

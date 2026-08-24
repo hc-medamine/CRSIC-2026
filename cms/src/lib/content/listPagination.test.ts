@@ -3,6 +3,8 @@ import { describe, it } from "node:test";
 import {
   LIST_PAGE_MAX,
   buildContentListQuery,
+  listQueryFromSearchParams,
+  normalizeListQuery,
   paginationBounds,
   parseListPage,
   trimHasMore,
@@ -74,5 +76,26 @@ describe("buildContentListQuery", () => {
     assert.equal(sql.params[1], "u1");
     assert.equal(sql.params[2], "draft");
     assert.equal(sql.params[3], "hello");
+  });
+
+  it("API search params pass sort/dir into ORDER BY", () => {
+    const q = listQueryFromSearchParams(new URLSearchParams("page=2&sort=title&dir=asc"));
+    const n = normalizeListQuery({ ...q, slice: "page" });
+    assert.deepEqual(n.sort, { key: "title", dir: "asc" });
+    const sql = buildContentListQuery({
+      contentType: "news",
+      role: { kind: "all" },
+      q: "",
+      status: "",
+      limit: 21,
+      offset: 20,
+      sort: n.sort,
+    });
+    assert.match(sql.text, /ORDER BY title_ar ASC/);
+  });
+
+  it("unknown sort keys stay on the default order", () => {
+    const q = listQueryFromSearchParams(new URLSearchParams("sort=drop&dir=asc"));
+    assert.equal(normalizeListQuery(q).sort, null);
   });
 });
