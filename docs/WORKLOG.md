@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-26 — Track local CMS media files
+
+Commit previously untracked `img/cms/news/` (49), `img/cms/partners/` (11), and one `img/covers/` file from local Desk uploads. Public JSON unchanged.
+
+---
+
 ### 2026-08-26 — CMS Desk interiors I2 walkthrough **Delivered** (docs)
 
 Stakeholder signed off I2 (forms, admin, login) on `:3000` AR+EN on **2026-08-23**. I2 code was already on `main` (`071abc9`). PRD [prds/2026-08-20-cms-desk-interiors.md](./prds/2026-08-20-cms-desk-interiors.md) is **Delivered** (I1 + I2). Docs close-out landed 2026-08-26.
