@@ -819,10 +819,8 @@ Own **internal CMS + PostgreSQL** (`cms/`): authenticated users with roles and p
 2. Server list pagination — **Delivered** [docs/prds/2026-08-22-cms-list-load-more.md](./docs/prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more)
 3. Soft-delete recycle bin — **Delivered** [docs/prds/2026-08-22-cms-recycle-bin.md](./docs/prds/2026-08-22-cms-recycle-bin.md) (PR #34)
 4. Bulk ops / clone / import-export UI — **list bulk unpublish/recycle on all CMS content types** (news PR #36; events/publications + remaining types PR #37). **Clone Cut 1 Delivered** ([PRD](./docs/prds/2026-08-22-cms-clone-import-export.md), PR #42). **JSON zip I/E Delivered** (PR #44). Picker bulk + sort: [PRD](./docs/prds/2026-08-24-cms-import-export-bulk-sort.md) (**Delivered**)
-5. Media crop / optimize / variants — **cover crop + card Delivered** (PR #44); extra optimize still later
-6. EN editorial body parity
-7. Static institutional pages in CMS (locales only today)
-8. Journals in CMS (OJS remains)
+5–7. Extra media optimize, remaining EN-when-ready, static institutional pages — **Draft** [docs/prds/2026-08-26-remaining-deferred-pack.md](./docs/prds/2026-08-26-remaining-deferred-pack.md) (do not implement until Approved). Cover crop + news/events/pubs/partners EN-when-ready already shipped (PR #44).
+8. Journals in CMS (OJS remains) — **still deferred**; out of the 2026-08-26 pack
 
 **Cancelled (do not re-open):** scheduled / timed auto-publish (2026-07-21, confirmed 2026-08-22). Publish stays manual Approve → Publish.
 
@@ -836,7 +834,7 @@ Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Core spec: [d
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-08-26** (CMS Desk interiors I2 walkthrough marked Delivered) |
+| Last updated     | **2026-08-26** (remaining-deferred PRD Draft; I2 docs + local CMS media on `main`) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes
