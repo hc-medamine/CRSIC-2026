@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-26 — PRD **Draft**: remaining deferred pack (no journals)
+
+[prds/2026-08-26-remaining-deferred-pack.md](./prds/2026-08-26-remaining-deferred-pack.md). One PRD for leftover deferred work: WebP siblings, remaining EN-when-ready types, static institutional pages in CMS. **Journals stay OJS.** Status **Draft** — do not implement until Approved.
+
+---
+
 ### 2026-08-26 — Track local CMS media files
 
 Commit previously untracked `img/cms/news/` (49), `img/cms/partners/` (11), and one `img/covers/` file from local Desk uploads. Public JSON unchanged.
@@ -668,10 +674,8 @@ Remind on CMS/product sessions; do **not** start without stakeholder PRD lock. O
 | 3 | Soft-delete recycle bin | **Delivered** on `main` — [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md) (PR #34) |
 | — | Scheduled publish | **Cancelled** (2026-07-21, confirmed 2026-08-22). Removed from this list. Manual Approve → Publish only. |
 | 4 | Bulk ops / clone / import-export UI | **List bulk** on all CMS content types (news PR #36; events/publications + remaining types PR #37). **Clone Cut 1 Delivered** — [prds/2026-08-22-cms-clone-import-export.md](./prds/2026-08-22-cms-clone-import-export.md) (PR #42). **JSON zip I/E Delivered** (PR #44). Picker bulk + sort: [prds/2026-08-24-cms-import-export-bulk-sort.md](./prds/2026-08-24-cms-import-export-bulk-sort.md) (**Delivered**). |
-| 5 | Media crop / optimize / variants | **Cover crop + card Delivered** (PR #44). Extra optimize still later. |
-| 6 | EN editorial body parity | Schema + forms + SPA across types — see [audits/PARITY.md](./audits/PARITY.md) |
-| 7 | Static institutional pages in CMS | New types + SPA routes; locales only today |
-| 8 | Journals in CMS | Replace OJS; largest product change |
+| 5–7 | Extra media optimize, remaining EN, static pages | **Draft** — [prds/2026-08-26-remaining-deferred-pack.md](./prds/2026-08-26-remaining-deferred-pack.md). Do not implement until Approved. Journals **out**. |
+| 8 | Journals in CMS | Replace OJS; largest product change — **still deferred** (out of the 2026-08-26 pack) |
 
 ---
 

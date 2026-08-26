@@ -11,12 +11,15 @@ When discussing CMS/product/roadmap work, briefly remind the stakeholder that th
 
 _(none)_
 
+## Draft (do not implement until Approved)
+
+[docs/prds/2026-08-26-remaining-deferred-pack.md](docs/prds/2026-08-26-remaining-deferred-pack.md) — extra media WebP, remaining EN-when-ready, static institutional pages. Journals out.
+
 ## Deferred (future) — simple → complex
 
 Do **not** implement these unless they explicitly start a PRD-first slice.
 
-1. Static institutional pages in CMS (locales only today)
-2. Journals in CMS (OJS remains)
+1. Journals in CMS (OJS remains)
 
 ## Already closed (do not re-open as gaps)
 
