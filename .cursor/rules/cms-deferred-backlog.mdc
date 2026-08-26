@@ -9,11 +9,7 @@ When discussing CMS/product/roadmap work, briefly remind the stakeholder that th
 
 ## Active Approved PRD (this slice — implement)
 
-_(none)_
-
-## Draft (do not implement until Approved)
-
-[docs/prds/2026-08-26-remaining-deferred-pack.md](docs/prds/2026-08-26-remaining-deferred-pack.md) — extra media WebP, remaining EN-when-ready, static institutional pages. Journals out.
+[docs/prds/2026-08-26-remaining-deferred-pack.md](docs/prds/2026-08-26-remaining-deferred-pack.md) — **Cut A only** (WebP siblings). Cuts B (remaining EN-when-ready) and C (static pages) wait until A is Delivered on `main`. Journals out.
 
 ## Deferred (future) — simple → complex
 

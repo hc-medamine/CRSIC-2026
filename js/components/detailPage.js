@@ -3,7 +3,7 @@
  * Body may be plain text or sanitized HTML (H1 allowlist) — never raw innerHTML.
  */
 import { getLang, t } from '../i18n.js';
-import { el, replaceChildren, safeImageSrc } from '../utils.js';
+import { el, replaceChildren, safeImageSrc, cmsPictureEl } from '../utils.js';
 import { nodesFromSafeBody } from '../safeBody.js';
 import {
   findNewsByKey,
@@ -24,9 +24,10 @@ import { editorialField, editorialLangAttrs } from '../editorial.js';
 /**
  * @param {object[]} media
  * @param {string} title
+ * @param {object} [item]
  * @returns {HTMLElement|null}
  */
-function buildMediaStage(media, title) {
+function buildMediaStage(media, title, item) {
   const list = Array.isArray(media) ? media : [];
   const images = list.filter((m) => m && m.kind === 'image' && m.src);
   const pdfs = list.filter((m) => m && m.kind === 'pdf' && m.src);
@@ -34,19 +35,24 @@ function buildMediaStage(media, title) {
   if (images.length === 0 && pdfs.length === 0) return null;
 
   const children = [];
+  const master = String(item?.img || '').trim();
+  const masterWebp = String(item?.img_webp || '').trim();
 
   if (images.length === 1) {
-    const src = safeImageSrc(images[0].src);
-    if (src) {
+    const src = images[0].src;
+    const webp = master && src === master ? masterWebp : '';
+    const pic = cmsPictureEl({
+      src,
+      webp,
+      alt: images[0].alt || title || '',
+      className: 'detail-hero-img',
+      loading: 'lazy',
+    });
+    if (pic) {
       children.push(
         el('div', {
           className: 'detail-hero',
-          children: [
-            el('img', {
-              className: 'detail-hero-img',
-              attrs: { src, alt: images[0].alt || title || '', loading: 'lazy' },
-            }),
-          ],
+          children: [pic],
         }),
       );
     }
@@ -252,7 +258,7 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
   applyItemSeoHead(item, type);
 
   const langAttrs = editorialLangAttrs(item);
-  const mediaEl = buildMediaStage(media, title);
+  const mediaEl = buildMediaStage(media, title, item);
   const children = [
     el('a', {
       className: 'detail-back',
@@ -425,7 +431,7 @@ function renderPartnerDetail(host, slugOrId, opts = {}) {
   const metaLine = [item.country, item.date].filter(Boolean).join(' · ');
   const summary = editorialField(item, 'summary');
   const bodyHtml = editorialField(item, 'body');
-  const imgSrc = safeImageSrc(item.img || item.og_image || '');
+  const imgSrc = item.img || item.og_image || '';
   const children = [];
   if (opts.isPreview) {
     children.push(
@@ -444,17 +450,21 @@ function renderPartnerDetail(host, slugOrId, opts = {}) {
     }),
   );
   if (imgSrc) {
-    children.push(
-      el('div', {
-        className: 'detail-hero',
-        children: [
-          el('img', {
-            className: 'detail-hero-img',
-            attrs: { src: imgSrc, alt: title, loading: 'lazy' },
-          }),
-        ],
-      }),
-    );
+    const pic = cmsPictureEl({
+      src: imgSrc,
+      webp: item.img_webp,
+      alt: title,
+      className: 'detail-hero-img',
+      loading: 'lazy',
+    });
+    if (pic) {
+      children.push(
+        el('div', {
+          className: 'detail-hero',
+          children: [pic],
+        }),
+      );
+    }
   } else if (item.emoji) {
     children.push(el('p', { className: 'detail-meta', text: item.emoji }));
   }
@@ -538,7 +548,7 @@ function renderPlatformDetail(host, slugOrId, opts = {}) {
   const media = item.media && item.media.length
     ? item.media
     : (item.img ? [{ kind: 'image', src: item.img }] : []);
-  const mediaEl = buildMediaStage(media, title);
+  const mediaEl = buildMediaStage(media, title, item);
   const children = [];
   if (opts.isPreview) {
     children.push(
@@ -631,7 +641,7 @@ function renderLawDetail(host, slugOrId, opts = {}) {
   const media = item.media && item.media.length
     ? item.media
     : (item.img ? [{ kind: 'image', src: item.img }] : []);
-  const mediaEl = buildMediaStage(media, title);
+  const mediaEl = buildMediaStage(media, title, item);
   const children = [];
   if (opts.isPreview) {
     children.push(
@@ -730,7 +740,7 @@ function renderResearchGroupDetail(host, slugOrId, opts = {}) {
   const lead =
     lang === 'en' && item.lead_en ? item.lead_en : item.lead_ar || item.lead_en || '';
   const members = Array.isArray(item.members) ? item.members : [];
-  const imgSrc = safeImageSrc(item.img || item.og_image || '');
+  const imgSrc = item.img || item.og_image || '';
   const projects = item.id && !opts.isPreview ? getResearchProjectsForGroup(item.id) : [];
 
   const children = [];
@@ -751,17 +761,21 @@ function renderResearchGroupDetail(host, slugOrId, opts = {}) {
     }),
   );
   if (imgSrc) {
-    children.push(
-      el('div', {
-        className: 'detail-hero',
-        children: [
-          el('img', {
-            className: 'detail-hero-img',
-            attrs: { src: imgSrc, alt: title, loading: 'lazy' },
-          }),
-        ],
-      }),
-    );
+    const pic = cmsPictureEl({
+      src: imgSrc,
+      webp: item.img_webp,
+      alt: title,
+      className: 'detail-hero-img',
+      loading: 'lazy',
+    });
+    if (pic) {
+      children.push(
+        el('div', {
+          className: 'detail-hero',
+          children: [pic],
+        }),
+      );
+    }
   }
   children.push(
     el('header', {

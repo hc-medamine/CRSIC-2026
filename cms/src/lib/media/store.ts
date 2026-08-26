@@ -18,6 +18,7 @@ import {
   publicPathFor,
   type MediaBucket,
 } from "@/lib/media/config";
+import { unlinkWebpSibling } from "@/lib/media/webp";
 import {
   listMediaReferences,
   type MediaReference,
@@ -364,6 +365,7 @@ export async function replaceMediaUpload(
   }
 
   writeBoth(existing.id, existing.extension, existing.public_path, validated.buffer);
+  unlinkWebpSibling(existing.public_path);
 
   const result = await query<MediaAsset>(
     `UPDATE media_assets SET
@@ -439,6 +441,7 @@ export async function deleteMediaAsset(
 
   unlinkIfExists(stagingPath(existing.id, existing.extension));
   unlinkIfExists(absolutePublicPath(existing.public_path));
+  unlinkWebpSibling(existing.public_path);
 
   await writeAudit({
     actor: user,
@@ -475,6 +478,7 @@ export async function purgeMediaIfUnreferenced(
     await query(`DELETE FROM media_assets WHERE id = $1`, [existing.id]);
     unlinkIfExists(stagingPath(existing.id, existing.extension));
     unlinkIfExists(absolutePublicPath(existing.public_path));
+    unlinkWebpSibling(existing.public_path);
     await writeAudit({
       actor,
       action: "media.delete",
@@ -485,6 +489,7 @@ export async function purgeMediaIfUnreferenced(
     });
   } else {
     unlinkIfExists(absolutePublicPath(publicPath));
+    unlinkWebpSibling(publicPath);
   }
   return true;
 }

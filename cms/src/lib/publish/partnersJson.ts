@@ -4,6 +4,7 @@ import { query } from "@/lib/db";
 import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
 import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 import { withPublicStoryFields, type StoryEnFields } from "@/lib/publish/storyPublic";
+import { attachWebpSiblings } from "@/lib/media/webp";
 
 export type PublicPartnerItem = {
   id: string;
@@ -18,7 +19,7 @@ export type PublicPartnerItem = {
   body_ar?: string;
   body_en?: string;
 } & PublicSeoFields &
-  StoryEnFields & { img_card?: string };
+  StoryEnFields & { img_card?: string; img_webp?: string; img_card_webp?: string };
 
 /** Public item plus the scope used to bucket it into intl/nat on rebuild. */
 export type StoredPartnerPayload = PublicPartnerItem & { scope: "intl" | "nat" };
@@ -92,6 +93,10 @@ export function buildPartnerPayload(row: PayloadSource): StoredPartnerPayload {
   if (emoji) item.emoji = emoji;
   if (img) item.img = img;
   return item;
+}
+
+export async function buildPartnerPayloadForItem(row: PayloadSource): Promise<StoredPartnerPayload> {
+  return attachWebpSiblings(buildPartnerPayload(row));
 }
 
 function publicPartnersPath(): string {

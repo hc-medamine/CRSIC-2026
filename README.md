@@ -252,6 +252,7 @@ erDiagram
 | `pubs[].title_en`, `summary_en`, `body_en`, `label_en` | optional | EN when `en_status` is `ready` |
 | `pubs[].en_status` | `pending` \| `ready` | missing = not ready |
 | `pubs[].img_card` | optional path | SPA cards; `covers[]` stay master paths |
+| `pubs[].img_webp` / `img_card_webp` | optional | WebP siblings; missing = JPEG/PNG only |
 | `pubs[].type` | `"collective"` | `"individual"`                                | Filter key |
 | `pubs[].dept` | string         | Department label (Arabic in current data)     |
 | `pubs[].desc` | string         | Plain text only                               |
@@ -267,6 +268,7 @@ erDiagram
 | `status` | `"upcoming"` \| `"ongoing"` \| `"done"` | Badge on SPA cards |
 | `img` | string (optional) | Detail master; CMS publish uses `img/cms/events/`; if omitted, Holders `0`–`5` cycle |
 | `img_card` | string (optional) | SPA cards when present |
+| `img_webp` / `img_card_webp` | optional | WebP siblings written on next publish |
 | `editor_ar` / `editor_en`, `reviewer_ar` / `reviewer_en`, `publisher_ar` / `publisher_en` | display names | Card byline (publisher line is Fariha Boufatah; identical reviewer+publisher collapse to one line) |
 
 Home teaser `#home-events-grid` uses `getHomeEvents(3)` (intl + nat merged, newest first). Full events page still lists all items by year. The Home **featured** strip (`#home-feat-carousel`) is **news**, not events.
@@ -279,6 +281,7 @@ Home teaser `#home-events-grid` uses `getHomeEvents(3)` (intl + nat merged, newe
 | `name`, `country`, `date`, `emoji` | strings |
 | `en_status`, `name_en` / `title_en` | optional; EN name when ready |
 | `img_card` | optional card image |
+| `img_webp` / `img_card_webp` | optional WebP siblings |
 | `summary_ar` / `summary_en`, `body_ar` / `body_en` | optional narrative (SPA uses EN only when `en_status` is `ready`) |
 
 #### `journals.json`
@@ -297,6 +300,7 @@ Home teaser `#home-events-grid` uses `getHomeEvents(3)` (intl + nat merged, newe
 | `id`, `slug` | public identity; deep link `#news/{slug}` |
 | `img` | path string or `null` (CMS: `img/cms/news/`) — detail / lightbox master |
 | `img_card` | optional card-sized 16:9 path; SPA cards use this when present, else `img` |
+| `img_webp` / `img_card_webp` | optional WebP siblings; SPA `<picture>` when present and `safeImageSrc` allows; missing = JPEG/PNG |
 | `label`, `title` | Arabic strings |
 | `en_status` | `pending` \| `ready` (missing = not ready; old JSON) |
 | `title_en`, `summary_en`, `body_en`, `label_en` | optional; public EN only when `en_status` is `ready` (per-field Arabic fallback) |
@@ -623,7 +627,7 @@ Deep links may pass `data-tab` / `data-filter` on navigable elements.
 | `img/Holders/*` | Placeholder photography (carousel fallbacks) |
 | Fonts                    | Google Fonts CDN (Amiri display, Tajawal UI) |
 
-**Optimisation notes:** serve over HTTP/2 or a CDN; prefer WebP/AVIF in a future pass — not implemented today. Unused large assets (`crsic_door.jpg`, `Holders/6.jpg`, `nav-crsic-logo2.png`) were removed on 2026-07-16.
+**Optimisation notes:** serve over HTTP/2 or a CDN. WebP siblings on next CMS publish (Cut A); AVIF still out. Unused large assets (`crsic_door.jpg`, `Holders/6.jpg`, `nav-crsic-logo2.png`) were removed on 2026-07-16.
 
 **Brand tokens** (`:root` in `css/style.css`): `--green-deep` `#1B4332`, `--green-mid` `#2D6A4F`, `--gold` `#C9A84C`, cream/text neutrals.
 
@@ -806,7 +810,7 @@ No separate staging config files exist in-repo.
 | Priority | Item |
 |----------|------|
 | Medium | Dual-field or locale-keyed content if EN parity is required |
-| Medium | Further image compression / WebP for covers and `img/cms/` |
+| Medium | Further image compression / WebP for covers and `img/cms/` — **Cut A implementing** (siblings on next publish; AVIF still out) |
 | Low | Introduce SPA linting/formatting once the team grows |
 
 ### Product direction
@@ -819,7 +823,7 @@ Own **internal CMS + PostgreSQL** (`cms/`): authenticated users with roles and p
 2. Server list pagination — **Delivered** [docs/prds/2026-08-22-cms-list-load-more.md](./docs/prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more)
 3. Soft-delete recycle bin — **Delivered** [docs/prds/2026-08-22-cms-recycle-bin.md](./docs/prds/2026-08-22-cms-recycle-bin.md) (PR #34)
 4. Bulk ops / clone / import-export UI — **list bulk unpublish/recycle on all CMS content types** (news PR #36; events/publications + remaining types PR #37). **Clone Cut 1 Delivered** ([PRD](./docs/prds/2026-08-22-cms-clone-import-export.md), PR #42). **JSON zip I/E Delivered** (PR #44). Picker bulk + sort: [PRD](./docs/prds/2026-08-24-cms-import-export-bulk-sort.md) (**Delivered**)
-5–7. Extra media optimize, remaining EN-when-ready, static institutional pages — **Draft** [docs/prds/2026-08-26-remaining-deferred-pack.md](./docs/prds/2026-08-26-remaining-deferred-pack.md) (do not implement until Approved). Cover crop + news/events/pubs/partners EN-when-ready already shipped (PR #44).
+5–7. Extra media optimize, remaining EN-when-ready, static institutional pages — **Approved** [docs/prds/2026-08-26-remaining-deferred-pack.md](./docs/prds/2026-08-26-remaining-deferred-pack.md). **Cut A implementing** (`feature/cms-webp-siblings`). Cover crop + news/events/pubs/partners EN-when-ready already shipped (PR #44).
 8. Journals in CMS (OJS remains) — **still deferred**; out of the 2026-08-26 pack
 
 **Cancelled (do not re-open):** scheduled / timed auto-publish (2026-07-21, confirmed 2026-08-22). Publish stays manual Approve → Publish.
@@ -834,7 +838,7 @@ Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Core spec: [d
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-08-26** (remaining-deferred PRD Draft; I2 docs + local CMS media on `main`) |
+| Last updated     | **2026-08-26** (remaining-deferred pack Approved; Cut A WebP) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes

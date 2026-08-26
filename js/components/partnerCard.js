@@ -1,9 +1,9 @@
 /**
  * Partner card — safe DOM builder (no innerHTML).
  */
-import { cmsCardImageSrc } from '../data.js';
+import { cmsCardImageSrc, cmsCardWebpSrc } from '../data.js';
 import { editorialCardAttrs, editorialField } from '../editorial.js';
-import { el, safeImageSrc } from '../utils.js';
+import { el, cmsPictureEl } from '../utils.js';
 
 /**
  * @param {object} p
@@ -11,17 +11,21 @@ import { el, safeImageSrc } from '../utils.js';
  */
 export function createPartnerCard(p) {
   const slug = p.slug || p.id;
-  const imgSrc = safeImageSrc(cmsCardImageSrc(p));
+  const imgSrc = cmsCardImageSrc(p);
   const name = editorialField(p, 'name');
   const summary = editorialField(p, 'summary');
-  const mark = imgSrc
+  const picture = imgSrc
+    ? cmsPictureEl({
+        src: imgSrc,
+        webp: cmsCardWebpSrc(p),
+        alt: name || '',
+        loading: 'lazy',
+      })
+    : null;
+  const mark = picture
     ? el('div', {
         className: 'partner-mark partner-mark-img',
-        children: [
-          el('img', {
-            attrs: { src: imgSrc, alt: name || '', loading: 'lazy' },
-          }),
-        ],
+        children: [picture],
       })
     : el('div', { className: 'partner-mark', text: p.emoji || '' });
 

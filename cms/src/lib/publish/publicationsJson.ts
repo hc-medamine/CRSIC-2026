@@ -10,6 +10,7 @@ import { slugifyTitle, uniqueSlug } from "@/lib/publish/slug";
 import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
 import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 import { withPublicStoryFields, type StoryEnFields } from "@/lib/publish/storyPublic";
+import { attachWebpSiblings } from "@/lib/media/webp";
 
 export type PublicPubItem = {
   id: string;
@@ -22,7 +23,7 @@ export type PublicPubItem = {
   body: string;
   media: PublicMediaItem[];
 } & PublicSeoFields &
-  StoryEnFields & { img_card?: string };
+  StoryEnFields & { img_card?: string; img_webp?: string; img_card_webp?: string };
 
 /** Public item plus its cover (kept alongside so covers.length === pubs.length on rebuild). */
 export type StoredPubPayload = PublicPubItem & { cover: string };
@@ -87,6 +88,13 @@ export function buildPublicationPayload(
     },
   );
   return { ...publicBase, cover };
+}
+
+export async function buildPublicationPayloadForItem(
+  row: PayloadSource,
+  usedSlugs?: Set<string>,
+): Promise<StoredPubPayload> {
+  return attachWebpSiblings(buildPublicationPayload(row, usedSlugs));
 }
 
 function publicPublicationsPath(): string {

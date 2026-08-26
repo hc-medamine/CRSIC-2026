@@ -1926,6 +1926,12 @@ a.partner-card-link:hover { border-color: var(--green-deep); }
   object-position: center;
   display: block;
 }
+
+/* WebP <picture> wrapper: keep img as the layout box (existing img CSS). */
+.cms-picture {
+  display: contents;
+}
+
 .news-thumb-placeholder {
   width: 100%;
   height: 100%;

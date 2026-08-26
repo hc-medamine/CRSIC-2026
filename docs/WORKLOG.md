@@ -19,6 +19,18 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-26 — Remaining deferred pack **Approved** (implement Cut A)
+
+[prds/2026-08-26-remaining-deferred-pack.md](./prds/2026-08-26-remaining-deferred-pack.md) **Approved**. Branch `feature/cms-webp-siblings`. Cut A: WebP siblings on publish + SPA `<picture>`. Cuts B/C wait. Journals stay OJS.
+
+---
+
+### 2026-08-26 — Remaining deferred pack: open questions **locked** (still Draft)
+
+[prds/2026-08-26-remaining-deferred-pack.md](./prds/2026-08-26-remaining-deferred-pack.md) Q1–Q8 locked: three cuts A→B→C; full Cut C; WebP siblings; missing `en_status` = not ready (EN drop accepted); Director-class site-pages gate; footer follows contact address; no WebP rebuild UI; alert banner Arabic-only when not ready. Superseded same day — **Approved** (entry above). Journals stay OJS.
+
+---
+
 ### 2026-08-26 — PRD **Draft**: remaining deferred pack (no journals)
 
 [prds/2026-08-26-remaining-deferred-pack.md](./prds/2026-08-26-remaining-deferred-pack.md). One PRD for leftover deferred work: WebP siblings, remaining EN-when-ready types, static institutional pages in CMS. **Journals stay OJS.** Status **Draft** — do not implement until Approved.

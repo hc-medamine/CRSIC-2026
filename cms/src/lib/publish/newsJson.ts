@@ -19,6 +19,7 @@ import {
   type PublicBylineFields,
 } from "@/lib/publish/publicByline";
 import { withPublicStoryFields, type StoryEnFields } from "@/lib/publish/storyPublic";
+import { attachWebpSiblings } from "@/lib/media/webp";
 
 export type PublicNewsItem = {
   id: string;
@@ -37,7 +38,7 @@ export type PublicNewsItem = {
   publisher_ar: string;
   publisher_en: string;
 } & PublicSeoFields &
-  StoryEnFields & { img_card?: string };
+  StoryEnFields & { img_card?: string; img_webp?: string; img_card_webp?: string };
 
 /** live_payload may keep source flags that public JSON does not emit. */
 export type StoredNewsPayload = PublicNewsItem & {
@@ -169,7 +170,7 @@ export async function buildNewsPayloadForItem(
   usedSlugs?: Set<string>,
 ): Promise<StoredNewsPayload> {
   const byline = row.id ? await loadPublicByline(row.id) : bylineFromRow(row);
-  return buildNewsPayload({ ...row, ...byline }, usedSlugs);
+  return attachWebpSiblings(buildNewsPayload({ ...row, ...byline }, usedSlugs));
 }
 
 function publicNewsPath(): string {

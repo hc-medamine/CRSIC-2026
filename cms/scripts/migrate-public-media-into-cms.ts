@@ -280,7 +280,7 @@ async function migrateLocalCmsMedia(uploadedBy: string): Promise<{ moved: number
       moved += 1;
     }
     const fresh = await query<(typeof director.rows)[0]>(`SELECT * FROM site_director WHERE id = 1`);
-    if (fresh.rows[0]?.portrait_path) writePublicDirectorJson(fresh.rows[0]);
+    if (fresh.rows[0]?.portrait_path) await writePublicDirectorJson(fresh.rows[0]);
   }
 
   return { moved, kept };

@@ -54,6 +54,8 @@ Estimated time: **~5 minutes**.
 | D7 | News card → lightbox → detail; browser back returns | ☐ |
 | D8 | Event card (home or events list) → lightbox → detail | ☐ |
 | D9 | Direct hash `#publication/…` / `#news/…` / `#event/…` loads after refresh | ☐ |
+| Wp1 | News/pub card with `img_card_webp` (or `img_webp`) uses a `<picture>` / `type=image/webp` source; JPEG/PNG still in the `img` | ☐ |
+| Wp2 | Item without `*_webp` keys still shows JPEG/PNG only (no broken image) | ☐ |
 
 ## E. Content invariants (when those files changed)
 

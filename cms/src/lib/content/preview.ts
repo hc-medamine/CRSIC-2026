@@ -14,13 +14,13 @@ import { getLawById } from "@/lib/content/laws";
 import { getPlatformById } from "@/lib/content/platforms";
 import { buildNewsPayloadForItem } from "@/lib/publish/newsJson";
 import { buildEventPayloadForItem } from "@/lib/publish/eventsJson";
-import { buildPublicationPayload } from "@/lib/publish/publicationsJson";
-import { buildPartnerPayload } from "@/lib/publish/partnersJson";
+import { buildPublicationPayloadForItem } from "@/lib/publish/publicationsJson";
+import { buildPartnerPayloadForItem } from "@/lib/publish/partnersJson";
 import { buildAlertPayload } from "@/lib/publish/alertsJson";
-import { buildResearchGroupPayload } from "@/lib/publish/researchGroupsJson";
+import { buildResearchGroupPayloadForItem } from "@/lib/publish/researchGroupsJson";
 import { buildResearchProjectPayload } from "@/lib/publish/researchProjectsJson";
-import { buildLawPayload } from "@/lib/publish/lawsJson";
-import { buildPlatformPayload } from "@/lib/publish/platformsJson";
+import { buildLawPayloadForItem } from "@/lib/publish/lawsJson";
+import { buildPlatformPayloadForItem } from "@/lib/publish/platformsJson";
 
 export const PREVIEW_TTL_MS = 30 * 60 * 1000;
 
@@ -101,12 +101,12 @@ async function buildCandidatePayload(
   if (contentType === "publication") {
     const row = await getPublicationById(id);
     if (!row) return null;
-    return buildPublicationPayload(row) as unknown as Record<string, unknown>;
+    return (await buildPublicationPayloadForItem(row)) as unknown as Record<string, unknown>;
   }
   if (contentType === "partner") {
     const row = await getPartnerById(id);
     if (!row) return null;
-    return buildPartnerPayload(row) as unknown as Record<string, unknown>;
+    return (await buildPartnerPayloadForItem(row)) as unknown as Record<string, unknown>;
   }
   if (contentType === "alert") {
     const row = await getAlertById(id);
@@ -116,7 +116,7 @@ async function buildCandidatePayload(
   if (contentType === "research_group") {
     const row = await getResearchGroupById(id);
     if (!row) return null;
-    return buildResearchGroupPayload(row) as unknown as Record<string, unknown>;
+    return (await buildResearchGroupPayloadForItem(row)) as unknown as Record<string, unknown>;
   }
   if (contentType === "research_project") {
     const row = await getResearchProjectById(id);
@@ -126,12 +126,12 @@ async function buildCandidatePayload(
   if (contentType === "law") {
     const row = await getLawById(id);
     if (!row) return null;
-    return buildLawPayload(row) as unknown as Record<string, unknown>;
+    return (await buildLawPayloadForItem(row)) as unknown as Record<string, unknown>;
   }
   if (contentType === "platform") {
     const row = await getPlatformById(id);
     if (!row) return null;
-    return buildPlatformPayload(row) as unknown as Record<string, unknown>;
+    return (await buildPlatformPayloadForItem(row)) as unknown as Record<string, unknown>;
   }
   return null;
 }

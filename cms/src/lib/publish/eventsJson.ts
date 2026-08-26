@@ -18,6 +18,7 @@ import {
   type PublicBylineFields,
 } from "@/lib/publish/publicByline";
 import { withPublicStoryFields, type StoryEnFields } from "@/lib/publish/storyPublic";
+import { attachWebpSiblings } from "@/lib/media/webp";
 
 export type PublicEventItem = {
   id: string;
@@ -39,7 +40,7 @@ export type PublicEventItem = {
   publisher_ar: string;
   publisher_en: string;
 } & PublicSeoFields &
-  StoryEnFields & { img_card?: string; type_en?: string };
+  StoryEnFields & { img_card?: string; type_en?: string; img_webp?: string; img_card_webp?: string };
 
 /** Public item plus the scope used to bucket it into intl/nat on rebuild. */
 export type StoredEventPayload = PublicEventItem & { scope: "intl" | "nat" };
@@ -139,7 +140,7 @@ export async function buildEventPayloadForItem(
     publisher_ar: PUBLIC_PUBLISHER_AR,
     publisher_en: PUBLIC_PUBLISHER_EN,
   };
-  return buildEventPayload({ ...row, ...byline }, usedSlugs);
+  return attachWebpSiblings(buildEventPayload({ ...row, ...byline }, usedSlugs));
 }
 
 function publicEventsPath(): string {
