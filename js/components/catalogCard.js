@@ -1,9 +1,9 @@
 /**
  * Laws & platforms catalog cards — native SPA hash details.
  */
-import { cmsItemImageSrc } from '../data.js';
+import { cmsItemImageSrc, cmsItemWebpSrc } from '../data.js';
 import { t, getLang } from '../i18n.js';
-import { el, safeImageSrc } from '../utils.js';
+import { el, cmsPictureEl } from '../utils.js';
 
 /**
  * @param {object} law
@@ -13,13 +13,21 @@ export function createLawCard(law) {
   const lang = getLang();
   const title = lang === 'en' && law.titleEn ? law.titleEn : (law.title || '');
   const summary = lang === 'en' && law.summaryEn ? law.summaryEn : (law.summary || '');
-  const img = safeImageSrc(cmsItemImageSrc(law));
+  const img = cmsItemImageSrc(law);
   const slug = law.slug || law.id || '';
   const href = slug ? `#law/${encodeURIComponent(slug)}` : '#laws';
-  const media = img
+  const picture = img
+    ? cmsPictureEl({
+        src: img,
+        webp: cmsItemWebpSrc(law),
+        alt: title,
+        loading: 'lazy',
+      })
+    : null;
+  const media = picture
     ? el('div', {
         className: 'catalog-card-media',
-        children: [el('img', { attrs: { src: img, alt: title, loading: 'lazy' } })],
+        children: [picture],
       })
     : el('div', { className: 'catalog-card-media catalog-card-media--empty' });
 
@@ -48,14 +56,22 @@ export function createPlatformCard(platform) {
   const lang = getLang();
   const title = lang === 'en' && platform.titleEn ? platform.titleEn : (platform.title || '');
   const summary = lang === 'en' && platform.summaryEn ? platform.summaryEn : (platform.summary || '');
-  const img = safeImageSrc(cmsItemImageSrc(platform));
+  const img = cmsItemImageSrc(platform);
   const slug = platform.slug || platform.id || '';
   const href = slug ? `#platform/${encodeURIComponent(slug)}` : '#platforms';
 
-  const media = img
+  const picture = img
+    ? cmsPictureEl({
+        src: img,
+        webp: cmsItemWebpSrc(platform),
+        alt: title,
+        loading: 'lazy',
+      })
+    : null;
+  const media = picture
     ? el('div', {
         className: 'catalog-card-media',
-        children: [el('img', { attrs: { src: img, alt: title, loading: 'lazy' } })],
+        children: [picture],
       })
     : el('div', { className: 'catalog-card-media catalog-card-media--empty' });
 

@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
+import { attachWebpSiblings } from "@/lib/media/webp";
 import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
 
 export type PublicResearchGroupMember = {
@@ -21,6 +22,7 @@ export type PublicResearchGroup = {
   lead_en: string;
   members: PublicResearchGroupMember[];
   img?: string;
+  img_webp?: string;
 } & PublicSeoFields;
 
 export function normalizeResearchMembers(raw: unknown): PublicResearchGroupMember[] {
@@ -77,6 +79,12 @@ export function buildResearchGroupPayload(row: PayloadSource): PublicResearchGro
   );
   if (img) return { ...base, img };
   return base;
+}
+
+export async function buildResearchGroupPayloadForItem(
+  row: PayloadSource,
+): Promise<PublicResearchGroup> {
+  return attachWebpSiblings(buildResearchGroupPayload(row));
 }
 
 function publicResearchGroupsPath(): string {

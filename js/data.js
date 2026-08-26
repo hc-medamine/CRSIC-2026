@@ -226,6 +226,39 @@ export function pubCardImageSrc(pub, index) {
   return coverSrcFromPub(pub, index);
 }
 
+/**
+ * WebP sibling for a card (img_card_webp when a card file exists, else img_webp).
+ * @param {object|undefined} item
+ * @returns {string}
+ */
+export function cmsCardWebpSrc(item) {
+  if (!item) return '';
+  const card = String(item.img_card || '').trim();
+  if (card) return String(item.img_card_webp || '').trim();
+  return String(item.img_webp || '').trim();
+}
+
+/**
+ * WebP sibling for detail/master (`img_webp`).
+ * @param {object|undefined} item
+ * @returns {string}
+ */
+export function cmsItemWebpSrc(item) {
+  return String(item?.img_webp || '').trim();
+}
+
+/**
+ * @param {object|undefined} pub
+ * @param {number} [index]
+ * @returns {string}
+ */
+export function pubCardWebpSrc(pub, index) {
+  const card = String(pub?.img_card || '').trim();
+  if (card) return String(pub?.img_card_webp || '').trim();
+  if (cmsItemImageSrc(pub)) return String(pub?.img_webp || '').trim();
+  return '';
+}
+
 /** @param {number} i */
 export function getCoverForPub(i) {
   return coverSrcFromPub(pubs[i], i);

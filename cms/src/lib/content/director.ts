@@ -3,7 +3,6 @@ import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
 import { getUserOrgIds } from "@/lib/content/permissions";
 import {
-  buildDirectorPayload,
   writePublicDirectorJson,
   type PublicDirector,
 } from "@/lib/publish/directorJson";
@@ -132,7 +131,6 @@ export async function publishSiteDirector(user: SessionUser): Promise<{
     throw new Error("Portrait image is required before publishing");
   }
 
-  const payload = buildDirectorPayload(existing);
   const beforePublished = existing.published_at;
   try {
     await query(
@@ -140,7 +138,7 @@ export async function publishSiteDirector(user: SessionUser): Promise<{
       [user.id],
     );
     const row = (await getSiteDirector())!;
-    writePublicDirectorJson(row);
+    const written = await writePublicDirectorJson(row);
     await writeAudit({
       actor: user,
       action: "director.publish",
@@ -148,7 +146,7 @@ export async function publishSiteDirector(user: SessionUser): Promise<{
       entityId: "1",
       summary: "Published director word",
     });
-    return { row, payload };
+    return { row, payload: written.payload };
   } catch (err) {
     await query(
       `UPDATE site_director SET published_at = $1, updated_at = NOW() WHERE id = 1`,

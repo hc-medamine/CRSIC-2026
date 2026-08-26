@@ -115,6 +115,9 @@ export async function listMediaReferencesForPaths(
           ci.live_payload->>'img' = path.p
           OR ci.live_payload->>'cover' = path.p
           OR ci.live_payload->>'img_card' = path.p
+          OR ci.live_payload->>'img_webp' = path.p
+          OR ci.live_payload->>'img_card_webp' = path.p
+          OR ci.live_payload->>'portrait_webp' = path.p
           OR ci.live_payload->>'og_image' = path.p
           OR EXISTS (
             SELECT 1

@@ -3,7 +3,7 @@ import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { appendWorkflowComment } from "@/lib/content/comments";
-import { buildLawPayload, rebuildPublicLawsJson } from "@/lib/publish/lawsJson";
+import { buildLawPayloadForItem, rebuildPublicLawsJson } from "@/lib/publish/lawsJson";
 import { mutateThenRebuildPublic } from "@/lib/publish/safeRebuild";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
 import {
@@ -397,7 +397,7 @@ export async function publishLaw(user: SessionUser, id: string) {
     titleAr: existing.title_ar,
     existingSlug: existing.public_slug,
   });
-  const payload = buildLawPayload({ ...existing, public_slug: slug });
+  const payload = await buildLawPayloadForItem({ ...existing, public_slug: slug });
   const item = await mutateThenRebuildPublic({
     itemId: id,
     mutate: async () => {

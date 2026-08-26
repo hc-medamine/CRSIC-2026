@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
 import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
 import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
+import { attachWebpSiblings } from "@/lib/media/webp";
 
 export type PlatformKind = "visual" | "radio" | "mobility";
 
@@ -17,6 +18,8 @@ export type PublicPlatformItem = {
   body?: string;
   bodyEn?: string;
   img?: string;
+  img_webp?: string;
+  img_card_webp?: string;
   externalUrl?: string;
   media?: { kind: string; src: string; alt?: string }[];
 } & PublicSeoFields;
@@ -87,6 +90,10 @@ export function buildPlatformPayload(row: PayloadSource): PublicPlatformItem {
   if (externalUrl) item.externalUrl = externalUrl;
   if (media.length > 0) item.media = media;
   return item;
+}
+
+export async function buildPlatformPayloadForItem(row: PayloadSource): Promise<PublicPlatformItem> {
+  return attachWebpSiblings(buildPlatformPayload(row));
 }
 
 function publicPlatformsPath(): string {

@@ -262,6 +262,15 @@ PRD [2026-08-24-cms-desk-production-boost.md](../prds/2026-08-24-cms-desk-produc
 | En1 | Published news with EN filled + **ready** + four-eyes publish: English locale shows EN body, **no** AR-only notice on that story’s list/detail. Pending item still Arabic + notice | ☐ |
 | En2 | Ready item with empty `title_en`: English title falls back to Arabic (no invented text). Preview token matches live EN/`img_card` rules | ☐ |
 
+## Remaining deferred pack — Cut A (WebP siblings)
+
+PRD [2026-08-26-remaining-deferred-pack.md](../prds/2026-08-26-remaining-deferred-pack.md). JPEG/PNG masters stay. No Editor crop control. Walk AR + EN.
+
+| # | Check | Pass? |
+|---|--------|-------|
+| Wp1 | Four-eyes publish a news cover: public JSON has optional `img_webp` / `img_card_webp`; files exist next to JPEG/PNG; Home/list card uses WebP in a supporting browser | ☐ |
+| Wp2 | Old JSON without `*_webp` still shows JPEG/PNG. Preview token follows the same WebP keys as live. Journals JSON hash unchanged. `cms npm test` green | ☐ |
+
 ## Import/Export picker bulk + header sort
 
 PRD [2026-08-24-cms-import-export-bulk-sort.md](../prds/2026-08-24-cms-import-export-bulk-sort.md). Super Admin `/dashboard/import-export` only. Type lists unchanged. Walk AR + EN.

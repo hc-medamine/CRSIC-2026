@@ -1,10 +1,10 @@
 /**
  * Publication card — safe DOM builder (no innerHTML).
  */
-import { pubCardImageSrc } from '../data.js';
+import { pubCardImageSrc, pubCardWebpSrc } from '../data.js';
 import { editorialCardAttrs, editorialField } from '../editorial.js';
 import { t } from '../i18n.js';
-import { el, safeImageSrc } from '../utils.js';
+import { el, cmsPictureEl } from '../utils.js';
 
 /**
  * @param {object} p
@@ -12,18 +12,17 @@ import { el, safeImageSrc } from '../utils.js';
  * @returns {HTMLElement}
  */
 export function createPubCard(p, i) {
-  const cover = safeImageSrc(pubCardImageSrc(p, i));
+  const cover = pubCardImageSrc(p, i);
   const badge = p.type === 'collective' ? t('badge_collective') : t('badge_individual');
   const title = editorialField(p, 'title');
   const dept = editorialField(p, 'label');
 
   const img = cover
-    ? el('img', {
-        attrs: {
-          src: cover,
-          alt: title || '',
-          loading: 'lazy',
-        },
+    ? cmsPictureEl({
+        src: cover,
+        webp: pubCardWebpSrc(p, i),
+        alt: title || '',
+        loading: 'lazy',
         style: {
           width: '100%',
           height: '100%',

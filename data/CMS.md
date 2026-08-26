@@ -8,17 +8,17 @@ When `CONTENT_BASE_URL` is set (e.g. `https://cdn.example.com/crsic/`), the app 
 
 | Path | Shape |
 |------|--------|
-| `news.json` | `{ "news": object[] }` — `id`, `slug`, `date`, `title`, `label`, `summary`, `body`, `img`, optional `img_card`, `en_status` + EN editorial fields, `media[]`, bylines (`editor_*` from author, `reviewer_*` from review owner, `publisher_*` from CMS `publisher_id` or Boufatah fallback), optional SEO |
+| `news.json` | `{ "news": object[] }` — `id`, `slug`, `date`, `title`, `label`, `summary`, `body`, `img`, optional `img_card` / `img_webp` / `img_card_webp`, `en_status` + EN editorial fields, `media[]`, bylines (`editor_*` from author, `reviewer_*` from review owner, `publisher_*` from CMS `publisher_id` or Boufatah fallback), optional SEO |
 | `featured-news.json` | `{ "ids": string[] }` — ordered public news ids for `#home-feat-carousel`, max 10. Empty or all missing → SPA shows 3 newest news. CMS: `/dashboard/featured-news` |
-| `events.json` | `{ "intl": object[], "nat": object[] }` — detail + `status` (`upcoming` \| `ongoing` \| `done`) + bylines + optional `img_card` / EN-when-ready + optional SEO |
-| `publications.json` | `{ "covers": string[], "pubs": object[] }` — SPA cards prefer `img_card`; keep `covers.length === pubs.length` (masters). Optional `en_status` + EN fields |
-| `partners.json` | `{ "nat": object[], "intl": object[] }` — optional summary/body + `en_status` / `name_en` / `img_card` + SEO |
+| `events.json` | `{ "intl": object[], "nat": object[] }` — detail + `status` (`upcoming` \| `ongoing` \| `done`) + bylines + optional `img_card` / `img_webp` / `img_card_webp` / EN-when-ready + optional SEO |
+| `publications.json` | `{ "covers": string[], "pubs": object[] }` — SPA cards prefer `img_card` then WebP sibling; keep `covers.length === pubs.length` (masters, not WebP). Optional `en_status` + EN fields + `img_webp` / `img_card_webp` |
+| `partners.json` | `{ "nat": object[], "intl": object[] }` — optional summary/body + `en_status` / `name_en` / `img_card` / `img_webp` / `img_card_webp` + SEO |
 | `alerts.json` | `{ "items": object[] }` — at most one live item |
 | `laws.json` | `{ "laws": object[] }` — hub `#laws`; detail `#law/{slug}`; optional `externalUrl` |
 | `platforms.json` | `{ "platforms": object[] }` — `kind`: visual \| radio \| mobility; hub `#platforms`; detail `#platform/{slug}` |
 | `research-groups.json` | `{ "items": object[] }` |
 | `research-projects.json` | `{ "items": object[] }` |
-| `director.json` | singleton `{ quote_ar, quote_en, name_ar, name_en, role_ar, role_en, portrait, … }` — CMS `/dashboard/director`. Soft-fail: SPA keeps locale placeholders |
+| `director.json` | singleton `{ quote_ar, quote_en, name_ar, name_en, role_ar, role_en, portrait, optional portrait_webp, … }` — CMS `/dashboard/director`. Soft-fail: SPA keeps locale placeholders |
 | `journals.json` | `{ "journals": object[] }` — **not** CMS-published (OJS) |
 | `locales/ar.json` | flat key → string (350 keys; must match EN) |
 | `locales/en.json` | flat key → string |

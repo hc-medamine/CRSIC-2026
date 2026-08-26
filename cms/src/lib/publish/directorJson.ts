@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { attachWebpSiblings } from "@/lib/media/webp";
 
 export type PublicDirector = {
   quote_ar: string;
@@ -9,6 +10,7 @@ export type PublicDirector = {
   role_ar: string;
   role_en: string;
   portrait: string;
+  portrait_webp?: string;
   portrait_alt_ar?: string;
   portrait_alt_en?: string;
 };
@@ -46,8 +48,8 @@ function publicDirectorPath(): string {
   return join(process.cwd(), "..", "data", "director.json");
 }
 
-export function writePublicDirectorJson(row: DirectorPayloadSource): { path: string } {
-  const payload = buildDirectorPayload(row);
+export async function writePublicDirectorJson(row: DirectorPayloadSource): Promise<{ path: string; payload: PublicDirector }> {
+  const payload = await attachWebpSiblings(buildDirectorPayload(row));
   const path = publicDirectorPath();
   const dir = dirname(path);
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
@@ -55,5 +57,5 @@ export function writePublicDirectorJson(row: DirectorPayloadSource): { path: str
   const tmp = `${path}.tmp`;
   writeFileSync(tmp, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
   renameSync(tmp, path);
-  return { path };
+  return { path, payload };
 }

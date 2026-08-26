@@ -15,7 +15,7 @@ import { getPublicationById } from "@/lib/content/publications";
 import { buildNewsPayloadForItem, rebuildPublicNewsJson } from "@/lib/publish/newsJson";
 import { buildEventPayloadForItem, rebuildPublicEventsJson } from "@/lib/publish/eventsJson";
 import {
-  buildPublicationPayload,
+  buildPublicationPayloadForItem,
   rebuildPublicPublicationsJson,
 } from "@/lib/publish/publicationsJson";
 import { normalizeAttachments } from "@/lib/publish/media";
@@ -227,7 +227,7 @@ export async function emergencyPublish(
       titleAr: existing.title_ar,
       existingSlug: existing.public_slug,
     });
-    const payload = buildPublicationPayload({ ...existing, public_slug: slug });
+    const payload = await buildPublicationPayloadForItem({ ...existing, public_slug: slug });
     await mutateThenRebuildPublic({
       itemId: item.id,
       mutate: async () => {

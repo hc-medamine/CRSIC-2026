@@ -1,11 +1,11 @@
 /**
  * Featured home news carousel (curated playlist, max 10) — CRSIC brand, vanilla JS.
  */
-import { cmsCardImageSrc, getFeaturedNewsIds, getNews } from '../data.js';
+import { cmsCardImageSrc, cmsCardWebpSrc, getFeaturedNewsIds, getNews } from '../data.js';
 import { editorialCardAttrs, editorialField } from '../editorial.js';
 import { newsResume, resolveFeaturedNews } from '../featuredNews.js';
 import { t } from '../i18n.js';
-import { el, replaceChildren, safeImageSrc, prefersReducedMotion } from '../utils.js';
+import { el, replaceChildren, safeImageSrc, cmsPictureEl, prefersReducedMotion } from '../utils.js';
 
 const HOLDER = [
   'img/Holders/0.jpg',
@@ -128,17 +128,17 @@ export function mountFeaturedCarousel(root) {
       },
     });
     if (imgSrc) {
-      slide.appendChild(
-        el('img', {
-          className: 'feat-carousel-media',
-          attrs: {
-            src: imgSrc,
-            alt: title,
-            loading: i === 0 ? 'eager' : 'lazy',
-            decoding: 'async',
-          },
-        }),
-      );
+      const cmsSrc = safeImageSrc(cmsCardImageSrc(item));
+      const webp = imgSrc === cmsSrc ? cmsCardWebpSrc(item) : '';
+      const pic = cmsPictureEl({
+        src: imgSrc,
+        webp,
+        alt: title,
+        className: 'feat-carousel-media',
+        loading: i === 0 ? 'eager' : 'lazy',
+        decoding: 'async',
+      });
+      if (pic) slide.appendChild(pic);
     }
     const inner = el('div', {
       className: 'feat-carousel-inner',

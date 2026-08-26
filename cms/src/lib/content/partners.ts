@@ -3,7 +3,7 @@ import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { appendWorkflowComment } from "@/lib/content/comments";
-import { buildPartnerPayload, rebuildPublicPartnersJson } from "@/lib/publish/partnersJson";
+import { buildPartnerPayloadForItem, rebuildPublicPartnersJson } from "@/lib/publish/partnersJson";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
 import { mutateThenRebuildPublic } from "@/lib/publish/safeRebuild";
 import {
@@ -420,7 +420,7 @@ export async function publishPartner(user: SessionUser, id: string) {
     titleAr: existing.title_ar,
     existingSlug: existing.public_slug,
   });
-  const payload = buildPartnerPayload({ ...existing, public_slug: slug });
+  const payload = await buildPartnerPayloadForItem({ ...existing, public_slug: slug });
   const item = await mutateThenRebuildPublic({
     itemId: id,
     mutate: async () => {

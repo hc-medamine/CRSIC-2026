@@ -26,7 +26,7 @@ import {
   prefersReducedMotion,
   el,
   replaceChildren,
-  safeImageSrc
+  cmsPictureEl,
 } from './utils.js';
 import { trapFocus, handleEscapeStack } from './a11y.js';
 import { createPubCard } from './components/pubCard.js';
@@ -250,20 +250,24 @@ export function applyDirectorWord() {
   const quoteEl = root.querySelector('[data-director="quote"]');
   const nameEl = root.querySelector('[data-director="name"]');
   const roleEl = root.querySelector('[data-director="role"]');
-  const imgEl = root.querySelector('.director-word-media img');
+  const mediaNode = root.querySelector('.director-word-frame > picture, .director-word-frame > img');
   const quote = lang === 'en' ? d.quote_en : d.quote_ar;
   const name = lang === 'en' ? (d.name_en || d.name_ar) : d.name_ar;
   const role = lang === 'en' ? (d.role_en || d.role_ar) : d.role_ar;
   if (quoteEl && quote) quoteEl.textContent = quote;
   if (nameEl && name) nameEl.textContent = name;
   if (roleEl && role) roleEl.textContent = role;
-  if (imgEl && d.portrait) {
-    imgEl.setAttribute('src', d.portrait);
-    const alt =
-      lang === 'en'
-        ? d.portrait_alt_en || d.portrait_alt_ar || name || ''
-        : d.portrait_alt_ar || d.portrait_alt_en || name || '';
-    imgEl.setAttribute('alt', alt);
+  if (mediaNode && d.portrait) {
+    const pic = cmsPictureEl({
+      src: d.portrait,
+      webp: d.portrait_webp,
+      alt:
+        lang === 'en'
+          ? d.portrait_alt_en || d.portrait_alt_ar || name || ''
+          : d.portrait_alt_ar || d.portrait_alt_en || name || '',
+      loading: 'lazy',
+    });
+    if (pic) mediaNode.replaceWith(pic);
   }
 }
 
@@ -858,20 +862,21 @@ export function openLightbox(optsOrIndex, triggerEl) {
   }
 
   const coverHost = document.getElementById('lb-cover');
-  const src = safeImageSrc(content.cover);
-  if (src) {
-    replaceChildren(coverHost, [
-      el('img', {
-        attrs: { src, alt: content.title || '' },
-        style: {
-          width: '100%',
-          height: '100%',
-          'object-fit': 'cover',
-          display: 'block',
-          'border-radius': '6px',
-        },
-      }),
-    ]);
+  const holderCover = String(content.cover || '').includes('img/Holders/');
+  const pic = cmsPictureEl({
+    src: content.cover,
+    webp: holderCover ? '' : content.item?.img_webp,
+    alt: content.title || '',
+    style: {
+      width: '100%',
+      height: '100%',
+      'object-fit': 'cover',
+      display: 'block',
+      'border-radius': '6px',
+    },
+  });
+  if (pic) {
+    replaceChildren(coverHost, [pic]);
   } else {
     replaceChildren(coverHost, [
       el('div', {

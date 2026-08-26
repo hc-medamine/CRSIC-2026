@@ -32,6 +32,8 @@ describe("buildNewsPayload EN + card", () => {
     assert.equal(item.body_en, "<p>English body</p>");
     assert.equal(item.label_en, "News");
     assert.equal(item.img_card, "img/cms/news/card.jpg");
+    assert.equal(item.img_webp, undefined);
+    assert.equal(item.img_card_webp, undefined);
   });
 
   it("omits empty EN strings and treats missing status as pending", () => {

@@ -1,9 +1,9 @@
 /**
  * News card — safe DOM builder (no innerHTML).
  */
-import { cmsCardImageSrc } from '../data.js';
+import { cmsCardImageSrc, cmsCardWebpSrc } from '../data.js';
 import { editorialCardAttrs, editorialField } from '../editorial.js';
-import { el, safeImageSrc } from '../utils.js';
+import { el, cmsPictureEl } from '../utils.js';
 import { createContentByline } from './contentByline.js';
 
 const GRADIENTS = [
@@ -51,15 +51,14 @@ export function createNewsCard(n, i) {
   let mediaChild;
   const title = editorialField(n, 'title');
   const label = editorialField(n, 'label');
-  const src = safeImageSrc(cmsCardImageSrc(n));
+  const src = cmsCardImageSrc(n);
   if (src) {
-    mediaChild = el('img', {
+    mediaChild = cmsPictureEl({
+      src,
+      webp: cmsCardWebpSrc(n),
+      alt: title || '',
       className: 'news-thumb',
-      attrs: {
-        src,
-        alt: title || '',
-        loading: 'lazy',
-      },
+      loading: 'lazy',
     });
   } else {
     mediaChild = el('div', {

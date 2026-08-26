@@ -4,7 +4,7 @@ import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { appendWorkflowComment } from "@/lib/content/comments";
 import {
-  buildPublicationPayload,
+  buildPublicationPayloadForItem,
   rebuildPublicPublicationsJson,
 } from "@/lib/publish/publicationsJson";
 import { persistImageCardPath } from "@/lib/content/imageCard";
@@ -486,7 +486,7 @@ export async function publishPublication(user: SessionUser, id: string) {
     titleAr: existing.title_ar,
     existingSlug: existing.public_slug,
   });
-  const payload = buildPublicationPayload({ ...existing, public_slug: slug });
+  const payload = await buildPublicationPayloadForItem({ ...existing, public_slug: slug });
   const item = await mutateThenRebuildPublic({
     itemId: id,
     mutate: async () => {

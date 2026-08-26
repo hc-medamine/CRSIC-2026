@@ -2,14 +2,14 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Draft** (2026-08-26) — do **not** implement until **Approved** |
+| Status | **Approved** (2026-08-26) — implement Cut A first (WebP); B then C after each is Delivered on `main` |
 | Date | 2026-08-26 |
 | Author | Stakeholder + agent |
 | Owners | Product / CMS Desk / Public SPA |
 | Related roadmap step | README §10 deferred #5 remainder, #6, #7 |
 | Supersedes | — (does not reopen [2026-08-24-cms-desk-production-boost.md](./2026-08-24-cms-desk-production-boost.md); that slice stays Delivered) |
 
-> One PRD for the leftover deferred work **except journals**. Three cuts: extra media optimize (WebP), remaining EN-when-ready types, then static institutional pages in CMS. **Journals stay on OJS.** Scheduled publish stays cancelled. **No code until this PRD is Approved.**
+> One PRD for the leftover deferred work **except journals**. Three cuts: extra media optimize (WebP), remaining EN-when-ready types, then static institutional pages in CMS. **Journals stay on OJS.** Scheduled publish stays cancelled. **Approved 2026-08-26** — Cut A on `feature/cms-webp-siblings`.
 
 ## 1. Problem
 
@@ -57,26 +57,27 @@ Who feels it: visitors on slow links; English visitors on laws/research; Super A
 1. On **next publish** of an item that already writes `img` / `img_card` (existing crop pipeline, `sharp` already in CMS): also write **WebP siblings** for master and card. Keep the JPEG/PNG files; do not replace them.
 2. Public JSON: keep `img` and `img_card` as today; add optional `img_webp` and `img_card_webp` (same pattern as `img_card`). Missing keys = old JSON, JPEG/PNG only.
 3. SPA: cards and detail use WebP when the matching `*_webp` path is present and `safeImageSrc` allows it (picture/`srcset` or equivalent — no `innerHTML`). Fallback is today’s `img` / `img_card`.
-4. Attachments / OG / director portrait: generate WebP on publish when that file is the primary/cover already handled by the pipeline. Do **not** build a new media-library optimizer UI in this cut.
-5. No new npm packages if `sharp` is enough (it is already a CMS dependency).
+4. Attachments / OG / director portrait: generate WebP on publish when that file is the primary/cover already handled by the pipeline (any published JPEG/PNG `image_path` / `image_card_path` / director `portrait_path`, including uncropped laws/platforms/groups). Do **not** build a new media-library optimizer UI in this cut.
+5. No new image libraries if `sharp` is enough. Declare `sharp` as a **direct** CMS dependency if needed (it is already present transitively via Next). Generate siblings **on publish**, not in the crop modal.
 
 **Cut B — Remaining EN-when-ready**
 
 1. Types: **alerts, laws, platforms, research groups, research projects**. Journals out.
 2. Reuse [production boost C](./2026-08-24-cms-desk-production-boost.md): public payload emits `en_status` plus non-empty EN editorial fields; SPA `lang=en` uses `editorialField` / `isEditorialEnReady`. Replace raw `title_en` reads in `js/research.js` and `js/components/detailPage.js`.
 3. Director stays the bilingual singleton it is today (quote/name/role already AR+EN). Do **not** add `en_status` to Director unless a field is empty — empty EN field already falls back in that form.
-4. Reaching visitors is still a **publish** (four-eyes). EN-pending queue (D1) lists published + pending for these types too.
+4. Reaching visitors is still a **publish** (existing four-eyes path for list types). EN-pending queue (D1) lists published + pending for these types too.
 5. Update [audits/PARITY.md](../audits/PARITY.md) and README §6.4 so they no longer say “all editorial JSON is Arabic-only”.
+6. Missing `en_status` = **not ready** (same as news). Existing public EN on laws/platforms/research/alerts **drops** until ready + publish — accepted. Alerts: not-ready → Arabic banner message only; **no** extra locale-notice chrome on the banner.
 
 **Cut C — Static institutional pages in CMS**
 
-1. New CMS singleton (or one “Site pages” record with sections), editable by **super_admin** and **centre-wide reviewer** — same gate as Director. Route under administration (e.g. `/dashboard/site-pages`), i18n AR+EN.
+1. New CMS singleton (one “Site pages” record with sections), editable by **super_admin** and **centre-wide reviewer** — **same gate as Director** (those roles may save and publish; not a new two-person workflow). Route under administration (e.g. `/dashboard/site-pages`), i18n AR+EN.
 2. **About** fields covering today’s locale bodies: hero tag/h1/p, nature (p1–p3), vision, mission, values, goals, axes (6), strategy (6). Headings that are chrome may stay locales; **body strings move**.
-3. **Org** chart node labels (today `org_*` locale keys that name offices/divisions).
-4. **Contact** display: address, phone, email, webmail label values (not the mailto form behaviour).
+3. **Org** chart node labels (today `org_*` locale keys that name offices/divisions), including the EN subtitle keys (`org_*_en`).
+4. **Contact** display: address, phone, email, webmail URL + visible text (not the mailto form behaviour). Labels stay locales. **Footer address** (`footer_contact_addr`) follows the same CMS address. Schema.org JSON-LD stays out.
 5. **Cooperation** intro: hero tag/h1/p and CTA paragraph (partner **cards** stay `partners.json`).
-6. Publish writes e.g. `data/site-pages.json` (name locked at implement if a cleaner split is cheaper — one file preferred). SPA `#about` `#org` `#contact` `#cooperation` read it; **locales remain fallback** until the first successful publish so About never blanks.
-7. Seed the singleton from current `data/locales/ar.json` + `en.json` on migrate/import (idempotent). Four-eyes on publish. Preview of the About block is a should-have.
+6. Publish writes e.g. `data/site-pages.json` (name locked at implement if a cleaner split is cheaper — one file preferred). SPA `#about` `#org` `#contact` `#cooperation` read it; **locales remain fallback** until the first successful publish so About never blanks. Treat the file as **optional** at `CONTENT_BASE_URL` (soft-fail like `featured-news.json`).
+7. Seed the singleton from current `data/locales/ar.json` + `en.json` on migrate/import (idempotent: insert-if-missing, never clobber later Desk edits). Preview of the About block is a should-have (in-form panel; A1 tokens stay `content_items` only).
 8. Nav labels, buttons, and other chrome stay in locales. Locale key count stays in sync; do not delete `about_*` keys until after fallback is proven (may keep as fallback forever).
 
 ### Should have
@@ -87,7 +88,7 @@ Who feels it: visitors on slow links; English visitors on laws/research; Super A
 
 ### Nice to have
 
-1. Cut A: Super Admin “rebuild WebP for this type” on Import/Export or media — **only if it falls out of the publish loop**; not a second product.
+1. Cut A: Super Admin “rebuild WebP for this type” — **out of this pack**. WebP only on next publish; revisit only if live JPEGs stay heavy with no appetite to republish.
 2. Cut C: org chart stays the current visual; only labels swap. No drag-and-drop org editor.
 
 ## 5. Content / data impact
@@ -101,8 +102,8 @@ Who feels it: visitors on slow links; English visitors on laws/research; Super A
 ## 6. UX notes
 
 - Cut A: invisible to Editors except smaller public images. No new form control.
-- Cut B: no new EN form sections — remaining types already have EN fields + ready. Public notice disappears only when ready.
-- Cut C: one Desk page with numbered sections (About, Org, Contact, Cooperation). Sticky Save / Submit / Publish like Director. Failures are sentences (“Publish failed — About left on locales”).
+- Cut B: no new EN form sections — remaining types already have EN fields + ready. Public list notice disappears only when ready. Alert banner: Arabic only when not ready (no notice chip).
+- Cut C: one Desk page with numbered sections (About, Org, Contact, Cooperation). Sticky Save / Publish like Director (same person may publish). Failures are sentences (“Publish failed — About left on locales”).
 - RTL and `prefers-reduced-motion` unchanged.
 
 ## 7. Technical notes
@@ -116,16 +117,12 @@ Who feels it: visitors on slow links; English visitors on laws/research; Super A
 
 - **A:** Publish a news cover; public card uses WebP in a supporting browser; JPEG/PNG still loads if WebP is skipped; `cms npm test` green.
 - **B:** A published law with EN filled but `pending` still shows Arabic + notice in EN UI; marking ready + four-eyes shows EN title/body and hides the notice. Research group cards use the ready gate (no more raw `title_en`).
-- **C:** Change About vision in CMS, four-eyes publish, `#about` updates without editing locales; with `site-pages.json` missing, About still renders from locales.
+- **C:** Change About vision in CMS, Director-class publish, `#about` updates without editing locales; with `site-pages.json` missing, About still renders from locales. Footer address matches the published contact address.
 - SMOKE + SMOKE-CMS checks added per cut. Journals and scheduled-publish behaviour untouched.
 
 ## 9. Open questions
 
-None blocking if the stakeholder confirms the locks in §10. Confirm before **Approved**:
-
-1. Three cuts with a walk each (proposed) vs one build / one walk.
-2. Cut C includes org + contact + cooperation intro (proposed) vs About-only first.
-3. WebP **siblings** + JSON keys (proposed) vs rewriting `img` to `.webp` only.
+None blocking. Stakeholder locked 2026-08-26 via Q&A (§10). Ready to mark **Approved**.
 
 ## 10. Decision log
 
@@ -134,5 +131,13 @@ None blocking if the stakeholder confirms the locks in §10. Confirm before **Ap
 | 2026-08-26 | Stakeholder: new PRD for remaining deferred; **keep out journals in CMS**. |
 | 2026-08-26 | **In:** extra media optimize, remaining EN-when-ready, static institutional pages. **Out:** journals, scheduled publish, SMTP, malware, legal pages. |
 | 2026-08-26 | News/events/publications/partners EN-when-ready **already shipped** (PR #44) — Cut B does not redo them; it extends the same rule and fixes raw `title_en` reads. |
-| 2026-08-26 | Proposed: three cuts A→B→C, walk each. WebP siblings (keep JPEG/PNG). Institutional singleton seeded from locales; Director-style roles. |
 | 2026-08-26 | Status **Draft**. No feature-branch product code until **Approved**. |
+| 2026-08-26 | Stakeholder **Approved**. Implement Cut A (WebP) first; B then C after each walk+merge. |
+| 2026-08-26 | **Locked Q1:** three cuts A→B→C, walk + merge each. Do not start the next cut until the previous is Delivered on `main`. |
+| 2026-08-26 | **Locked Q2:** Cut C is full — About + org labels + contact values + cooperation intro. |
+| 2026-08-26 | **Locked Q3:** WebP **siblings** + optional JSON keys; keep JPEG/PNG masters. Do not rewrite `img` to `.webp` only. |
+| 2026-08-26 | **Locked Q4:** Missing `en_status` = not ready (Arabic + notice). Accept temporary EN drop on laws/platforms/research/alerts until ready + publish. |
+| 2026-08-26 | **Locked Q5:** Site pages use **Director-class** gate (SA or centre-wide Reviewer may edit and publish). No new two-person workflow. |
+| 2026-08-26 | **Locked Q6:** Footer address follows CMS contact address. Schema.org JSON-LD stays out. |
+| 2026-08-26 | **Locked Q7:** No SA WebP rebuild UI in this pack. WebP only on next publish. |
+| 2026-08-26 | **Locked Q8:** Not-ready alert = Arabic banner message only; no locale-notice chrome on the banner. |

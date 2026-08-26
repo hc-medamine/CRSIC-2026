@@ -4,7 +4,7 @@ import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { appendWorkflowComment } from "@/lib/content/comments";
 import {
-  buildResearchGroupPayload,
+  buildResearchGroupPayloadForItem,
   normalizeResearchMembers,
   rebuildPublicResearchGroupsJson,
   type PublicResearchGroupMember,
@@ -448,7 +448,7 @@ export async function publishResearchGroup(user: SessionUser, id: string) {
     titleAr: existing.title_ar,
     existingSlug: existing.public_slug,
   });
-  const payload = buildResearchGroupPayload({ ...existing, public_slug: slug });
+  const payload = await buildResearchGroupPayloadForItem({ ...existing, public_slug: slug });
   const item = await mutateThenRebuildPublic({
     itemId: id,
     mutate: async () => {

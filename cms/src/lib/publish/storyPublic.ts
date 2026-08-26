@@ -52,6 +52,8 @@ export function withImgCard<T extends object>(
   return { ...item, img_card: v };
 }
 
+export type StoryImageFields = { img_card?: string; img_webp?: string; img_card_webp?: string };
+
 /** Attach EN-when-ready fields + optional card image for live_payload / public JSON. */
 export function withPublicStoryFields<T extends object>(
   item: T,

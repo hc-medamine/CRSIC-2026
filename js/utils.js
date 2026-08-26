@@ -162,6 +162,59 @@ export function safeImageSrc(src) {
 }
 
 /**
+ * Pair a JPEG/PNG src with an optional WebP sibling. Missing/unsafe WebP → jpeg only.
+ * @param {unknown} src
+ * @param {unknown} webp
+ * @returns {{ jpeg: string, webp: string }}
+ */
+export function resolvePictureSrcs(src, webp) {
+  const jpeg = safeImageSrc(src);
+  const webpSrc = safeImageSrc(webp);
+  if (!jpeg) return { jpeg: '', webp: '' };
+  if (!webpSrc || webpSrc === jpeg) return { jpeg, webp: '' };
+  return { jpeg, webp: webpSrc };
+}
+
+/**
+ * `<picture>` with WebP source + JPEG/PNG img, or a single img when WebP is missing.
+ * No innerHTML. `display: contents` on picture so existing img CSS still matches.
+ * @param {{
+ *   src: unknown,
+ *   webp?: unknown,
+ *   alt?: string,
+ *   className?: string,
+ *   loading?: string,
+ *   decoding?: string,
+ *   style?: Record<string, string>,
+ *   extraAttrs?: Record<string, string>,
+ * }} opts
+ * @returns {HTMLElement|null}
+ */
+export function cmsPictureEl(opts) {
+  const { jpeg, webp } = resolvePictureSrcs(opts.src, opts.webp);
+  if (!jpeg) return null;
+  const img = el('img', {
+    className: opts.className,
+    style: opts.style,
+    attrs: {
+      src: jpeg,
+      alt: opts.alt || '',
+      loading: opts.loading || 'lazy',
+      ...(opts.decoding ? { decoding: opts.decoding } : {}),
+      ...(opts.extraAttrs || {}),
+    },
+  });
+  if (!webp) return img;
+  return el('picture', {
+    className: 'cms-picture',
+    children: [
+      el('source', { attrs: { type: 'image/webp', srcset: webp } }),
+      img,
+    ],
+  });
+}
+
+/**
  * Allow only linear-gradient(...) backgrounds from content JSON.
  * @param {unknown} bg
  * @returns {string}
