@@ -120,12 +120,12 @@ Walk AR + EN on `:3000`. Visual only — workflow and publish rules stay the sam
 
 | # | Check | Pass? |
 |---|--------|-------|
-| Dsk1 | Create or edit **news**: numbered form sections, sticky Save/Submit, comment/revision panels match Desk cards | ☐ |
-| Dsk2 | Login still authenticates; language toggle works; non-production bubbles sit **under** the sign-in card | ☐ |
-| Dsk3 | `/dashboard/media` shows “Showing N”; if N hits the load cap, truncated hint appears (no pager) | ☐ |
-| Dsk4 | One admin page (users **or** audit) uses the same header card as lists; filters/actions still work | ☐ |
-| Dsk5 | In-CMS preview chrome is localized (Home / Preview) in AR and EN | ☐ |
-| Dsk6 | `prefers-reduced-motion: reduce` keeps new interiors static | ☐ |
+| Dsk1 | Create or edit **news**: numbered form sections, sticky Save/Submit, comment/revision panels match Desk cards | ☑ 2026-08-23 |
+| Dsk2 | Login still authenticates; language toggle works; non-production bubbles sit **under** the sign-in card | ☑ 2026-08-23 |
+| Dsk3 | `/dashboard/media` shows “Showing N”; if N hits the load cap, truncated hint appears (no pager) | ☑ 2026-08-23 |
+| Dsk4 | One admin page (users **or** audit) uses the same header card as lists; filters/actions still work | ☑ 2026-08-23 |
+| Dsk5 | In-CMS preview chrome is localized (Home / Preview) in AR and EN | ☑ 2026-08-23 |
+| Dsk6 | `prefers-reduced-motion: reduce` keeps new interiors static | ☑ 2026-08-23 |
 
 ## Align authorship (desks + public publisher)
 

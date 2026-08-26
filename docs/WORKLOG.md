@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-26 — CMS Desk interiors I2 walkthrough **Delivered** (docs)
+
+Stakeholder signed off I2 (forms, admin, login) on `:3000` AR+EN on **2026-08-23**. I2 code was already on `main` (`071abc9`). PRD [prds/2026-08-20-cms-desk-interiors.md](./prds/2026-08-20-cms-desk-interiors.md) is **Delivered** (I1 + I2). Docs close-out landed 2026-08-26.
+
+---
+
 ### 2026-08-24 — I/E picker bulk export + header sort **Delivered**
 
 [prds/2026-08-24-cms-import-export-bulk-sort.md](./prds/2026-08-24-cms-import-export-bulk-sort.md). Ie5–Ie8 walked: publications Load more + Title sort (no URL `sort=`/`page=`); events header checkbox = 20 loaded of 21; **Export selected** confirm; news list still Duplicate only. Editor I/E API 403.

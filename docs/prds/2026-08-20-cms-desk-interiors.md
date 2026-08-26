@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Approved** (2026-08-20) — **I1 Delivered** on `main` (PR #31). **I2** forms/admin/login implemented on `feature/cms-desk-interiors-i2` — awaiting walkthrough |
+| Status | **Delivered** (2026-08-23) — I1 on `main` (PR #31); I2 on `main` (`071abc9`); AR+EN walkthrough passed 2026-08-23 |
 | Date | 2026-08-20 |
 | Author | Cursor session (with stakeholder) |
 | Owners | Stakeholder + agent |
@@ -138,6 +138,7 @@
 | 2026-08-20 | PRD drafted as **Draft**. No feature-branch code until status **Approved**. |
 | 2026-08-20 | Stakeholder **Approved**. Implementation starts on `feature/cms-desk-interiors` with **I1 (lists)** only; I2 after I1 walkthrough. |
 | 2026-08-20 | Login bubbles: always on in non-production (opt out with `NEXT_PUBLIC_CMS_LOGIN_BUBBLES=0`); moved to a bottom developer strip, not inside the sign-in card. |
+| 2026-08-23 | Stakeholder **passed** I2 walkthrough (Dsk1–Dsk6: news form, login + bubbles, media “showing N”, admin header, preview chrome, reduced motion). Interiors PRD **Delivered**. |
 
 ## 11. Item backlog (source of truth for implementation)
 
@@ -147,7 +148,7 @@
 - [x] Switch news / events / publications pages to `ContentListPage` + `ContentListFilters` toolbar; keep `?q=` / `?status=`
 - [x] Confirm alerts, partners, laws, platforms, research groups/projects inherit the restyle
 - [x] Preserve `cms-row-enter` stagger cap (12) and `ListSkeleton`
-- [ ] AR + EN walkthrough of at least News + one already-shared list (e.g. Partners)
+- [x] AR + EN walkthrough of at least News + one already-shared list (e.g. Partners)
 
 **I2 — Forms, admin, login** (merge 2, after walkthrough)
 
@@ -156,4 +157,4 @@
 - [x] Restyle users, org units, editors, audit, notifications (honesty on caps if present)
 - [x] Login visual alignment
 - [x] Should-have: preview chrome i18n + Desk spacing; edit-page panel chrome
-- [ ] AR + EN walkthrough: create/edit news, login, media
+- [x] AR + EN walkthrough: create/edit news, login, media (2026-08-23)

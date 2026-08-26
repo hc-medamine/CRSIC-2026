@@ -788,7 +788,7 @@ No separate staging config files exist in-repo.
 | 4 | Internal web app + database (users, roles, publish) — **no external CMS**, **no email/SMTP** | **On `main`** — Next.js 16 + PostgreSQL 18; migrations through `029_site_featured_news.sql` |
 | 5 | Motion & interactivity polish (SPA + CMS) | **Done on `main`** — [PRD](./docs/prds/2026-08-18-motion-interactivity-polish.md) (PRs #24–#27) |
 | — | CMS Desk (shell + dashboard home) | **Done on `main`** — [PRD](./docs/prds/2026-08-19-cms-desk-design.md) (`25b15cc`) |
-| — | CMS Desk interiors (lists, forms, admin, login) | **I1 on `main`** (PR #31). **I2** on `feature/cms-desk-interiors-i2` — awaiting walkthrough — [PRD](./docs/prds/2026-08-20-cms-desk-interiors.md) |
+| — | CMS Desk interiors (lists, forms, admin, login) | **Done on `main`** — [PRD](./docs/prds/2026-08-20-cms-desk-interiors.md) (I1 PR #31; I2 `071abc9`; walkthrough 2026-08-23) |
 | — | WordPress → CMS/SPA cutover (owned types) | **Done on `main`** (`b1c022c`) — [PRD](./docs/prds/2026-08-21-wordpress-cms-spa-cutover.md) |
 | — | News/event card bylines | **Done on `main`** — [PRD](./docs/prds/2026-08-21-spa-news-event-card-byline.md) |
 | — | Home Center News 3-card pager | **Done on `main`** — [PRD](./docs/prds/2026-08-21-home-news-carousel.md) |
@@ -800,7 +800,6 @@ No separate staging config files exist in-repo.
 2. **Contact depends on a local mail client** — no server-side mailer or form API.
 3. **Audit TODOs are closed**; no `TODO`/`FIXME` markers remain in app JS for open defects.
 4. **Home featured playlist** is empty until Reviewer/SA publishes `/dashboard/featured-news` (SPA fallback is live).
-5. **CMS Desk I2** (forms/admin/login) is implemented on `feature/cms-desk-interiors-i2`; merge after the AR+EN walkthrough.
 
 ### Technical debt
 
@@ -837,7 +836,7 @@ Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Core spec: [d
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-08-24** (I/E picker bulk+sort PRD Approved; Desk production boost on `main` PR #44) |
+| Last updated     | **2026-08-26** (CMS Desk interiors I2 walkthrough marked Delivered) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes
