@@ -279,16 +279,16 @@ PRD [2026-08-26-remaining-deferred-pack.md](../prds/2026-08-26-remaining-deferre
 
 | # | Check | Pass? |
 |---|--------|-------|
-| Sp1 | Nav **Site pages** under Administration (next to Director). Editor: no nav; URL redirects Home | ☐ |
-| Sp2 | Change About vision, Save, Publish. Public `#about` updates without editing locales. Footer address matches the published contact address | ☐ |
-| Sp3 | Publish failure (or missing `site-pages.json`): About still renders from locales. Message is a sentence, not a stack trace | ☐ |
+| Sp1 | Nav **Site pages** under Administration (next to Director). Editor: no nav; URL redirects Home | ☑ 2026-08-31 |
+| Sp2 | Change About vision, Save, Publish. Public `#about` updates without editing locales. Footer address matches the published contact address | ☑ 2026-08-31 |
+| Sp3 | Publish failure (or missing `site-pages.json`): About still renders from locales. Message is a sentence, not a stack trace | ☑ 2026-08-31 rename-hide JSON |
 
 ## G. Gate
 
 | # | Check | Pass? |
 |---|--------|-------|
-| G1 | No known bugs on this path | ☐ |
-| G2 | Public SPA still loads (if you published, verify or restore JSON) | ☐ |
+| G1 | No known bugs on this path | ☑ 2026-08-31 Cut C walk |
+| G2 | Public SPA still loads (if you published, verify or restore JSON) | ☑ 2026-08-31 |
 
 ---
 
