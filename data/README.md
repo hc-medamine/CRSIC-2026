@@ -25,6 +25,7 @@ Project docs index: [docs/README.md](../docs/README.md).
 | `laws.json` | `laws[]` — hub `#laws`, detail `#law/{slug}` |
 | `platforms.json` | `platforms[]` — hub `#platforms`, detail `#platform/{slug}` |
 | `director.json` | About director singleton (CMS `/dashboard/director`) |
+| `site-pages.json` | Optional. About / org labels / contact / cooperation intro (CMS `/dashboard/site-pages`). Missing → locales |
 | `locales/ar.json` | Arabic UI chrome (350 keys) |
 | `locales/en.json` | English UI chrome (same keys as `ar`) |
 

@@ -3,12 +3,13 @@
  */
 import {
   applyTranslations,
+  overlaySitePages,
   setOnAfterTranslate,
   bindLangUI,
   initLangBanner,
   loadLocales
 } from './i18n.js';
-import { loadData, getLoadErrors } from './data.js';
+import { loadData, getLoadErrors, getSitePages } from './data.js';
 import { initSiteAlert, rerenderSiteAlert } from './alerts.js';
 import { renderResearchPage } from './research.js';
 import {
@@ -45,6 +46,7 @@ async function boot() {
   const [localeResult] = await Promise.all([loadLocales(), loadData()]);
   await initSiteAlert();
 
+  overlaySitePages(getSitePages());
   applyTranslations();
   renderResearchPage();
   if (localeResult && !localeResult.ok) {

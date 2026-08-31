@@ -19,8 +19,10 @@ import {
   getLaws,
   getPlatforms,
   getDirector,
+  getSitePages,
 } from './data.js';
 import { t, getLang } from './i18n.js';
+import { applySiteContact } from './sitePages.js';
 import { editorialField, isEditorialEnReady } from './editorial.js';
 import {
   prefersReducedMotion,
@@ -269,6 +271,7 @@ export function applyDirectorWord() {
 
 export function renderAll() {
   applyDirectorWord();
+  applySiteContact(getSitePages());
   const hpg = document.getElementById('home-pub-grid');
   const hng = document.getElementById('home-news-grid');
   const heg = document.getElementById('home-events-grid');

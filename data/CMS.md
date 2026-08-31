@@ -19,6 +19,7 @@ When `CONTENT_BASE_URL` is set (e.g. `https://cdn.example.com/crsic/`), the app 
 | `research-groups.json` | `{ "items": object[] }` |
 | `research-projects.json` | `{ "items": object[] }` |
 | `director.json` | singleton `{ quote_ar, quote_en, name_ar, name_en, role_ar, role_en, portrait, … }` — CMS `/dashboard/director`. Soft-fail: SPA keeps locale placeholders |
+| `site-pages.json` | **optional** `{ ar, en, contact }` — CMS `/dashboard/site-pages` (SA or centre-wide Reviewer). Missing or 404 → locales + hardcoded email/phone/webmail. Footer address follows `contact_addr_val`. |
 | `journals.json` | `{ "journals": object[] }` — **not** CMS-published (OJS) |
 | `locales/ar.json` | flat key → string (350 keys; must match EN) |
 | `locales/en.json` | flat key → string |

@@ -1,6 +1,47 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { Pool } from "pg";
+import { DEFAULT_CONTACT, pickLocaleFields } from "../src/lib/content/sitePageKeys";
+
+async function seedSitePagesIfMissing(pool: Pool) {
+  const table = await pool.query<{ exists: boolean }>(
+    `SELECT EXISTS (
+       SELECT 1 FROM information_schema.tables
+       WHERE table_schema = 'public' AND table_name = 'site_pages'
+     ) AS exists`,
+  );
+  if (!table.rows[0]?.exists) return;
+
+  const existing = await pool.query(`SELECT id FROM site_pages WHERE id = 1`);
+  if (existing.rows[0]) {
+    console.log("Skip site_pages seed (row exists)");
+    return;
+  }
+
+  const arPath = join(process.cwd(), "..", "data", "locales", "ar.json");
+  const enPath = join(process.cwd(), "..", "data", "locales", "en.json");
+  if (!existsSync(arPath) || !existsSync(enPath)) {
+    console.warn("Skip site_pages seed (locale files missing)");
+    return;
+  }
+  const ar = JSON.parse(readFileSync(arPath, "utf8")) as Record<string, unknown>;
+  const en = JSON.parse(readFileSync(enPath, "utf8")) as Record<string, unknown>;
+  await pool.query(
+    `INSERT INTO site_pages (
+      id, fields_ar, fields_en, email, phone, webmail_url, webmail_text, updated_at
+    ) VALUES (1, $1::jsonb, $2::jsonb, $3, $4, $5, $6, NOW())
+    ON CONFLICT (id) DO NOTHING`,
+    [
+      JSON.stringify(pickLocaleFields(ar)),
+      JSON.stringify(pickLocaleFields(en)),
+      DEFAULT_CONTACT.email,
+      DEFAULT_CONTACT.phone,
+      DEFAULT_CONTACT.webmail_url,
+      DEFAULT_CONTACT.webmail_text,
+    ],
+  );
+  console.log("Seeded site_pages from locales");
+}
 
 async function ensureMigrationsTable(pool: Pool) {
   await pool.query(`
@@ -63,6 +104,8 @@ async function main() {
     } else {
       console.log(`Migrations complete (${appliedCount} new).`);
     }
+
+    await seedSitePagesIfMissing(pool);
   } finally {
     await pool.end();
   }
