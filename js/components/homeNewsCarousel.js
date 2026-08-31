@@ -109,7 +109,7 @@ export function mountHomeNewsCarousel(grid, news) {
   if (!carousel) {
     replaceChildren(
       grid,
-      list.slice(0, HOME_NEWS_PAGE_SIZE).map((n, i) => createNewsCard(n, i)),
+      list.slice(0, HOME_NEWS_PAGE_SIZE).map((n, i) => createNewsCard(n, i, { linkToDetail: true })),
     );
     window.dispatchEvent(new Event('crsic:content-locale'));
     return;
@@ -138,7 +138,7 @@ export function mountHomeNewsCarousel(grid, news) {
     const base = index * HOME_NEWS_PAGE_SIZE;
     replaceChildren(
       grid,
-      slice.map((n, i) => createNewsCard(n, base + i)),
+      slice.map((n, i) => createNewsCard(n, base + i, { linkToDetail: true })),
     );
     window.dispatchEvent(new Event('crsic:content-locale'));
   }

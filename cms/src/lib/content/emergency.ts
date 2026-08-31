@@ -388,7 +388,7 @@ export async function unpublishPostReview(
     mutate: async () => {
       const result = await query(
         `UPDATE content_items SET
-           status = 'unpublished',
+           status = 'draft',
            live_payload = NULL,
            live_at = NULL,
            needs_post_review = FALSE,

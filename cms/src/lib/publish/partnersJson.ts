@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
+import { prepareContentImagesForPublish } from "@/lib/media/publishImages";
 import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
 import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 import { withPublicStoryFields, type StoryEnFields } from "@/lib/publish/storyPublic";
@@ -80,6 +81,7 @@ export function buildPartnerPayload(row: PayloadSource): StoredPartnerPayload {
     {
       en_status: row.en_status,
       title_en: row.title_en,
+      image_path: img || row.image_path,
       image_card_path: row.image_card_path,
     },
     { nameEn: true },
@@ -92,6 +94,11 @@ export function buildPartnerPayload(row: PayloadSource): StoredPartnerPayload {
   if (emoji) item.emoji = emoji;
   if (img) item.img = img;
   return item;
+}
+
+export async function buildPartnerPayloadForItem(row: PayloadSource): Promise<StoredPartnerPayload> {
+  const prepared = await prepareContentImagesForPublish(row);
+  return buildPartnerPayload(prepared);
 }
 
 function publicPartnersPath(): string {

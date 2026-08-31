@@ -3,6 +3,7 @@
  * Org unit IDs map to research tab ids (r1–r4).
  */
 import { getLang, t } from './i18n.js';
+import { editorialField } from './editorial.js';
 import { el, replaceChildren } from './utils.js';
 import { getResearchGroups, getResearchProjectsForGroup } from './data.js';
 import { navigateTo } from './router.js';
@@ -13,33 +14,6 @@ export const RESEARCH_TAB_ORG = {
   r3: 'dept_algeria_history',
   r4: 'dept_islamic_civ',
 };
-
-/**
- * @param {object} group
- * @param {'ar'|'en'} lang
- */
-function groupName(group, lang) {
-  if (lang === 'en' && group.name_en) return group.name_en;
-  return group.name_ar || group.name_en || '';
-}
-
-/**
- * @param {object} group
- * @param {'ar'|'en'} lang
- */
-function groupSummary(group, lang) {
-  if (lang === 'en' && group.summary_en) return group.summary_en;
-  return group.summary_ar || group.summary_en || '';
-}
-
-/**
- * @param {object} project
- * @param {'ar'|'en'} lang
- */
-function projectTitle(project, lang) {
-  if (lang === 'en' && project.title_en) return project.title_en;
-  return project.title_ar || project.title_en || '';
-}
 
 /**
  * Render group cards (+ nested project links) into a tab panel host.
@@ -80,7 +54,7 @@ export function renderResearchGroupsForTab(tabId) {
                       attrs: {
                         href: `#research-project/${encodeURIComponent(slug)}`,
                       },
-                      text: projectTitle(p, lang),
+                      text: editorialField(p, 'title', lang),
                       on: {
                         click: (e) => {
                           e.preventDefault();
@@ -102,21 +76,23 @@ export function renderResearchGroupsForTab(tabId) {
         ? el('a', {
             className: 'team-card-name',
             attrs: { href: `#research-group/${encodeURIComponent(groupSlug)}` },
-            text: groupName(group, lang),
+            text: editorialField(group, 'name', lang),
           })
         : el('div', {
             className: 'team-card-name',
-            text: groupName(group, lang),
+            text: editorialField(group, 'name', lang),
           });
+
+      const summary = editorialField(group, 'summary', lang);
 
       return el('div', {
         className: 'team-card research-group-card',
         children: [
           nameEl,
-          groupSummary(group, lang)
+          summary
             ? el('div', {
                 className: 'team-card-desc',
-                text: groupSummary(group, lang),
+                text: summary,
               })
             : null,
           projectLinks,

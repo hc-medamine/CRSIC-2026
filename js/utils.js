@@ -162,6 +162,33 @@ export function safeImageSrc(src) {
 }
 
 /**
+ * Responsive CMS image: WebP source + JPEG/PNG fallback in a picture element.
+ * @param {object} opts
+ * @param {string} opts.fallbackSrc
+ * @param {string} [opts.webpSrc]
+ * @param {string} [opts.className]
+ * @param {string} [opts.alt]
+ * @param {string} [opts.loading]
+ * @returns {HTMLElement|null}
+ */
+export function createPictureImg({ fallbackSrc, webpSrc, className, alt, loading = 'lazy' }) {
+  if (!fallbackSrc) return null;
+  if (!webpSrc) {
+    return el('img', {
+      className,
+      attrs: { src: fallbackSrc, alt: alt || '', loading, decoding: 'async' },
+    });
+  }
+  return el('picture', {
+    className,
+    children: [
+      el('source', { attrs: { type: 'image/webp', srcset: webpSrc } }),
+      el('img', { attrs: { src: fallbackSrc, alt: alt || '', loading, decoding: 'async' } }),
+    ],
+  });
+}
+
+/**
  * Allow only linear-gradient(...) backgrounds from content JSON.
  * @param {unknown} bg
  * @returns {string}

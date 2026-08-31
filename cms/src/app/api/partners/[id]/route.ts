@@ -74,6 +74,9 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         item = await updatePartnerDraft(user, id, body.fields);
         break;
       case "submit":
+        if (body.fields) {
+          await updatePartnerDraft(user, id, body.fields);
+        }
         item = await submitPartner(user, id, Boolean(body.checklistConfirmed));
         break;
       case "withdraw":

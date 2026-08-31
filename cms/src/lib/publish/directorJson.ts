@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
-
+import { ensureWebpForContentRow } from "@/lib/media/publishImages";
+import { webpPathIfExists } from "@/lib/media/webp";
 export type PublicDirector = {
   quote_ar: string;
   quote_en: string;
@@ -9,6 +10,7 @@ export type PublicDirector = {
   role_ar: string;
   role_en: string;
   portrait: string;
+  portrait_webp?: string;
   portrait_alt_ar?: string;
   portrait_alt_en?: string;
 };
@@ -39,7 +41,16 @@ export function buildDirectorPayload(row: DirectorPayloadSource): PublicDirector
   };
   if (row.portrait_alt_ar?.trim()) item.portrait_alt_ar = row.portrait_alt_ar.trim();
   if (row.portrait_alt_en?.trim()) item.portrait_alt_en = row.portrait_alt_en.trim();
+  const portrait_webp = webpPathIfExists(portrait);
+  if (portrait_webp) item.portrait_webp = portrait_webp;
   return item;
+}
+
+export async function writePublicDirectorJsonAsync(
+  row: DirectorPayloadSource,
+): Promise<{ path: string }> {
+  await ensureWebpForContentRow({ portrait_path: row.portrait_path });
+  return writePublicDirectorJson(row);
 }
 
 function publicDirectorPath(): string {

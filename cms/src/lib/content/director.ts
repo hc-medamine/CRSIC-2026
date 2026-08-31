@@ -5,6 +5,7 @@ import { getUserOrgIds } from "@/lib/content/permissions";
 import {
   buildDirectorPayload,
   writePublicDirectorJson,
+  writePublicDirectorJsonAsync,
   type PublicDirector,
 } from "@/lib/publish/directorJson";
 
@@ -140,7 +141,7 @@ export async function publishSiteDirector(user: SessionUser): Promise<{
       [user.id],
     );
     const row = (await getSiteDirector())!;
-    writePublicDirectorJson(row);
+    await writePublicDirectorJsonAsync(row);
     await writeAudit({
       actor: user,
       action: "director.publish",

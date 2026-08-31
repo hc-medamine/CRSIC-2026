@@ -328,7 +328,7 @@ export function ContentListPage({
     setRows((prev) => {
       if (action === "recycle") return prev.filter((r) => !doneIds.has(r.id));
       return prev
-        .map((r) => (doneIds.has(r.id) ? { ...r, status: "unpublished" } : r))
+        .map((r) => (doneIds.has(r.id) ? { ...r, status: "draft" } : r))
         .filter((r) => !(publishedFilter && doneIds.has(r.id)));
     });
     setSelected((prev) => {

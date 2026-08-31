@@ -8,6 +8,7 @@
  */
 import { contentUrl } from './config.js';
 import { getLang } from './i18n.js';
+import { editorialField } from './editorial.js';
 
 const DISMISS_KEY = 'crsic_alert_dismissed';
 
@@ -47,16 +48,12 @@ function render() {
   }
 
   const lang = getLang();
-  const message = lang === 'en'
-    ? (currentAlert.message_en || currentAlert.message_ar || '')
-    : (currentAlert.message_ar || currentAlert.message_en || '');
+  const message = editorialField(currentAlert, 'message', lang);
   msgEl.textContent = message;
 
   const link = currentAlert.link;
   if (link) {
-    const label = lang === 'en'
-      ? (currentAlert.link_label_en || currentAlert.link_label_ar || link)
-      : (currentAlert.link_label_ar || currentAlert.link_label_en || link);
+    const label = editorialField(currentAlert, 'link_label', lang) || link;
     linkEl.textContent = label;
     linkEl.href = link;
     linkEl.classList.remove('hidden');

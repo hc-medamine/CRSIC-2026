@@ -6,7 +6,8 @@ import { getResearchProjectById } from "@/lib/content/researchProjects";
 import { getResearchGroupById } from "@/lib/content/researchGroups";
 import { normalizeResearchEntries } from "@/lib/publish/researchProjectsJson";
 import { canAccessContentType, canReview } from "@/lib/content/permissions";
-import { canRecycleFromEditPage } from "@/lib/content/recycleBin";
+import { canSubmitStatus } from "@/lib/content/reviewWorkflow";
+import { canRecycleFromEditPageAsync } from "@/lib/content/recycleBin";
 import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 import { listSelectableOrgUnits } from "@/lib/users";
 import { getItemPeopleMeta } from "@/lib/content/people";
@@ -60,6 +61,7 @@ export default async function ResearchProjectDetailPage({ params }: Props) {
 
   const axes = normalizeResearchEntries(item.research_axes).map((a) => ({ ar: a.ar, en: a.en ?? "" }));
   const impacts = normalizeResearchEntries(item.research_impacts).map((i) => ({ ar: i.ar, en: i.en ?? "" }));
+  const canDelete = await canRecycleFromEditPageAsync(user, item);
 
   return (
     <EditPageShell
@@ -84,9 +86,9 @@ export default async function ResearchProjectDetailPage({ params }: Props) {
         mode="edit"
         orgUnits={orgs}
         isAuthor={isAuthor}
-        canSubmit={isAuthor && ["draft", "changes_requested"].includes(item.status)}
+        canSubmit={isAuthor && canSubmitStatus(item.status)}
         canReview={reviewer}
-        canDelete={canRecycleFromEditPage(user, item)}
+        canDelete={canDelete}
         initialGroupOption={
           currentGroup
             ? { id: currentGroup.id, title_ar: currentGroup.title_ar, title_en: currentGroup.title_en }

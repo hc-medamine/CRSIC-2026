@@ -4,7 +4,8 @@ import { CMS_LANG_COOKIE, normalizeLang, t, localizedDisplayName } from "@/lib/i
 import { requireUser } from "@/lib/auth/session";
 import { getPublicationById } from "@/lib/content/publications";
 import { canAccessContentType, canReview } from "@/lib/content/permissions";
-import { canRecycleFromEditPage } from "@/lib/content/recycleBin";
+import { canSubmitStatus } from "@/lib/content/reviewWorkflow";
+import { canRecycleFromEditPageAsync } from "@/lib/content/recycleBin";
 import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 import { getMediaByPublicPath } from "@/lib/media/store";
 import { listSelectableOrgUnits } from "@/lib/users";
@@ -76,6 +77,7 @@ export default async function PublicationDetailPage({ params }: Props) {
   const canPostReview = canManage && emergencyMeta.needsPostReview;
   const canConfirmOk = canPostReview && emergencyMeta.emergencyPublishedBy !== user.id;
   const media = item.image_path ? await getMediaByPublicPath(item.image_path) : null;
+  const canDelete = await canRecycleFromEditPageAsync(user, item);
 
   return (
     <EditPageShell
@@ -100,9 +102,9 @@ export default async function PublicationDetailPage({ params }: Props) {
         mode="edit"
         orgUnits={orgs}
         isAuthor={isAuthor}
-        canSubmit={isAuthor && ["draft", "changes_requested"].includes(item.status)}
+        canSubmit={isAuthor && canSubmitStatus(item.status)}
         canReview={reviewer}
-        canDelete={canRecycleFromEditPage(user, item)}
+        canDelete={canDelete}
         initial={{
           id: item.id,
           orgUnitId: item.org_unit_id,

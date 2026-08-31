@@ -388,8 +388,8 @@ async function runSmoke() {
     `SELECT status, needs_post_review FROM content_items WHERE id = $1`,
     [emerg2.id],
   );
-  if (unpubRow.rows[0]?.status !== "unpublished" || unpubRow.rows[0]?.needs_post_review) {
-    throw new Error("Expected unpublished + flag cleared after post-review unpublish");
+  if (unpubRow.rows[0]?.status !== "draft" || unpubRow.rows[0]?.needs_post_review) {
+    throw new Error("Expected draft + flag cleared after post-review unpublish");
   }
   restoreNewsSnapshot(emergSnap);
 

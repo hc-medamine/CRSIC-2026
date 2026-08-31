@@ -3,7 +3,7 @@
  * Body may be plain text or sanitized HTML (H1 allowlist) — never raw innerHTML.
  */
 import { getLang, t } from '../i18n.js';
-import { el, replaceChildren, safeImageSrc } from '../utils.js';
+import { el, replaceChildren, safeImageSrc, createPictureImg } from '../utils.js';
 import { nodesFromSafeBody } from '../safeBody.js';
 import {
   findNewsByKey,
@@ -16,17 +16,19 @@ import {
   findLawByKey,
   getCoverForPub,
   getResearchProjectsForGroup,
+  cmsResponsiveSources,
 } from '../data.js';
 import { applyItemSeoHead, restoreSiteSeoHead } from '../seoHead.js';
 import { createContentByline } from './contentByline.js';
-import { editorialField, editorialLangAttrs } from '../editorial.js';
+import { editorialBilingualEntry, editorialField, editorialLangAttrs } from '../editorial.js';
 
 /**
  * @param {object[]} media
  * @param {string} title
+ * @param {object} [item] full story item for WebP / sizing helpers
  * @returns {HTMLElement|null}
  */
-function buildMediaStage(media, title) {
+function buildMediaStage(media, title, item) {
   const list = Array.isArray(media) ? media : [];
   const images = list.filter((m) => m && m.kind === 'image' && m.src);
   const pdfs = list.filter((m) => m && m.kind === 'pdf' && m.src);
@@ -36,19 +38,17 @@ function buildMediaStage(media, title) {
   const children = [];
 
   if (images.length === 1) {
-    const src = safeImageSrc(images[0].src);
-    if (src) {
-      children.push(
-        el('div', {
-          className: 'detail-hero',
-          children: [
-            el('img', {
-              className: 'detail-hero-img',
-              attrs: { src, alt: images[0].alt || title || '', loading: 'lazy' },
-            }),
-          ],
-        }),
-      );
+    const sources = item
+      ? cmsResponsiveSources(item, 'master')
+      : { fallback: safeImageSrc(images[0].src), webp: '' };
+    const heroImg = createPictureImg({
+      fallbackSrc: sources.fallback || safeImageSrc(images[0].src),
+      webpSrc: sources.webp,
+      className: 'detail-hero-img',
+      alt: images[0].alt || title || '',
+    });
+    if (heroImg) {
+      children.push(el('div', { className: 'detail-hero', children: [heroImg] }));
     }
   } else if (images.length > 1) {
     children.push(
@@ -252,7 +252,7 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
   applyItemSeoHead(item, type);
 
   const langAttrs = editorialLangAttrs(item);
-  const mediaEl = buildMediaStage(media, title);
+  const mediaEl = buildMediaStage(media, title, item);
   const children = [
     el('a', {
       className: 'detail-back',
@@ -345,12 +345,8 @@ function renderAlertPreview(host, opts = {}) {
 
   applyItemSeoHead(item, 'alert');
   const lang = getLang();
-  const message =
-    lang === 'en' && item.message_en ? item.message_en : item.message_ar || item.message_en || '';
-  const linkLabel =
-    lang === 'en' && item.link_label_en
-      ? item.link_label_en
-      : item.link_label_ar || item.link_label_en || '';
+  const message = editorialField(item, 'message', lang);
+  const linkLabel = editorialField(item, 'link_label', lang);
 
   const children = [];
   if (opts.isPreview) {
@@ -444,17 +440,16 @@ function renderPartnerDetail(host, slugOrId, opts = {}) {
     }),
   );
   if (imgSrc) {
-    children.push(
-      el('div', {
-        className: 'detail-hero',
-        children: [
-          el('img', {
-            className: 'detail-hero-img',
-            attrs: { src: imgSrc, alt: title, loading: 'lazy' },
-          }),
-        ],
-      }),
-    );
+    const sources = cmsResponsiveSources(item, 'master');
+    const heroImg = createPictureImg({
+      fallbackSrc: sources.fallback || imgSrc,
+      webpSrc: sources.webp,
+      className: 'detail-hero-img',
+      alt: title,
+    });
+    if (heroImg) {
+      children.push(el('div', { className: 'detail-hero', children: [heroImg] }));
+    }
   } else if (item.emoji) {
     children.push(el('p', { className: 'detail-meta', text: item.emoji }));
   }
@@ -527,9 +522,9 @@ function renderPlatformDetail(host, slugOrId, opts = {}) {
 
   applyItemSeoHead(item, 'platform');
   const lang = getLang();
-  const title = lang === 'en' && item.titleEn ? item.titleEn : (item.title || '');
-  const summary = lang === 'en' && item.summaryEn ? item.summaryEn : (item.summary || '');
-  const bodyHtml = lang === 'en' && item.bodyEn ? item.bodyEn : (item.body || '');
+  const title = editorialField(item, 'title', lang);
+  const summary = editorialField(item, 'summary', lang);
+  const bodyHtml = editorialField(item, 'body', lang);
   const kindKey = item.kind === 'radio'
     ? 'platform_kind_radio'
     : item.kind === 'mobility'
@@ -538,7 +533,7 @@ function renderPlatformDetail(host, slugOrId, opts = {}) {
   const media = item.media && item.media.length
     ? item.media
     : (item.img ? [{ kind: 'image', src: item.img }] : []);
-  const mediaEl = buildMediaStage(media, title);
+  const mediaEl = buildMediaStage(media, title, item);
   const children = [];
   if (opts.isPreview) {
     children.push(
@@ -625,13 +620,13 @@ function renderLawDetail(host, slugOrId, opts = {}) {
 
   applyItemSeoHead(item, 'law');
   const lang = getLang();
-  const title = lang === 'en' && item.titleEn ? item.titleEn : (item.title || '');
-  const summary = lang === 'en' && item.summaryEn ? item.summaryEn : (item.summary || '');
-  const bodyHtml = lang === 'en' && item.bodyEn ? item.bodyEn : (item.body || '');
+  const title = editorialField(item, 'title', lang);
+  const summary = editorialField(item, 'summary', lang);
+  const bodyHtml = editorialField(item, 'body', lang);
   const media = item.media && item.media.length
     ? item.media
     : (item.img ? [{ kind: 'image', src: item.img }] : []);
-  const mediaEl = buildMediaStage(media, title);
+  const mediaEl = buildMediaStage(media, title, item);
   const children = [];
   if (opts.isPreview) {
     children.push(
@@ -721,16 +716,11 @@ function renderResearchGroupDetail(host, slugOrId, opts = {}) {
   }
 
   applyItemSeoHead(item, 'research-group');
-  const title =
-    lang === 'en' && item.name_en ? item.name_en : item.name_ar || item.name_en || '';
-  const summary =
-    lang === 'en' && item.summary_en
-      ? item.summary_en
-      : item.summary_ar || item.summary_en || '';
-  const lead =
-    lang === 'en' && item.lead_en ? item.lead_en : item.lead_ar || item.lead_en || '';
+  const title = editorialField(item, 'name', lang);
+  const summary = editorialField(item, 'summary', lang);
+  const lead = editorialField(item, 'lead', lang);
   const members = Array.isArray(item.members) ? item.members : [];
-  const imgSrc = safeImageSrc(item.img || item.og_image || '');
+  const sources = cmsResponsiveSources(item, 'master');
   const projects = item.id && !opts.isPreview ? getResearchProjectsForGroup(item.id) : [];
 
   const children = [];
@@ -750,18 +740,16 @@ function renderResearchGroupDetail(host, slugOrId, opts = {}) {
       text: t('detail_back'),
     }),
   );
-  if (imgSrc) {
-    children.push(
-      el('div', {
-        className: 'detail-hero',
-        children: [
-          el('img', {
-            className: 'detail-hero-img',
-            attrs: { src: imgSrc, alt: title, loading: 'lazy' },
-          }),
-        ],
-      }),
-    );
+  if (sources.fallback) {
+    const heroImg = createPictureImg({
+      fallbackSrc: sources.fallback,
+      webpSrc: sources.webp,
+      className: 'detail-hero-img',
+      alt: title,
+    });
+    if (heroImg) {
+      children.push(el('div', { className: 'detail-hero', children: [heroImg] }));
+    }
   }
   children.push(
     el('header', {
@@ -791,11 +779,9 @@ function renderResearchGroupDetail(host, slugOrId, opts = {}) {
           }),
           el('ul', {
             className: 'detail-pdf-list',
-            children: members.map((m) => {
-              const name =
-                lang === 'en' && m.name_en ? m.name_en : m.name_ar || m.name_en || '';
-              return el('li', { text: name });
-            }),
+            children: members.map((m) =>
+              el('li', { text: editorialBilingualEntry(m, item, lang) }),
+            ),
           }),
         ],
       }),
@@ -814,8 +800,7 @@ function renderResearchGroupDetail(host, slugOrId, opts = {}) {
             className: 'detail-pdf-list',
             children: projects.map((p) => {
               const slug = p.slug || p.id;
-              const pTitle =
-                lang === 'en' && p.title_en ? p.title_en : p.title_ar || p.title_en || '';
+              const pTitle = editorialField(p, 'title', lang);
               return el('li', {
                 children: [
                   el('a', {
@@ -864,36 +849,21 @@ function renderResearchProjectDetail(host, slugOrId, opts = {}) {
   }
 
   applyItemSeoHead(item, 'research-project');
-  const langAttrs = lang === 'en' ? { lang: 'ar' } : {};
-  const title =
-    lang === 'en' && item.title_en ? item.title_en : item.title_ar || item.title_en || '';
-  const lead =
-    lang === 'en' && item.lead_en ? item.lead_en : item.lead_ar || item.lead_en || '';
-  const dibaja =
-    lang === 'en' && item.dibaja_en ? item.dibaja_en : item.dibaja_ar || item.dibaja_en || '';
-  const questions =
-    lang === 'en' && item.questions_en
-      ? item.questions_en
-      : item.questions_ar || item.questions_en || '';
-  const duration =
-    lang === 'en' && item.duration_en
-      ? item.duration_en
-      : item.duration_ar || item.duration_en || '';
+  const langAttrs = editorialLangAttrs(item, lang);
+  const title = editorialField(item, 'title', lang);
+  const lead = editorialField(item, 'lead', lang);
+  const dibaja = editorialField(item, 'body', lang);
+  const questions = editorialField(item, 'questions', lang);
+  const duration = editorialField(item, 'duration', lang);
   const group = item.groupId ? findResearchGroupByKey(item.groupId) : null;
-  const groupLabel = group
-    ? lang === 'en' && group.name_en
-      ? group.name_en
-      : group.name_ar || group.name_en || ''
-    : '';
+  const groupLabel = group ? editorialField(group, 'name', lang) : '';
 
   const axes = Array.isArray(item.axes) ? item.axes : [];
   const impacts = Array.isArray(item.impacts) ? item.impacts : [];
 
   /** @param {object} row */
   function bilingualLine(row) {
-    if (!row || typeof row !== 'object') return '';
-    if (lang === 'en' && row.en) return row.en;
-    return row.ar || row.en || '';
+    return editorialBilingualEntry(row, item, lang);
   }
 
   const sections = [];

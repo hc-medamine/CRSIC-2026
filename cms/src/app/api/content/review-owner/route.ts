@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
   const kind = request.nextUrl.searchParams.get("kind");
   if (kind === "eligible") {
-    if (user.role !== "super_admin" && user.role !== "reviewer") {
+    if (user.role !== "super_admin") {
       return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
     }
     const users = await listEligibleReviewOwners();

@@ -715,8 +715,8 @@ export async function setItemPublisher(
   itemId: string,
   publisherId: string | null,
 ): Promise<{ rebuilt: boolean; rebuildError?: string }> {
-  if (user.role !== "super_admin" && user.role !== "reviewer") {
-    throw new Error("Super Admin or Reviewer role required");
+  if (user.role !== "super_admin") {
+    throw new Error("Only Super Admin can set public publisher");
   }
   const meta = await getContentMeta(itemId);
   if (!meta) throw new Error("Not found");

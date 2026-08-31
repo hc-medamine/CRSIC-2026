@@ -260,6 +260,17 @@ export function applyDirectorWord() {
   if (nameEl && name) nameEl.textContent = name;
   if (roleEl && role) roleEl.textContent = role;
   if (imgEl && d.portrait) {
+    const webp = safeImageSrc(d.portrait_webp || '');
+    const parent = imgEl.parentElement;
+    if (webp && parent && parent.tagName !== 'PICTURE') {
+      const picture = document.createElement('picture');
+      const source = document.createElement('source');
+      source.type = 'image/webp';
+      source.srcset = webp;
+      parent.insertBefore(picture, imgEl);
+      picture.appendChild(source);
+      picture.appendChild(imgEl);
+    }
     imgEl.setAttribute('src', d.portrait);
     const alt =
       lang === 'en'
@@ -623,6 +634,8 @@ const STORY_NOTICE_HOSTS = new Set([
   'ev-nat-list',
   'nat-partners',
   'intl-partners',
+  'laws-grid',
+  'platforms-grid',
 ]);
 
 function storyGridNeedsEnNotice(grid) {

@@ -5,7 +5,8 @@ import { requireUser } from "@/lib/auth/session";
 import { getResearchGroupById } from "@/lib/content/researchGroups";
 import { normalizeResearchMembers } from "@/lib/publish/researchGroupsJson";
 import { canAccessContentType, canReview } from "@/lib/content/permissions";
-import { canRecycleFromEditPage } from "@/lib/content/recycleBin";
+import { canSubmitStatus } from "@/lib/content/reviewWorkflow";
+import { canRecycleFromEditPageAsync } from "@/lib/content/recycleBin";
 import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 import { listSelectableOrgUnits } from "@/lib/users";
 import { getItemPeopleMeta } from "@/lib/content/people";
@@ -61,6 +62,8 @@ export default async function ResearchGroupDetailPage({ params }: Props) {
     nameEn: m.name_en ?? "",
   }));
 
+  const canDelete = await canRecycleFromEditPageAsync(user, item);
+
   return (
     <EditPageShell
       breadcrumbs={[
@@ -84,9 +87,9 @@ export default async function ResearchGroupDetailPage({ params }: Props) {
         mode="edit"
         orgUnits={orgs}
         isAuthor={isAuthor}
-        canSubmit={isAuthor && ["draft", "changes_requested"].includes(item.status)}
+        canSubmit={isAuthor && canSubmitStatus(item.status)}
         canReview={reviewer}
-        canDelete={canRecycleFromEditPage(user, item)}
+        canDelete={canDelete}
         initial={{
           id: item.id,
           orgUnitId: item.org_unit_id,

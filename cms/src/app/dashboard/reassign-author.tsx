@@ -45,7 +45,8 @@ export function ReassignAuthor({ contentItemId, contentType, currentAuthorId }: 
   useEffect(() => {
     let cancelled = false;
     async function load() {
-      const res = await fetch("/api/content/assignable-users");
+      const q = new URLSearchParams({ contentItemId });
+      const res = await fetch(`/api/content/assignable-users?${q}`);
       const data = (await res.json()) as { ok: boolean; users?: AssignableUser[] };
       if (!cancelled && data.ok && data.users) setUsers(data.users);
     }
@@ -53,7 +54,7 @@ export function ReassignAuthor({ contentItemId, contentType, currentAuthorId }: 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [contentItemId]);
 
   async function reassign() {
     if (!target) return;

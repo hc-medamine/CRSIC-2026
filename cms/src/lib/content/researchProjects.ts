@@ -3,6 +3,7 @@ import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { appendWorkflowComment } from "@/lib/content/comments";
+import { ensureWebpForContentRow } from "@/lib/media/publishImages";
 import {
   buildResearchProjectPayload,
   normalizeResearchEntries,
@@ -21,6 +22,7 @@ import {
   assertOrgAllowsContentType,
 } from "@/lib/content/permissions";
 import { notifyOnSubmit } from "@/lib/content/delegation";
+import { isReviewerDecisionStatus, canSubmitStatus, submitStatusError, isEditableStatus } from "@/lib/content/reviewWorkflow";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
 import { normalizeSeoInput, seoSnapshotFields, type SeoInput } from "@/lib/content/seo";
 import type { ContentStatus } from "@/lib/content/news";
@@ -279,7 +281,7 @@ export async function updateResearchProjectDraft(
 ) {
   const existing = await getResearchProjectById(id);
   if (!existing) throw new Error("Not found");
-  if (!["draft", "changes_requested"].includes(existing.status)) {
+  if (!isEditableStatus(existing.status)) {
     throw new Error("Only draft or changes_requested items can be edited");
   }
   if (existing.created_by !== user.id && user.role !== "super_admin") {
@@ -305,6 +307,7 @@ export async function updateResearchProjectDraft(
       research_impacts = $17::jsonb,
       meta_title_ar = $18, meta_title_en = $19, meta_description_ar = $20,
       meta_description_en = $21, og_image = $22,
+      status = CASE WHEN status = 'unpublished' THEN 'draft' ELSE status END,
       updated_at = NOW()
      WHERE id = $1 AND content_type = 'research_project'
      RETURNING *`,
@@ -345,7 +348,9 @@ async function notifyReviewers(itemId: string, title: string, body: string, link
 export async function submitResearchProject(user: SessionUser, id: string, checklistConfirmed: boolean) {
   const existing = await getResearchProjectById(id);
   if (!existing) throw new Error("Not found");
-  if (!["draft", "changes_requested"].includes(existing.status)) throw new Error("Cannot submit in current status");
+  if (!canSubmitStatus(existing.status)) {
+    throw new Error(submitStatusError(existing.status));
+  }
   if (existing.created_by !== user.id && user.role !== "super_admin") throw new Error("Only the author can submit");
   if (!checklistConfirmed) throw new Error("Editorial checklist must be confirmed");
   if (!existing.title_ar.trim()) throw new Error("Project title (AR) is required");
@@ -397,7 +402,7 @@ export async function requestResearchProjectChanges(user: SessionUser, id: strin
   const existing = await getResearchProjectById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
-  if (existing.status !== "submitted") throw new Error("Item is not awaiting review");
+  if (!isReviewerDecisionStatus(existing.status)) throw new Error("Item is not awaiting review");
   if (!note.trim()) throw new Error("Change request note is required");
   const result = await query<ResearchProjectItem>(
     `UPDATE content_items SET status = 'changes_requested', review_note = $2, updated_by = $3, updated_at = NOW()
@@ -422,7 +427,7 @@ export async function approveResearchProject(user: SessionUser, id: string) {
   const existing = await getResearchProjectById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
-  if (existing.status !== "submitted") throw new Error("Item is not awaiting review");
+  if (!isReviewerDecisionStatus(existing.status)) throw new Error("Item is not awaiting review");
   const result = await query<ResearchProjectItem>(
     `UPDATE content_items SET status = 'approved', review_note = NULL, updated_by = $2, updated_at = NOW()
      WHERE id = $1 RETURNING *`,
@@ -445,7 +450,7 @@ export async function rejectResearchProject(user: SessionUser, id: string, note:
   const existing = await getResearchProjectById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
-  if (existing.status !== "submitted") throw new Error("Item is not awaiting review");
+  if (!isReviewerDecisionStatus(existing.status)) throw new Error("Item is not awaiting review");
   if (!note.trim()) throw new Error("Rejection note is required");
   const result = await query<ResearchProjectItem>(
     `UPDATE content_items SET status = 'rejected', review_note = $2, updated_by = $3, updated_at = NOW()
@@ -479,6 +484,7 @@ export async function publishResearchProject(user: SessionUser, id: string) {
     titleAr: existing.title_ar,
     existingSlug: existing.public_slug,
   });
+  await ensureWebpForContentRow(existing);
   const payload = buildResearchProjectPayload({ ...existing, public_slug: slug });
   const item = await mutateThenRebuildPublic({
     itemId: id,
@@ -514,7 +520,7 @@ export async function unpublishResearchProject(user: SessionUser, id: string, op
   if (existing.status !== "published") throw new Error("Item is not published");
   const mutate = async () => {
     const result = await query<ResearchProjectItem>(
-      `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
+      `UPDATE content_items SET status = 'draft', live_payload = NULL, live_at = NULL,
         needs_post_review = FALSE, emergency_published_at = NULL,
         emergency_published_by = NULL, emergency_reason = NULL,
         updated_by = $2, updated_at = NOW()
@@ -524,7 +530,7 @@ export async function unpublishResearchProject(user: SessionUser, id: string, op
     return result.rows[0];
   };
   const item = await unpublishMutateMaybeRebuild(id, mutate, rebuildPublicResearchProjectsJson, opts);
-  await addRevision(item.id, "unpublished", snapshotOf(item), user.id, "Unpublished");
+  await addRevision(item.id, "draft", snapshotOf(item), user.id, "Unpublished");
   if (shouldNotifyUnpublish(opts)) {
     await createNotification({
       userId: item.created_by,

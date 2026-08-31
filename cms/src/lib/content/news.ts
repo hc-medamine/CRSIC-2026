@@ -17,6 +17,12 @@ import {
   getUserOrgIds,
   assertOrgAllowsContentType,
 } from "@/lib/content/permissions";
+import {
+  canSubmitStatus,
+  isEditableStatus,
+  isReviewerDecisionStatus,
+  submitStatusError,
+} from "@/lib/content/reviewWorkflow";
 import { notifyOnSubmit } from "@/lib/content/delegation";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
 import { pruneFeaturedNewsItem } from "@/lib/content/featuredNews";
@@ -262,7 +268,7 @@ export async function updateNewsDraft(
 ): Promise<NewsItem> {
   const existing = await getNewsById(id);
   if (!existing) throw new Error("Not found");
-  if (!["draft", "changes_requested"].includes(existing.status)) {
+  if (!isEditableStatus(existing.status)) {
     throw new Error("Only draft or changes_requested items can be edited");
   }
   if (existing.created_by !== user.id && user.role !== "super_admin") {
@@ -311,6 +317,7 @@ export async function updateNewsDraft(
       meta_description_ar = $20,
       meta_description_en = $21,
       og_image = $22,
+      status = CASE WHEN status = 'unpublished' THEN 'draft' ELSE status END,
       updated_at = NOW()
      WHERE id = $1 AND content_type = 'news'
      RETURNING *`,
@@ -353,8 +360,8 @@ async function notifyReviewers(itemId: string, title: string, body: string, link
 export async function submitNews(user: SessionUser, id: string, checklistConfirmed: boolean) {
   const existing = await getNewsById(id);
   if (!existing) throw new Error("Not found");
-  if (!["draft", "changes_requested"].includes(existing.status)) {
-    throw new Error("Cannot submit in current status");
+  if (!canSubmitStatus(existing.status)) {
+    throw new Error(submitStatusError(existing.status));
   }
   if (existing.created_by !== user.id && user.role !== "super_admin") {
     throw new Error("Only the author can submit");
@@ -418,7 +425,7 @@ export async function requestNewsChanges(user: SessionUser, id: string, note: st
   const existing = await getNewsById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
-  if (existing.status !== "submitted") throw new Error("Item is not awaiting review");
+  if (!isReviewerDecisionStatus(existing.status)) throw new Error("Item is not awaiting review");
   if (!note.trim()) throw new Error("Change request note is required");
 
   const result = await query<NewsItem>(
@@ -448,7 +455,7 @@ export async function approveNews(user: SessionUser, id: string) {
   const existing = await getNewsById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
-  if (existing.status !== "submitted") throw new Error("Item is not awaiting review");
+  if (!isReviewerDecisionStatus(existing.status)) throw new Error("Item is not awaiting review");
 
   const result = await query<NewsItem>(
     `UPDATE content_items SET
@@ -476,7 +483,7 @@ export async function rejectNews(user: SessionUser, id: string, note: string) {
   const existing = await getNewsById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
-  if (existing.status !== "submitted") throw new Error("Item is not awaiting review");
+  if (!isReviewerDecisionStatus(existing.status)) throw new Error("Item is not awaiting review");
   if (!note.trim()) throw new Error("Rejection note is required");
 
   const result = await query<NewsItem>(
@@ -565,7 +572,7 @@ export async function unpublishNews(user: SessionUser, id: string, opts: Unpubli
   const mutate = async () => {
     const result = await query<NewsItem>(
       `UPDATE content_items SET
-        status = 'unpublished',
+        status = 'draft',
         live_payload = NULL,
         live_at = NULL,
         needs_post_review = FALSE,
@@ -588,7 +595,7 @@ export async function unpublishNews(user: SessionUser, id: string, opts: Unpubli
           mutate,
           rebuild: rebuildPublicNewsJson,
         });
-  await addRevision(item.id, "unpublished", snapshotOf(item), user.id, "Unpublished");
+  await addRevision(item.id, "draft", snapshotOf(item), user.id, "Unpublished");
   if (opts.notify !== false) {
     await createNotification({
       userId: item.created_by,

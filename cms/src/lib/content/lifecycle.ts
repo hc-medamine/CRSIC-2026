@@ -290,7 +290,11 @@ export type AssignableUser = {
  */
 export async function listAssignableUsers(
   actor: SessionUser,
+  contentItemId?: string,
 ): Promise<AssignableUser[]> {
+  if (contentItemId) {
+    return listAssignableUsersForItem(actor, contentItemId);
+  }
   const result = await query<AssignableUser>(
     actor.role === "super_admin"
       ? `SELECT id, display_name, name_ar, name_en, email, role
@@ -302,6 +306,42 @@ export async function listAssignableUsers(
          WHERE is_active = TRUE
            AND role IN ('editor', 'reviewer')
          ORDER BY display_name ASC`,
+  );
+  return result.rows;
+}
+
+/** Editors scoped to the item's org + content type (Reviewers); SA sees all active users. */
+export async function listAssignableUsersForItem(
+  actor: SessionUser,
+  contentItemId: string,
+): Promise<AssignableUser[]> {
+  const meta = await getContentMeta(contentItemId);
+  if (!meta) throw new Error("Not found");
+
+  if (actor.role === "super_admin") {
+    const result = await query<AssignableUser>(
+      `SELECT id, display_name, name_ar, name_en, email, role
+       FROM users
+       WHERE is_active = TRUE
+       ORDER BY display_name ASC`,
+    );
+    return result.rows;
+  }
+
+  if (actor.role !== "reviewer") {
+    throw new Error("Forbidden");
+  }
+
+  const result = await query<AssignableUser>(
+    `SELECT DISTINCT u.id, u.display_name, u.name_ar, u.name_en, u.email, u.role
+     FROM editor_content_type_claims ect
+     JOIN users u ON u.id = ect.editor_id
+     WHERE u.is_active = TRUE
+       AND u.role = 'editor'
+       AND ect.content_type = $1
+       AND ect.org_unit_id = $2
+     ORDER BY u.display_name ASC`,
+    [meta.content_type, meta.org_unit_id],
   );
   return result.rows;
 }
@@ -339,6 +379,13 @@ export async function reassignAuthor(
   if (!targetRow.is_active) throw new Error("Target user is not active");
   if (targetRow.role === "super_admin" && user.role !== "super_admin") {
     throw new Error("Only Super Admin can reassign to a Super Admin");
+  }
+
+  if (user.role === "reviewer") {
+    const assignable = await listAssignableUsersForItem(user, id);
+    if (!assignable.some((u) => u.id === newUserId)) {
+      throw new Error("Target user is not assignable for this item");
+    }
   }
 
   const previous = item.created_by;

@@ -15,7 +15,7 @@ import { getPlatformById } from "@/lib/content/platforms";
 import { buildNewsPayloadForItem } from "@/lib/publish/newsJson";
 import { buildEventPayloadForItem } from "@/lib/publish/eventsJson";
 import { buildPublicationPayload } from "@/lib/publish/publicationsJson";
-import { buildPartnerPayload } from "@/lib/publish/partnersJson";
+import { buildPartnerPayloadForItem } from "@/lib/publish/partnersJson";
 import { buildAlertPayload } from "@/lib/publish/alertsJson";
 import { buildResearchGroupPayload } from "@/lib/publish/researchGroupsJson";
 import { buildResearchProjectPayload } from "@/lib/publish/researchProjectsJson";
@@ -106,7 +106,7 @@ async function buildCandidatePayload(
   if (contentType === "partner") {
     const row = await getPartnerById(id);
     if (!row) return null;
-    return buildPartnerPayload(row) as unknown as Record<string, unknown>;
+    return (await buildPartnerPayloadForItem(row)) as unknown as Record<string, unknown>;
   }
   if (contentType === "alert") {
     const row = await getAlertById(id);

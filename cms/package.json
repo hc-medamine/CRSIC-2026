@@ -17,7 +17,6 @@
     "db:forensics:seo-restore": "node --env-file=.env.local --import tsx scripts/forensics-seo-restore.ts",
     "db:rebuild:partners": "node --env-file=.env.local --import tsx scripts/rebuild-partners.ts",
     "db:enrich:partners": "node --env-file=.env.local --import tsx scripts/enrich-partners-from-legacy.ts",
-
     "test": "node --env-file=.env.local --import tsx --test --test-force-exit \"src/lib/**/*.test.ts\"",
     "db:cleanup:smoke": "node --env-file=.env.local --import tsx scripts/cleanup-smoke-data.ts",
     "db:seed:super-admin": "node --env-file=.env.local --import tsx scripts/seed-super-admin.ts",
@@ -26,7 +25,6 @@
     "db:seed:welcome-notifications": "node --env-file=.env.local --import tsx scripts/seed-welcome-notifications.ts",
     "db:import-legacy": "node --env-file=.env.local --import tsx scripts/import-legacy.ts",
     "db:import-legacy:partners": "node --env-file=.env.local --import tsx scripts/import-legacy.ts -- --partners-only",
-
     "db:import:laws-platforms": "node --env-file=.env.local --import tsx scripts/import-laws-platforms.ts",
     "db:migrate:media-to-cms": "node --env-file=.env.local --import tsx scripts/migrate-public-media-into-cms.ts",
     "db:cutover:wordpress": "node --env-file=.env.local --import tsx scripts/cutover-from-wordpress.ts",
@@ -43,7 +41,8 @@
     "pg": "^8.22.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "sanitize-html": "^2.17.6"
+    "sanitize-html": "^2.17.6",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

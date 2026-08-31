@@ -5,6 +5,7 @@
  */
 import { contentUrl } from './config.js';
 import { normalizeFeaturedIds } from './featuredNews.js';
+import { safeImageSrc } from './utils.js';
 
 /** @type {string[]} */
 let covers = [];
@@ -212,6 +213,42 @@ export function cmsCardImageSrc(item) {
   if (!item) return '';
   const card = String(item.img_card || '').trim();
   return card || cmsItemImageSrc(item);
+}
+
+/**
+ * WebP sibling for card/detail images when published.
+ * @param {object|undefined} item
+ * @param {'card'|'master'|'portrait'} [variant]
+ * @returns {string}
+ */
+export function cmsWebpSrc(item, variant = 'card') {
+  if (!item) return '';
+  if (variant === 'portrait') {
+    return safeImageSrc(item.portrait_webp || item.img_webp || '');
+  }
+  const cardWebp = String(item.img_card_webp || '').trim();
+  const masterWebp = String(item.img_webp || item.cover_webp || '').trim();
+  if (variant === 'master') return safeImageSrc(masterWebp);
+  return safeImageSrc(cardWebp || masterWebp);
+}
+
+/**
+ * Fallback + WebP sources for picture elements.
+ * @param {object|undefined} item
+ * @param {'card'|'master'|'pub'} [variant]
+ * @param {number} [pubIndex]
+ * @returns {{ fallback: string, webp: string }}
+ */
+export function cmsResponsiveSources(item, variant = 'card', pubIndex) {
+  let fallback = '';
+  if (variant === 'pub') fallback = safeImageSrc(pubCardImageSrc(item, pubIndex));
+  else if (variant === 'card') fallback = safeImageSrc(cmsCardImageSrc(item));
+  else fallback = safeImageSrc(cmsItemImageSrc(item));
+  const webp =
+    variant === 'master'
+      ? cmsWebpSrc(item, 'master')
+      : cmsWebpSrc(item, variant === 'pub' ? 'card' : variant);
+  return { fallback, webp };
 }
 
 /**
