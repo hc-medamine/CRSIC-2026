@@ -273,6 +273,16 @@ PRD [2026-08-24-cms-import-export-bulk-sort.md](../prds/2026-08-24-cms-import-ex
 | Ie7 | Check 3 news → **Export selected** → one zip → import = 3 new drafts; `news.json` hash unchanged. Header checkbox = loaded rows only | ☑ 2026-08-24 API zip + header=20/21 events; import skipped (no extra drafts) |
 | Ie8 | **Export this type** and per-row **Export this item** still work. News list has no Export. N>200 warns and does not drop extras | ☑ 2026-08-24 |
 
+## Site pages (Cut C)
+
+PRD [2026-08-26-remaining-deferred-pack.md](../prds/2026-08-26-remaining-deferred-pack.md) Cut C. Run `cd cms && npm run db:migrate` (`033` `site_pages`). Same gate as Director: Super Admin or centre-wide Reviewer; **same person** may Save and Publish. Walk AR + EN. Journals hash unchanged.
+
+| # | Check | Pass? |
+|---|--------|-------|
+| Sp1 | Nav **Site pages** under Administration (next to Director). Editor: no nav; URL redirects Home | ☐ |
+| Sp2 | Change About vision, Save, Publish. Public `#about` updates without editing locales. Footer address matches the published contact address | ☐ |
+| Sp3 | Publish failure (or missing `site-pages.json`): About still renders from locales. Message is a sentence, not a stack trace | ☐ |
+
 ## G. Gate
 
 | # | Check | Pass? |

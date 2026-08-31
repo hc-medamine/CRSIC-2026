@@ -32,6 +32,8 @@ let laws = [];
 let platforms = [];
 /** @type {object | null} */
 let director = null;
+/** @type {object | null} */
+let sitePages = null;
 /** @type {string[]} */
 let featuredNewsIds = [];
 
@@ -128,6 +130,17 @@ export function loadData() {
             ? data
             : null;
       }),
+      loadResource(
+        'sitePages',
+        'site-pages.json',
+        (data) => {
+          sitePages =
+            data && typeof data === 'object' && data.ar && typeof data.ar === 'object'
+              ? data
+              : null;
+        },
+        { optional: true },
+      ),
       loadResource(
         'featuredNews',
         'featured-news.json',
@@ -399,6 +412,11 @@ export function getPlatforms() {
 /** @returns {object | null} */
 export function getDirector() {
   return director;
+}
+
+/** @returns {object | null} */
+export function getSitePages() {
+  return sitePages;
 }
 
 export function findPlatformByKey(key) {

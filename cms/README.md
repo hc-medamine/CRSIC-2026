@@ -79,6 +79,7 @@ not treat as people: `smoke.editor@crsic.dz`, `smoke.reviewer@crsic.dz`.
 | Platforms | Done | `data/platforms.json` |
 | Research groups / projects | Done | `data/research-groups.json`, `data/research-projects.json` |
 | Site director | Done | `data/director.json` (singleton `site_director`, not `content_items`) |
+| Site pages | Cut C | `data/site-pages.json` (singleton `site_pages`; optional until first publish; locales fallback). Desk `/dashboard/site-pages` (SA or centre-wide Reviewer; same person may Save and Publish) |
 | Home featured news | Done | `data/featured-news.json` (singleton `site_featured_news`; max 10 ids; four-eyes on the **playlist**) |
 
 Editors need the matching content-type scope. Four-eyes: authors cannot approve their own **content items**. Featured playlist: News Editor + SA + Reviewer can edit the draft; **only Reviewer or SA publish**.

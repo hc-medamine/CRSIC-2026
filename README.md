@@ -108,6 +108,7 @@ CRSIC 2026/
 │   ├── config.js              # CONTENT_BASE_URL, PREVIEW_API_BASE, contentUrl()
 │   ├── data.js                # fetch JSON, soft-fail, sync getters
 │   ├── i18n.js                # locales, RTL/LTR, localStorage, banner
+│   ├── sitePages.js           # optional site-pages.json overlay (About/org/contact/coop)
 │   ├── research.js            # research groups / projects hub + detail
 │   ├── router.js              # hash navigation, PAGE_PARENT, deep links
 │   ├── safeBody.js            # sanitized rich-text body renderer (allowlist)
@@ -132,6 +133,7 @@ CRSIC 2026/
 │   ├── CMS.md                 # CDN / remote JSON publish contract
 │   ├── alerts.json            # Site-wide alert (CMS-published)
 │   ├── director.json          # About director block (CMS-published)
+│   ├── site-pages.json        # About/org/contact/coop bodies (CMS-published; optional until first publish)
 │   ├── featured-news.json     # Home featured playlist ids (CMS-published)
 │   ├── events.json
 │   ├── journals.json
@@ -316,7 +318,18 @@ Empty array or missing file → Home featured strip shows **3 newest** news. CMS
 
 #### `laws.json` / `platforms.json` / `director.json` / research
 
-See [data/CMS.md](./data/CMS.md). Hubs: `#laws`, `#platforms`. Details: `#law/{slug}`, `#platform/{slug}`, `#research-group/{slug}`, `#research-project/{slug}`. Director singleton feeds the About block.
+See [data/CMS.md](./data/CMS.md). Hubs: `#laws`, `#platforms`. Details: `#law/{slug}`, `#platform/{slug}`, `#research-group/{slug}`, `#research-project/{slug}`. Director singleton feeds the About director block.
+
+#### `site-pages.json` (optional)
+
+CMS `/dashboard/site-pages` (Super Admin or centre-wide Reviewer; same person may Save and Publish). Missing file → `#about` `#org` `#contact` `#cooperation` and footer keep `locales/*.json` plus hardcoded email/phone/webmail. After publish:
+
+| Field | Type |
+|-------|------|
+| `ar` / `en` | flat maps of body keys (`about_*` bodies, `org_*` labels, `coop_*` intro, `contact_addr_val`, `footer_contact_addr`) |
+| `contact` | `{ email, phone, webmail_url, webmail_text }` |
+
+`footer_contact_addr` is copied from `contact_addr_val` on publish. Locale chrome headings stay in `locales/*.json`. Do not delete locale fallback keys.
 
 #### Locales
 
@@ -352,11 +365,12 @@ Approximate inventory of **shipped public JSON** after WordPress cutover + Home 
 | Alerts | `alerts.json` — 0 live items (`items[]`, at most one live) |
 | Laws / Platforms | `laws.json` (3), `platforms.json` (3) |
 | Research | `research-groups.json` (8), `research-projects.json` (1), `director.json` (singleton) |
+| Site pages | `site-pages.json` optional until first CMS publish (locales fallback) |
 | Locale preference | `localStorage` `crsic_lang` + URL `?lang=ar\|en` |
 | Public SPA auth | **None** |
 | CMS staff | Seeded people in Postgres — see [`cms/README.md`](./cms/README.md) (emails are login ids; passwords never in git) |
 
-**Hard-coded in HTML (not JSON):** hero copy (via i18n keys), about / mission / vision / values, organisational chart. Research department tabs (`r1`–`r4`) load groups from `research-groups.json`. Home publications, events teaser, **featured news**, and Center News are JSON-driven.
+**Hard-coded in HTML (not JSON):** hero copy (via i18n keys). About / mission / vision / values / org labels / contact address overlay from optional `site-pages.json` after CMS publish; locales remain fallback. Research department tabs (`r1`–`r4`) load groups from `research-groups.json`. Home publications, events teaser, **featured news**, and Center News are JSON-driven.
 
 **Client-only persistence:**
 
@@ -729,6 +743,7 @@ When `CONTENT_BASE_URL` is `https://cdn.example.com/crsic/`:
 | GET    | `research-groups.json` | `{ items: object[] }`               |
 | GET    | `research-projects.json` | `{ items: object[] }`             |
 | GET    | `director.json`     | director singleton                     |
+| GET    | `site-pages.json`   | optional About/org/contact/coop overlay (missing → locales) |
 | GET    | `locales/ar.json`   | flat key → string                      |
 | GET    | `locales/en.json`   | flat key → string                      |
 
@@ -819,7 +834,7 @@ Own **internal CMS + PostgreSQL** (`cms/`): authenticated users with roles and p
 2. Server list pagination — **Delivered** [docs/prds/2026-08-22-cms-list-load-more.md](./docs/prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more)
 3. Soft-delete recycle bin — **Delivered** [docs/prds/2026-08-22-cms-recycle-bin.md](./docs/prds/2026-08-22-cms-recycle-bin.md) (PR #34)
 4. Bulk ops / clone / import-export UI — **list bulk unpublish/recycle on all CMS content types** (news PR #36; events/publications + remaining types PR #37). **Clone Cut 1 Delivered** ([PRD](./docs/prds/2026-08-22-cms-clone-import-export.md), PR #42). **JSON zip I/E Delivered** (PR #44). Picker bulk + sort: [PRD](./docs/prds/2026-08-24-cms-import-export-bulk-sort.md) (**Delivered**)
-5–7. Extra media optimize, remaining EN-when-ready, static institutional pages — **Draft** [docs/prds/2026-08-26-remaining-deferred-pack.md](./docs/prds/2026-08-26-remaining-deferred-pack.md) (do not implement until Approved). Cover crop + news/events/pubs/partners EN-when-ready already shipped (PR #44).
+5–7. Extra media optimize, remaining EN-when-ready, static institutional pages — [docs/prds/2026-08-26-remaining-deferred-pack.md](./docs/prds/2026-08-26-remaining-deferred-pack.md). **Cut C** (site pages) implementing on `feature/cms-site-pages`. Cover crop + news/events/pubs/partners EN-when-ready already shipped (PR #44).
 8. Journals in CMS (OJS remains) — **still deferred**; out of the 2026-08-26 pack
 
 **Cancelled (do not re-open):** scheduled / timed auto-publish (2026-07-21, confirmed 2026-08-22). Publish stays manual Approve → Publish.
@@ -834,7 +849,7 @@ Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Core spec: [d
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-08-26** (remaining-deferred PRD Draft; I2 docs + local CMS media on `main`) |
+| Last updated     | **2026-08-26** (Cut C site pages implementing; remaining-deferred pack) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes

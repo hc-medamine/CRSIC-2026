@@ -218,7 +218,10 @@ export function CmsChrome({
 
   const adminItems: NavItem[] = [];
   if (showDirector) {
-    adminItems.push({ key: "directorWord", href: "/dashboard/director", icon: <IconUser /> });
+    adminItems.push(
+      { key: "directorWord", href: "/dashboard/director", icon: <IconUser /> },
+      { key: "sitePages", href: "/dashboard/site-pages", icon: <IconGlobe /> },
+    );
   }
   if (role === "super_admin") {
     adminItems.push(

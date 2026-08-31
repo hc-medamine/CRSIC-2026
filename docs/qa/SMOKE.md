@@ -40,6 +40,7 @@ Estimated time: **~5 minutes**.
 | C2 | Toggle **AR** → UI chrome Arabic, `dir=rtl` | ☐ |
 | C3 | Preference survives refresh (`localStorage` `crsic_lang`) | ☐ |
 | C4 | After layout/CSS/i18n changes: run [RTL-LTR.md](./RTL-LTR.md) checklist both dirs | ☐ |
+| C5 | `#about` still shows locale copy when `site-pages.json` is missing; Home has no data-error banner for that file | ☐ |
 
 ## D. Features
 

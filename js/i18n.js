@@ -7,6 +7,7 @@
  */
 import { setTrustedBrHtml } from './utils.js';
 import { contentUrl } from './config.js';
+import { mergeSitePageDict } from './sitePages.js';
 
 const LANG_KEY = 'crsic_lang';
 const BANNER_KEY = 'crsic_banner_dismissed';
@@ -140,6 +141,17 @@ function reportKeyParity() {
   const onlyEn = [...enKeys].filter((k) => !arKeys.has(k));
   if (onlyAr.length) console.warn('[i18n] Keys in ar but not en:', onlyAr);
   if (onlyEn.length) console.warn('[i18n] Keys in en but not ar:', onlyEn);
+}
+
+/**
+ * Overlay CMS-published site-page strings onto locale dictionaries.
+ * Empty or missing payload leaves locales unchanged.
+ * @param {object|null|undefined} payload
+ */
+export function overlaySitePages(payload) {
+  if (!payload || typeof payload !== 'object') return;
+  TRANSLATIONS.ar = mergeSitePageDict(TRANSLATIONS.ar, payload.ar);
+  TRANSLATIONS.en = mergeSitePageDict(TRANSLATIONS.en, payload.en);
 }
 
 export function applyTranslations() {
