@@ -7,9 +7,9 @@ alwaysApply: true
 
 When discussing CMS/product/roadmap work, briefly remind the stakeholder that these are **deferred** (tracked in `docs/WORKLOG.md` § “Deferred backlog”). Do **not** implement them unless they explicitly start a PRD-first slice for that item.
 
-## Active Approved PRD (this slice — implement)
+## Active Approved PRD (remaining cuts)
 
-[docs/prds/2026-08-26-remaining-deferred-pack.md](docs/prds/2026-08-26-remaining-deferred-pack.md) — **Cut C only** (static institutional pages). Cuts A (WebP) and B (remaining EN-when-ready) are on other branches.
+[docs/prds/2026-08-26-remaining-deferred-pack.md](docs/prds/2026-08-26-remaining-deferred-pack.md) — **Cut C Delivered** on `main` (PR #50). **Cuts A (WebP) and B (remaining EN-when-ready)** still open — implement only when starting that cut’s branch.
 
 ## Deferred (future) — simple → complex
 

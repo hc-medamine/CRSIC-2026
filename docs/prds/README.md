@@ -42,7 +42,7 @@ Product specs for CRSIC live here. **New feature slices follow the PRD-first wor
 | [2026-08-24-cms-table-header-sort.md](./2026-08-24-cms-table-header-sort.md) | **Delivered** on `main` (PR #43) | Click data column headers to sort CMS tables; this visit only. No URL `?sort=`. |
 | [2026-08-24-cms-desk-production-boost.md](./2026-08-24-cms-desk-production-boost.md) | **Delivered** on `main` (PR #44) | SA JSON zip import/export + cover crop/card variant + EN show-when-ready. |
 | [2026-08-24-cms-import-export-bulk-sort.md](./2026-08-24-cms-import-export-bulk-sort.md) | **Delivered** on `main` | I/E page picker: Load more 20, header sort, bulk **Export selected**. Type lists unchanged. |
-| [2026-08-26-remaining-deferred-pack.md](./2026-08-26-remaining-deferred-pack.md) | **Approved** (2026-08-26) | Cuts A–C. **Cut C walk passed** (`feature/cms-site-pages`). Journals out. |
+| [2026-08-26-remaining-deferred-pack.md](./2026-08-26-remaining-deferred-pack.md) | **Approved** (2026-08-26) | **Cut C Delivered** (PR #50). Cuts A–B remain. Journals out. |
 
 ## Related
 

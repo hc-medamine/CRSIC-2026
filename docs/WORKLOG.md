@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-08-31 — CMS site pages Cut C **Delivered** (PR #50)
+
+[prds/2026-08-26-remaining-deferred-pack.md](./prds/2026-08-26-remaining-deferred-pack.md) Cut C on `main`. Singleton `site_pages` → optional `data/site-pages.json`. Desk `/dashboard/site-pages` (Director-class). Locales fallback until first publish. Footer address follows contact. Sp1–Sp3 + G1/G2 walked. Cuts A (WebP) and B (EN-when-ready remainder) remain. Journals stay OJS.
+
+---
+
 ### 2026-08-31 — CMS site pages Cut C **walk passed**
 
 [prds/2026-08-26-remaining-deferred-pack.md](./prds/2026-08-26-remaining-deferred-pack.md) Cut C. Sp1–Sp3 + G1/G2 on `feature/cms-site-pages`. Site pages nav gate, publish overlays `#about` + footer address, missing `site-pages.json` falls back to locales. Not Delivered until merge to `main`.
