@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Approved** (2026-08-26) — **Cut C walk passed** (not Delivered until `main`) |
+| Status | **Approved** (2026-08-26) — **Cut C Delivered** on `main` (PR #50); Cuts A–B remain |
 | Date | 2026-08-26 |
 | Author | Stakeholder + agent |
 | Owners | Product / CMS Desk / Public SPA |
@@ -138,3 +138,4 @@ None blocking if the stakeholder confirms the locks in §10. Confirm before **Ap
 | 2026-08-26 | Status **Draft**. No feature-branch product code until **Approved**. |
 | 2026-08-26 | Stakeholder **Approved**. Cut C: Director-class gate (SA or centre-wide Reviewer; same person Save + Publish). Footer address follows contact address. Missing `site-pages.json` → locales. No schema.org JSON-LD. Implementing on `feature/cms-site-pages`. |
 | 2026-08-31 | Cut C walk passed (Sp1–Sp3, G1/G2). Not Delivered until merge to `main`. |
+| 2026-08-31 | Cut C **Delivered** on `main` (PR #50). Cuts A (WebP) and B (remaining EN-when-ready) still open. |
