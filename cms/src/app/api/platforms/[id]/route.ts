@@ -74,6 +74,9 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         item = await updatePlatformDraft(user, id, body.fields);
         break;
       case "submit":
+        if (body.fields) {
+          await updatePlatformDraft(user, id, body.fields);
+        }
         item = await submitPlatform(user, id, Boolean(body.checklistConfirmed));
         break;
       case "withdraw":

@@ -2,6 +2,12 @@ import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from "
 import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
 import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
+import {
+  publicEnStatus,
+  withImgWebpFromDisk,
+  withPublicStoryFields,
+  type StoryEnFields,
+} from "@/lib/publish/storyPublic";
 
 export type PublicResearchGroupMember = {
   name_ar: string;
@@ -14,16 +20,21 @@ export type PublicResearchGroup = {
   slug: string;
   orgUnitId: string;
   name_ar: string;
-  name_en: string;
+  name_en?: string;
   summary_ar: string;
-  summary_en: string;
+  summary_en?: string;
   lead_ar: string;
-  lead_en: string;
+  lead_en?: string;
   members: PublicResearchGroupMember[];
   img?: string;
-} & PublicSeoFields;
+  img_webp?: string;
+} & PublicSeoFields &
+  StoryEnFields;
 
-export function normalizeResearchMembers(raw: unknown): PublicResearchGroupMember[] {
+export function normalizeResearchMembers(
+  raw: unknown,
+  enReady = true,
+): PublicResearchGroupMember[] {
   if (!Array.isArray(raw)) return [];
   const out: PublicResearchGroupMember[] = [];
   for (const entry of raw) {
@@ -32,7 +43,9 @@ export function normalizeResearchMembers(raw: unknown): PublicResearchGroupMembe
     const nameAr = typeof e.name_ar === "string" ? e.name_ar.trim() : "";
     if (!nameAr) continue;
     const member: PublicResearchGroupMember = { name_ar: nameAr };
-    if (typeof e.name_en === "string" && e.name_en.trim()) member.name_en = e.name_en.trim();
+    if (enReady && typeof e.name_en === "string" && e.name_en.trim()) {
+      member.name_en = e.name_en.trim();
+    }
     out.push(member);
   }
   return out;
@@ -50,6 +63,7 @@ type PayloadSource = {
   research_members: unknown;
   public_slug?: string | null;
   image_path?: string | null;
+  en_status?: string | null;
   meta_title_ar?: string | null;
   meta_title_en?: string | null;
   meta_description_ar?: string | null;
@@ -60,22 +74,32 @@ type PayloadSource = {
 /** Public object for a research_group row (persisted to content_items.live_payload). */
 export function buildResearchGroupPayload(row: PayloadSource): PublicResearchGroup {
   const img = row.image_path?.trim() || row.og_image?.trim() || "";
-  const base = withPublicSeo(
+  const enReady = publicEnStatus(row.en_status) === "ready";
+  const base = withPublicStoryFields(
+    withPublicSeo(
+      {
+        id: row.id,
+        slug: row.public_slug?.trim() || row.id,
+        orgUnitId: row.org_unit_id,
+        name_ar: row.title_ar.trim(),
+        summary_ar: row.summary_ar?.trim() || "",
+        lead_ar: row.research_lead_ar?.trim() || "",
+        members: normalizeResearchMembers(row.research_members, enReady),
+        ...(img ? { img } : {}),
+      },
+      row,
+    ),
     {
-      id: row.id,
-      slug: row.public_slug?.trim() || row.id,
-      orgUnitId: row.org_unit_id,
-      name_ar: row.title_ar.trim(),
-      name_en: row.title_en?.trim() || "",
-      summary_ar: row.summary_ar?.trim() || "",
-      summary_en: row.summary_en?.trim() || "",
-      lead_ar: row.research_lead_ar?.trim() || "",
-      lead_en: row.research_lead_en?.trim() || "",
-      members: normalizeResearchMembers(row.research_members),
+      en_status: row.en_status,
+      title_en: row.title_en,
+      summary_en: row.summary_en,
+      image_path: img || null,
     },
-    row,
+    { nameEn: true },
   );
-  if (img) return { ...base, img };
+  if (enReady && row.research_lead_en?.trim()) {
+    base.lead_en = row.research_lead_en.trim();
+  }
   return base;
 }
 
@@ -94,6 +118,7 @@ export async function rebuildPublicResearchGroupsJson(): Promise<{ count: number
   const items: PublicResearchGroup[] = result.rows.map((row) => ({
     ...row.live_payload,
     ...seoFromRow(row.live_payload),
+    ...withImgWebpFromDisk(row.live_payload, row.live_payload.img),
   }));
 
   const path = publicResearchGroupsPath();

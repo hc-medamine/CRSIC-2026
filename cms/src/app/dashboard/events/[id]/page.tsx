@@ -4,7 +4,8 @@ import { CMS_LANG_COOKIE, normalizeLang, t, localizedDisplayName } from "@/lib/i
 import { requireUser } from "@/lib/auth/session";
 import { getEventById } from "@/lib/content/events";
 import { canAccessContentType, canReview } from "@/lib/content/permissions";
-import { canRecycleFromEditPage } from "@/lib/content/recycleBin";
+import { canSubmitStatus } from "@/lib/content/reviewWorkflow";
+import { canRecycleFromEditPageAsync } from "@/lib/content/recycleBin";
 import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 import { getMediaByPublicPath } from "@/lib/media/store";
 import { listSelectableOrgUnits } from "@/lib/users";
@@ -64,8 +65,11 @@ export default async function EventDetailPage({ params }: Props) {
   const reviewer = canReview(user) && item.created_by !== user.id;
   const canManage = user.role === "super_admin" || user.role === "reviewer";
   const canReassign = canManage && ["draft", "changes_requested", "submitted"].includes(item.status);
-  const canProposeOwner =
-    canManage && ["draft", "changes_requested", "submitted"].includes(item.status);
+  const showPublisherPanel = user.role !== "editor";
+  const canEditPublisher = user.role === "super_admin";
+  const canEditReviewOwner =
+    user.role === "super_admin" &&
+    ["draft", "changes_requested", "submitted"].includes(item.status);
   const canEscalate = trueAuthor || canReview(user);
   const eligibleEmergency = ["draft", "changes_requested", "submitted", "approved"].includes(
     item.status,
@@ -75,6 +79,7 @@ export default async function EventDetailPage({ params }: Props) {
   const canPostReview = canManage && emergencyMeta.needsPostReview;
   const canConfirmOk = canPostReview && emergencyMeta.emergencyPublishedBy !== user.id;
   const media = item.image_path ? await getMediaByPublicPath(item.image_path) : null;
+  const canDelete = await canRecycleFromEditPageAsync(user, item);
 
   return (
     <EditPageShell
@@ -99,9 +104,9 @@ export default async function EventDetailPage({ params }: Props) {
         mode="edit"
         orgUnits={orgs}
         isAuthor={isAuthor}
-        canSubmit={isAuthor && ["draft", "changes_requested"].includes(item.status)}
+        canSubmit={isAuthor && canSubmitStatus(item.status)}
         canReview={reviewer}
-        canDelete={canRecycleFromEditPage(user, item)}
+        canDelete={canDelete}
         initial={{
           id: item.id,
           orgUnitId: item.org_unit_id,
@@ -170,6 +175,7 @@ export default async function EventDetailPage({ params }: Props) {
         escalatedAt={ownerMeta.escalatedAt}
       />
 
+      {showPublisherPanel ? (
       <PublisherPanel
         key={`${item.id}:${people.publicPublisher?.id ?? item.publisher_id ?? ""}`}
         contentItemId={item.id}
@@ -187,12 +193,13 @@ export default async function EventDetailPage({ params }: Props) {
               )
             : null
         }
-        canEdit={canManage}
+        canEdit={canEditPublisher}
       />
+      ) : null}
 
       <ReviewOwnerPanel
         contentItemId={item.id}
-        canPropose={canProposeOwner}
+        canPropose={canEditReviewOwner}
         canConfirm={user.role === "super_admin"}
         reviewOwnerName={
           ownerMeta.reviewOwnerName

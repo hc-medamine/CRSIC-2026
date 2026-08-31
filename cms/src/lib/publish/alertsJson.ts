@@ -2,16 +2,18 @@ import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from "
 import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
 import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
+import { withStoryEn, type StoryEnFields } from "@/lib/publish/storyPublic";
 
 /** Public item shape persisted to content_items.live_payload and served as data/alerts.json. */
 export type PublicAlertItem = {
   id: string;
   message_ar: string;
-  message_en: string;
+  message_en?: string;
   link: string | null;
   link_label_ar: string;
-  link_label_en: string;
-} & PublicSeoFields;
+  link_label_en?: string;
+} & PublicSeoFields &
+  StoryEnFields;
 
 type PayloadSource = {
   id: string;
@@ -20,6 +22,7 @@ type PayloadSource = {
   alert_link_url: string | null;
   alert_link_label_ar: string | null;
   alert_link_label_en: string | null;
+  en_status?: string | null;
   meta_title_ar?: string | null;
   meta_title_en?: string | null;
   meta_description_ar?: string | null;
@@ -29,17 +32,33 @@ type PayloadSource = {
 
 /** Public object for an alert row (persisted to content_items.live_payload). */
 export function buildAlertPayload(row: PayloadSource): PublicAlertItem {
-  return withPublicSeo(
+  const message_ar = row.title_ar.trim();
+  const base = withPublicSeo(
     {
       id: row.id,
-      message_ar: row.title_ar.trim(),
-      message_en: row.title_en?.trim() || "",
+      message_ar,
       link: row.alert_link_url?.trim() || null,
       link_label_ar: row.alert_link_label_ar?.trim() || "",
-      link_label_en: row.alert_link_label_en?.trim() || "",
     },
     row,
   );
+  const en = withStoryEn(
+    { ...base },
+    {
+      en_status: row.en_status,
+      title_en: row.title_en,
+      label_en: row.alert_link_label_en,
+    },
+  );
+  const item: PublicAlertItem = {
+    ...en,
+    message_ar,
+    link: base.link,
+    link_label_ar: base.link_label_ar,
+  };
+  if (en.title_en) item.message_en = en.title_en;
+  if (en.label_en) item.link_label_en = en.label_en;
+  return item;
 }
 
 function publicAlertsPath(): string {

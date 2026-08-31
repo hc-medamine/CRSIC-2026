@@ -674,6 +674,18 @@ export const LABELS: LabelMap = {
   exportPickerHeading: { en: "Items of this type", ar: "عناصر هذا النوع" },
   exportTypeCount: { en: "{n} items will be in the zip.", ar: "سيضم الملف {n} عنصرًا." },
   exportTypeEmpty: { en: "Nothing to export for this type.", ar: "لا شيء للتصدير في هذا النوع." },
+  rebuildWebpThisType: {
+    en: "Rebuild WebP for this type",
+    ar: "إعادة بناء WebP لهذا النوع",
+  },
+  rebuildWebpDirector: {
+    en: "Rebuild director portrait WebP",
+    ar: "إعادة بناء WebP لصورة المدير",
+  },
+  rebuildWebpDone: {
+    en: "WebP rebuild finished ({n} new files). Public JSON refreshed.",
+    ar: "اكتمل بناء WebP ({n} ملفًا جديدًا). تم تحديث JSON العام.",
+  },
   exportTypeLargeWarn: {
     en: "This is a large export — confirm before continuing.",
     ar: "هذا تصدير كبير — أكّدوا قبل المتابعة.",
@@ -717,8 +729,8 @@ export const LABELS: LabelMap = {
   cropImage: { en: "Crop", ar: "قص" },
   cropApply: { en: "Apply crop", ar: "تطبيق القص" },
   cropHint: {
-    en: "Drag the box, then apply. Cancel keeps the current file.",
-    ar: "اسحبوا الإطار ثم طبّقوا. الإلغاء يُبقي الملف الحالي.",
+    en: "Drag the box on the full image, then apply. Only the list/card crop changes — the original file is kept. Cancel leaves everything as-is.",
+    ar: "اسحبوا الإطار على الصورة الكاملة ثم طبّقوا. يتغيّر قص البطاقة فقط ويبقى الملف الأصلي. الإلغاء يُبقي كل شيء كما هو.",
   },
 
   pageDescRecycleBin: {
@@ -1141,6 +1153,7 @@ export const LABELS: LabelMap = {
     ar: "الموقع العام غير شغّال على هذا العنوان. شغّلوا الواجهة (مثل npm run spa من جذر المشروع) لاستخدام تبويب الموقع.",
   },
   previewOpenOnSite: { en: "Open on public site", ar: "فتح على الموقع العام" },
+  previewBackToEdit: { en: "Back to edit", ar: "العودة إلى التحرير" },
   emptyFiltered: {
     en: "No items match this search.",
     ar: "لا عناصر تطابق هذا البحث.",

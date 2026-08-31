@@ -4,7 +4,8 @@ import { CMS_LANG_COOKIE, normalizeLang, t } from "@/lib/i18n/labels";
 import { requireUser } from "@/lib/auth/session";
 import { getAlertById } from "@/lib/content/alerts";
 import { canAccessContentType, canReview } from "@/lib/content/permissions";
-import { canRecycleFromEditPage } from "@/lib/content/recycleBin";
+import { canSubmitStatus } from "@/lib/content/reviewWorkflow";
+import { canRecycleFromEditPageAsync } from "@/lib/content/recycleBin";
 import { canViewContentItem, getContentMeta } from "@/lib/content/revisions";
 import { listSelectableOrgUnits } from "@/lib/users";
 import { getItemPeopleMeta } from "@/lib/content/people";
@@ -54,6 +55,7 @@ export default async function AlertDetailPage({ params }: Props) {
   const reviewer = canReview(user) && item.created_by !== user.id;
   const canManage = user.role === "super_admin" || user.role === "reviewer";
   const canReassign = canManage && ["draft", "changes_requested", "submitted"].includes(item.status);
+  const canDelete = await canRecycleFromEditPageAsync(user, item);
 
   return (
     <EditPageShell
@@ -85,9 +87,9 @@ export default async function AlertDetailPage({ params }: Props) {
         mode="edit"
         orgUnits={orgs}
         isAuthor={isAuthor}
-        canSubmit={isAuthor && ["draft", "changes_requested"].includes(item.status)}
+        canSubmit={isAuthor && canSubmitStatus(item.status)}
         canReview={reviewer}
-        canDelete={canRecycleFromEditPage(user, item)}
+        canDelete={canDelete}
         initial={{
           id: item.id,
           orgUnitId: item.org_unit_id,

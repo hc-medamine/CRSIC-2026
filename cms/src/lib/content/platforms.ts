@@ -3,6 +3,7 @@ import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { appendWorkflowComment } from "@/lib/content/comments";
+import { ensureWebpForContentRow } from "@/lib/media/publishImages";
 import { buildPlatformPayload, rebuildPublicPlatformsJson } from "@/lib/publish/platformsJson";
 import { mutateThenRebuildPublic } from "@/lib/publish/safeRebuild";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
@@ -14,6 +15,7 @@ import {
   assertOrgAllowsContentType,
 } from "@/lib/content/permissions";
 import { notifyOnSubmit } from "@/lib/content/delegation";
+import { isReviewerDecisionStatus, canSubmitStatus, submitStatusError, isEditableStatus } from "@/lib/content/reviewWorkflow";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
 import { unpublishMutateMaybeRebuild, shouldNotifyUnpublish, type SilentUnpublishOpts } from "@/lib/content/silentUnpublish";
 import { normalizeSeoInput, seoSnapshotFields, type SeoInput } from "@/lib/content/seo";
@@ -214,7 +216,7 @@ export async function createPlatform(user: SessionUser, input: PlatformInput): P
 export async function updatePlatformDraft(user: SessionUser, id: string, input: PlatformInput) {
   const existing = await getPlatformById(id);
   if (!existing) throw new Error("Not found");
-  if (!["draft", "changes_requested"].includes(existing.status)) {
+  if (!isEditableStatus(existing.status)) {
     throw new Error("Only draft or changes_requested items can be edited");
   }
   if (existing.created_by !== user.id && user.role !== "super_admin") {
@@ -235,6 +237,7 @@ export async function updatePlatformDraft(user: SessionUser, id: string, input: 
       image_path = $11, external_url = $12, platform_kind = $13, attachments = $14::jsonb,
       meta_title_ar = $15, meta_title_en = $16, meta_description_ar = $17,
       meta_description_en = $18, og_image = $19,
+      status = CASE WHEN status = 'unpublished' THEN 'draft' ELSE status END,
       updated_at = NOW()
      WHERE id = $1 AND content_type = 'platform'
      RETURNING *`,
@@ -272,7 +275,9 @@ async function notifyReviewers(itemId: string, title: string, body: string, link
 export async function submitPlatform(user: SessionUser, id: string, checklistConfirmed: boolean) {
   const existing = await getPlatformById(id);
   if (!existing) throw new Error("Not found");
-  if (!["draft", "changes_requested"].includes(existing.status)) throw new Error("Cannot submit in current status");
+  if (!canSubmitStatus(existing.status)) {
+    throw new Error(submitStatusError(existing.status));
+  }
   if (existing.created_by !== user.id && user.role !== "super_admin") throw new Error("Only the author can submit");
   if (!checklistConfirmed) throw new Error("Editorial checklist must be confirmed");
   if (!existing.title_ar.trim()) throw new Error("Platform title (AR) is required");
@@ -322,7 +327,7 @@ export async function requestPlatformChanges(user: SessionUser, id: string, note
   const existing = await getPlatformById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
-  if (existing.status !== "submitted") throw new Error("Item is not awaiting review");
+  if (!isReviewerDecisionStatus(existing.status)) throw new Error("Item is not awaiting review");
   if (!note.trim()) throw new Error("Change request note is required");
   const result = await query<PlatformItem>(
     `UPDATE content_items SET status = 'changes_requested', review_note = $2, updated_by = $3, updated_at = NOW()
@@ -347,7 +352,7 @@ export async function approvePlatform(user: SessionUser, id: string) {
   const existing = await getPlatformById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
-  if (existing.status !== "submitted") throw new Error("Item is not awaiting review");
+  if (!isReviewerDecisionStatus(existing.status)) throw new Error("Item is not awaiting review");
   const result = await query<PlatformItem>(
     `UPDATE content_items SET status = 'approved', review_note = NULL, updated_by = $2, updated_at = NOW()
      WHERE id = $1 RETURNING *`,
@@ -370,7 +375,7 @@ export async function rejectPlatform(user: SessionUser, id: string, note: string
   const existing = await getPlatformById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
-  if (existing.status !== "submitted") throw new Error("Item is not awaiting review");
+  if (!isReviewerDecisionStatus(existing.status)) throw new Error("Item is not awaiting review");
   if (!note.trim()) throw new Error("Rejection note is required");
   const result = await query<PlatformItem>(
     `UPDATE content_items SET status = 'rejected', review_note = $2, updated_by = $3, updated_at = NOW()
@@ -406,6 +411,7 @@ export async function publishPlatform(user: SessionUser, id: string) {
     titleAr: existing.title_ar,
     existingSlug: existing.public_slug,
   });
+  await ensureWebpForContentRow(existing);
   const payload = buildPlatformPayload({ ...existing, public_slug: slug });
   const item = await mutateThenRebuildPublic({
     itemId: id,
@@ -441,7 +447,7 @@ export async function unpublishPlatform(user: SessionUser, id: string, opts: Sil
   if (existing.status !== "published") throw new Error("Item is not published");
   const mutate = async () => {
     const result = await query<PlatformItem>(
-      `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
+      `UPDATE content_items SET status = 'draft', live_payload = NULL, live_at = NULL,
         needs_post_review = FALSE, emergency_published_at = NULL,
         emergency_published_by = NULL, emergency_reason = NULL,
         updated_by = $2, updated_at = NOW()
@@ -451,7 +457,7 @@ export async function unpublishPlatform(user: SessionUser, id: string, opts: Sil
     return result.rows[0];
   };
   const item = await unpublishMutateMaybeRebuild(id, mutate, rebuildPublicPlatformsJson, opts);
-  await addRevision(item.id, "unpublished", snapshotOf(item), user.id, "Unpublished");
+  await addRevision(item.id, "draft", snapshotOf(item), user.id, "Unpublished");
   if (shouldNotifyUnpublish(opts)) {
     await createNotification({
       userId: item.created_by,

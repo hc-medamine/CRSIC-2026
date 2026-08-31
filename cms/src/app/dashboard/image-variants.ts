@@ -101,6 +101,20 @@ export async function variantsFromFile(file: File): Promise<{ master: File; card
   }
 }
 
+export async function cardFromCrop(
+  img: HTMLImageElement,
+  crop: { x: number; y: number; w: number; h: number },
+): Promise<File> {
+  const cropped = await fileFromCrop(img, crop);
+  const url = URL.createObjectURL(cropped);
+  try {
+    const croppedImg = await loadImage(url);
+    return cardFileFromImage(croppedImg);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 export async function variantsFromCrop(
   img: HTMLImageElement,
   crop: { x: number; y: number; w: number; h: number },

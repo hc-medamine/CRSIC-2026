@@ -1,5 +1,6 @@
 "use client";
 
+import { isReviewerDecisionStatus, isEditableStatus } from "@/lib/content/reviewWorkflow";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ItemWorkflowMeta, type PersonDisplay } from "@/app/dashboard/item-workflow-meta";
@@ -96,7 +97,7 @@ export function ResearchGroupForm({
   const [message, setMessage] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
-  const editable = mode === "create" || initial?.status === "draft" || initial?.status === "changes_requested";
+  const editable = mode === "create" || isEditableStatus(initial?.status ?? "");
 
   function updateMember(index: number, patch: Partial<MemberRow>) {
     setMembers((prev) => prev.map((m, i) => (i === index ? { ...m, ...patch } : m)));
@@ -360,7 +361,7 @@ export function ResearchGroupForm({
                     type="button"
                     disabled={pending || !checklist}
                     className="inline-flex min-h-11 items-center rounded-xl bg-crs-primary px-4 py-2 text-sm font-medium text-white hover:bg-crs-secondary disabled:opacity-60"
-                    onClick={() => void run("submit", { checklistConfirmed: checklist })}
+                    onClick={() => void run("submit", { checklistConfirmed: checklist, fields: fields() })}
                   >
                     {t("actionSubmit", lang)}
                   </button>
@@ -381,7 +382,7 @@ export function ResearchGroupForm({
         </FormStickyActions>
       </form>
 
-      {mode === "edit" && canReview && initial?.status === "submitted" ? (
+      {mode === "edit" && canReview && isReviewerDecisionStatus(initial?.status ?? "") ? (
         <div className="grid gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
           <p className="text-sm font-medium">{t("actionReviewerActions", lang)}</p>
           <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("actionNotePlaceholder", lang)} className="w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" rows={2} />

@@ -54,6 +54,19 @@ export function canManageRecycleBin(user: SessionUser): boolean {
   return user.role === "super_admin";
 }
 
+async function hasUnpublishRevision(itemId: string): Promise<boolean> {
+  const result = await query<{ n: number }>(
+    `SELECT 1 AS n FROM content_revisions WHERE content_item_id = $1 AND summary = 'Unpublished' LIMIT 1`,
+    [itemId],
+  );
+  return result.rows.length > 0;
+}
+
+export async function isSaRecycleEligible(item: { id: string; status: string }): Promise<boolean> {
+  if (isRecycleEligibleStatus(item.status)) return true;
+  return item.status === "draft" && (await hasUnpublishRevision(item.id));
+}
+
 export function canRecycleFromEditPage(
   user: SessionUser,
   item: { created_by: string; status: string },
@@ -63,6 +76,14 @@ export function canRecycleFromEditPage(
     return item.created_by === user.id && isEditorRecycleEligibleStatus(item.status);
   }
   return false;
+}
+
+export async function canRecycleFromEditPageAsync(
+  user: SessionUser,
+  item: { id: string; created_by: string; status: string },
+): Promise<boolean> {
+  if (user.role === "super_admin") return isSaRecycleEligible(item);
+  return canRecycleFromEditPage(user, item);
 }
 
 export function canRestoreRecycledRow(user: SessionUser, createdBy: string): boolean {
@@ -128,7 +149,7 @@ export async function recycleContentItem(user: SessionUser, id: string): Promise
   if (item.recycled_at) throw new Error("Item is already in the recycle bin");
 
   if (user.role === "super_admin") {
-    if (!isRecycleEligibleStatus(item.status)) {
+    if (!(await isSaRecycleEligible({ id, status: item.status }))) {
       throw new Error("Only unpublished or rejected items can be moved to the recycle bin");
     }
   } else if (user.role === "editor") {

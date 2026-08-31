@@ -204,6 +204,48 @@ export function ImportExportClient() {
     setConfirm({ kind: "export-type" });
   }
 
+  async function rebuildWebpForType() {
+    setBusy(true);
+    try {
+      const res = await fetch("/api/import-export/rebuild-webp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type }),
+      });
+      const data = (await res.json()) as { ok: boolean; error?: string; pathsWritten?: number };
+      if (!res.ok || !data.ok) {
+        cmsToast.error(data.error ?? t("actionFailed", lang));
+        return;
+      }
+      cmsToast.success(
+        tf("rebuildWebpDone", lang, { n: String(data.pathsWritten ?? 0) }),
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function rebuildDirectorWebp() {
+    setBusy(true);
+    try {
+      const res = await fetch("/api/import-export/rebuild-webp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ director: true }),
+      });
+      const data = (await res.json()) as { ok: boolean; error?: string; pathsWritten?: number };
+      if (!res.ok || !data.ok) {
+        cmsToast.error(data.error ?? t("actionFailed", lang));
+        return;
+      }
+      cmsToast.success(
+        tf("rebuildWebpDone", lang, { n: String(data.pathsWritten ?? 0) }),
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
   function onToggleSort(key: string, kind: SortKind) {
     setSort(toggleHeaderSort(sort, key, kind));
   }
@@ -292,6 +334,22 @@ export function ImportExportClient() {
             onClick={askExportType}
           >
             {t("exportThisType", lang)}
+          </button>
+          <button
+            type="button"
+            className={BTN_SECONDARY}
+            disabled={busy}
+            onClick={rebuildWebpForType}
+          >
+            {t("rebuildWebpThisType", lang)}
+          </button>
+          <button
+            type="button"
+            className={BTN_SECONDARY}
+            disabled={busy}
+            onClick={rebuildDirectorWebp}
+          >
+            {t("rebuildWebpDirector", lang)}
           </button>
         </div>
       </section>
