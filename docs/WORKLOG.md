@@ -19,6 +19,10 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-09-03 — Fix publication cover layout (no crop/zoom)
+
+Pub cards + lightbox use `object-fit: contain` in a 3:4 frame (full book art). Detail covers capped ~320×480 (`detail-hero--cover` / covers path). Pubs skip 16:9 `img_card`. Partner marks `contain`. Local `serve.json` no-cache. Branch `fix/images-layouts`.
+
 ### 2026-08-31 — CMS site pages Cut C **Delivered** (PR #50)
 
 [prds/2026-08-26-remaining-deferred-pack.md](./prds/2026-08-26-remaining-deferred-pack.md) Cut C on `main`. Singleton `site_pages` → optional `data/site-pages.json`. Desk `/dashboard/site-pages` (Director-class). Locales fallback until first publish. Footer address follows contact. Sp1–Sp3 + G1/G2 walked. Cuts A (WebP) and B (EN-when-ready remainder) remain. Journals stay OJS.

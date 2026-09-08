@@ -131,15 +131,13 @@
     .news-card .card-media img,
     .news-card .card-media .news-thumb,
     .event-card .event-thumb img,
-    .catalog-card-media img,
-    .pub-cover img {
+    .catalog-card-media img {
       transition: transform var(--duration-slow) var(--ease-out-expo);
     }
     .news-card:hover .card-media img,
     .news-card:hover .card-media .news-thumb,
     .event-card:hover .event-thumb img,
-    .catalog-card:hover .catalog-card-media img,
-    .pub-card:hover .pub-cover img {
+    .catalog-card:hover .catalog-card-media img {
       transform: scale(1.05);
     }
   }

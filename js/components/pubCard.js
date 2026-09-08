@@ -24,12 +24,6 @@ export function createPubCard(p, i) {
           alt: title || '',
           loading: 'lazy',
         },
-        style: {
-          width: '100%',
-          height: '100%',
-          'object-fit': 'cover',
-          display: 'block',
-        },
       })
     : el('div', { className: 'pub-cover-empty', attrs: { 'aria-hidden': 'true' } });
 

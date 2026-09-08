@@ -866,13 +866,6 @@ export function openLightbox(optsOrIndex, triggerEl) {
     replaceChildren(coverHost, [
       el('img', {
         attrs: { src, alt: content.title || '' },
-        style: {
-          width: '100%',
-          height: '100%',
-          'object-fit': 'cover',
-          display: 'block',
-          'border-radius': '6px',
-        },
       }),
     ]);
   } else {
