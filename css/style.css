@@ -698,6 +698,24 @@ a.stat:hover { background: rgba(27,67,50,0.04); }
   overflow: hidden;
   position: relative;
   background: #EDF4F1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Book covers: show full art (no crop/zoom). News/event thumbs keep cover.
+   !important locks layout against accidental inline object-fit from JS. */
+.pub-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain !important;
+  object-position: center;
+  display: block;
+}
+.pub-cover-empty {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  background: linear-gradient(145deg, #e8f0eb, #f3efe6);
 }
 
 .pub-cover-type-badge {
@@ -1112,6 +1130,18 @@ footer.site-footer { background: var(--green-deep); }
   border-radius: 6px;
   overflow: hidden;
   aspect-ratio: 3/4;
+  background: #EDF4F1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lightbox-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain !important;
+  object-position: center;
+  display: block;
+  border-radius: 6px;
 }
 .lightbox-dept-badge {
   display: inline-block;
@@ -1762,7 +1792,9 @@ a.partner-card-link:hover { border-color: var(--green-deep); }
 .partner-mark-img img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
+  display: block;
 }
 .partner-name { font-size: 14px; font-weight: 600; color: var(--green-deep); margin-bottom: 3px; }
 .partner-country { font-size: 11px; color: var(--text-subtle); margin-bottom: 5px; }
@@ -3341,6 +3373,25 @@ nav.site-nav.scrolled .nav-logo-text span {
   object-fit: contain;
   object-position: center;
 }
+/* Publication book covers: readable size, never upscale past a book-like frame.
+   Prefer .detail-hero--cover / data-detail-type; :has(covers) is a CSS-only fallback. */
+.detail-hero--cover,
+#page-detail[data-detail-type="publication"] .detail-hero,
+.detail-hero:has(img[src*="/covers/"]),
+.detail-hero:has(img[src*="img/covers/"]) {
+  background: transparent;
+  padding: 0;
+  justify-content: flex-start;
+}
+.detail-hero--cover .detail-hero-img,
+#page-detail[data-detail-type="publication"] .detail-hero-img,
+.detail-hero:has(img[src*="/covers/"]) .detail-hero-img,
+.detail-hero:has(img[src*="img/covers/"]) .detail-hero-img {
+  width: auto;
+  max-width: min(320px, 100%);
+  max-height: min(480px, 70vh);
+  height: auto;
+}
 .detail-gallery {
   display: grid;
   grid-template-columns: 1fr;
@@ -3363,6 +3414,17 @@ nav.site-nav.scrolled .nav-logo-text span {
   object-fit: contain;
   object-position: center;
   display: block;
+}
+.detail-gallery--cover .detail-gallery-item--cover {
+  background: transparent;
+  padding: 0;
+  justify-content: flex-start;
+}
+.detail-gallery--cover .detail-gallery-item--cover img {
+  width: auto;
+  max-width: min(320px, 100%);
+  max-height: min(480px, 70vh);
+  height: auto;
 }
 .detail-pdfs { margin: 0 0 1.5rem; }
 .detail-pdfs-title {

@@ -181,6 +181,8 @@ export function navigateTo(pageId, tab, filter, opts = {}) {
 
   if (detailType && detailSlug) {
     showDetailShell();
+    const detailPage = document.getElementById('page-detail');
+    if (detailPage) detailPage.dataset.detailType = detailType;
     renderDetailPage(detailType, detailSlug);
 
     const parentNav =
@@ -231,6 +233,8 @@ export function navigateTo(pageId, tab, filter, opts = {}) {
 
   const resolvedId = parsed.pageId;
   restoreSiteSeoHead();
+  const detailPageEl = document.getElementById('page-detail');
+  if (detailPageEl && resolvedId !== 'detail') delete detailPageEl.dataset.detailType;
   let target = null;
   withPageTransition(() => {
     const pages = document.querySelectorAll('.page');

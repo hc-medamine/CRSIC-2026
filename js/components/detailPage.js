@@ -24,12 +24,14 @@ import { editorialField, editorialLangAttrs } from '../editorial.js';
 /**
  * @param {object[]} media
  * @param {string} title
+ * @param {{ coverLayout?: boolean }} [opts]
  * @returns {HTMLElement|null}
  */
-function buildMediaStage(media, title) {
+function buildMediaStage(media, title, opts = {}) {
   const list = Array.isArray(media) ? media : [];
   const images = list.filter((m) => m && m.kind === 'image' && m.src);
   const pdfs = list.filter((m) => m && m.kind === 'pdf' && m.src);
+  const coverLayout = !!opts.coverLayout;
 
   if (images.length === 0 && pdfs.length === 0) return null;
 
@@ -40,7 +42,7 @@ function buildMediaStage(media, title) {
     if (src) {
       children.push(
         el('div', {
-          className: 'detail-hero',
+          className: coverLayout ? 'detail-hero detail-hero--cover' : 'detail-hero',
           children: [
             el('img', {
               className: 'detail-hero-img',
@@ -53,12 +55,14 @@ function buildMediaStage(media, title) {
   } else if (images.length > 1) {
     children.push(
       el('div', {
-        className: 'detail-gallery',
+        className: coverLayout ? 'detail-gallery detail-gallery--cover' : 'detail-gallery',
         attrs: { role: 'list', 'aria-label': t('detail_gallery') },
         children: images.map((img) => {
           const src = safeImageSrc(img.src);
           return el('div', {
-            className: 'detail-gallery-item',
+            className: coverLayout
+              ? 'detail-gallery-item detail-gallery-item--cover'
+              : 'detail-gallery-item',
             attrs: { role: 'listitem' },
             children: src
               ? [
@@ -252,7 +256,9 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
   applyItemSeoHead(item, type);
 
   const langAttrs = editorialLangAttrs(item);
-  const mediaEl = buildMediaStage(media, title);
+  const mediaEl = buildMediaStage(media, title, {
+    coverLayout: type === 'publication',
+  });
   const children = [
     el('a', {
       className: 'detail-back',

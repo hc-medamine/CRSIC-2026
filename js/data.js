@@ -228,14 +228,13 @@ export function coverSrcFromPub(pub, index) {
 }
 
 /**
- * Publication card image: img_card, else master cover.
+ * Publication card image: always the master cover.
+ * Do not use 16:9 `img_card` — book covers live in a 3:4 frame and must stay uncropped.
  * @param {object|undefined} pub
  * @param {number} [index]
  * @returns {string}
  */
 export function pubCardImageSrc(pub, index) {
-  const card = String(pub?.img_card || '').trim();
-  if (card) return card;
   return coverSrcFromPub(pub, index);
 }
 
