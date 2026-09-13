@@ -23,56 +23,54 @@
   --muted: #6B7C74;
   --line: #DDD7CB;
   --white: #fff;
-  --shadow: 0 10px 28px rgba(18,41,32,.08);
-  --radius: 10px;
-  --chrome-h: 52px;
+  --shadow: 0 8px 22px rgba(18,41,32,.09);
+  --radius: 8px;
+  --chrome-h: 48px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; overflow: hidden; background: var(--green-deep); color: var(--body); font-family: 'Tajawal', sans-serif; }
-h1,h2,h3,h4 { font-family: 'Amiri', serif; font-weight: 700; color: var(--green); line-height: 1.22; }
+h1,h2,h3,h4 { font-family: 'Amiri', serif; font-weight: 700; color: var(--green); line-height: 1.2; }
 
-/* —— chrome —— */
 .progress { position: fixed; top: 0; inset-inline: 0; height: 3px; background: rgba(255,255,255,.1); z-index: 50; }
 .progress > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--gold), #e4c878); transition: width .25s ease; }
 
 .lang {
-  position: fixed; top: 14px; inset-inline-end: 14px; z-index: 60;
+  position: fixed; top: 12px; inset-inline-end: 12px; z-index: 60;
   display: flex; gap: 2px; padding: 3px; background: var(--white);
   border: 1px solid var(--line); border-radius: 999px; box-shadow: var(--shadow);
 }
 .lang button {
   border: 0; background: transparent; cursor: pointer; font-family: inherit;
-  font-weight: 700; font-size: .78rem; padding: 6px 12px; border-radius: 999px; color: var(--muted);
+  font-weight: 700; font-size: .72rem; padding: 5px 11px; border-radius: 999px; color: var(--muted);
 }
 .lang button.active { background: var(--green); color: var(--cream); }
 
 .bar {
   position: fixed; inset-inline: 0; bottom: 0; height: var(--chrome-h); z-index: 50;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 18px; background: var(--green); color: var(--cream);
+  padding: 0 16px; background: var(--green); color: var(--cream);
   border-top: 1px solid rgba(201,168,76,.35);
 }
-.bar .mid { font-size: .78rem; color: rgba(250,248,243,.72); text-align: center; }
+.bar .mid { font-size: .72rem; color: rgba(250,248,243,.72); text-align: center; }
 .bar .mid b { color: var(--gold); font-weight: 700; }
 .bar button {
-  font-family: inherit; font-weight: 600; font-size: .78rem; cursor: pointer;
+  font-family: inherit; font-weight: 600; font-size: .72rem; cursor: pointer;
   border: 1px solid rgba(250,248,243,.3); background: transparent; color: var(--cream);
-  padding: 7px 14px; border-radius: 6px;
+  padding: 6px 12px; border-radius: 6px;
 }
 .bar button:hover:not(:disabled) { border-color: var(--gold); background: rgba(201,168,76,.2); }
 .bar button:disabled { opacity: .35; cursor: default; }
-.hint { opacity: .45; font-size: .72rem; }
+.hint { opacity: .45; font-size: .68rem; }
 
-/* —— slides —— */
 .deck { height: 100%; width: 100%; position: relative; }
 .slide {
   position: absolute; inset: 0; display: none; flex-direction: column;
-  padding: 36px 48px calc(var(--chrome-h) + 18px);
-  background: var(--cream); overflow: hidden;
+  padding: 28px 36px calc(var(--chrome-h) + 12px);
+  background: var(--cream); overflow: hidden; gap: 8px;
 }
-.slide.active { display: flex; animation: in .35s ease; }
-@keyframes in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.slide.active { display: flex; animation: in .3s ease; }
+@keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 .slide.dark {
   background:
@@ -87,57 +85,62 @@ h1,h2,h3,h4 { font-family: 'Amiri', serif; font-weight: 700; color: var(--green)
 
 .slide.band {
   background:
-    linear-gradient(180deg, var(--cream) 0%, var(--cream) 58%, var(--cream-2) 58%, var(--cream-2) 100%);
+    linear-gradient(180deg, var(--cream) 0%, var(--cream) 52%, var(--cream-2) 52%, var(--cream-2) 100%);
 }
 
 .kicker {
   display: inline-flex; align-items: center; gap: 8px;
-  font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--gold-dim); margin-bottom: 8px;
+  font-size: .68rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--gold-dim); margin-bottom: 2px; flex-shrink: 0;
 }
 html[dir="rtl"] .kicker { letter-spacing: 0; text-transform: none; }
 .kicker::before {
-  content: ""; width: 18px; height: 2px; background: var(--gold); border-radius: 2px;
+  content: ""; width: 16px; height: 2px; background: var(--gold); border-radius: 2px;
 }
 
-.heading { font-size: clamp(1.55rem, 2.5vw, 2.2rem); margin-bottom: 8px; max-width: 28ch; }
-.lede { font-size: .95rem; color: var(--muted); max-width: 68ch; line-height: 1.55; margin-bottom: 18px; }
-.rule { width: 56px; height: 3px; background: var(--gold); border-radius: 2px; margin: 10px 0 18px; }
+.heading { font-size: clamp(1.35rem, 2.2vw, 1.85rem); margin-bottom: 2px; max-width: 42ch; flex-shrink: 0; }
+.lede { font-size: .82rem; color: var(--muted); max-width: 90ch; line-height: 1.45; margin-bottom: 4px; flex-shrink: 0; }
+.rule { width: 48px; height: 3px; background: var(--gold); border-radius: 2px; margin: 4px 0 8px; flex-shrink: 0; }
 
-/* layouts */
-.row { display: flex; gap: 18px; flex: 1; min-height: 0; }
-.col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.row { display: flex; gap: 12px; flex: 1; min-height: 0; }
+.col { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; }
 .grow { flex: 1; }
-.w45 { flex: 0 0 44%; }
-.w55 { flex: 0 0 54%; }
+.w40 { flex: 0 0 40%; }
+.w42 { flex: 0 0 42%; }
+.w45 { flex: 0 0 45%; }
 .w50 { flex: 1; }
+.w55 { flex: 0 0 55%; }
+.w58 { flex: 0 0 58%; }
 
-.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; flex: 1; min-height: 0; }
-.g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.g23 { display: grid; grid-template-columns: 1.15fr .85fr; gap: 16px; flex: 1; min-height: 0; }
-.g32 { display: grid; grid-template-columns: .9fr 1.1fr; gap: 16px; flex: 1; min-height: 0; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; min-height: 0; }
+.g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1; min-height: 0; }
+.g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; flex: 1; min-height: 0; }
+.g23 { display: grid; grid-template-columns: 1.15fr .85fr; gap: 12px; flex: 1; min-height: 0; }
+.g32 { display: grid; grid-template-columns: .85fr 1.15fr; gap: 12px; flex: 1; min-height: 0; }
+.g8 { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr 1fr; gap: 8px; flex: 1; min-height: 0; }
 
 .card {
   background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 14px 16px; box-shadow: 0 1px 0 rgba(27,67,50,.03);
+  padding: 10px 12px; box-shadow: 0 1px 0 rgba(27,67,50,.03); min-height: 0;
+  display: flex; flex-direction: column;
 }
+.card.fill { flex: 1; }
 .card.soft { background: var(--cream-2); }
 .card.accent { border-top: 3px solid var(--gold); }
 .card.green { border-top: 3px solid var(--green-mid); }
 .card h3, .card h4 {
-  font-family: 'Tajawal', sans-serif; font-size: .92rem; font-weight: 700;
-  color: var(--green); margin-bottom: 6px; display: flex; gap: 8px; align-items: center;
+  font-family: 'Tajawal', sans-serif; font-size: .82rem; font-weight: 700;
+  color: var(--green); margin-bottom: 4px; display: flex; gap: 6px; align-items: center;
 }
-.card p, .card li { font-size: .82rem; color: var(--body); line-height: 1.45; }
-.card ul { padding-inline-start: 1.05rem; }
-.card li + li { margin-top: 4px; }
-.ico { font-size: 1.05rem; line-height: 1; }
+.card p, .card li { font-size: .74rem; color: var(--body); line-height: 1.4; }
+.card ul { padding-inline-start: 1rem; margin: 0; }
+.card li + li { margin-top: 3px; }
+.ico { font-size: .95rem; line-height: 1; }
 
 .pill {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: .68rem; font-weight: 700; padding: 3px 9px; border-radius: 999px;
-  background: var(--gold-soft); color: var(--green); margin-bottom: 8px;
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: .62rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+  background: var(--gold-soft); color: var(--green); margin-bottom: 5px; width: fit-content;
 }
 .pill.blue { background: #e7eef8; color: #1e3a5f; }
 .pill.grey { background: #ececec; color: #555; }
@@ -145,13 +148,13 @@ html[dir="rtl"] .kicker { letter-spacing: 0; text-transform: none; }
 
 .stat {
   background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 14px 12px; text-align: center; position: relative; overflow: hidden;
+  padding: 10px 8px; text-align: center; position: relative; overflow: hidden;
 }
 .stat::after {
   content: ""; position: absolute; inset-inline: 0; top: 0; height: 3px; background: var(--gold);
 }
-.stat .n { font-family: 'Amiri', serif; font-size: 1.85rem; color: var(--green); line-height: 1; }
-.stat .l { font-size: .75rem; color: var(--muted); margin-top: 6px; font-weight: 500; }
+.stat .n { font-family: 'Amiri', serif; font-size: 1.55rem; color: var(--green); line-height: 1; }
+.stat .l { font-size: .68rem; color: var(--muted); margin-top: 4px; font-weight: 500; }
 
 .shot {
   background: #0d1c15; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line);
@@ -159,68 +162,125 @@ html[dir="rtl"] .kicker { letter-spacing: 0; text-transform: none; }
 }
 .shot img { width: 100%; flex: 1; object-fit: cover; object-position: top center; display: block; min-height: 0; }
 .shot figcaption {
-  background: var(--green); color: rgba(250,248,243,.92); font-size: .7rem;
-  padding: 8px 11px; line-height: 1.35; border-top: 1px solid rgba(201,168,76,.25);
+  background: var(--green); color: rgba(250,248,243,.92); font-size: .64rem;
+  padding: 6px 9px; line-height: 1.3; border-top: 1px solid rgba(201,168,76,.25); flex-shrink: 0;
 }
 
-.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
+.collage {
+  display: grid; grid-template-columns: 1.2fr 1fr; grid-template-rows: 1fr 1fr;
+  gap: 8px; flex: 1; min-height: 0;
+}
+.collage .shot:first-child { grid-row: 1 / -1; }
+.collage-4 {
+  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+  gap: 8px; flex: 1; min-height: 0;
+}
+
+.mosaic { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; flex: 1; min-height: 0; }
+.mosaic .shot, .mosaic .card { min-height: 0; }
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1; min-height: 0; }
+
+.filmstrip {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; flex-shrink: 0;
+}
+.filmstrip .shot { height: 88px; }
+.filmstrip .shot img { object-position: top center; }
+.filmstrip.thumbs-3 { grid-template-columns: repeat(3, 1fr); }
+
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; flex-shrink: 0; }
 .steps::before {
-  content: ""; position: absolute; top: 22px; inset-inline: 8%; height: 2px;
+  content: ""; position: absolute; top: 18px; inset-inline: 8%; height: 2px;
   background: linear-gradient(90deg, transparent, var(--gold), transparent); z-index: 0;
 }
 .step {
   position: relative; z-index: 1; background: var(--white); border: 1px solid var(--line);
-  border-radius: var(--radius); padding: 14px 12px; margin: 0 6px; text-align: center;
+  border-radius: var(--radius); padding: 10px 8px; margin: 0 5px; text-align: center;
 }
 .step .num {
-  width: 28px; height: 28px; margin: 0 auto 8px; border-radius: 50%;
-  background: var(--green); color: var(--cream); font-weight: 700; font-size: .8rem;
+  width: 24px; height: 24px; margin: 0 auto 6px; border-radius: 50%;
+  background: var(--green); color: var(--cream); font-weight: 700; font-size: .72rem;
   display: flex; align-items: center; justify-content: center; border: 2px solid var(--gold);
 }
-.step h4 { font-family: 'Tajawal', sans-serif; font-size: .85rem; margin-bottom: 4px; justify-content: center; }
-.step p { font-size: .76rem; color: var(--muted); line-height: 1.4; }
+.step h4 { font-family: 'Tajawal', sans-serif; font-size: .76rem; margin-bottom: 3px; justify-content: center; }
+.step p { font-size: .68rem; color: var(--muted); line-height: 1.35; }
 
-table.tbl { width: 100%; border-collapse: collapse; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; font-size: .8rem; }
-table.tbl th, table.tbl td { text-align: start; padding: 9px 12px; border-bottom: 1px solid var(--line); }
-table.tbl th { background: var(--green); color: var(--cream); font-size: .72rem; font-weight: 700; }
+/* architecture flow */
+.flow {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  flex-wrap: wrap; padding: 10px 8px; background: var(--white);
+  border: 1px solid var(--line); border-radius: var(--radius); flex-shrink: 0;
+}
+.flow-box {
+  background: var(--cream-2); border: 1.5px solid var(--green-mid); border-radius: 6px;
+  padding: 8px 12px; text-align: center; min-width: 100px;
+}
+.flow-box.gold { border-color: var(--gold); background: var(--gold-soft); }
+.flow-box.dark { background: var(--green); border-color: var(--gold); color: var(--cream); }
+.flow-box.dark .fb-t { color: var(--gold); }
+.flow-box .fb-t { font-size: .72rem; font-weight: 700; color: var(--green); display: block; }
+.flow-box .fb-d { font-size: .62rem; color: var(--muted); margin-top: 2px; display: block; }
+.flow-box.dark .fb-d { color: rgba(250,248,243,.7); }
+.flow-arrow {
+  font-size: .9rem; color: var(--gold-dim); font-weight: 700; flex-shrink: 0;
+  font-family: 'Tajawal', sans-serif;
+}
+html[dir="rtl"] .flow-arrow { transform: scaleX(-1); display: inline-block; }
+
+table.tbl { width: 100%; border-collapse: collapse; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; font-size: .72rem; }
+table.tbl th, table.tbl td { text-align: start; padding: 6px 10px; border-bottom: 1px solid var(--line); }
+table.tbl th { background: var(--green); color: var(--cream); font-size: .66rem; font-weight: 700; }
 table.tbl td.n { font-weight: 700; color: var(--green-mid); white-space: nowrap; }
 table.tbl tr:nth-child(even) td { background: var(--cream-2); }
 table.tbl tr:last-child td { border-bottom: 0; }
 
-.agenda { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 28px; flex: 1; align-content: start; }
+/* bar chart */
+.bars { display: flex; flex-direction: column; gap: 8px; flex: 1; justify-content: center; }
+.bar-row { display: grid; grid-template-columns: 88px 1fr 36px; gap: 8px; align-items: center; }
+.bar-row .bl { font-size: .72rem; font-weight: 600; color: var(--green); }
+.bar-row .bn { font-size: .72rem; font-weight: 700; color: var(--green-mid); text-align: end; }
+.bar-track { height: 18px; background: var(--cream-2); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.bar-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, var(--green-mid), var(--green));
+  display: flex; align-items: center; padding-inline-start: 6px;
+  font-size: .58rem; color: var(--cream); font-weight: 700; min-width: 4px;
+}
+.bar-fill.gold { background: linear-gradient(90deg, var(--gold-dim), var(--gold)); color: var(--green-deep); }
+.bar-fill.mid { background: linear-gradient(90deg, #3d7a5c, var(--green-mid)); }
+.bar-fill.soft { background: linear-gradient(90deg, #5a8f72, #7aad92); }
+
+.agenda { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; flex: 1; align-content: start; }
 .agenda-item {
-  display: grid; grid-template-columns: 36px 1fr; gap: 12px; align-items: start;
-  padding: 12px 14px; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
+  display: grid; grid-template-columns: 32px 1fr; gap: 10px; align-items: start;
+  padding: 10px 12px; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
 }
 .agenda-item .ix {
-  font-family: 'Amiri', serif; font-size: 1.35rem; color: var(--gold); line-height: 1; padding-top: 2px;
+  font-family: 'Amiri', serif; font-size: 1.2rem; color: var(--gold); line-height: 1; padding-top: 1px;
 }
-.agenda-item strong { display: block; color: var(--green); font-size: .9rem; margin-bottom: 2px; }
-.agenda-item span { font-size: .78rem; color: var(--muted); line-height: 1.4; }
+.agenda-item strong { display: block; color: var(--green); font-size: .82rem; margin-bottom: 2px; }
+.agenda-item span { font-size: .7rem; color: var(--muted); line-height: 1.35; }
 
-.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; flex: 1; }
-.compare .card h3 { margin-bottom: 10px; }
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; min-height: 0; }
+.compare .card { flex: 1; }
+.compare .card h3 { margin-bottom: 6px; }
 .tag-before { color: #8a4b2a; }
 .tag-after { color: var(--green-mid); }
 
 .note {
-  margin-top: auto; padding: 10px 14px; border-radius: 8px;
+  margin-top: auto; padding: 8px 12px; border-radius: 6px; flex-shrink: 0;
   background: var(--gold-soft); border-inline-start: 3px solid var(--gold);
-  font-size: .8rem; color: var(--ink); line-height: 1.45;
+  font-size: .72rem; color: var(--ink); line-height: 1.4;
 }
 html[dir="rtl"] .note { border-inline-start: 0; border-inline-end: 3px solid var(--gold); }
 
 .meta {
-  margin-top: 22px; padding-top: 14px; border-top: 1px solid rgba(201,168,76,.3);
-  font-size: .82rem; color: rgba(250,248,243,.65); max-width: 52ch;
+  margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(201,168,76,.3);
+  font-size: .74rem; color: rgba(250,248,243,.65); max-width: 60ch; flex-shrink: 0;
 }
 
-.mosaic { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; flex: 1; min-height: 0; }
-.mosaic .shot { min-height: 0; }
-
-.chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; flex-shrink: 0; }
 .chip {
-  font-size: .72rem; font-weight: 600; padding: 5px 10px; border-radius: 999px;
+  font-size: .66rem; font-weight: 600; padding: 4px 9px; border-radius: 999px;
   background: var(--white); border: 1px solid var(--line); color: var(--green);
 }
 
@@ -230,14 +290,26 @@ html[dir="rtl"] .note { border-inline-start: 0; border-inline-end: 3px solid var
 .dark .stat { background: rgba(255,255,255,.07); border-color: rgba(201,168,76,.25); }
 .dark .stat .n { color: var(--gold); }
 .dark .stat .l { color: rgba(250,248,243,.7); }
+.dark .shot { border-color: rgba(201,168,76,.3); }
+.dark .flow { background: rgba(255,255,255,.06); border-color: rgba(201,168,76,.28); }
+.dark .flow-box { background: rgba(255,255,255,.08); border-color: rgba(201,168,76,.4); }
+.dark .flow-box .fb-t { color: var(--gold); }
+.dark .flow-box .fb-d { color: rgba(250,248,243,.65); }
+
+.mini-list { list-style: none; display: flex; flex-direction: column; gap: 6px; flex: 1; min-height: 0; }
+.mini-list .card { flex: 0 0 auto; }
 
 @media (max-width: 980px) {
-  .slide { padding: 24px 16px calc(var(--chrome-h) + 12px); }
-  .g2, .g3, .g4, .g23, .g32, .compare, .agenda, .steps, .mosaic, .row { grid-template-columns: 1fr; display: grid; }
-  .w45, .w55, .w50 { flex: none; }
+  .slide { padding: 20px 14px calc(var(--chrome-h) + 10px); }
+  .g2, .g3, .g4, .g8, .g23, .g32, .compare, .agenda, .steps, .mosaic, .collage, .collage-4, .trio, .row, .filmstrip {
+    grid-template-columns: 1fr; display: grid;
+  }
+  .collage .shot:first-child { grid-row: auto; }
+  .w40, .w42, .w45, .w50, .w55, .w58 { flex: none; }
   .steps::before { display: none; }
-  .shot { max-height: 200px; }
+  .shot { max-height: 160px; }
   .hint { display: none; }
+  .bar-row { grid-template-columns: 70px 1fr 28px; }
 }
 
 @media print {
@@ -262,12 +334,20 @@ html[dir="rtl"] .note { border-inline-start: 0; border-inline-end: 3px solid var
   <p class="kicker" data-i18n="t1k">CRSIC 2026 · Digital presence</p>
   <h1 class="heading" data-i18n="t1t">Institutional website &amp; editorial desk</h1>
   <div class="rule"></div>
-  <p class="lede" data-i18n="t1d">A factual briefing on what is live: the Arabic-first public site, the internal content desk, publish governance, inventory, safeguards, and remaining work — illustrated with screenshots from the running systems.</p>
-  <div class="g4" style="margin-top:8px;max-width:720px">
-    <div class="stat"><div class="n">2</div><div class="l" data-i18n="t1s1">Products</div></div>
-    <div class="stat"><div class="n">9+</div><div class="l" data-i18n="t1s2">Content types</div></div>
-    <div class="stat"><div class="n">3</div><div class="l" data-i18n="t1s3">Staff roles</div></div>
-    <div class="stat"><div class="n">350</div><div class="l" data-i18n="t1s4">UI language keys</div></div>
+  <p class="lede" data-i18n="t1d">Factual briefing on systems in production: Arabic-first public SPA, internal editorial desk, publish governance, live inventory, safeguards, and remaining work — with screenshots from the running surfaces.</p>
+  <div class="row" style="gap:12px;margin-top:4px">
+    <div class="collage-4" style="flex:1.4">
+      <figure class="shot"><img src="screenshots/01-home.png" alt="Home"><figcaption data-i18n="t1c1">Public home (AR)</figcaption></figure>
+      <figure class="shot"><img src="screenshots/02-publications.png" alt="Publications"><figcaption data-i18n="t1c2">Publications catalogue</figcaption></figure>
+      <figure class="shot"><img src="screenshots/07-cms-dashboard.png" alt="CMS"><figcaption data-i18n="t1c3">Editorial dashboard</figcaption></figure>
+      <figure class="shot"><img src="screenshots/08-cms-news.png" alt="News desk"><figcaption data-i18n="t1c4">News queue</figcaption></figure>
+    </div>
+    <div class="col" style="flex:0 0 200px;justify-content:center;gap:10px">
+      <div class="stat"><div class="n">2</div><div class="l" data-i18n="t1s1">Products</div></div>
+      <div class="stat"><div class="n">9+</div><div class="l" data-i18n="t1s2">Content types</div></div>
+      <div class="stat"><div class="n">3</div><div class="l" data-i18n="t1s3">Staff roles</div></div>
+      <div class="stat"><div class="n">350</div><div class="l" data-i18n="t1s4">UI language keys</div></div>
+    </div>
   </div>
   <p class="meta" data-i18n="t1m">Center for Research in Islamic Sciences and Civilization · Laghouat · crsic.dz</p>
 </section>
@@ -276,14 +356,20 @@ html[dir="rtl"] .note { border-inline-start: 0; border-inline-end: 3px solid var
 <section class="slide" data-i="1">
   <p class="kicker" data-i18n="t2k">Contents</p>
   <h2 class="heading" data-i18n="t2t">Briefing map</h2>
-  <p class="lede" data-i18n="t2d">Eighteen slides. Navigate with arrows or Space. Language: EN / ع.</p>
+  <p class="lede" data-i18n="t2d">Eighteen slides. Navigate with arrows or Space. Switch language EN / ع at any time. Footer shows section name and position.</p>
   <div class="agenda">
-    <div class="agenda-item"><div class="ix">01</div><div><strong data-i18n="t2a1t">Context &amp; change</strong><span data-i18n="t2a1d">Mandate, before/after, cutover scope</span></div></div>
-    <div class="agenda-item"><div class="ix">02</div><div><strong data-i18n="t2a2t">Architecture</strong><span data-i18n="t2a2d">Public site + desk, publish path</span></div></div>
-    <div class="agenda-item"><div class="ix">03</div><div><strong data-i18n="t2a3t">Public experience</strong><span data-i18n="t2a3d">Pages, catalogues, bilingual UI</span></div></div>
-    <div class="agenda-item"><div class="ix">04</div><div><strong data-i18n="t2a4t">Inventory</strong><span data-i18n="t2a4d">Live counts and external links</span></div></div>
-    <div class="agenda-item"><div class="ix">05</div><div><strong data-i18n="t2a5t">Editorial governance</strong><span data-i18n="t2a5d">Workflow, roles, queues</span></div></div>
-    <div class="agenda-item"><div class="ix">06</div><div><strong data-i18n="t2a6t">Safeguards &amp; roadmap</strong><span data-i18n="t2a6d">Controls, open items, position today</span></div></div>
+    <div class="agenda-item"><div class="ix">01</div><div><strong data-i18n="t2a1t">Context &amp; change</strong><span data-i18n="t2a1d">Mandate, before/after cutover, institutional channel</span></div></div>
+    <div class="agenda-item"><div class="ix">02</div><div><strong data-i18n="t2a2t">Architecture</strong><span data-i18n="t2a2d">Public SPA + desk, publish path, static JSON snapshots</span></div></div>
+    <div class="agenda-item"><div class="ix">03</div><div><strong data-i18n="t2a3t">Public experience</strong><span data-i18n="t2a3d">Site map, home anatomy, catalogues, About / research / journals</span></div></div>
+    <div class="agenda-item"><div class="ix">04</div><div><strong data-i18n="t2a4t">Language &amp; inventory</strong><span data-i18n="t2a4d">Arabic-first policy, live counts, bar chart, external links</span></div></div>
+    <div class="agenda-item"><div class="ix">05</div><div><strong data-i18n="t2a5t">Editorial governance</strong><span data-i18n="t2a5d">Workflow, roles, desks, queues, operational tools</span></div></div>
+    <div class="agenda-item"><div class="ix">06</div><div><strong data-i18n="t2a6t">Safeguards &amp; open items</strong><span data-i18n="t2a6d">Controls in force, remaining work, position today</span></div></div>
+  </div>
+  <div class="filmstrip" style="margin-top:4px">
+    <figure class="shot"><img src="screenshots/01-home.png" alt=""><figcaption data-i18n="t2f1">Home</figcaption></figure>
+    <figure class="shot"><img src="screenshots/03-news.png" alt=""><figcaption data-i18n="t2f2">News</figcaption></figure>
+    <figure class="shot"><img src="screenshots/06-cms-login.png" alt=""><figcaption data-i18n="t2f3">Desk login</figcaption></figure>
+    <figure class="shot"><img src="screenshots/12-cms-desks.png" alt=""><figcaption data-i18n="t2f4">Desks</figcaption></figure>
   </div>
 </section>
 
@@ -293,18 +379,28 @@ html[dir="rtl"] .note { border-inline-start: 0; border-inline-end: 3px solid var
   <h2 class="heading" data-i18n="t3t">Why a digital presence exists</h2>
   <div class="g23">
     <div class="col grow">
-      <div class="card accent">
+      <div class="card accent fill">
         <h3><span class="ico">🏛️</span><span data-i18n="t3a_t">Public scientific centre</span></h3>
-        <p data-i18n="t3a_d">CRSIC is a public scientific and technological research centre under Algeria’s Ministry of Higher Education and Scientific Research. Founded by executive decree 15-136 (23 May 2015); opened January 2016, Laghouat.</p>
+        <p data-i18n="t3a_d">CRSIC is a public scientific and technological research centre under Algeria’s Ministry of Higher Education and Scientific Research. Founded by executive decree 15-136 (23 May 2015); opened January 2016 in Laghouat. The site is the primary public channel for research departments, publications, journals, events, partnerships, news, and contact.</p>
       </div>
-      <div class="g2">
-        <div class="card">
+      <div class="g2" style="flex:1">
+        <div class="card fill">
           <h3><span class="ico">🎯</span><span data-i18n="t3b_t">Public channel</span></h3>
-          <p data-i18n="t3b_d">Present the centre, research departments, publications, journals, events, partnerships, news, and contact paths to researchers, partners, and the public.</p>
+          <ul>
+            <li data-i18n="t3b1">Present centre identity and ministry positioning</li>
+            <li data-i18n="t3b2">Expose catalogues: news, events, publications, partners</li>
+            <li data-i18n="t3b3">Link research groups/projects and institutional hubs</li>
+            <li data-i18n="t3b4">Route journals to OJS; library to OPAC</li>
+          </ul>
         </div>
-        <div class="card">
+        <div class="card fill">
           <h3><span class="ico">🔐</span><span data-i18n="t3c_t">Controlled publishing</span></h3>
-          <p data-i18n="t3c_d">Staff publish through roles and review — not by editing live WordPress or raw production files by hand.</p>
+          <ul>
+            <li data-i18n="t3c1a">Staff publish through roles and review queues</li>
+            <li data-i18n="t3c2a">No live WordPress or hand-edited production JSON</li>
+            <li data-i18n="t3c3a">Four-eyes on approve / publish</li>
+            <li data-i18n="t3c4a">Manual go-live only — no scheduled auto-publish</li>
+          </ul>
         </div>
       </div>
       <div class="chip-row">
@@ -314,39 +410,44 @@ html[dir="rtl"] .note { border-inline-start: 0; border-inline-end: 3px solid var
         <span class="chip" data-i18n="t3c4">Manual go-live only</span>
       </div>
     </div>
-    <figure class="shot">
-      <img src="screenshots/01-home.png" alt="Public home">
-      <figcaption data-i18n="t3cap">Public home — hero, ministry positioning, research departments</figcaption>
-    </figure>
+    <div class="col" style="gap:8px">
+      <figure class="shot" style="flex:1.2"><img src="screenshots/09-about.png" alt="About"><figcaption data-i18n="t3cap1">About — mission, vision, director narrative</figcaption></figure>
+      <figure class="shot" style="flex:1"><img src="screenshots/01-home.png" alt="Home"><figcaption data-i18n="t3cap2">Public home — hero, departments, catalogues entry</figcaption></figure>
+    </div>
   </div>
 </section>
 
-<!-- 4 BEFORE AFTER -->
+<!-- 4 BEFORE / AFTER -->
 <section class="slide" data-i="3">
   <p class="kicker" data-i18n="t4k">Transition</p>
   <h2 class="heading" data-i18n="t4t">What changed in practice</h2>
-  <p class="lede" data-i18n="t4d">Owned content types have already cut over. Journals remain on Open Journal Systems by design.</p>
-  <div class="compare">
-    <div class="card soft">
-      <span class="pill" data-i18n="t4b">Before</span>
-      <h3 class="tag-before" data-i18n="t4bt">WordPress + informal edits</h3>
-      <ul>
-        <li data-i18n="t4b1">Unclear ownership of who could change live pages</li>
-        <li data-i18n="t4b2">Risk of direct production edits without review</li>
-        <li data-i18n="t4b3">Harder to attribute who published what, when</li>
-        <li data-i18n="t4b4">Public runtime tied to a heavier CMS stack</li>
-      </ul>
+  <p class="lede" data-i18n="t4d">Owned content types have already cut over from WordPress. Journals remain on Open Journal Systems by design and are linked, not authored, in the desk.</p>
+  <div class="row">
+    <div class="compare" style="flex:1.1">
+      <div class="card soft fill">
+        <span class="pill" data-i18n="t4b">Before</span>
+        <h3 class="tag-before" data-i18n="t4bt">WordPress + informal edits</h3>
+        <ul>
+          <li data-i18n="t4b1">Unclear ownership of who could change live pages</li>
+          <li data-i18n="t4b2">Risk of direct production edits without review</li>
+          <li data-i18n="t4b3">Harder to attribute who published what, when</li>
+          <li data-i18n="t4b4">Public runtime tied to a heavier CMS stack</li>
+          <li data-i18n="t4b5">No exclusive desks by content type or org unit</li>
+        </ul>
+      </div>
+      <div class="card accent fill">
+        <span class="pill green" data-i18n="t4a">Now</span>
+        <h3 class="tag-after" data-i18n="t4at">Static public site + editorial desk</h3>
+        <ul>
+          <li data-i18n="t4a1">Desks assign exclusive ownership by type / org unit</li>
+          <li data-i18n="t4a2">Draft → submit → review → manual publish</li>
+          <li data-i18n="t4a3">Author cannot approve their own item (four-eyes)</li>
+          <li data-i18n="t4a4">Visitors load static pages; desk writes approved snapshots</li>
+          <li data-i18n="t4a5">Audit log and recycle instead of opaque hard deletes</li>
+        </ul>
+      </div>
     </div>
-    <div class="card accent">
-      <span class="pill green" data-i18n="t4a">Now</span>
-      <h3 class="tag-after" data-i18n="t4at">Static public site + editorial desk</h3>
-      <ul>
-        <li data-i18n="t4a1">Desks assign exclusive ownership by type / org unit</li>
-        <li data-i18n="t4a2">Draft → submit → review → manual publish</li>
-        <li data-i18n="t4a3">Author cannot approve their own item (four-eyes)</li>
-        <li data-i18n="t4a4">Visitors load static pages; desk writes approved snapshots</li>
-      </ul>
-    </div>
+    <figure class="shot" style="flex:0 0 38%"><img src="screenshots/01-home.png" alt="Home now"><figcaption data-i18n="t4cap">Live public home after cutover — static SPA shell + JSON content</figcaption></figure>
   </div>
   <div class="note" data-i18n="t4n">Cutover scope: news, events, publications, partners, research groups/projects, laws, platforms, alerts, director, featured playlist, site pages. Out of desk: journals (OJS).</div>
 </section>
@@ -355,20 +456,29 @@ html[dir="rtl"] .note { border-inline-start: 0; border-inline-end: 3px solid var
 <section class="slide band" data-i="4">
   <p class="kicker" data-i18n="t5k">Architecture</p>
   <h2 class="heading" data-i18n="t5t">Two surfaces, one publish path</h2>
-  <p class="lede" data-i18n="t5d">Visitors never run the editorial system. Staff never hand-edit the live public files.</p>
-  <div class="g2">
-    <div class="card green">
+  <p class="lede" data-i18n="t5d">Visitors never run the editorial system. Staff never hand-edit the live public files. Publish rebuilds matching data/*.json with backup/rename safety.</p>
+  <div class="flow">
+    <div class="flow-box"><span class="fb-t" data-i18n="t5f1t">Editor draft</span><span class="fb-d" data-i18n="t5f1d">Desk + Postgres</span></div>
+    <span class="flow-arrow" aria-hidden="true">→</span>
+    <div class="flow-box"><span class="fb-t" data-i18n="t5f2t">Submit / review</span><span class="fb-d" data-i18n="t5f2d">Four-eyes gate</span></div>
+    <span class="flow-arrow" aria-hidden="true">→</span>
+    <div class="flow-box gold"><span class="fb-t" data-i18n="t5f3t">Manual publish</span><span class="fb-d" data-i18n="t5f3d">live_payload + rebuild</span></div>
+    <span class="flow-arrow" aria-hidden="true">→</span>
+    <div class="flow-box dark"><span class="fb-t" data-i18n="t5f4t">Public SPA</span><span class="fb-d" data-i18n="t5f4d">data/*.json · hash routes</span></div>
+  </div>
+  <div class="g2" style="margin-top:4px">
+    <div class="card green fill">
       <h3><span class="ico">🌐</span><span data-i18n="t5a_t">1 · Public website</span></h3>
       <ul>
         <li data-i18n="t5a1">Single-page shell with hash routes (#home, #news, #publications…)</li>
         <li data-i18n="t5a2">Content from JSON files (local /data or optional CDN base URL)</li>
-        <li data-i18n="t5a3">Zero build for visitors — browser loads modules directly</li>
+        <li data-i18n="t5a3">Zero build for visitors — browser loads ES modules directly</li>
         <li data-i18n="t5a4">Deployable on Vercel, Netlify, or Apache static hosting</li>
         <li data-i18n="t5a5">Contact opens mailto:contact@crsic.dz — no public form backend</li>
         <li data-i18n="t5a6">Soft-fail: if one JSON file fails, other sections still render</li>
       </ul>
     </div>
-    <div class="card accent">
+    <div class="card accent fill">
       <h3><span class="ico">🗂️</span><span data-i18n="t5b_t">2 · Editorial desk</span></h3>
       <ul>
         <li data-i18n="t5b1">Internal Next.js app + PostgreSQL for drafts and workflow</li>
@@ -386,35 +496,41 @@ html[dir="rtl"] .note { border-inline-start: 0; border-inline-end: 3px solid var
 <section class="slide" data-i="5">
   <p class="kicker" data-i18n="t6k">Public site · map</p>
   <h2 class="heading" data-i18n="t6t">Pages visitors can open</h2>
-  <div class="g4" style="flex:1;align-content:start">
-    <div class="card"><h3>🏠 <span data-i18n="t6_1t">Home</span></h3><p data-i18n="t6_1d">Hero video, stats, 4 departments, pubs strip, featured news, Center News pager, events teaser</p></div>
-    <div class="card"><h3>📰 <span data-i18n="t6_2t">News</span></h3><p data-i18n="t6_2d">Full archive, search, year filters, detail #news/{slug}, bylines</p></div>
-    <div class="card"><h3>📚 <span data-i18n="t6_3t">Publications</span></h3><p data-i18n="t6_3d">Collective / individual filters, search, covers, detail pages, lightbox</p></div>
-    <div class="card"><h3>📅 <span data-i18n="t6_4t">Events</span></h3><p data-i18n="t6_4d">International &amp; national tabs, status badges, detail #event/{slug}</p></div>
-    <div class="card"><h3>🔬 <span data-i18n="t6_5t">Research</span></h3><p data-i18n="t6_5d">Four department tabs, groups &amp; projects with slug details</p></div>
-    <div class="card"><h3>🤝 <span data-i18n="t6_6t">Partners</span></h3><p data-i18n="t6_6d">National / international cooperation with narrative detail</p></div>
-    <div class="card"><h3>⚖️ <span data-i18n="t6_7t">Laws &amp; platforms</span></h3><p data-i18n="t6_7d">Institutional hubs + #law/{slug} and #platform/{slug}</p></div>
-    <div class="card"><h3>ℹ️ <span data-i18n="t6_8t">About · Org · Contact</span></h3><p data-i18n="t6_8d">Mission/vision/director, org chart, contact + optional CMS site-pages overlay</p></div>
+  <div class="row">
+    <div class="g8" style="flex:1.35">
+      <div class="card fill"><h3>🏠 <span data-i18n="t6_1t">Home</span></h3><p data-i18n="t6_1d">Hero video, stats, 4 departments, pubs strip, featured news, Center News pager, events teaser</p></div>
+      <div class="card fill"><h3>📰 <span data-i18n="t6_2t">News</span></h3><p data-i18n="t6_2d">Full archive, search, year filters, detail #news/{slug}, bylines</p></div>
+      <div class="card fill"><h3>📚 <span data-i18n="t6_3t">Publications</span></h3><p data-i18n="t6_3d">Collective / individual filters, search, covers, detail pages, lightbox</p></div>
+      <div class="card fill"><h3>📅 <span data-i18n="t6_4t">Events</span></h3><p data-i18n="t6_4d">International &amp; national tabs, status badges, detail #event/{slug}</p></div>
+      <div class="card fill"><h3>🔬 <span data-i18n="t6_5t">Research</span></h3><p data-i18n="t6_5d">Four department tabs, groups &amp; projects with slug details</p></div>
+      <div class="card fill"><h3>🤝 <span data-i18n="t6_6t">Partners</span></h3><p data-i18n="t6_6d">National / international cooperation with narrative detail</p></div>
+      <div class="card fill"><h3>⚖️ <span data-i18n="t6_7t">Laws &amp; platforms</span></h3><p data-i18n="t6_7d">Institutional hubs + #law/{slug} and #platform/{slug}</p></div>
+      <div class="card fill"><h3>ℹ️ <span data-i18n="t6_8t">About · Org · Contact</span></h3><p data-i18n="t6_8d">Mission/vision/director, org chart, contact + optional CMS site-pages overlay</p></div>
+    </div>
+    <div class="col" style="flex:0 0 28%;gap:8px">
+      <figure class="shot" style="flex:1"><img src="screenshots/10-research.png" alt="Research"><figcaption data-i18n="t6cap1">Research — four department tabs</figcaption></figure>
+      <figure class="shot" style="flex:1"><img src="screenshots/11-journals.png" alt="Journals"><figcaption data-i18n="t6cap2">Journals — cards link out to OJS</figcaption></figure>
+    </div>
   </div>
   <div class="note" data-i18n="t6n">Also: #journals (cards → OJS), mobile drawer + bottom bar, site alert banner, language suggestion banner, accessibility skip link.</div>
 </section>
 
-<!-- 7 HOME DETAIL -->
+<!-- 7 HOME ANATOMY -->
 <section class="slide" data-i="6">
   <p class="kicker" data-i18n="t7k">Public site · home</p>
   <h2 class="heading" data-i18n="t7t">First screen, section by section</h2>
   <div class="g32">
-    <ul class="col" style="list-style:none;gap:8px;display:flex;flex-direction:column">
-      <li class="card"><h4>1 · <span data-i18n="t7_1t">Hero</span></h4><p data-i18n="t7_1d">Looping video, centre positioning, CTAs to publications and about.</p></li>
-      <li class="card"><h4>2 · <span data-i18n="t7_2t">Stats strip</span></h4><p data-i18n="t7_2d">Founding year, researchers, departments, publications — deep-links into site sections.</p></li>
-      <li class="card"><h4>3 · <span data-i18n="t7_3t">Research departments</span></h4><p data-i18n="t7_3d">Four cards into #research tabs r1–r4.</p></li>
-      <li class="card"><h4>4 · <span data-i18n="t7_4t">Latest publications</span></h4><p data-i18n="t7_4d">Grid on desktop; horizontal scroll-snap on phone.</p></li>
-      <li class="card"><h4>5–7 · <span data-i18n="t7_5t">News &amp; events</span></h4><p data-i18n="t7_5d">Featured playlist (max 10), Center News 3-per-page autoplay, 3 newest events.</p></li>
+    <ul class="mini-list">
+      <li class="card"><h4>1 · <span data-i18n="t7_1t">Hero</span></h4><p data-i18n="t7_1d">Looping video, centre positioning under the ministry, CTAs to publications and about.</p></li>
+      <li class="card"><h4>2 · <span data-i18n="t7_2t">Stats strip</span></h4><p data-i18n="t7_2d">Founding year, researchers, departments, publications — each deep-links into a site section.</p></li>
+      <li class="card"><h4>3 · <span data-i18n="t7_3t">Research departments</span></h4><p data-i18n="t7_3d">Four cards into #research tabs r1–r4 with department names and entry points.</p></li>
+      <li class="card"><h4>4 · <span data-i18n="t7_4t">Latest publications</span></h4><p data-i18n="t7_4d">Cover grid on desktop; horizontal scroll-snap on phone for the same strip.</p></li>
+      <li class="card"><h4>5–7 · <span data-i18n="t7_5t">News &amp; events</span></h4><p data-i18n="t7_5d">Featured playlist (max 10), Center News 3-per-page autoplay carousel, 3 newest events teaser.</p></li>
     </ul>
-    <figure class="shot">
-      <img src="screenshots/05-home-en.png" alt="Home English">
-      <figcaption data-i18n="t7cap">Home in English (LTR) — same structure, flipped chrome</figcaption>
-    </figure>
+    <div class="col" style="gap:8px">
+      <figure class="shot" style="flex:1.3"><img src="screenshots/05-home-en.png" alt="Home EN"><figcaption data-i18n="t7cap1">Home in English (LTR) — same structure, flipped chrome</figcaption></figure>
+      <figure class="shot" style="flex:1"><img src="screenshots/01-home.png" alt="Home AR"><figcaption data-i18n="t7cap2">Home in Arabic (RTL) — default locale</figcaption></figure>
+    </div>
   </div>
 </section>
 
@@ -426,7 +542,7 @@ html[dir="rtl"] .note { border-inline-start: 0; border-inline-end: 3px solid var
     <figure class="shot"><img src="screenshots/02-publications.png" alt="Publications"><figcaption data-i18n="t8c1">Publications — search · all / collective / individual · cover grid</figcaption></figure>
     <figure class="shot"><img src="screenshots/03-news.png" alt="News"><figcaption data-i18n="t8c2">News — search · year chips · cards with date &amp; byline</figcaption></figure>
     <figure class="shot"><img src="screenshots/04-events.png" alt="Events"><figcaption data-i18n="t8c3">Events — international / national · date blocks · status</figcaption></figure>
-    <div class="card accent" style="display:flex;flex-direction:column;justify-content:center">
+    <div class="card accent fill" style="justify-content:center">
       <h3 data-i18n="t8x_t">Detail routes</h3>
       <ul>
         <li>#news/{slug}</li>
@@ -436,199 +552,260 @@ html[dir="rtl"] .note { border-inline-start: 0; border-inline-end: 3px solid var
         <li>#research-group/{slug}</li>
         <li>#law/{slug} · #platform/{slug}</li>
       </ul>
-      <p style="margin-top:10px" data-i18n="t8x_d">Each detail updates page title and social meta for that item.</p>
+      <p style="margin-top:8px" data-i18n="t8x_d">Each detail updates document title and social meta for that item. Soft-fail keeps sibling catalogues usable if one JSON payload fails.</p>
     </div>
   </div>
 </section>
 
-<!-- 9 LANGUAGE -->
+<!-- 9 ABOUT / RESEARCH / JOURNALS -->
 <section class="slide" data-i="8">
-  <p class="kicker" data-i18n="t9k">Language policy</p>
-  <h2 class="heading" data-i18n="t9t">Arabic-first, English when ready</h2>
-  <div class="g2">
-    <div class="card green">
-      <h3><span class="ico">🌐</span><span data-i18n="t9a_t">Interface (chrome)</span></h3>
-      <ul>
-        <li data-i18n="t9a1">Default: Arabic, dir=rtl, lang=ar</li>
-        <li data-i18n="t9a2">English flips UI to LTR</li>
-        <li data-i18n="t9a3">Preference via ?lang= and localStorage</li>
-        <li data-i18n="t9a4">350 keys in ar.json and en.json — sets must stay in sync</li>
-        <li data-i18n="t9a5">Optional banner if browser prefers EN or FR</li>
-      </ul>
-    </div>
-    <div class="card accent">
-      <h3><span class="ico">📝</span><span data-i18n="t9b_t">Editorial bodies</span></h3>
-      <ul>
-        <li data-i18n="t9b1">Arabic is the publish baseline</li>
-        <li data-i18n="t9b2">EN fields (title/summary/body) show publicly only when en_status = ready</li>
-        <li data-i18n="t9b3">Per-field fallback to Arabic if EN missing</li>
-        <li data-i18n="t9b4">Desk tracks “English pending” separately from publish status</li>
-        <li data-i18n="t9b5">Journals remain Arabic / OJS-linked</li>
-      </ul>
-    </div>
+  <p class="kicker" data-i18n="t9k">Public site · institutional pages</p>
+  <h2 class="heading" data-i18n="t9t">About, research, journals</h2>
+  <p class="lede" data-i18n="t9d">Three complementary surfaces: narrative identity, department research structure, and OJS-linked journals (not authored in the desk).</p>
+  <div class="trio">
+    <figure class="shot"><img src="screenshots/09-about.png" alt="About"><figcaption data-i18n="t9c1">About — mission, vision, values, director word; optional CMS site-pages overlay</figcaption></figure>
+    <figure class="shot"><img src="screenshots/10-research.png" alt="Research"><figcaption data-i18n="t9c2">Research — 4 department tabs, groups &amp; projects with #research-group/{slug}</figcaption></figure>
+    <figure class="shot"><img src="screenshots/11-journals.png" alt="Journals"><figcaption data-i18n="t9c3">Journals — 4 cards → https://crsic.dz/ojsre/ (Open Journal Systems)</figcaption></figure>
   </div>
-  <div class="note" data-i18n="t9n">Desk chrome also supports AR RTL / EN LTR via cms_lang cookie — staff can work in either direction.</div>
+  <div class="g3" style="flex:0 0 auto;margin-top:2px">
+    <div class="card"><h4 data-i18n="t9b1t">About / org / contact</h4><p data-i18n="t9b1d">Locales provide fallback copy until desk publishes site-pages bodies for About, organisation chart, contact, and cooperation.</p></div>
+    <div class="card"><h4 data-i18n="t9b2t">Research inventory</h4><p data-i18n="t9b2d">Eight research groups and one project across four departments, each with slug detail routes.</p></div>
+    <div class="card"><h4 data-i18n="t9b3t">Journals boundary</h4><p data-i18n="t9b3d">Editorial workflow for articles stays in OJS. The public site only presents cards and footer links.</p></div>
+  </div>
 </section>
 
-<!-- 10 INVENTORY -->
+<!-- 10 LANGUAGE -->
 <section class="slide" data-i="9">
-  <p class="kicker" data-i18n="t10k">Inventory</p>
-  <h2 class="heading" data-i18n="t10t">What is already public</h2>
-  <p class="lede" data-i18n="t10d">Approximate counts from public JSON after WordPress cutover of owned types.</p>
-  <div class="g4" style="margin-bottom:12px">
-    <div class="stat"><div class="n">39</div><div class="l" data-i18n="t10s1">News</div></div>
-    <div class="stat"><div class="n">55</div><div class="l" data-i18n="t10s2">Events</div></div>
-    <div class="stat"><div class="n">36</div><div class="l" data-i18n="t10s3">Publications</div></div>
-    <div class="stat"><div class="n">17</div><div class="l" data-i18n="t10s4">Partners</div></div>
+  <p class="kicker" data-i18n="t10k">Language policy</p>
+  <h2 class="heading" data-i18n="t10t">Arabic-first, English when ready</h2>
+  <div class="row">
+    <div class="g2" style="flex:1.15">
+      <div class="card green fill">
+        <h3><span class="ico">🌐</span><span data-i18n="t10a_t">Interface (chrome)</span></h3>
+        <ul>
+          <li data-i18n="t10a1">Default: Arabic, dir=rtl, lang=ar</li>
+          <li data-i18n="t10a2">English flips UI chrome to LTR</li>
+          <li data-i18n="t10a3">Preference via ?lang= and localStorage.crsic_lang</li>
+          <li data-i18n="t10a4">350 keys in ar.json and en.json — key sets must stay in sync</li>
+          <li data-i18n="t10a5">Optional banner if browser prefers EN or FR</li>
+          <li data-i18n="t10a6">Desk chrome: AR RTL / EN LTR via cms_lang cookie</li>
+        </ul>
+      </div>
+      <div class="card accent fill">
+        <h3><span class="ico">📝</span><span data-i18n="t10b_t">Editorial bodies</span></h3>
+        <ul>
+          <li data-i18n="t10b1">Arabic is the publish baseline for every owned type</li>
+          <li data-i18n="t10b2">EN title/summary/body show publicly only when en_status = ready</li>
+          <li data-i18n="t10b3">Per-field fallback to Arabic if an EN field is missing</li>
+          <li data-i18n="t10b4">Desk tracks “English pending” separately from publish status</li>
+          <li data-i18n="t10b5">EN bodies of editorial content may remain Arabic-only until marked ready</li>
+          <li data-i18n="t10b6">Journals remain Arabic / OJS-linked outside this policy</li>
+        </ul>
+      </div>
+    </div>
+    <figure class="shot" style="flex:0 0 34%"><img src="screenshots/05-home-en.png" alt="EN home"><figcaption data-i18n="t10cap">Same home structure with English chrome (LTR)</figcaption></figure>
   </div>
-  <table class="tbl">
-    <thead><tr><th data-i18n="t10h1">Resource</th><th data-i18n="t10h2">Count</th><th data-i18n="t10h3">Detail</th></tr></thead>
-    <tbody>
-      <tr><td data-i18n="t10r1a">Events breakdown</td><td class="n">14 + 41</td><td data-i18n="t10r1c">International + national</td></tr>
-      <tr><td data-i18n="t10r2a">Research groups / projects</td><td class="n">8 / 1</td><td data-i18n="t10r2c">Four research departments</td></tr>
-      <tr><td data-i18n="t10r3a">Laws / platforms</td><td class="n">3 / 3</td><td data-i18n="t10r3c">Hubs with slug details</td></tr>
-      <tr><td data-i18n="t10r4a">Journals</td><td class="n">4</td><td data-i18n="t10r4c">All link to crsic.dz/ojsre/ (OJS)</td></tr>
-      <tr><td data-i18n="t10r5a">UI locale keys</td><td class="n">350 × 2</td><td data-i18n="t10r5c">AR + EN matched key sets</td></tr>
-      <tr><td data-i18n="t10r6a">Featured playlist</td><td class="n">0–10</td><td data-i18n="t10r6c">Empty → fallback 3 newest news</td></tr>
-    </tbody>
-  </table>
+  <div class="note" data-i18n="t10n">Publishing in Arabic is never blocked by missing English. English visibility is an explicit readiness flag, not automatic translation.</div>
 </section>
 
-<!-- 11 EXTERNAL -->
+<!-- 11 INVENTORY -->
 <section class="slide" data-i="10">
-  <p class="kicker" data-i18n="t11k">Connections</p>
-  <h2 class="heading" data-i18n="t11t">Services linked from the site</h2>
-  <div class="g3" style="flex:1;align-content:start">
-    <div class="card accent"><h3>📖 <span data-i18n="t11_1t">Open Journal Systems</span></h3><p data-i18n="t11_1d">Scientific journals — not authored in the desk. Cards and footer point to https://crsic.dz/ojsre/</p></div>
-    <div class="card"><h3>📚 <span data-i18n="t11_2t">Digital library</span></h3><p data-i18n="t11_2d">OPAC at crsic.dz/bib/opac_css/ — also reachable from publication lightbox CTA.</p></div>
-    <div class="card"><h3>✉️ <span data-i18n="t11_3t">Contact</span></h3><p data-i18n="t11_3d">mailto:contact@crsic.dz · phone +213 29 14 61 90 · webmail :2096</p></div>
-    <div class="card"><h3>🗺️ <span data-i18n="t11_4t">Maps</span></h3><p data-i18n="t11_4d">Google Maps search from the contact page for Laghouat location.</p></div>
-    <div class="card"><h3>🔗 <span data-i18n="t11_5t">Social</span></h3><p data-i18n="t11_5d">Facebook, X, LinkedIn in the footer for institutional channels.</p></div>
-    <div class="card green"><h3>📄 <span data-i18n="t11_6t">Site pages overlay</span></h3><p data-i18n="t11_6d">Optional CMS publish of About / org / contact / cooperation bodies; locales remain fallback until first publish.</p></div>
+  <p class="kicker" data-i18n="t11k">Inventory</p>
+  <h2 class="heading" data-i18n="t11t">What is already public</h2>
+  <p class="lede" data-i18n="t11d">Approximate counts from public JSON after WordPress cutover of owned types. Bars are relative to the largest catalogue (events = 55).</p>
+  <div class="row">
+    <div class="col" style="flex:0 0 42%;gap:10px">
+      <div class="g2" style="flex:0 0 auto">
+        <div class="stat"><div class="n">55</div><div class="l" data-i18n="t11s2">Events</div></div>
+        <div class="stat"><div class="n">39</div><div class="l" data-i18n="t11s1">News</div></div>
+        <div class="stat"><div class="n">36</div><div class="l" data-i18n="t11s3">Publications</div></div>
+        <div class="stat"><div class="n">17</div><div class="l" data-i18n="t11s4">Partners</div></div>
+      </div>
+      <div class="card fill">
+        <h3 data-i18n="t11bt">Relative catalogue size</h3>
+        <div class="bars">
+          <div class="bar-row"><span class="bl" data-i18n="t11s2">Events</span><div class="bar-track"><div class="bar-fill" style="width:100%">55</div></div><span class="bn">55</span></div>
+          <div class="bar-row"><span class="bl" data-i18n="t11s1">News</span><div class="bar-track"><div class="bar-fill mid" style="width:71%">39</div></div><span class="bn">39</span></div>
+          <div class="bar-row"><span class="bl" data-i18n="t11s3">Publications</span><div class="bar-track"><div class="bar-fill gold" style="width:65%">36</div></div><span class="bn">36</span></div>
+          <div class="bar-row"><span class="bl" data-i18n="t11s4">Partners</span><div class="bar-track"><div class="bar-fill soft" style="width:31%">17</div></div><span class="bn">17</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="col grow" style="gap:8px">
+      <table class="tbl">
+        <thead><tr><th data-i18n="t11h1">Resource</th><th data-i18n="t11h2">Count</th><th data-i18n="t11h3">Detail</th></tr></thead>
+        <tbody>
+          <tr><td data-i18n="t11r1a">Events breakdown</td><td class="n">14 + 41</td><td data-i18n="t11r1c">International + national</td></tr>
+          <tr><td data-i18n="t11r2a">Research groups / projects</td><td class="n">8 / 1</td><td data-i18n="t11r2c">Four research departments</td></tr>
+          <tr><td data-i18n="t11r3a">Laws / platforms</td><td class="n">3 / 3</td><td data-i18n="t11r3c">Hubs with slug details</td></tr>
+          <tr><td data-i18n="t11r4a">Journals</td><td class="n">4</td><td data-i18n="t11r4c">All link to crsic.dz/ojsre/ (OJS)</td></tr>
+          <tr><td data-i18n="t11r5a">UI locale keys</td><td class="n">350 × 2</td><td data-i18n="t11r5c">AR + EN matched key sets</td></tr>
+          <tr><td data-i18n="t11r6a">Featured playlist</td><td class="n">0–10</td><td data-i18n="t11r6c">Empty → fallback 3 newest news</td></tr>
+        </tbody>
+      </table>
+      <div class="filmstrip thumbs-3" style="flex:1;min-height:0">
+        <figure class="shot" style="height:auto"><img src="screenshots/04-events.png" alt=""><figcaption data-i18n="t11f1">Events (55)</figcaption></figure>
+        <figure class="shot" style="height:auto"><img src="screenshots/03-news.png" alt=""><figcaption data-i18n="t11f2">News (39)</figcaption></figure>
+        <figure class="shot" style="height:auto"><img src="screenshots/02-publications.png" alt=""><figcaption data-i18n="t11f3">Publications (36)</figcaption></figure>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- 12 WORKFLOW -->
+<!-- 12 CONNECTIONS -->
 <section class="slide" data-i="11">
-  <p class="kicker" data-i18n="t12k">Editorial desk · workflow</p>
-  <h2 class="heading" data-i18n="t12t">How an item becomes public</h2>
-  <p class="lede" data-i18n="t12d">Statuses: draft → submitted → approved → published. Side paths: changes_requested, rejected, unpublished.</p>
-  <div class="steps" style="margin-bottom:16px">
-    <div class="step"><div class="num">1</div><h4 data-i18n="t12_1t">Draft</h4><p data-i18n="t12_1d">Editor on assigned types; Arabic required; media upload; EN optional</p></div>
-    <div class="step"><div class="num">2</div><h4 data-i18n="t12_2t">Submit</h4><p data-i18n="t12_2d">Enters review queue; withdraw possible before approval</p></div>
-    <div class="step"><div class="num">3</div><h4 data-i18n="t12_3t">Decide</h4><p data-i18n="t12_3d">Request changes / approve / reject — author cannot self-approve</p></div>
-    <div class="step"><div class="num">4</div><h4 data-i18n="t12_4t">Publish</h4><p data-i18n="t12_4d">Manual only; rebuilds public JSON; revision keeps live copy</p></div>
-  </div>
-  <div class="g2">
-    <div class="card"><h3 data-i18n="t12_5t">Live-safe revision</h3><p data-i18n="t12_5d">“Create revision (public stays live)” returns a published item to draft while live_payload remains until the next publish.</p></div>
-    <div class="card"><h3 data-i18n="t12_6t">Emergency path</h3><p data-i18n="t12_6d">Super Admin may emergency-publish with audit trail and post-review flag — exceptional, not routine.</p></div>
+  <p class="kicker" data-i18n="t12k">Connections</p>
+  <h2 class="heading" data-i18n="t12t">Services linked from the site</h2>
+  <div class="row">
+    <div class="g3" style="flex:1.2;align-content:stretch">
+      <div class="card accent fill"><h3>📖 <span data-i18n="t12_1t">Open Journal Systems</span></h3><p data-i18n="t12_1d">Scientific journals — not authored in the desk. Cards and footer point to https://crsic.dz/ojsre/</p></div>
+      <div class="card fill"><h3>📚 <span data-i18n="t12_2t">Digital library</span></h3><p data-i18n="t12_2d">OPAC at crsic.dz/bib/opac_css/ — also reachable from publication lightbox CTA.</p></div>
+      <div class="card fill"><h3>✉️ <span data-i18n="t12_3t">Contact</span></h3><p data-i18n="t12_3d">mailto:contact@crsic.dz · phone +213 29 14 61 90 · webmail :2096</p></div>
+      <div class="card fill"><h3>🗺️ <span data-i18n="t12_4t">Maps</span></h3><p data-i18n="t12_4d">Google Maps search from the contact page for Laghouat location.</p></div>
+      <div class="card fill"><h3>🔗 <span data-i18n="t12_5t">Social</span></h3><p data-i18n="t12_5d">Facebook, X, LinkedIn in the footer for institutional channels.</p></div>
+      <div class="card green fill"><h3>📄 <span data-i18n="t12_6t">Site pages overlay</span></h3><p data-i18n="t12_6d">Optional CMS publish of About / org / contact / cooperation bodies; locales remain fallback until first publish.</p></div>
+    </div>
+    <div class="col" style="flex:0 0 30%;gap:8px">
+      <figure class="shot" style="flex:1"><img src="screenshots/11-journals.png" alt="Journals"><figcaption data-i18n="t12cap1">Journals → OJS</figcaption></figure>
+      <figure class="shot" style="flex:1"><img src="screenshots/09-about.png" alt="About"><figcaption data-i18n="t12cap2">About / contact narrative</figcaption></figure>
+    </div>
   </div>
 </section>
 
-<!-- 13 ROLES -->
+<!-- 13 WORKFLOW -->
 <section class="slide" data-i="12">
-  <p class="kicker" data-i18n="t13k">Editorial desk · roles</p>
-  <h2 class="heading" data-i18n="t13t">Who can do what</h2>
-  <div class="g3" style="margin-bottom:12px">
-    <div class="card green"><span class="pill green" data-i18n="t13_1p">Oversight</span><h3>👑 <span data-i18n="t13_1t">Super Admin</span></h3><p data-i18n="t13_1d">Users, desks, org units, audit, import/export, recycle, all types. Password resets. Emergency publish.</p></div>
-    <div class="card accent"><span class="pill blue" data-i18n="t13_2p">Gate</span><h3>👁️ <span data-i18n="t13_2t">Reviewer</span></h3><p data-i18n="t13_2d">Approve / request changes / reject / publish / unpublish in exclusive org scope. Cannot manage users.</p></div>
-    <div class="card"><span class="pill" data-i18n="t13_3p">Author</span><h3>✏️ <span data-i18n="t13_3t">Editor</span></h3><p data-i18n="t13_3d">Create/edit own items in assigned content types only. Submit and revise. Cannot approve or publish alone.</p></div>
+  <p class="kicker" data-i18n="t13k">Editorial desk · workflow</p>
+  <h2 class="heading" data-i18n="t13t">How an item becomes public</h2>
+  <p class="lede" data-i18n="t13d">Statuses: draft → submitted → approved → published. Side paths: changes_requested, rejected, unpublished. Publish is always a deliberate human action.</p>
+  <div class="steps">
+    <div class="step"><div class="num">1</div><h4 data-i18n="t13_1t">Draft</h4><p data-i18n="t13_1d">Editor on assigned types; Arabic required; media upload; EN optional</p></div>
+    <div class="step"><div class="num">2</div><h4 data-i18n="t13_2t">Submit</h4><p data-i18n="t13_2d">Enters review queue; withdraw possible before approval</p></div>
+    <div class="step"><div class="num">3</div><h4 data-i18n="t13_3t">Decide</h4><p data-i18n="t13_3d">Request changes / approve / reject — author cannot self-approve</p></div>
+    <div class="step"><div class="num">4</div><h4 data-i18n="t13_4t">Publish</h4><p data-i18n="t13_4d">Manual only; rebuilds public JSON; revision keeps live copy</p></div>
+  </div>
+  <div class="row" style="margin-top:4px">
+    <div class="g2" style="flex:1.1">
+      <div class="card fill"><h3 data-i18n="t13_5t">Live-safe revision</h3><p data-i18n="t13_5d">“Create revision (public stays live)” returns a published item to draft while live_payload remains until the next publish. Visitors keep seeing the previous approved snapshot.</p></div>
+      <div class="card fill"><h3 data-i18n="t13_6t">Emergency path</h3><p data-i18n="t13_6d">Super Admin may emergency-publish with audit trail and post-review flag — exceptional, not routine, and still recorded.</p></div>
+    </div>
+    <figure class="shot" style="flex:0 0 34%"><img src="screenshots/06-cms-login.png" alt="CMS login"><figcaption data-i18n="t13cap">Desk sign-in — institutional email; idle timeout 30 minutes</figcaption></figure>
+  </div>
+</section>
+
+<!-- 14 ROLES -->
+<section class="slide" data-i="13">
+  <p class="kicker" data-i18n="t14k">Editorial desk · roles</p>
+  <h2 class="heading" data-i18n="t14t">Who can do what</h2>
+  <div class="g3" style="flex:0 0 auto;margin-bottom:2px">
+    <div class="card green fill"><span class="pill green" data-i18n="t14_1p">Oversight</span><h3>👑 <span data-i18n="t14_1t">Super Admin</span></h3><p data-i18n="t14_1d">Users, desks, org units, audit, import/export, recycle, all types. Password resets. Emergency publish.</p></div>
+    <div class="card accent fill"><span class="pill blue" data-i18n="t14_2p">Gate</span><h3>👁️ <span data-i18n="t14_2t">Reviewer</span></h3><p data-i18n="t14_2d">Approve / request changes / reject / publish / unpublish in exclusive org scope. Cannot manage users.</p></div>
+    <div class="card fill"><span class="pill" data-i18n="t14_3p">Author</span><h3>✏️ <span data-i18n="t14_3t">Editor</span></h3><p data-i18n="t14_3d">Create/edit own items in assigned content types only. Submit and revise. Cannot approve or publish alone.</p></div>
   </div>
   <div class="g23">
-    <div class="card soft">
-      <h3 data-i18n="t13_4t">Desks (ownership model)</h3>
+    <div class="card soft fill">
+      <h3 data-i18n="t14_4t">Desks (ownership model)</h3>
       <ul>
-        <li data-i18n="t13_4a">Editors: globally exclusive content types (or per research department)</li>
-        <li data-i18n="t13_4b">Reviewers: exclusive organisation claims</li>
-        <li data-i18n="t13_4c">Align authorship after desk changes so Editors can open owned items</li>
+        <li data-i18n="t14_4a">Editors: globally exclusive content types (or per research department)</li>
+        <li data-i18n="t14_4b">Reviewers: exclusive organisation claims — one reviewer gate per org scope</li>
+        <li data-i18n="t14_4c">Align authorship after desk changes so Editors can open owned items</li>
+        <li data-i18n="t14_4d">Assignable publisher and JSON rebuild stay tied to desk SSOT</li>
+        <li data-i18n="t14_4e">Four-eyes: the author of an item cannot approve that same item</li>
       </ul>
     </div>
-    <figure class="shot"><img src="screenshots/06-cms-login.png" alt="CMS login"><figcaption data-i18n="t13cap">Desk sign-in — institutional email; session idle timeout 30 minutes</figcaption></figure>
+    <figure class="shot"><img src="screenshots/12-cms-desks.png" alt="Desks"><figcaption data-i18n="t14cap">Desks administration — exclusive type / org claims</figcaption></figure>
   </div>
 </section>
 
-<!-- 14 CMS UI -->
-<section class="slide" data-i="13">
-  <p class="kicker" data-i18n="t14k">Editorial desk · interface</p>
-  <h2 class="heading" data-i18n="t14t">Queues and lists in daily use</h2>
-  <div class="duo mosaic" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;min-height:0">
-    <figure class="shot"><img src="screenshots/07-cms-dashboard.png" alt="Dashboard"><figcaption data-i18n="t14c1">Dashboard — drafts · awaiting review · published · English pending · content by editor</figcaption></figure>
-    <figure class="shot"><img src="screenshots/08-cms-news.png" alt="News list"><figcaption data-i18n="t14c2">News list — status · EN readiness · sort · duplicate · filter · bulk select</figcaption></figure>
-  </div>
-</section>
-
-<!-- 15 TOOLS -->
+<!-- 15 DESK UI -->
 <section class="slide" data-i="14">
-  <p class="kicker" data-i18n="t15k">Editorial desk · capabilities</p>
-  <h2 class="heading" data-i18n="t15t">Operational tools already available</h2>
-  <div class="g3" style="flex:1;align-content:start">
-    <div class="card"><h3>⭐ <span data-i18n="t15_1t">Featured playlist</span></h3><p data-i18n="t15_1d">Order up to 10 news ids for home spotlight. News Editor + SA + Reviewer edit draft; only Reviewer/SA publish the playlist.</p></div>
-    <div class="card"><h3>🖼️ <span data-i18n="t15_2t">Media library</span></h3><p data-i18n="t15_2d">JPEG/PNG/WebP/PDF, max 5 MB, magic-byte check. Scoped by role. Cover crop / img_card for publications.</p></div>
-    <div class="card"><h3>♻️ <span data-i18n="t15_3t">Recycle bin</span></h3><p data-i18n="t15_3d">Soft-delete; restore to draft. Editors: own draft/rejected. SA: unpublished/rejected. Stale after 90 days.</p></div>
-    <div class="card"><h3>⧉ <span data-i18n="t15_4t">Clone</span></h3><p data-i18n="t15_4d">Duplicate → new draft (title suffix copy). From edit page and bulk for Reviewer/SA.</p></div>
-    <div class="card"><h3>📦 <span data-i18n="t15_5t">Import / Export</span></h3><p data-i18n="t15_5d">SA zip of desk records + files. Export selected. Import always creates new drafts — never live.</p></div>
-    <div class="card"><h3>📜 <span data-i18n="t15_6t">Audit &amp; revisions</span></h3><p data-i18n="t15_6d">Append-only audit log. Revision history with restore to editable draft (Reviewer/SA).</p></div>
-    <div class="card"><h3>🔔 <span data-i18n="t15_7t">Notifications</span></h3><p data-i18n="t15_7d">In-app only — no SMTP for alerts or password recovery.</p></div>
-    <div class="card"><h3>👁️ <span data-i18n="t15_8t">Preview</span></h3><p data-i18n="t15_8d">In-form public card preview + short-lived tokens for SPA #preview/{token}.</p></div>
-    <div class="card"><h3>↕️ <span data-i18n="t15_9t">Lists UX</span></h3><p data-i18n="t15_9d">Load more (20), header sort this visit, bulk unpublish/recycle with skip report.</p></div>
-  </div>
-</section>
-
-<!-- 16 SAFEGUARDS -->
-<section class="slide" data-i="15">
-  <p class="kicker" data-i18n="t16k">Safeguards</p>
-  <h2 class="heading" data-i18n="t16t">Controls in force</h2>
+  <p class="kicker" data-i18n="t15k">Editorial desk · interface</p>
+  <h2 class="heading" data-i18n="t15t">Queues and lists in daily use</h2>
+  <p class="lede" data-i18n="t15d">Dashboard aggregates drafts, awaiting review, published, and English-pending. Type lists support status filters, EN readiness, header sort (this visit), duplicate, and bulk select.</p>
   <div class="g2" style="flex:1">
-    <div class="card green">
-      <h3>🛡️ <span data-i18n="t16_a_t">Access &amp; integrity</span></h3>
-      <ul>
-        <li data-i18n="t16_a1">Encrypted iron-session cookies; Secure in production; SameSite=lax</li>
-        <li data-i18n="t16_a2">Password hashing (bcrypt); SESSION_SECRET ≥ 32 chars</li>
-        <li data-i18n="t16_a3">30-minute idle timeout with activity touch</li>
-        <li data-i18n="t16_a4">Role + org + content-type checks on every action</li>
-        <li data-i18n="t16_a5">Four-eyes on review/publish; deactivated users cannot log in</li>
-        <li data-i18n="t16_a6">Public site: no login surface; DOM built without raw innerHTML for content</li>
-      </ul>
-    </div>
-    <div class="card accent">
-      <h3>📋 <span data-i18n="t16_b_t">Release &amp; recovery</span></h3>
-      <ul>
-        <li data-i18n="t16_b1">Written product decision (PRD) before feature coding</li>
-        <li data-i18n="t16_b2">~5 minute smoke checklist before merge to live line</li>
-        <li data-i18n="t16_b3">Publish rebuild with .bak / temp / rename; rollback on failure</li>
-        <li data-i18n="t16_b4">Recycle instead of hard delete; media DELETE blocked if still referenced</li>
-        <li data-i18n="t16_b5">Import never lands as published</li>
-        <li data-i18n="t16_b6">WordPress cutover for owned types already applied on main</li>
-      </ul>
-    </div>
+    <figure class="shot"><img src="screenshots/07-cms-dashboard.png" alt="Dashboard"><figcaption data-i18n="t15c1">Dashboard — drafts · awaiting review · published · English pending · content by editor</figcaption></figure>
+    <figure class="shot"><img src="screenshots/08-cms-news.png" alt="News list"><figcaption data-i18n="t15c2">News list — status · EN readiness · sort · duplicate · filter · bulk select</figcaption></figure>
+  </div>
+  <div class="filmstrip" style="margin-top:2px">
+    <figure class="shot"><img src="screenshots/06-cms-login.png" alt=""><figcaption data-i18n="t15f1">Login</figcaption></figure>
+    <figure class="shot"><img src="screenshots/12-cms-desks.png" alt=""><figcaption data-i18n="t15f2">Desks</figcaption></figure>
+    <figure class="shot"><img src="screenshots/07-cms-dashboard.png" alt=""><figcaption data-i18n="t15f3">Dashboard</figcaption></figure>
+    <figure class="shot"><img src="screenshots/08-cms-news.png" alt=""><figcaption data-i18n="t15f4">Type list</figcaption></figure>
   </div>
 </section>
 
-<!-- 17 ROADMAP -->
+<!-- 16 TOOLS -->
+<section class="slide" data-i="15">
+  <p class="kicker" data-i18n="t16k">Editorial desk · capabilities</p>
+  <h2 class="heading" data-i18n="t16t">Operational tools already available</h2>
+  <div class="g3" style="flex:1;align-content:stretch">
+    <div class="card fill"><h3>⭐ <span data-i18n="t16_1t">Featured playlist</span></h3><p data-i18n="t16_1d">Order up to 10 news ids for home spotlight. News Editor + SA + Reviewer edit draft; only Reviewer/SA publish the playlist.</p></div>
+    <div class="card fill"><h3>🖼️ <span data-i18n="t16_2t">Media library</span></h3><p data-i18n="t16_2d">JPEG/PNG/WebP/PDF, max 5 MB, magic-byte check. Scoped by role. Cover crop / img_card for publications.</p></div>
+    <div class="card fill"><h3>♻️ <span data-i18n="t16_3t">Recycle bin</span></h3><p data-i18n="t16_3d">Soft-delete; restore to draft. Editors: own draft/rejected. SA: unpublished/rejected. Stale after 90 days.</p></div>
+    <div class="card fill"><h3>⧉ <span data-i18n="t16_4t">Clone</span></h3><p data-i18n="t16_4d">Duplicate → new draft (title suffix copy). From edit page and bulk for Reviewer/SA.</p></div>
+    <div class="card fill"><h3>📦 <span data-i18n="t16_5t">Import / Export</span></h3><p data-i18n="t16_5d">SA zip of desk records + files. Export selected. Import always creates new drafts — never live.</p></div>
+    <div class="card fill"><h3>📜 <span data-i18n="t16_6t">Audit &amp; revisions</span></h3><p data-i18n="t16_6d">Append-only audit log. Revision history with restore to editable draft (Reviewer/SA).</p></div>
+    <div class="card fill"><h3>🔔 <span data-i18n="t16_7t">Notifications</span></h3><p data-i18n="t16_7d">In-app only — no SMTP for alerts or password recovery.</p></div>
+    <div class="card fill"><h3>👁️ <span data-i18n="t16_8t">Preview</span></h3><p data-i18n="t16_8d">In-form public card preview + short-lived tokens for SPA #preview/{token}.</p></div>
+    <div class="card fill"><h3>↕️ <span data-i18n="t16_9t">Lists UX</span></h3><p data-i18n="t16_9d">Load more (20), header sort this visit, bulk unpublish/recycle with skip report.</p></div>
+  </div>
+</section>
+
+<!-- 17 SAFEGUARDS -->
 <section class="slide" data-i="16">
-  <p class="kicker" data-i18n="t17k">Open items</p>
-  <h2 class="heading" data-i18n="t17t">Status of known remaining work</h2>
-  <div class="g2" style="flex:1;align-content:start">
-    <div class="card"><span class="pill blue" data-i18n="t17_1b">In progress</span><h3 data-i18n="t17_1t">WebP + remaining EN-when-ready</h3><p data-i18n="t17_1d">Faster image delivery; English visibility for remaining types when marked ready. Does not block Arabic publication.</p></div>
-    <div class="card"><span class="pill" data-i18n="t17_2b">Deferred</span><h3 data-i18n="t17_2t">Journals inside the desk</h3><p data-i18n="t17_2d">Remain on OJS. No desk journals work unless a new written decision opens that slice.</p></div>
-    <div class="card"><span class="pill grey" data-i18n="t17_3b">Closed</span><h3 data-i18n="t17_3t">Scheduled auto-publish</h3><p data-i18n="t17_3d">Cancelled. Rule remains Approve → Publish by a human.</p></div>
-    <div class="card"><span class="pill green" data-i18n="t17_4b">Optional later</span><h3 data-i18n="t17_4t">Possible extensions</h3><p data-i18n="t17_4d">Visitor statistics, translator role, staff SSO — only if prioritised as a new decision.</p></div>
+  <p class="kicker" data-i18n="t17k">Safeguards</p>
+  <h2 class="heading" data-i18n="t17t">Controls in force</h2>
+  <div class="row">
+    <div class="g2" style="flex:1.25">
+      <div class="card green fill">
+        <h3>🛡️ <span data-i18n="t17_a_t">Access &amp; integrity</span></h3>
+        <ul>
+          <li data-i18n="t17_a1">Encrypted iron-session cookies; Secure in production; SameSite=lax</li>
+          <li data-i18n="t17_a2">Password hashing (bcrypt); SESSION_SECRET ≥ 32 chars</li>
+          <li data-i18n="t17_a3">30-minute idle timeout with activity touch</li>
+          <li data-i18n="t17_a4">Role + org + content-type checks on every action</li>
+          <li data-i18n="t17_a5">Four-eyes on review/publish; deactivated users cannot log in</li>
+          <li data-i18n="t17_a6">Public site: no login surface; DOM built without raw innerHTML for content</li>
+        </ul>
+      </div>
+      <div class="card accent fill">
+        <h3>📋 <span data-i18n="t17_b_t">Release &amp; recovery</span></h3>
+        <ul>
+          <li data-i18n="t17_b1">Written product decision (PRD) before feature coding</li>
+          <li data-i18n="t17_b2">~5 minute smoke checklist before merge to live line</li>
+          <li data-i18n="t17_b3">Publish rebuild with .bak / temp / rename; rollback on failure</li>
+          <li data-i18n="t17_b4">Recycle instead of hard delete; media DELETE blocked if still referenced</li>
+          <li data-i18n="t17_b5">Import never lands as published</li>
+          <li data-i18n="t17_b6">WordPress cutover for owned types already applied on main</li>
+        </ul>
+      </div>
+    </div>
+    <figure class="shot" style="flex:0 0 30%"><img src="screenshots/07-cms-dashboard.png" alt="Dashboard"><figcaption data-i18n="t17cap">Desk queues — visibility into drafts, review, and published stock</figcaption></figure>
   </div>
-  <div class="note" data-i18n="t17n">Remaining work is limited polish under existing decisions — not a rebuild of the public site or the desk.</div>
 </section>
 
-<!-- 18 CLOSE -->
+<!-- 18 OPEN + CLOSE -->
 <section class="slide dark" data-i="17">
-  <p class="kicker" data-i18n="t18k">Closing</p>
-  <h2 class="heading" data-i18n="t18t">Position today</h2>
+  <p class="kicker" data-i18n="t18k">Open items &amp; closing</p>
+  <h2 class="heading" data-i18n="t18t">Remaining work and position today</h2>
   <div class="rule"></div>
-  <p class="lede" data-i18n="t18d">A live public website and a live editorial desk: desks, four-eyes review, audited manual publish, bilingual chrome, and WordPress cutover complete for owned types.</p>
-  <div class="g3">
-    <div class="card"><h3 data-i18n="t18_a_t">In place</h3><p data-i18n="t18_a_d">Public site · desk · cutover · inventory · audit · featured playlist · recycle · I/E</p></div>
+  <div class="g2" style="flex:0 0 auto">
+    <div class="card"><span class="pill blue" data-i18n="t18_1b">In progress</span><h3 data-i18n="t18_1t">WebP + remaining EN-when-ready</h3><p data-i18n="t18_1d">Faster image delivery; English visibility for remaining types when marked ready. Does not block Arabic publication.</p></div>
+    <div class="card"><span class="pill" data-i18n="t18_2b">Deferred</span><h3 data-i18n="t18_2t">Journals inside the desk</h3><p data-i18n="t18_2d">Remain on OJS. No desk journals work unless a new written decision opens that slice.</p></div>
+    <div class="card"><span class="pill grey" data-i18n="t18_3b">Closed</span><h3 data-i18n="t18_3t">Scheduled auto-publish</h3><p data-i18n="t18_3d">Cancelled. Rule remains Approve → Publish by a human.</p></div>
+    <div class="card"><span class="pill green" data-i18n="t18_4b">Optional later</span><h3 data-i18n="t18_4t">Possible extensions</h3><p data-i18n="t18_4d">Visitor statistics, translator role, staff SSO — only if prioritised as a new decision.</p></div>
+  </div>
+  <div class="g3" style="flex:0 0 auto;margin-top:4px">
+    <div class="card"><h3 data-i18n="t18_a_t">In place</h3><p data-i18n="t18_a_d">Public site · desk · cutover · inventory · audit · featured playlist · recycle · I/E · desks · four-eyes</p></div>
     <div class="card"><h3 data-i18n="t18_b_t">Under way</h3><p data-i18n="t18_b_d">WebP delivery · remaining English-when-ready coverage</p></div>
     <div class="card"><h3 data-i18n="t18_c_t">Next choice</h3><p data-i18n="t18_c_d">Whether any new slice is opened beyond the current pack</p></div>
   </div>
-  <p class="meta" data-i18n="t18m">CRSIC · Laghouat · crsic.dz · End of briefing</p>
+  <div class="filmstrip" style="margin-top:4px;flex:1;min-height:0">
+    <figure class="shot" style="height:auto"><img src="screenshots/01-home.png" alt=""><figcaption data-i18n="t18f1">Public home</figcaption></figure>
+    <figure class="shot" style="height:auto"><img src="screenshots/08-cms-news.png" alt=""><figcaption data-i18n="t18f2">Desk queues</figcaption></figure>
+    <figure class="shot" style="height:auto"><img src="screenshots/10-research.png" alt=""><figcaption data-i18n="t18f3">Research</figcaption></figure>
+    <figure class="shot" style="height:auto"><img src="screenshots/12-cms-desks.png" alt=""><figcaption data-i18n="t18f4">Desks</figcaption></figure>
+  </div>
+  <p class="meta" data-i18n="t18m">CRSIC · Laghouat · crsic.dz · End of briefing — remaining work is limited polish under existing decisions, not a rebuild.</p>
 </section>
 
 </div>
@@ -640,35 +817,54 @@ html[dir="rtl"] .note { border-inline-start: 0; border-inline-end: 3px solid var
 </nav>
 
 <script>
-const SECTIONS_EN = ["Title","Contents","Institution","Transition","Architecture","Site map","Home","Catalogues","Language","Inventory","Connections","Workflow","Roles","Desk UI","Tools","Safeguards","Open items","Closing"];
-const SECTIONS_AR = ["العنوان","المحتويات","المؤسسة","الانتقال","البنية","خريطة الموقع","الرئيسية","الكتالوجات","اللغة","الجرد","الروابط","سير العمل","الأدوار","واجهة المكتب","الأدوات","الضوابط","بنود مفتوحة","الختام"];
+const SECTIONS_EN = [
+  "Title","Contents","Institution","Transition","Architecture","Site map","Home",
+  "Catalogues","Institutional pages","Language","Inventory","Connections","Workflow",
+  "Roles","Desk UI","Tools","Safeguards","Closing"
+];
+const SECTIONS_AR = [
+  "العنوان","المحتويات","المؤسسة","الانتقال","البنية","خريطة الموقع","الرئيسية",
+  "الكتالوجات","صفحات مؤسسية","اللغة","الجرد","الروابط","سير العمل",
+  "الأدوار","واجهة المكتب","الأدوات","الضوابط","الختام"
+];
 
 const I18N = {
 en: {
   t1k:"CRSIC 2026 · Digital presence", t1t:"Institutional website & editorial desk",
-  t1d:"A factual briefing on what is live: the Arabic-first public site, the internal content desk, publish governance, inventory, safeguards, and remaining work — illustrated with screenshots from the running systems.",
+  t1d:"Factual briefing on systems in production: Arabic-first public SPA, internal editorial desk, publish governance, live inventory, safeguards, and remaining work — with screenshots from the running surfaces.",
+  t1c1:"Public home (AR)", t1c2:"Publications catalogue", t1c3:"Editorial dashboard", t1c4:"News queue",
   t1s1:"Products", t1s2:"Content types", t1s3:"Staff roles", t1s4:"UI language keys",
   t1m:"Center for Research in Islamic Sciences and Civilization · Laghouat · crsic.dz",
-  t2k:"Contents", t2t:"Briefing map", t2d:"Eighteen slides. Navigate with arrows or Space. Language: EN / ع.",
-  t2a1t:"Context & change", t2a1d:"Mandate, before/after, cutover scope",
-  t2a2t:"Architecture", t2a2d:"Public site + desk, publish path",
-  t2a3t:"Public experience", t2a3d:"Pages, catalogues, bilingual UI",
-  t2a4t:"Inventory", t2a4d:"Live counts and external links",
-  t2a5t:"Editorial governance", t2a5d:"Workflow, roles, queues",
-  t2a6t:"Safeguards & roadmap", t2a6d:"Controls, open items, position today",
+  t2k:"Contents", t2t:"Briefing map", t2d:"Eighteen slides. Navigate with arrows or Space. Switch language EN / ع at any time. Footer shows section name and position.",
+  t2a1t:"Context & change", t2a1d:"Mandate, before/after cutover, institutional channel",
+  t2a2t:"Architecture", t2a2d:"Public SPA + desk, publish path, static JSON snapshots",
+  t2a3t:"Public experience", t2a3d:"Site map, home anatomy, catalogues, About / research / journals",
+  t2a4t:"Language & inventory", t2a4d:"Arabic-first policy, live counts, bar chart, external links",
+  t2a5t:"Editorial governance", t2a5d:"Workflow, roles, desks, queues, operational tools",
+  t2a6t:"Safeguards & open items", t2a6d:"Controls in force, remaining work, position today",
+  t2f1:"Home", t2f2:"News", t2f3:"Desk login", t2f4:"Desks",
   t3k:"Institution", t3t:"Why a digital presence exists",
-  t3a_t:"Public scientific centre", t3a_d:"CRSIC is a public scientific and technological research centre under Algeria’s Ministry of Higher Education and Scientific Research. Founded by executive decree 15-136 (23 May 2015); opened January 2016, Laghouat.",
-  t3b_t:"Public channel", t3b_d:"Present the centre, research departments, publications, journals, events, partnerships, news, and contact paths to researchers, partners, and the public.",
-  t3c_t:"Controlled publishing", t3c_d:"Staff publish through roles and review — not by editing live WordPress or raw production files by hand.",
+  t3a_t:"Public scientific centre",
+  t3a_d:"CRSIC is a public scientific and technological research centre under Algeria’s Ministry of Higher Education and Scientific Research. Founded by executive decree 15-136 (23 May 2015); opened January 2016 in Laghouat. The site is the primary public channel for research departments, publications, journals, events, partnerships, news, and contact.",
+  t3b_t:"Public channel", t3b1:"Present centre identity and ministry positioning", t3b2:"Expose catalogues: news, events, publications, partners", t3b3:"Link research groups/projects and institutional hubs", t3b4:"Route journals to OJS; library to OPAC",
+  t3c_t:"Controlled publishing", t3c1a:"Staff publish through roles and review queues", t3c2a:"No live WordPress or hand-edited production JSON", t3c3a:"Four-eyes on approve / publish", t3c4a:"Manual go-live only — no scheduled auto-publish",
   t3c1:"Arabic-first (RTL)", t3c2:"English chrome when selected", t3c3:"Four-eyes publish", t3c4:"Manual go-live only",
-  t3cap:"Public home — hero, ministry positioning, research departments",
-  t4k:"Transition", t4t:"What changed in practice", t4d:"Owned content types have already cut over. Journals remain on Open Journal Systems by design.",
-  t4b:"Before", t4bt:"WordPress + informal edits", t4b1:"Unclear ownership of who could change live pages", t4b2:"Risk of direct production edits without review", t4b3:"Harder to attribute who published what, when", t4b4:"Public runtime tied to a heavier CMS stack",
-  t4a:"Now", t4at:"Static public site + editorial desk", t4a1:"Desks assign exclusive ownership by type / org unit", t4a2:"Draft → submit → review → manual publish", t4a3:"Author cannot approve their own item (four-eyes)", t4a4:"Visitors load static pages; desk writes approved snapshots",
+  t3cap1:"About — mission, vision, director narrative", t3cap2:"Public home — hero, departments, catalogues entry",
+  t4k:"Transition", t4t:"What changed in practice",
+  t4d:"Owned content types have already cut over from WordPress. Journals remain on Open Journal Systems by design and are linked, not authored, in the desk.",
+  t4b:"Before", t4bt:"WordPress + informal edits",
+  t4b1:"Unclear ownership of who could change live pages", t4b2:"Risk of direct production edits without review", t4b3:"Harder to attribute who published what, when", t4b4:"Public runtime tied to a heavier CMS stack", t4b5:"No exclusive desks by content type or org unit",
+  t4a:"Now", t4at:"Static public site + editorial desk",
+  t4a1:"Desks assign exclusive ownership by type / org unit", t4a2:"Draft → submit → review → manual publish", t4a3:"Author cannot approve their own item (four-eyes)", t4a4:"Visitors load static pages; desk writes approved snapshots", t4a5:"Audit log and recycle instead of opaque hard deletes",
+  t4cap:"Live public home after cutover — static SPA shell + JSON content",
   t4n:"Cutover scope: news, events, publications, partners, research groups/projects, laws, platforms, alerts, director, featured playlist, site pages. Out of desk: journals (OJS).",
-  t5k:"Architecture", t5t:"Two surfaces, one publish path", t5d:"Visitors never run the editorial system. Staff never hand-edit the live public files.",
-  t5a_t:"1 · Public website", t5a1:"Single-page shell with hash routes (#home, #news, #publications…)", t5a2:"Content from JSON files (local /data or optional CDN base URL)", t5a3:"Zero build for visitors — browser loads modules directly", t5a4:"Deployable on Vercel, Netlify, or Apache static hosting", t5a5:"Contact opens mailto:contact@crsic.dz — no public form backend", t5a6:"Soft-fail: if one JSON file fails, other sections still render",
-  t5b_t:"2 · Editorial desk", t5b1:"Internal Next.js app + PostgreSQL for drafts and workflow", t5b2:"On Publish: builds public object, stores live payload, rebuilds matching data/*.json", t5b3:"Unpublish clears live payload and rebuilds without that item", t5b4:"“Create revision” returns to draft while public copy stays live", t5b5:"Media published under img/cms/… (tracked for consistent clones)", t5b6:"Preview tokens for candidate payloads before go-live",
+  t5k:"Architecture", t5t:"Two surfaces, one publish path",
+  t5d:"Visitors never run the editorial system. Staff never hand-edit the live public files. Publish rebuilds matching data/*.json with backup/rename safety.",
+  t5f1t:"Editor draft", t5f1d:"Desk + Postgres", t5f2t:"Submit / review", t5f2d:"Four-eyes gate", t5f3t:"Manual publish", t5f3d:"live_payload + rebuild", t5f4t:"Public SPA", t5f4d:"data/*.json · hash routes",
+  t5a_t:"1 · Public website",
+  t5a1:"Single-page shell with hash routes (#home, #news, #publications…)", t5a2:"Content from JSON files (local /data or optional CDN base URL)", t5a3:"Zero build for visitors — browser loads ES modules directly", t5a4:"Deployable on Vercel, Netlify, or Apache static hosting", t5a5:"Contact opens mailto:contact@crsic.dz — no public form backend", t5a6:"Soft-fail: if one JSON file fails, other sections still render",
+  t5b_t:"2 · Editorial desk",
+  t5b1:"Internal Next.js app + PostgreSQL for drafts and workflow", t5b2:"On Publish: builds public object, stores live payload, rebuilds matching data/*.json", t5b3:"Unpublish clears live payload and rebuilds without that item", t5b4:"“Create revision” returns to draft while public copy stays live", t5b5:"Media published under img/cms/… (tracked for consistent clones)", t5b6:"Preview tokens for candidate payloads before go-live",
   t6k:"Public site · map", t6t:"Pages visitors can open",
   t6_1t:"Home", t6_1d:"Hero video, stats, 4 departments, pubs strip, featured news, Center News pager, events teaser",
   t6_2t:"News", t6_2d:"Full archive, search, year filters, detail #news/{slug}, bylines",
@@ -678,107 +874,139 @@ en: {
   t6_6t:"Partners", t6_6d:"National / international cooperation with narrative detail",
   t6_7t:"Laws & platforms", t6_7d:"Institutional hubs + #law/{slug} and #platform/{slug}",
   t6_8t:"About · Org · Contact", t6_8d:"Mission/vision/director, org chart, contact + optional CMS site-pages overlay",
+  t6cap1:"Research — four department tabs", t6cap2:"Journals — cards link out to OJS",
   t6n:"Also: #journals (cards → OJS), mobile drawer + bottom bar, site alert banner, language suggestion banner, accessibility skip link.",
   t7k:"Public site · home", t7t:"First screen, section by section",
-  t7_1t:"Hero", t7_1d:"Looping video, centre positioning, CTAs to publications and about.",
-  t7_2t:"Stats strip", t7_2d:"Founding year, researchers, departments, publications — deep-links into site sections.",
-  t7_3t:"Research departments", t7_3d:"Four cards into #research tabs r1–r4.",
-  t7_4t:"Latest publications", t7_4d:"Grid on desktop; horizontal scroll-snap on phone.",
-  t7_5t:"News & events", t7_5d:"Featured playlist (max 10), Center News 3-per-page autoplay, 3 newest events.",
-  t7cap:"Home in English (LTR) — same structure, flipped chrome",
+  t7_1t:"Hero", t7_1d:"Looping video, centre positioning under the ministry, CTAs to publications and about.",
+  t7_2t:"Stats strip", t7_2d:"Founding year, researchers, departments, publications — each deep-links into a site section.",
+  t7_3t:"Research departments", t7_3d:"Four cards into #research tabs r1–r4 with department names and entry points.",
+  t7_4t:"Latest publications", t7_4d:"Cover grid on desktop; horizontal scroll-snap on phone for the same strip.",
+  t7_5t:"News & events", t7_5d:"Featured playlist (max 10), Center News 3-per-page autoplay carousel, 3 newest events teaser.",
+  t7cap1:"Home in English (LTR) — same structure, flipped chrome", t7cap2:"Home in Arabic (RTL) — default locale",
   t8k:"Public site · catalogues", t8t:"Browse, filter, open detail",
   t8c1:"Publications — search · all / collective / individual · cover grid",
   t8c2:"News — search · year chips · cards with date & byline",
   t8c3:"Events — international / national · date blocks · status",
-  t8x_t:"Detail routes", t8x_d:"Each detail updates page title and social meta for that item.",
-  t9k:"Language policy", t9t:"Arabic-first, English when ready",
-  t9a_t:"Interface (chrome)", t9a1:"Default: Arabic, dir=rtl, lang=ar", t9a2:"English flips UI to LTR", t9a3:"Preference via ?lang= and localStorage", t9a4:"350 keys in ar.json and en.json — sets must stay in sync", t9a5:"Optional banner if browser prefers EN or FR",
-  t9b_t:"Editorial bodies", t9b1:"Arabic is the publish baseline", t9b2:"EN fields (title/summary/body) show publicly only when en_status = ready", t9b3:"Per-field fallback to Arabic if EN missing", t9b4:"Desk tracks “English pending” separately from publish status", t9b5:"Journals remain Arabic / OJS-linked",
-  t9n:"Desk chrome also supports AR RTL / EN LTR via cms_lang cookie — staff can work in either direction.",
-  t10k:"Inventory", t10t:"What is already public", t10d:"Approximate counts from public JSON after WordPress cutover of owned types.",
-  t10s1:"News", t10s2:"Events", t10s3:"Publications", t10s4:"Partners",
-  t10h1:"Resource", t10h2:"Count", t10h3:"Detail",
-  t10r1a:"Events breakdown", t10r1c:"International + national",
-  t10r2a:"Research groups / projects", t10r2c:"Four research departments",
-  t10r3a:"Laws / platforms", t10r3c:"Hubs with slug details",
-  t10r4a:"Journals", t10r4c:"All link to crsic.dz/ojsre/ (OJS)",
-  t10r5a:"UI locale keys", t10r5c:"AR + EN matched key sets",
-  t10r6a:"Featured playlist", t10r6c:"Empty → fallback 3 newest news",
-  t11k:"Connections", t11t:"Services linked from the site",
-  t11_1t:"Open Journal Systems", t11_1d:"Scientific journals — not authored in the desk. Cards and footer point to https://crsic.dz/ojsre/",
-  t11_2t:"Digital library", t11_2d:"OPAC at crsic.dz/bib/opac_css/ — also reachable from publication lightbox CTA.",
-  t11_3t:"Contact", t11_3d:"mailto:contact@crsic.dz · phone +213 29 14 61 90 · webmail :2096",
-  t11_4t:"Maps", t11_4d:"Google Maps search from the contact page for Laghouat location.",
-  t11_5t:"Social", t11_5d:"Facebook, X, LinkedIn in the footer for institutional channels.",
-  t11_6t:"Site pages overlay", t11_6d:"Optional CMS publish of About / org / contact / cooperation bodies; locales remain fallback until first publish.",
-  t12k:"Editorial desk · workflow", t12t:"How an item becomes public", t12d:"Statuses: draft → submitted → approved → published. Side paths: changes_requested, rejected, unpublished.",
-  t12_1t:"Draft", t12_1d:"Editor on assigned types; Arabic required; media upload; EN optional",
-  t12_2t:"Submit", t12_2d:"Enters review queue; withdraw possible before approval",
-  t12_3t:"Decide", t12_3d:"Request changes / approve / reject — author cannot self-approve",
-  t12_4t:"Publish", t12_4d:"Manual only; rebuilds public JSON; revision keeps live copy",
-  t12_5t:"Live-safe revision", t12_5d:"“Create revision (public stays live)” returns a published item to draft while live_payload remains until the next publish.",
-  t12_6t:"Emergency path", t12_6d:"Super Admin may emergency-publish with audit trail and post-review flag — exceptional, not routine.",
-  t13k:"Editorial desk · roles", t13t:"Who can do what",
-  t13_1p:"Oversight", t13_1t:"Super Admin", t13_1d:"Users, desks, org units, audit, import/export, recycle, all types. Password resets. Emergency publish.",
-  t13_2p:"Gate", t13_2t:"Reviewer", t13_2d:"Approve / request changes / reject / publish / unpublish in exclusive org scope. Cannot manage users.",
-  t13_3p:"Author", t13_3t:"Editor", t13_3d:"Create/edit own items in assigned content types only. Submit and revise. Cannot approve or publish alone.",
-  t13_4t:"Desks (ownership model)", t13_4a:"Editors: globally exclusive content types (or per research department)", t13_4b:"Reviewers: exclusive organisation claims", t13_4c:"Align authorship after desk changes so Editors can open owned items",
-  t13cap:"Desk sign-in — institutional email; session idle timeout 30 minutes",
-  t14k:"Editorial desk · interface", t14t:"Queues and lists in daily use",
-  t14c1:"Dashboard — drafts · awaiting review · published · English pending · content by editor",
-  t14c2:"News list — status · EN readiness · sort · duplicate · filter · bulk select",
-  t15k:"Editorial desk · capabilities", t15t:"Operational tools already available",
-  t15_1t:"Featured playlist", t15_1d:"Order up to 10 news ids for home spotlight. News Editor + SA + Reviewer edit draft; only Reviewer/SA publish the playlist.",
-  t15_2t:"Media library", t15_2d:"JPEG/PNG/WebP/PDF, max 5 MB, magic-byte check. Scoped by role. Cover crop / img_card for publications.",
-  t15_3t:"Recycle bin", t15_3d:"Soft-delete; restore to draft. Editors: own draft/rejected. SA: unpublished/rejected. Stale after 90 days.",
-  t15_4t:"Clone", t15_4d:"Duplicate → new draft (title suffix copy). From edit page and bulk for Reviewer/SA.",
-  t15_5t:"Import / Export", t15_5d:"SA zip of desk records + files. Export selected. Import always creates new drafts — never live.",
-  t15_6t:"Audit & revisions", t15_6d:"Append-only audit log. Revision history with restore to editable draft (Reviewer/SA).",
-  t15_7t:"Notifications", t15_7d:"In-app only — no SMTP for alerts or password recovery.",
-  t15_8t:"Preview", t15_8d:"In-form public card preview + short-lived tokens for SPA #preview/{token}.",
-  t15_9t:"Lists UX", t15_9d:"Load more (20), header sort this visit, bulk unpublish/recycle with skip report.",
-  t16k:"Safeguards", t16t:"Controls in force",
-  t16_a_t:"Access & integrity", t16_a1:"Encrypted iron-session cookies; Secure in production; SameSite=lax", t16_a2:"Password hashing (bcrypt); SESSION_SECRET ≥ 32 chars", t16_a3:"30-minute idle timeout with activity touch", t16_a4:"Role + org + content-type checks on every action", t16_a5:"Four-eyes on review/publish; deactivated users cannot log in", t16_a6:"Public site: no login surface; DOM built without raw innerHTML for content",
-  t16_b_t:"Release & recovery", t16_b1:"Written product decision (PRD) before feature coding", t16_b2:"~5 minute smoke checklist before merge to live line", t16_b3:"Publish rebuild with .bak / temp / rename; rollback on failure", t16_b4:"Recycle instead of hard delete; media DELETE blocked if still referenced", t16_b5:"Import never lands as published", t16_b6:"WordPress cutover for owned types already applied on main",
-  t17k:"Open items", t17t:"Status of known remaining work",
-  t17_1b:"In progress", t17_1t:"WebP + remaining EN-when-ready", t17_1d:"Faster image delivery; English visibility for remaining types when marked ready. Does not block Arabic publication.",
-  t17_2b:"Deferred", t17_2t:"Journals inside the desk", t17_2d:"Remain on OJS. No desk journals work unless a new written decision opens that slice.",
-  t17_3b:"Closed", t17_3t:"Scheduled auto-publish", t17_3d:"Cancelled. Rule remains Approve → Publish by a human.",
-  t17_4b:"Optional later", t17_4t:"Possible extensions", t17_4d:"Visitor statistics, translator role, staff SSO — only if prioritised as a new decision.",
-  t17n:"Remaining work is limited polish under existing decisions — not a rebuild of the public site or the desk.",
-  t18k:"Closing", t18t:"Position today",
-  t18d:"A live public website and a live editorial desk: desks, four-eyes review, audited manual publish, bilingual chrome, and WordPress cutover complete for owned types.",
-  t18_a_t:"In place", t18_a_d:"Public site · desk · cutover · inventory · audit · featured playlist · recycle · I/E",
+  t8x_t:"Detail routes", t8x_d:"Each detail updates document title and social meta for that item. Soft-fail keeps sibling catalogues usable if one JSON payload fails.",
+  t9k:"Public site · institutional pages", t9t:"About, research, journals",
+  t9d:"Three complementary surfaces: narrative identity, department research structure, and OJS-linked journals (not authored in the desk).",
+  t9c1:"About — mission, vision, values, director word; optional CMS site-pages overlay",
+  t9c2:"Research — 4 department tabs, groups & projects with #research-group/{slug}",
+  t9c3:"Journals — 4 cards → https://crsic.dz/ojsre/ (Open Journal Systems)",
+  t9b1t:"About / org / contact", t9b1d:"Locales provide fallback copy until desk publishes site-pages bodies for About, organisation chart, contact, and cooperation.",
+  t9b2t:"Research inventory", t9b2d:"Eight research groups and one project across four departments, each with slug detail routes.",
+  t9b3t:"Journals boundary", t9b3d:"Editorial workflow for articles stays in OJS. The public site only presents cards and footer links.",
+  t10k:"Language policy", t10t:"Arabic-first, English when ready",
+  t10a_t:"Interface (chrome)",
+  t10a1:"Default: Arabic, dir=rtl, lang=ar", t10a2:"English flips UI chrome to LTR", t10a3:"Preference via ?lang= and localStorage.crsic_lang", t10a4:"350 keys in ar.json and en.json — key sets must stay in sync", t10a5:"Optional banner if browser prefers EN or FR", t10a6:"Desk chrome: AR RTL / EN LTR via cms_lang cookie",
+  t10b_t:"Editorial bodies",
+  t10b1:"Arabic is the publish baseline for every owned type", t10b2:"EN title/summary/body show publicly only when en_status = ready", t10b3:"Per-field fallback to Arabic if an EN field is missing", t10b4:"Desk tracks “English pending” separately from publish status", t10b5:"EN bodies of editorial content may remain Arabic-only until marked ready", t10b6:"Journals remain Arabic / OJS-linked outside this policy",
+  t10cap:"Same home structure with English chrome (LTR)",
+  t10n:"Publishing in Arabic is never blocked by missing English. English visibility is an explicit readiness flag, not automatic translation.",
+  t11k:"Inventory", t11t:"What is already public",
+  t11d:"Approximate counts from public JSON after WordPress cutover of owned types. Bars are relative to the largest catalogue (events = 55).",
+  t11s1:"News", t11s2:"Events", t11s3:"Publications", t11s4:"Partners", t11bt:"Relative catalogue size",
+  t11h1:"Resource", t11h2:"Count", t11h3:"Detail",
+  t11r1a:"Events breakdown", t11r1c:"International + national",
+  t11r2a:"Research groups / projects", t11r2c:"Four research departments",
+  t11r3a:"Laws / platforms", t11r3c:"Hubs with slug details",
+  t11r4a:"Journals", t11r4c:"All link to crsic.dz/ojsre/ (OJS)",
+  t11r5a:"UI locale keys", t11r5c:"AR + EN matched key sets",
+  t11r6a:"Featured playlist", t11r6c:"Empty → fallback 3 newest news",
+  t11f1:"Events (55)", t11f2:"News (39)", t11f3:"Publications (36)",
+  t12k:"Connections", t12t:"Services linked from the site",
+  t12_1t:"Open Journal Systems", t12_1d:"Scientific journals — not authored in the desk. Cards and footer point to https://crsic.dz/ojsre/",
+  t12_2t:"Digital library", t12_2d:"OPAC at crsic.dz/bib/opac_css/ — also reachable from publication lightbox CTA.",
+  t12_3t:"Contact", t12_3d:"mailto:contact@crsic.dz · phone +213 29 14 61 90 · webmail :2096",
+  t12_4t:"Maps", t12_4d:"Google Maps search from the contact page for Laghouat location.",
+  t12_5t:"Social", t12_5d:"Facebook, X, LinkedIn in the footer for institutional channels.",
+  t12_6t:"Site pages overlay", t12_6d:"Optional CMS publish of About / org / contact / cooperation bodies; locales remain fallback until first publish.",
+  t12cap1:"Journals → OJS", t12cap2:"About / contact narrative",
+  t13k:"Editorial desk · workflow", t13t:"How an item becomes public",
+  t13d:"Statuses: draft → submitted → approved → published. Side paths: changes_requested, rejected, unpublished. Publish is always a deliberate human action.",
+  t13_1t:"Draft", t13_1d:"Editor on assigned types; Arabic required; media upload; EN optional",
+  t13_2t:"Submit", t13_2d:"Enters review queue; withdraw possible before approval",
+  t13_3t:"Decide", t13_3d:"Request changes / approve / reject — author cannot self-approve",
+  t13_4t:"Publish", t13_4d:"Manual only; rebuilds public JSON; revision keeps live copy",
+  t13_5t:"Live-safe revision", t13_5d:"“Create revision (public stays live)” returns a published item to draft while live_payload remains until the next publish. Visitors keep seeing the previous approved snapshot.",
+  t13_6t:"Emergency path", t13_6d:"Super Admin may emergency-publish with audit trail and post-review flag — exceptional, not routine, and still recorded.",
+  t13cap:"Desk sign-in — institutional email; idle timeout 30 minutes",
+  t14k:"Editorial desk · roles", t14t:"Who can do what",
+  t14_1p:"Oversight", t14_1t:"Super Admin", t14_1d:"Users, desks, org units, audit, import/export, recycle, all types. Password resets. Emergency publish.",
+  t14_2p:"Gate", t14_2t:"Reviewer", t14_2d:"Approve / request changes / reject / publish / unpublish in exclusive org scope. Cannot manage users.",
+  t14_3p:"Author", t14_3t:"Editor", t14_3d:"Create/edit own items in assigned content types only. Submit and revise. Cannot approve or publish alone.",
+  t14_4t:"Desks (ownership model)",
+  t14_4a:"Editors: globally exclusive content types (or per research department)", t14_4b:"Reviewers: exclusive organisation claims — one reviewer gate per org scope", t14_4c:"Align authorship after desk changes so Editors can open owned items", t14_4d:"Assignable publisher and JSON rebuild stay tied to desk SSOT", t14_4e:"Four-eyes: the author of an item cannot approve that same item",
+  t14cap:"Desks administration — exclusive type / org claims",
+  t15k:"Editorial desk · interface", t15t:"Queues and lists in daily use",
+  t15d:"Dashboard aggregates drafts, awaiting review, published, and English-pending. Type lists support status filters, EN readiness, header sort (this visit), duplicate, and bulk select.",
+  t15c1:"Dashboard — drafts · awaiting review · published · English pending · content by editor",
+  t15c2:"News list — status · EN readiness · sort · duplicate · filter · bulk select",
+  t15f1:"Login", t15f2:"Desks", t15f3:"Dashboard", t15f4:"Type list",
+  t16k:"Editorial desk · capabilities", t16t:"Operational tools already available",
+  t16_1t:"Featured playlist", t16_1d:"Order up to 10 news ids for home spotlight. News Editor + SA + Reviewer edit draft; only Reviewer/SA publish the playlist.",
+  t16_2t:"Media library", t16_2d:"JPEG/PNG/WebP/PDF, max 5 MB, magic-byte check. Scoped by role. Cover crop / img_card for publications.",
+  t16_3t:"Recycle bin", t16_3d:"Soft-delete; restore to draft. Editors: own draft/rejected. SA: unpublished/rejected. Stale after 90 days.",
+  t16_4t:"Clone", t16_4d:"Duplicate → new draft (title suffix copy). From edit page and bulk for Reviewer/SA.",
+  t16_5t:"Import / Export", t16_5d:"SA zip of desk records + files. Export selected. Import always creates new drafts — never live.",
+  t16_6t:"Audit & revisions", t16_6d:"Append-only audit log. Revision history with restore to editable draft (Reviewer/SA).",
+  t16_7t:"Notifications", t16_7d:"In-app only — no SMTP for alerts or password recovery.",
+  t16_8t:"Preview", t16_8d:"In-form public card preview + short-lived tokens for SPA #preview/{token}.",
+  t16_9t:"Lists UX", t16_9d:"Load more (20), header sort this visit, bulk unpublish/recycle with skip report.",
+  t17k:"Safeguards", t17t:"Controls in force",
+  t17_a_t:"Access & integrity",
+  t17_a1:"Encrypted iron-session cookies; Secure in production; SameSite=lax", t17_a2:"Password hashing (bcrypt); SESSION_SECRET ≥ 32 chars", t17_a3:"30-minute idle timeout with activity touch", t17_a4:"Role + org + content-type checks on every action", t17_a5:"Four-eyes on review/publish; deactivated users cannot log in", t17_a6:"Public site: no login surface; DOM built without raw innerHTML for content",
+  t17_b_t:"Release & recovery",
+  t17_b1:"Written product decision (PRD) before feature coding", t17_b2:"~5 minute smoke checklist before merge to live line", t17_b3:"Publish rebuild with .bak / temp / rename; rollback on failure", t17_b4:"Recycle instead of hard delete; media DELETE blocked if still referenced", t17_b5:"Import never lands as published", t17_b6:"WordPress cutover for owned types already applied on main",
+  t17cap:"Desk queues — visibility into drafts, review, and published stock",
+  t18k:"Open items & closing", t18t:"Remaining work and position today",
+  t18_1b:"In progress", t18_1t:"WebP + remaining EN-when-ready", t18_1d:"Faster image delivery; English visibility for remaining types when marked ready. Does not block Arabic publication.",
+  t18_2b:"Deferred", t18_2t:"Journals inside the desk", t18_2d:"Remain on OJS. No desk journals work unless a new written decision opens that slice.",
+  t18_3b:"Closed", t18_3t:"Scheduled auto-publish", t18_3d:"Cancelled. Rule remains Approve → Publish by a human.",
+  t18_4b:"Optional later", t18_4t:"Possible extensions", t18_4d:"Visitor statistics, translator role, staff SSO — only if prioritised as a new decision.",
+  t18_a_t:"In place", t18_a_d:"Public site · desk · cutover · inventory · audit · featured playlist · recycle · I/E · desks · four-eyes",
   t18_b_t:"Under way", t18_b_d:"WebP delivery · remaining English-when-ready coverage",
   t18_c_t:"Next choice", t18_c_d:"Whether any new slice is opened beyond the current pack",
-  t18m:"CRSIC · Laghouat · crsic.dz · End of briefing",
+  t18f1:"Public home", t18f2:"Desk queues", t18f3:"Research", t18f4:"Desks",
+  t18m:"CRSIC · Laghouat · crsic.dz · End of briefing — remaining work is limited polish under existing decisions, not a rebuild.",
   nav_prev:"Previous", nav_next:"Next", nav_hint:" · ← → Space"
 },
 ar: {
   t1k:"CRSIC 2026 · الحضور الرقمي", t1t:"الموقع المؤسسي ومكتب التحرير",
-  t1d:"إحاطة واقعية بما هو حي اليوم: الموقع العام العربي أولاً، مكتب المحتوى الداخلي، حوكمة النشر، الجرد، الضوابط، والعمل المتبقي — مع لقطات من الأنظمة قيد التشغيل.",
+  t1d:"إحاطة واقعية بالأنظمة قيد التشغيل: الموقع العام العربي أولاً، مكتب التحرير الداخلي، حوكمة النشر، الجرد الحي، الضوابط، والعمل المتبقي — مع لقطات من السطوح العاملة.",
+  t1c1:"الرئيسية العامة (ع)", t1c2:"كتالوج المنشورات", t1c3:"لوحة التحرير", t1c4:"طابور الأخبار",
   t1s1:"منتجان", t1s2:"أنواع محتوى", t1s3:"أدوار الفريق", t1s4:"مفاتيح واجهة اللغة",
   t1m:"مركز البحث في العلوم الإسلامية والحضارة · الأغواط · crsic.dz",
-  t2k:"المحتويات", t2t:"خريطة الإحاطة", t2d:"ثمانية عشر شريحة. التنقل بالأسهم أو المسافة. اللغة: EN / ع.",
-  t2a1t:"السياق والتغيير", t2a1d:"المهمة، قبل/بعد، نطاق الانتقال",
-  t2a2t:"البنية", t2a2d:"الموقع العام + المكتب، مسار النشر",
-  t2a3t:"تجربة الجمهور", t2a3d:"الصفحات، الكتالوجات، الواجهة ثنائية اللغة",
-  t2a4t:"الجرد", t2a4d:"الأعداد الحية والروابط الخارجية",
-  t2a5t:"حوكمة التحرير", t2a5d:"سير العمل، الأدوار، الطوابير",
-  t2a6t:"الضوابط والمسار", t2a6d:"الضوابط، البنود المفتوحة، الوضع اليوم",
+  t2k:"المحتويات", t2t:"خريطة الإحاطة", t2d:"ثمانية عشر شريحة. التنقل بالأسهم أو المسافة. تبديل اللغة EN / ع في أي وقت. التذييل يعرض اسم القسم والموضع.",
+  t2a1t:"السياق والتغيير", t2a1d:"المهمة، قبل/بعد الانتقال، القناة المؤسسية",
+  t2a2t:"البنية", t2a2d:"الموقع العام + المكتب، مسار النشر، لقطات JSON ثابتة",
+  t2a3t:"تجربة الجمهور", t2a3d:"خريطة الموقع، تشريح الرئيسية، الكتالوجات، عن/بحث/مجلات",
+  t2a4t:"اللغة والجرد", t2a4d:"سياسة عربي أولاً، الأعداد الحية، رسم بياني، روابط خارجية",
+  t2a5t:"حوكمة التحرير", t2a5d:"سير العمل، الأدوار، المكاتب، الطوابير، الأدوات",
+  t2a6t:"الضوابط والبنود المفتوحة", t2a6d:"الضوابط النافذة، العمل المتبقي، الوضع اليوم",
+  t2f1:"الرئيسية", t2f2:"الأخبار", t2f3:"دخول المكتب", t2f4:"المكاتب",
   t3k:"المؤسسة", t3t:"لماذا يوجد حضور رقمي",
-  t3a_t:"مركز بحث عمومي", t3a_d:"CRSIC مركز بحث علمي وتكنولوجي عمومي تحت وزارة التعليم العالي والبحث العلمي. تأسس بالمرسوم التنفيذي 15-136 (23 مايو 2015)؛ افتتح يناير 2016 بالأغواط.",
-  t3b_t:"قناة عامة", t3b_d:"تقديم المركز وأقسام البحث والمنشورات والمجلات والفعاليات والشراكات والأخبار وقنوات الاتصال للباحثين والشركاء والجمهور.",
-  t3c_t:"نشر مضبوط", t3c_d:"ينشر الفريق عبر الأدوار والمراجعة — لا بتعديل ووردبريس الحي أو ملفات الإنتاج يدوياً.",
+  t3a_t:"مركز بحث عمومي",
+  t3a_d:"CRSIC مركز بحث علمي وتكنولوجي عمومي تحت وزارة التعليم العالي والبحث العلمي. تأسس بالمرسوم التنفيذي 15-136 (23 مايو 2015)؛ افتتح يناير 2016 بالأغواط. الموقع هو القناة العامة الأساسية لأقسام البحث والمنشورات والمجلات والفعاليات والشراكات والأخبار والاتصال.",
+  t3b_t:"قناة عامة", t3b1:"تقديم هوية المركز والتموضع الوزاري", t3b2:"عرض الكتالوجات: أخبار، فعاليات، منشورات، شركاء", t3b3:"ربط فرق/مشاريع البحث والمراكز المؤسسية", t3b4:"توجيه المجلات إلى OJS والمكتبة إلى OPAC",
+  t3c_t:"نشر مضبوط", t3c1a:"ينشر الفريق عبر الأدوار وطوابير المراجعة", t3c2a:"لا ووردبريس حي ولا تعديل JSON الإنتاج يدوياً", t3c3a:"أربعة أعين في الموافقة / النشر", t3c4a:"إطلاق يدوي فقط — بلا نشر آلي مجدول",
   t3c1:"عربي أولاً (RTL)", t3c2:"واجهة إنجليزية عند الاختيار", t3c3:"نشر بأربعة أعين", t3c4:"إطلاق يدوي فقط",
-  t3cap:"الرئيسية العامة — البطل، التموضع الوزاري، أقسام البحث",
-  t4k:"الانتقال", t4t:"ماذا تغيّر عملياً", t4d:"أنواع المحتوى المملوكة انتقلت. المجلات تبقى على نظام المجلات المفتوحة عن قصد.",
-  t4b:"قبل", t4bt:"ووردبريس + تعديلات غير رسمية", t4b1:"غموض حول من يغيّر الصفحات الحية", t4b2:"خطر تعديل الإنتاج مباشرة بلا مراجعة", t4b3:"صعوبة نسب من نشر ماذا ومتى", t4b4:"تشغيل عام مرتبط بنظام محتوى أثقل",
-  t4a:"الآن", t4at:"موقع ثابت + مكتب تحرير", t4a1:"المكاتب تمنح ملكية حصرية حسب النوع / الوحدة", t4a2:"مسودة ← إرسال ← مراجعة ← نشر يدوي", t4a3:"المؤلف لا يوافق على عمله (أربعة أعين)", t4a4:"الزائر يحمّل صفحات ثابتة؛ المكتب يكتب اللقطات المعتمدة",
+  t3cap1:"عن المركز — المهمة والرؤية وكلمة المدير", t3cap2:"الرئيسية العامة — البطل والأقسام ومدخل الكتالوجات",
+  t4k:"الانتقال", t4t:"ماذا تغيّر عملياً",
+  t4d:"أنواع المحتوى المملوكة انتقلت من ووردبريس. المجلات تبقى على نظام المجلات المفتوحة عن قصد وتُربَط من المكتب دون تأليف داخله.",
+  t4b:"قبل", t4bt:"ووردبريس + تعديلات غير رسمية",
+  t4b1:"غموض حول من يغيّر الصفحات الحية", t4b2:"خطر تعديل الإنتاج مباشرة بلا مراجعة", t4b3:"صعوبة نسب من نشر ماذا ومتى", t4b4:"تشغيل عام مرتبط بنظام محتوى أثقل", t4b5:"لا مكاتب حصرية حسب نوع المحتوى أو الوحدة",
+  t4a:"الآن", t4at:"موقع ثابت + مكتب تحرير",
+  t4a1:"المكاتب تمنح ملكية حصرية حسب النوع / الوحدة", t4a2:"مسودة ← إرسال ← مراجعة ← نشر يدوي", t4a3:"المؤلف لا يوافق على عمله (أربعة أعين)", t4a4:"الزائر يحمّل صفحات ثابتة؛ المكتب يكتب اللقطات المعتمدة", t4a5:"سجل تدقيق واستعادة بدل حذف نهائي غامض",
+  t4cap:"الرئيسية العامة بعد الانتقال — هيكل SPA ثابت + محتوى JSON",
   t4n:"نطاق الانتقال: أخبار، فعاليات، منشورات، شركاء، فرق/مشاريع بحث، قوانين، منصات، تنبيهات، كلمة المدير، القائمة المميزة، صفحات الموقع. خارج المكتب: المجلات (OJS).",
-  t5k:"البنية", t5t:"سطحان ومسار نشر واحد", t5d:"الزائر لا يشغّل نظام التحرير. والفريق لا يعدّل ملفات الموقع الحي يدوياً.",
-  t5a_t:"1 · الموقع العام", t5a1:"هيكل صفحة واحدةحدة بمسارات هاش (#home، #news، #publications…)", t5a2:"المحتوى من ملفات JSON (محلي /data أو CDN اختياري)", t5a3:"بلا بناء للزائر — المتصفح يحمّل الوحدات مباشرة", t5a4:"قابل للنشر على Vercel أو Netlify أو Apache", t5a5:"الاتصال يفتح mailto:contact@crsic.dz — بلا خادم نماذج عام", t5a6:"فشل مرن: إن فشل ملف JSON واحد تبقى الأقسام الأخرى",
-  t5b_t:"2 · مكتب التحرير", t5b1:"تطبيق Next.js داخلي + PostgreSQL للمسودات وسير العمل", t5b2:"عند النشر: بناء كائن عام، تخزين الحمولة الحية، إعادة بناء data/*.json", t5b3:"إلغاء النشر يمسح الحمولة الحية ويعيد البناء بدون العنصر", t5b4:"«إنشاء مراجعة» يعيد للمسودة والنسخة العامة تبقى حية", t5b5:"الوسائط تحت img/cms/… (متتبَّعة لنسخ متسقة)", t5b6:"رموز معاينة لحمولات مرشّحة قبل الإطلاق",
+  t5k:"البنية", t5t:"سطحان ومسار نشر واحد",
+  t5d:"الزائر لا يشغّل نظام التحرير. والفريق لا يعدّل ملفات الموقع الحي يدوياً. النشر يعيد بناء data/*.json مع سلامة النسخ الاحتياطي وإعادة التسمية.",
+  t5f1t:"مسودة المحرر", t5f1d:"المكتب + Postgres", t5f2t:"إرسال / مراجعة", t5f2d:"بوابة أربعة أعين", t5f3t:"نشر يدوي", t5f3d:"حمولة حية + إعادة بناء", t5f4t:"الموقع العام", t5f4d:"data/*.json · مسارات هاش",
+  t5a_t:"1 · الموقع العام",
+  t5a1:"هيكل صفحة واحدةحدة بمسارات هاش (#home، #news، #publications…)", t5a2:"المحتوى من ملفات JSON (محلي /data أو CDN اختياري)", t5a3:"بلا بناء للزائر — المتصفح يحمّل وحدات ES مباشرة", t5a4:"قابل للنشر على Vercel أو Netlify أو Apache", t5a5:"الاتصال يفتح mailto:contact@crsic.dz — بلا خادم نماذج عام", t5a6:"فشل مرن: إن فشل ملف JSON واحد تبقى الأقسام الأخرى",
+  t5b_t:"2 · مكتب التحرير",
+  t5b1:"تطبيق Next.js داخلي + PostgreSQL للمسودات وسير العمل", t5b2:"عند النشر: بناء كائن عام، تخزين الحمولة الحية، إعادة بناء data/*.json", t5b3:"إلغاء النشر يمسح الحمولة الحية ويعيد البناء بدون العنصر", t5b4:"«إنشاء مراجعة» يعيد للمسودة والنسخة العامة تبقى حية", t5b5:"الوسائط تحت img/cms/… (متتبَّعة لنسخ متسقة)", t5b6:"رموز معاينة لحمولات مرشّحة قبل الإطلاق",
   t6k:"الموقع العام · الخريطة", t6t:"صفحات يمكن للزائر فتحها",
   t6_1t:"الرئيسية", t6_1d:"فيديو بطولي، إحصاءات، 4 أقسام، شريط منشورات، أخبار مميزة، أخبار المركز، فعاليات",
   t6_2t:"الأخبار", t6_2d:"أرشيف كامل، بحث، سنوات، تفصيل #news/{slug}، توقيع تحريري",
@@ -788,80 +1016,101 @@ ar: {
   t6_6t:"الشركاء", t6_6d:"تعاون وطني/دولي مع سرد تفصيلي",
   t6_7t:"القوانين والمنصات", t6_7d:"مراكز موارد + #law/{slug} و #platform/{slug}",
   t6_8t:"عن المركز · الهيكل · الاتصال", t6_8d:"المهمة/الرؤية/المدير، الهيكل، الاتصال + طبقة صفحات الموقع الاختيارية",
+  t6cap1:"البحث — أربعة تبويبات أقسام", t6cap2:"المجلات — بطاقات تربط بـ OJS",
   t6n:"أيضاً: #journals (بطاقات ← OJS)، درج الجوال وشريط سفلي، شريط تنبيه، اقتراح لغة، رابط تخطّي للإتاحة.",
   t7k:"الموقع العام · الرئيسية", t7t:"الشاشة الأولى قسماً بقسم",
-  t7_1t:"البطل", t7_1d:"فيديو متكرر، تموضع المركز، أزرار للمنشورات وعن المركز.",
-  t7_2t:"شريط الإحصاءات", t7_2d:"سنة التأسيس، الباحثون، الأقسام، المنشورات — روابط عميقة.",
-  t7_3t:"أقسام البحث", t7_3d:"أربع بطاقات إلى تبويبات #research r1–r4.",
-  t7_4t:"أحدث المنشورات", t7_4d:"شبكة على سطح المكتب؛ تمرير أفقياً على الهاتف.",
-  t7_5t:"الأخبار والفعاليات", t7_5d:"قائمة مميزة (حتى 10)، أخبار المركز 3/صفحة، أحدث 3 فعاليات.",
-  t7cap:"الرئيسية بالإنجليزية (LTR) — نفس البنية، واجهة مقلوبة",
+  t7_1t:"البطل", t7_1d:"فيديو متكرر، تموضع المركز تحت الوزارة، أزرار للمنشورات وعن المركز.",
+  t7_2t:"شريط الإحصاءات", t7_2d:"سنة التأسيس، الباحثون، الأقسام، المنشورات — كل منها رابط عميق لقسم.",
+  t7_3t:"أقسام البحث", t7_3d:"أربع بطاقات إلى تبويبات #research r1–r4 بأسماء الأقسام ومداخلها.",
+  t7_4t:"أحدث المنشورات", t7_4d:"شبكة أغلفة على سطح المكتب؛ تمرير أفقياً على الهاتف لنفس الشريط.",
+  t7_5t:"الأخبار والفعاليات", t7_5d:"قائمة مميزة (حتى 10)، أخبار المركز 3/صفحة بتشغيل تلقائي، أحدث 3 فعاليات.",
+  t7cap1:"الرئيسية بالإنجليزية (LTR) — نفس البنية، واجهة مقلوبة", t7cap2:"الرئيسية بالعربية (RTL) — اللغة الافتراضية",
   t8k:"الموقع العام · الكتالوجات", t8t:"تصفّح، صفِّ، افتح التفصيل",
   t8c1:"المنشورات — بحث · الكل/جماعي/فردي · شبكة أغلفة",
   t8c2:"الأخبار — بحث · سنوات · بطاقات بتاريخ وتوقيع",
   t8c3:"الفعاليات — دولي/وطني · كتل تاريخ · حالة",
-  t8x_t:"مسارات التفصيل", t8x_d:"كل تفصيل يحدّث عنوان الصفحة ووسوم التواصل لهذا العنصر.",
-  t9k:"سياسة اللغة", t9t:"عربي أولاً، إنجليزية عند الجاهزية",
-  t9a_t:"الواجهة", t9a1:"الافتراضي: عربية، dir=rtl، lang=ar", t9a2:"الإنجليزية تقلب الواجهة إلى LTR", t9a3:"التفضيل عبر ?lang= و localStorage", t9a4:"350 مفتاحاً في ar.json و en.json — يجب تطابق المجموعتين", t9a5:"شريط اختياري إن فضّل المتصفح EN أو FR",
-  t9b_t:"النصوص التحريرية", t9b1:"العربية أساس النشر", t9b2:"حقول EN تظهر للعموم فقط عند en_status = ready", t9b3:"رجوع للحقل العربي إن نقصت الإنجليزية", t9b4:"المكتب يتتبّع «إنجليزية معلّقة» منفصلاً عن حالة النشر", t9b5:"المجلات تبقى عربية / مرتبطة بـ OJS",
-  t9n:"واجهة المكتب تدعم أيضاً ع RTL / EN LTR عبر كوكي cms_lang.",
-  t10k:"الجرد", t10t:"ما هو منشور فعلاً", t10d:"أعداد تقريبية من JSON العام بعد انتقال الأنواع المملوكة.",
-  t10s1:"أخبار", t10s2:"فعاليات", t10s3:"منشورات", t10s4:"شركاء",
-  t10h1:"المورد", t10h2:"العدد", t10h3:"التفصيل",
-  t10r1a:"تفصيل الفعاليات", t10r1c:"دولية + وطنية",
-  t10r2a:"فرق / مشاريع بحث", t10r2c:"أربعة أقسام بحثية",
-  t10r3a:"قوانين / منصات", t10r3c:"مراكز مع صفحات slug",
-  t10r4a:"مجلات", t10r4c:"كلها إلى crsic.dz/ojsre/ (OJS)",
-  t10r5a:"مفاتيح الواجهة", t10r5c:"مجموعتا ع+EN متطابقتان",
-  t10r6a:"القائمة المميزة", t10r6c:"فارغة ← أحدث 3 أخبار",
-  t11k:"الروابط", t11t:"خدمات مرتبطة من الموقع",
-  t11_1t:"نظام المجلات المفتوحة", t11_1d:"المجلات العلمية — ليست من تأليف المكتب. البطاقات والتذييل إلى https://crsic.dz/ojsre/",
-  t11_2t:"المكتبة الرقمية", t11_2d:"OPAC على crsic.dz/bib/opac_css/ — أيضاً من عارض المنشورات.",
-  t11_3t:"الاتصال", t11_3d:"mailto:contact@crsic.dz · هاتف +213 29 14 61 90 · ويب ميل :2096",
-  t11_4t:"الخرائط", t11_4d:"بحث خرائط Google من صفحة الاتصال لموقع الأغواط.",
-  t11_5t:"التواصل", t11_5d:"فيسبوك وX ولينكدإن في التذييل.",
-  t11_6t:"طبقة صفحات الموقع", t11_6d:"نشر اختياري لنصوص عن/هيكل/اتصال/تعاون؛ اللغات احتياطية حتى أول نشر.",
-  t12k:"مكتب التحرير · سير العمل", t12t:"كيف يصبح العنصر عاماً", t12d:"الحالات: مسودة ← مُرسل ← موافق ← منشور. مسارات جانبية: طلب تعديلات، مرفوض، غير منشور.",
-  t12_1t:"مسودة", t12_1d:"المحرر على أنواعه؛ عربية إلزامية؛ وسائط؛ EN اختيارية",
-  t12_2t:"إرسال", t12_2d:"يدخل طابور المراجعة؛ سحب ممكن قبل الموافقة",
-  t12_3t:"قرار", t12_3d:"طلب تعديلات / موافقة / رفض — لا موافقة ذاتية",
-  t12_4t:"نشر", t12_4d:"يدوي فقط؛ يعيد بناء JSON؛ المراجعة تبقي النسخة الحية",
-  t12_5t:"مراجعة آمنة أثناء البث", t12_5d:"«إنشاء مراجعة (العام يبقى حياً)» يعيد للمسودة والحمولة الحية تبقى حتى النشر التالي.",
-  t12_6t:"مسار طارئ", t12_6d:"المشرف الأعلى قد ينشر طارئاً مع تدقيق وعلامة مراجعة لاحقة — استثنائي لا روتيني.",
-  t13k:"مكتب التحرير · الأدوار", t13t:"من يفعل ماذا",
-  t13_1p:"رقابة", t13_1t:"المشرف الأعلى", t13_1d:"مستخدمون، مكاتب، وحدات، تدقيق، استيراد/تصدير، سلة، كل الأنواع. إعادة كلمات المرور. نشر طارئ.",
-  t13_2p:"بوابة", t13_2t:"المراجع", t13_2d:"موافقة / طلب تعديلات / رفض / نشر / إلغاء نشر ضمن نطاقه. لا يدير المستخدمين.",
-  t13_3p:"تأليف", t13_3t:"المحرر", t13_3d:"ينشئ/يحرر عناصره في أنواعه فقط. يرسل ويراجع. لا يوافق ولا ينشر وحده.",
-  t13_4t:"المكاتب (نموذج الملكية)", t13_4a:"المحررون: أنواع حصرية عالمياً (أو لكل قسم بحث)", t13_4b:"المراجعون: مطالبات تنظيمية حصرية", t13_4c:"محاذاة التأليف بعد تغيير المكتب ليتمكن المحررون من فتح عناصرهم",
+  t8x_t:"مسارات التفصيل", t8x_d:"كل تفصيل يحدّث عنوان الصفحة ووسوم التواصل. الفشل المرن يبقي الكتالوجات الأخرى قابلة للاستخدام.",
+  t9k:"الموقع العام · صفحات مؤسسية", t9t:"عن المركز، البحث، المجلات",
+  t9d:"ثلاثة سطوح متكاملة: الهوية السردية، بنية البحث حسب الأقسام، والمجلات المرتبطة بـ OJS (ليست من تأليف المكتب).",
+  t9c1:"عن المركز — المهمة والرؤية والقيم وكلمة المدير؛ طبقة صفحات موقع اختيارية",
+  t9c2:"البحث — 4 تبويبات أقسام، فرق ومشاريع مع #research-group/{slug}",
+  t9c3:"المجلات — 4 بطاقات ← https://crsic.dz/ojsre/ (نظام المجلات المفتوحة)",
+  t9b1t:"عن / الهيكل / الاتصال", t9b1d:"اللغات توفر نصاً احتياطياً حتى ينشر المكتب أجسام صفحات الموقع لعن والهيكل والاتصال والتعاون.",
+  t9b2t:"جرد البحث", t9b2d:"ثمانية فرق بحث ومشروع واحد عبر أربعة أقسام، لكل منها مسار تفصيل slug.",
+  t9b3t:"حدود المجلات", t9b3d:"سير عمل المقالات يبقى في OJS. الموقع العام يعرض بطاقات وروابط التذييل فقط.",
+  t10k:"سياسة اللغة", t10t:"عربي أولاً، إنجليزية عند الجاهزية",
+  t10a_t:"الواجهة",
+  t10a1:"الافتراضي: عربية، dir=rtl، lang=ar", t10a2:"الإنجليزية تقلب واجهة الكروم إلى LTR", t10a3:"التفضيل عبر ?lang= و localStorage.crsic_lang", t10a4:"350 مفتاحاً في ar.json و en.json — يجب تطابق المجموعتين", t10a5:"شريط اختياري إن فضّل المتصفح EN أو FR", t10a6:"واجهة المكتب: ع RTL / EN LTR عبر كوكي cms_lang",
+  t10b_t:"النصوص التحريرية",
+  t10b1:"العربية أساس النشر لكل نوع مملوك", t10b2:"عنوان/ملخص/متن EN يظهر للعموم فقط عند en_status = ready", t10b3:"رجوع للحقل العربي إن نقص حقل إنجليزي", t10b4:"المكتب يتتبّع «إنجليزية معلّقة» منفصلاً عن حالة النشر", t10b5:"متون المحتوى التحريري قد تبقى عربية فقط حتى تُعلَّم جاهزة", t10b6:"المجلات تبقى عربية / مرتبطة بـ OJS خارج هذه السياسة",
+  t10cap:"نفس بنية الرئيسية بواجهة إنجليزية (LTR)",
+  t10n:"النشر بالعربية لا يُحجَب أبداً لغياب الإنجليزية. ظهور الإنجليزية علم جاهزية صريح، لا ترجمة آلية.",
+  t11k:"الجرد", t11t:"ما هو منشور فعلاً",
+  t11d:"أعداد تقريبية من JSON العام بعد انتقال الأنواع المملوكة. الأشرطة نسبية لأكبر كتالوج (الفعاليات = 55).",
+  t11s1:"أخبار", t11s2:"فعاليات", t11s3:"منشورات", t11s4:"شركاء", t11bt:"الحجم النسبي للكتالوج",
+  t11h1:"المورد", t11h2:"العدد", t11h3:"التفصيل",
+  t11r1a:"تفصيل الفعاليات", t11r1c:"دولية + وطنية",
+  t11r2a:"فرق / مشاريع بحث", t11r2c:"أربعة أقسام بحثية",
+  t11r3a:"قوانين / منصات", t11r3c:"مراكز مع صفحات slug",
+  t11r4a:"مجلات", t11r4c:"كلها إلى crsic.dz/ojsre/ (OJS)",
+  t11r5a:"مفاتيح الواجهة", t11r5c:"مجموعتا ع+EN متطابقتان",
+  t11r6a:"القائمة المميزة", t11r6c:"فارغة ← أحدث 3 أخبار",
+  t11f1:"فعاليات (55)", t11f2:"أخبار (39)", t11f3:"منشورات (36)",
+  t12k:"الروابط", t12t:"خدمات مرتبطة من الموقع",
+  t12_1t:"نظام المجلات المفتوحة", t12_1d:"المجلات العلمية — ليست من تأليف المكتب. البطاقات والتذييل إلى https://crsic.dz/ojsre/",
+  t12_2t:"المكتبة الرقمية", t12_2d:"OPAC على crsic.dz/bib/opac_css/ — أيضاً من عارض المنشورات.",
+  t12_3t:"الاتصال", t12_3d:"mailto:contact@crsic.dz · هاتف +213 29 14 61 90 · ويب ميل :2096",
+  t12_4t:"الخرائط", t12_4d:"بحث خرائط Google من صفحة الاتصال لموقع الأغواط.",
+  t12_5t:"التواصل", t12_5d:"فيسبوك وX ولينكدإن في التذييل.",
+  t12_6t:"طبقة صفحات الموقع", t12_6d:"نشر اختياري لنصوص عن/هيكل/اتصال/تعاون؛ اللغات احتياطية حتى أول نشر.",
+  t12cap1:"المجلات ← OJS", t12cap2:"سرد عن / الاتصال",
+  t13k:"مكتب التحرير · سير العمل", t13t:"كيف يصبح العنصر عاماً",
+  t13d:"الحالات: مسودة ← مُرسل ← موافق ← منشور. مسارات جانبية: طلب تعديلات، مرفوض، غير منشور. النشر دائماً فعل بشري متعمّد.",
+  t13_1t:"مسودة", t13_1d:"المحرر على أنواعه؛ عربية إلزامية؛ وسائط؛ EN اختيارية",
+  t13_2t:"إرسال", t13_2d:"يدخل طابور المراجعة؛ سحب ممكن قبل الموافقة",
+  t13_3t:"قرار", t13_3d:"طلب تعديلات / موافقة / رفض — لا موافقة ذاتية",
+  t13_4t:"نشر", t13_4d:"يدوي فقط؛ يعيد بناء JSON؛ المراجعة تبقي النسخة الحية",
+  t13_5t:"مراجعة آمنة أثناء البث", t13_5d:"«إنشاء مراجعة (العام يبقى حياً)» يعيد للمسودة والحمولة الحية تبقى حتى النشر التالي. الزائر يرى اللقطة المعتمدة السابقة.",
+  t13_6t:"مسار طارئ", t13_6d:"المشرف الأعلى قد ينشر طارئاً مع تدقيق وعلامة مراجعة لاحقة — استثنائي لا روتيني، ومُسجَّل دائماً.",
   t13cap:"تسجيل دخول المكتب — بريد مؤسسي؛ انتهاء جلسة بعد 30 دقيقة خمول",
-  t14k:"مكتب التحرير · الواجهة", t14t:"الطوابير والقوائم في العمل اليومي",
-  t14c1:"لوحة القيادة — مسودات · بانتظار المراجعة · منشور · إنجليزية معلّقة · المحتوى حسب المحرر",
-  t14c2:"قائمة الأخبار — الحالة · جاهزية EN · ترتيب · نسخ · تصفية · تحديد جماعي",
-  t15k:"مكتب التحرير · القدرات", t15t:"أدوات تشغيل متاحة",
-  t15_1t:"القائمة المميزة", t15_1d:"ترتيب حتى 10 أخبار لواجهة الرئيسية. محرر الأخبار+المشرف+المراجع يعدّون؛ النشر للمراجع/المشرف فقط.",
-  t15_2t:"مكتبة الوسائط", t15_2d:"JPEG/PNG/WebP/PDF، حد 5 ميغابايت، فحص التوقيع. نطاق حسب الدور. قص غلاف للمنشورات.",
-  t15_3t:"سلة الاستعادة", t15_3d:"حذف ناعم؛ استعادة لمسودة. المحرر: مسوداته/مرفوضاته. المشرف: غير منشور/مرفوض. تقادم 90 يوماً.",
-  t15_4t:"النسخ", t15_4d:"تكرار ← مسودة جديدة. من صفحة التحرير وجماعياً للمراجع/المشرف.",
-  t15_5t:"استيراد / تصدير", t15_5d:"مضغوط المشرف للسجلات والملفات. تصدير المحدد. الاستيراد مسودات جديدة دائماً.",
-  t15_6t:"التدقيق والمراجعات", t15_6d:"سجل تدقيق لا يُحذف. تاريخ مراجعات مع استعادة لمسودة قابلة للتحرير.",
-  t15_7t:"التنبيهات", t15_7d:"داخل التطبيق فقط — بلا SMTP للتنبيهات أو استعادة كلمة المرور.",
-  t15_8t:"المعاينة", t15_8d:"معاينة بطاقة عامة في النموذج + رموز قصيرة لـ #preview/{token}.",
-  t15_9t:"تجربة القوائم", t15_9d:"تحميل المزيد (20)، ترتيب رأس الزيارة، إلغاء نشر/تدوير جماعي مع تقرير تخطٍ.",
-  t16k:"الضوابط", t16t:"ضوابط نافذة",
-  t16_a_t:"الوصول والسلامة", t16_a1:"جلسات iron-session مشفّرة؛ Secure في الإنتاج؛ SameSite=lax", t16_a2:"تجزئة كلمات المرور (bcrypt)؛ SESSION_SECRET ≥ 32 حرفاً", t16_a3:"انتهاء بعد 30 دقيقة خمول مع لمس النشاط", t16_a4:"فحص الدور والوحدة ونوع المحتوى في كل إجراء", t16_a5:"أربعة أعين في المراجعة/النشر؛ المعطَّلون لا يدخلون", t16_a6:"الموقع العام بلا تسجيل دخول؛ بناء DOM بلا innerHTML خام للمحتوى",
-  t16_b_t:"الإصدار والاستعادة", t16_b1:"قرار منتج مكتوب قبل برمجة الشريحة", t16_b2:"قائمة تحقق دخان ~5 دقائق قبل الدمج في الخط الحي", t16_b3:"إعادة بناء النشر مع .bak / مؤقت / إعادة تسمية؛ تراجع عند الفشل", t16_b4:"استعادة بدل الحذف النهائي؛ منع حذف وسائط ما زالت مُشاراً إليها", t16_b5:"الاستيراد لا يصل منشوراً أبداً", t16_b6:"انتقال ووردبريس للأنواع المملوكة مطبَّق على main",
-  t17k:"بنود مفتوحة", t17t:"وضع العمل المتبقي المعروف",
-  t17_1b:"قيد التنفيذ", t17_1t:"WebP واستكمال الإنجليزية عند الجاهزية", t17_1d:"صور أسرع؛ ظهور الإنجليزية للأنواع المتبقية عند الجاهزية. لا يحجب النشر بالعربية.",
-  t17_2b:"مؤجّل", t17_2t:"المجلات داخل المكتب", t17_2d:"تبقى على OJS. لا عمل مجلات في المكتب إلا بقرار مكتوب جديد.",
-  t17_3b:"مغلق", t17_3t:"النشر الآلي المجدول", t17_3d:"أُلغي. القاعدة: موافقة ← نشر بشري.",
-  t17_4b:"اختياري لاحقاً", t17_4t:"امتدادات محتملة", t17_4d:"إحصاءات زوار، دور مترجم، دخول موحّد — فقط إن رُفعت أولوية بقرار جديد.",
-  t17n:"ما تبقى صقل محدود تحت قرارات قائمة — لا إعادة بناء للموقع أو المكتب.",
-  t18k:"الختام", t18t:"الوضع اليوم",
-  t18d:"موقع عام حي ومكتب تحرير حي: مكاتب، مراجعة بأربعة أعين، نشر يدوي مُدقَّق، واجهة ثنائية اللغة، وانتقال ووردبريس مكتمل للأنواع المملوكة.",
-  t18_a_t:"قائم", t18_a_d:"الموقع · المكتب · الانتقال · الجرد · التدقيق · القائمة المميزة · السلة · الاستيراد/التصدير",
+  t14k:"مكتب التحرير · الأدوار", t14t:"من يفعل ماذا",
+  t14_1p:"رقابة", t14_1t:"المشرف الأعلى", t14_1d:"مستخدمون، مكاتب، وحدات، تدقيق، استيراد/تصدير، سلة، كل الأنواع. إعادة كلمات المرور. نشر طارئ.",
+  t14_2p:"بوابة", t14_2t:"المراجع", t14_2d:"موافقة / طلب تعديلات / رفض / نشر / إلغاء نشر ضمن نطاقه. لا يدير المستخدمين.",
+  t14_3p:"تأليف", t14_3t:"المحرر", t14_3d:"ينشئ/يحرر عناصره في أنواعه فقط. يرسل ويراجع. لا يوافق ولا ينشر وحده.",
+  t14_4t:"المكاتب (نموذج الملكية)",
+  t14_4a:"المحررون: أنواع حصرية عالمياً (أو لكل قسم بحث)", t14_4b:"المراجعون: مطالبات تنظيمية حصرية — بوابة مراجع لكل نطاق", t14_4c:"محاذاة التأليف بعد تغيير المكتب ليتمكن المحررون من فتح عناصرهم", t14_4d:"الناشر القابل للتعيين وإعادة بناء JSON مرتبطان بمرجع المكاتب", t14_4e:"أربعة أعين: مؤلف العنصر لا يوافق على نفس العنصر",
+  t14cap:"إدارة المكاتب — مطالبات نوع / وحدة حصرية",
+  t15k:"مكتب التحرير · الواجهة", t15t:"الطوابير والقوائم في العمل اليومي",
+  t15d:"لوحة القيادة تجمع المسودات وبانتظار المراجعة والمنشور والإنجليزية المعلّقة. قوائم الأنواع تدعم تصفية الحالة وجاهزية EN وترتيب الرأس (هذه الزيارة) والنسخ والتحديد الجماعي.",
+  t15c1:"لوحة القيادة — مسودات · بانتظار المراجعة · منشور · إنجليزية معلّقة · المحتوى حسب المحرر",
+  t15c2:"قائمة الأخبار — الحالة · جاهزية EN · ترتيب · نسخ · تصفية · تحديد جماعي",
+  t15f1:"الدخول", t15f2:"المكاتب", t15f3:"لوحة القيادة", t15f4:"قائمة النوع",
+  t16k:"مكتب التحرير · القدرات", t16t:"أدوات تشغيل متاحة",
+  t16_1t:"القائمة المميزة", t16_1d:"ترتيب حتى 10 أخبار لواجهة الرئيسية. محرر الأخبار+المشرف+المراجع يعدّون؛ النشر للمراجع/المشرف فقط.",
+  t16_2t:"مكتبة الوسائط", t16_2d:"JPEG/PNG/WebP/PDF، حد 5 ميغابايت، فحص التوقيع. نطاق حسب الدور. قص غلاف للمنشورات.",
+  t16_3t:"سلة الاستعادة", t16_3d:"حذف ناعم؛ استعادة لمسودة. المحرر: مسوداته/مرفوضاته. المشرف: غير منشور/مرفوض. تقادم 90 يوماً.",
+  t16_4t:"النسخ", t16_4d:"تكرار ← مسودة جديدة. من صفحة التحرير وجماعياً للمراجع/المشرف.",
+  t16_5t:"استيراد / تصدير", t16_5d:"مضغوط المشرف للسجلات والملفات. تصدير المحدد. الاستيراد مسودات جديدة دائماً.",
+  t16_6t:"التدقيق والمراجعات", t16_6d:"سجل تدقيق لا يُحذف. تاريخ مراجعات مع استعادة لمسودة قابلة للتحرير.",
+  t16_7t:"التنبيهات", t16_7d:"داخل التطبيق فقط — بلا SMTP للتنبيهات أو استعادة كلمة المرور.",
+  t16_8t:"المعاينة", t16_8d:"معاينة بطاقة عامة في النموذج + رموز قصيرة لـ #preview/{token}.",
+  t16_9t:"تجربة القوائم", t16_9d:"تحميل المزيد (20)، ترتيب رأس الزيارة، إلغاء نشر/تدوير جماعي مع تقرير تخطٍ.",
+  t17k:"الضوابط", t17t:"ضوابط نافذة",
+  t17_a_t:"الوصول والسلامة",
+  t17_a1:"جلسات iron-session مشفّرة؛ Secure في الإنتاج؛ SameSite=lax", t17_a2:"تجزئة كلمات المرور (bcrypt)؛ SESSION_SECRET ≥ 32 حرفاً", t17_a3:"انتهاء بعد 30 دقيقة خمول مع لمس النشاط", t17_a4:"فحص الدور والوحدة ونوع المحتوى في كل إجراء", t17_a5:"أربعة أعين في المراجعة/النشر؛ المعطَّلون لا يدخلون", t17_a6:"الموقع العام بلا تسجيل دخول؛ بناء DOM بلا innerHTML خام للمحتوى",
+  t17_b_t:"الإصدار والاستعادة",
+  t17_b1:"قرار منتج مكتوب قبل برمجة الشريحة", t17_b2:"قائمة تحقق دخان ~5 دقائق قبل الدمج في الخط الحي", t17_b3:"إعادة بناء النشر مع .bak / مؤقت / إعادة تسمية؛ تراجع عند الفشل", t17_b4:"استعادة بدل الحذف النهائي؛ منع حذف وسائط ما زالت مُشاراً إليها", t17_b5:"الاستيراد لا يصل منشوراً أبداً", t17_b6:"انتقال ووردبريس للأنواع المملوكة مطبَّق على main",
+  t17cap:"طوابير المكتب — رؤية المسودات والمراجعة والمخزون المنشور",
+  t18k:"بنود مفتوحة وختام", t18t:"العمل المتبقي والوضع اليوم",
+  t18_1b:"قيد التنفيذ", t18_1t:"WebP واستكمال الإنجليزية عند الجاهزية", t18_1d:"صور أسرع؛ ظهور الإنجليزية للأنواع المتبقية عند الجاهزية. لا يحجب النشر بالعربية.",
+  t18_2b:"مؤجّل", t18_2t:"المجلات داخل المكتب", t18_2d:"تبقى على OJS. لا عمل مجلات في المكتب إلا بقرار مكتوب جديد.",
+  t18_3b:"مغلق", t18_3t:"النشر الآلي المجدول", t18_3d:"أُلغي. القاعدة: موافقة ← نشر بشري.",
+  t18_4b:"اختياري لاحقاً", t18_4t:"امتدادات محتملة", t18_4d:"إحصاءات زوار، دور مترجم، دخول موحّد — فقط إن رُفعت أولوية بقرار جديد.",
+  t18_a_t:"قائم", t18_a_d:"الموقع · المكتب · الانتقال · الجرد · التدقيق · القائمة المميزة · السلة · الاستيراد/التصدير · المكاتب · أربعة أعين",
   t18_b_t:"جارٍ", t18_b_d:"تسليم WebP · استكمال الإنجليزية عند الجاهزية",
   t18_c_t:"الخيار التالي", t18_c_d:"ما إذا فُتحت شريحة جديدة خارج الحزمة الحالية",
-  t18m:"CRSIC · الأغواط · crsic.dz · نهاية الإحاطة",
+  t18f1:"الرئيسية العامة", t18f2:"طوابير المكتب", t18f3:"البحث", t18f4:"المكاتب",
+  t18m:"CRSIC · الأغواط · crsic.dz · نهاية الإحاطة — ما تبقى صقل محدود تحت قرارات قائمة، لا إعادة بناء.",
   nav_prev:"السابق", nav_next:"التالي", nav_hint:" · ← → مسافة"
 }
 };
