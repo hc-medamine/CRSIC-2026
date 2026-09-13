@@ -27,9 +27,17 @@ const MONTH_DISPLAY_AR = {
  * @param {object} e
  * @returns {string}
  */
+function displayMonth(e) {
+  const raw = String((e && e.month) || '').trim();
+  return MONTH_DISPLAY_AR[raw] || raw;
+}
+
+/**
+ * @param {object} e
+ * @returns {string}
+ */
 function formatHomeEventDate(e) {
-  const rawMonth = String((e && e.month) || '').trim();
-  const month = MONTH_DISPLAY_AR[rawMonth] || rawMonth;
+  const month = displayMonth(e);
   const year = (e && e.year) || '';
   const loc = t('home_event_loc');
   const left = [month, year].filter(Boolean).join(' ');
@@ -98,7 +106,7 @@ export function createHomeEventCard(e, i = 0) {
         attrs: { 'aria-hidden': 'true' },
         children: [
           el('span', { className: 'event-row-day', text: (e && e.day) || '—' }),
-          el('span', { className: 'event-row-month', text: (e && e.month) || '' }),
+          el('span', { className: 'event-row-month', text: displayMonth(e) }),
           el('span', { className: 'event-row-year', text: (e && e.year) || '' }),
         ],
       }),
@@ -168,7 +176,7 @@ export function createEvCard(e) {
         children: [
           el('div', { className: 'ev-date-year', text: e.year || '' }),
           el('div', { className: 'ev-date-day', text: e.day || '' }),
-          el('div', { className: 'ev-date-month', text: e.month || '' }),
+          el('div', { className: 'ev-date-month', text: displayMonth(e) }),
         ],
       }),
       el('div', {

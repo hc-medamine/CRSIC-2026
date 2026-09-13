@@ -4255,7 +4255,7 @@ html[dir="rtl"] li {
   box-shadow: 0 6px 18px rgba(27, 67, 50, 0.1);
 }
 .event-row-date {
-  flex: 0 0 4.75rem;
+  flex: 0 0 5.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -4263,7 +4263,7 @@ html[dir="rtl"] li {
   gap: 2px;
   background: var(--green-deep);
   color: #fff;
-  padding: 0.85rem 0.5rem;
+  padding: 0.85rem 0.4rem;
   text-align: center;
 }
 .event-row-day {
@@ -4273,8 +4273,11 @@ html[dir="rtl"] li {
   line-height: 1;
 }
 .event-row-month {
-  font-size: 0.7rem;
-  opacity: 0.9;
+  font-size: 0.72rem;
+  opacity: 0.95;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 .event-row-year {
   font-size: 0.65rem;
