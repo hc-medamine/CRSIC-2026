@@ -124,6 +124,7 @@
 
     .news-card .card-media,
     .event-card .event-thumb,
+    .event-row-visual,
     .catalog-card-media,
     .pub-cover {
       overflow: hidden;
@@ -139,6 +140,15 @@
     .event-card:hover .event-thumb img,
     .catalog-card:hover .catalog-card-media img {
       transform: scale(1.05);
+    }
+
+    /* Home event cover: pan right → left on hover */
+    .event-row-visual img {
+      transform: translate3d(0, 0, 0);
+      transition: transform 1.2s var(--ease-out-expo);
+    }
+    .event-row:hover .event-row-visual img {
+      transform: translate3d(-21.875%, 0, 0); /* (128% − 100%) / 128% */
     }
   }
 }
