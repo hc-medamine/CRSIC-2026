@@ -428,10 +428,12 @@ html[dir="rtl"] .nav-drawer.open {
     opacity: 0;
   }
 
+  /* Float on media; entrance/hover on frame — avoids transform fights */
+  .director-word.is-director-in .director-word-media {
+    animation: directorFloat 7s var(--ease-out-soft) 1.4s infinite alternate;
+  }
   .director-word.is-director-in .director-word-frame {
-    animation:
-      directorPortraitIn 0.95s var(--ease-out-expo) both,
-      directorFloat 7s var(--ease-out-soft) 1.4s infinite alternate;
+    animation: directorPortraitIn 0.95s var(--ease-out-expo) both;
   }
   .director-word.is-director-in .director-word-glow {
     animation: directorGlowDrift 7s var(--ease-out-soft) 0.8s infinite;
@@ -463,14 +465,16 @@ html[dir="rtl"] .nav-drawer.open {
     }
     .director-word-frame img {
       transition: transform 1.1s var(--ease-out-expo);
+      transform-origin: center 20%;
     }
     .director-word:hover .director-word-frame img {
-      transform: scale(1.03);
+      transform: scale(1.04);
     }
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .director-word-media,
   .director-word-frame,
   .director-word-mark,
   .director-word-quote p,
