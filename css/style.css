@@ -4290,29 +4290,14 @@ html[dir="rtl"] li {
   gap: 0.25rem;
   justify-content: center;
 }
-.event-row-body--with-visual {
-  flex-direction: row;
-  align-items: stretch;
-  padding: 0;
-  gap: 0;
-}
-.event-row-copy {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  justify-content: center;
-  padding-block: 0.85rem;
-  padding-inline: 1rem 1.1rem;
-}
 .event-row-visual {
-  flex: 0 0 clamp(7.5rem, 20vw, 11rem);
+  flex: 0 0 clamp(6.5rem, 16vw, 9.5rem);
   align-self: stretch;
   min-height: 100%;
   overflow: hidden;
   background: #edf4f1;
   position: relative;
+  border-inline-end: 0.5px solid var(--border-light);
 }
 .event-row-visual img {
   position: absolute;
@@ -4354,8 +4339,8 @@ html[dir="rtl"] li {
 }
 
 @media (max-width: 560px) {
-  .event-row-body--with-visual .event-row-visual {
-    flex-basis: 5.75rem;
+  .event-row-visual {
+    flex-basis: 5.25rem;
   }
 }
 

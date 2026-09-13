@@ -79,31 +79,7 @@ export function createHomeEventCard(e, i = 0) {
         ? t('ev_badge_upcoming')
         : t('ev_badge_done');
 
-  const copy = el('div', {
-    className: 'event-row-copy',
-    children: [
-      el('span', { className: badgeClass, text: badgeText }),
-      el('div', { className: 'event-row-type', text: type }),
-      el('div', { className: 'event-row-title', text: title }),
-      createContentByline(e, { includeDate: false }),
-      el('div', {
-        className: 'event-row-meta',
-        children: [
-          el('span', { className: 'event-date', text: formatHomeEventDate(e) }),
-          el('span', {
-            className: 'event-album-link',
-            children: [
-              el('span', { className: 'event-album-dot' }),
-              el('span', { text: t('ev_details') }),
-            ],
-          }),
-        ],
-      }),
-    ],
-  });
-
   const visual = createHomeEventVisual(e, title);
-  const bodyChildren = visual ? [copy, visual] : [copy];
 
   return el('article', {
     className: 'event-row event-card--link',
@@ -126,9 +102,28 @@ export function createHomeEventCard(e, i = 0) {
           el('span', { className: 'event-row-year', text: (e && e.year) || '' }),
         ],
       }),
+      ...(visual ? [visual] : []),
       el('div', {
-        className: visual ? 'event-row-body event-row-body--with-visual' : 'event-row-body',
-        children: bodyChildren,
+        className: 'event-row-body',
+        children: [
+          el('span', { className: badgeClass, text: badgeText }),
+          el('div', { className: 'event-row-type', text: type }),
+          el('div', { className: 'event-row-title', text: title }),
+          createContentByline(e, { includeDate: false }),
+          el('div', {
+            className: 'event-row-meta',
+            children: [
+              el('span', { className: 'event-date', text: formatHomeEventDate(e) }),
+              el('span', {
+                className: 'event-album-link',
+                children: [
+                  el('span', { className: 'event-album-dot' }),
+                  el('span', { text: t('ev_details') }),
+                ],
+              }),
+            ],
+          }),
+        ],
       }),
     ],
   });
