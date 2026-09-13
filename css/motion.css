@@ -124,6 +124,7 @@
 
     .news-card .card-media,
     .event-card .event-thumb,
+    .event-row-visual,
     .catalog-card-media,
     .pub-cover {
       overflow: hidden;
@@ -139,6 +140,51 @@
     .event-card:hover .event-thumb img,
     .catalog-card:hover .catalog-card-media img {
       transform: scale(1.05);
+    }
+
+    /*
+     * Home event cover: collapsed until hover/focus, then opens with a
+     * right → left image slide. Touch / reduced-motion keep always-on strip.
+     */
+    .event-row-visual {
+      flex-basis: 0;
+      width: 0;
+      max-width: 0;
+      opacity: 0;
+      border-inline-end-width: 0;
+      pointer-events: none;
+      transition:
+        flex-basis var(--duration-base) var(--ease-out-expo),
+        width var(--duration-base) var(--ease-out-expo),
+        max-width var(--duration-base) var(--ease-out-expo),
+        opacity var(--duration-fast) var(--ease-out-soft),
+        border-inline-end-width var(--duration-fast) var(--ease-out-soft);
+    }
+    .event-row-visual img {
+      transform: translate3d(100%, 0, 0);
+      transition: transform 0.75s var(--ease-out-expo);
+    }
+    .event-row:hover .event-row-visual,
+    .event-row:focus-within .event-row-visual {
+      flex-basis: clamp(6.5rem, 16vw, 9.5rem);
+      width: clamp(6.5rem, 16vw, 9.5rem);
+      max-width: clamp(6.5rem, 16vw, 9.5rem);
+      opacity: 1;
+      border-inline-end-width: 0.5px;
+      pointer-events: auto;
+    }
+    .event-row:hover .event-row-visual img,
+    .event-row:focus-within .event-row-visual img {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @media (max-width: 560px) and (hover: hover) and (pointer: fine) {
+    .event-row:hover .event-row-visual,
+    .event-row:focus-within .event-row-visual {
+      flex-basis: 5.25rem;
+      width: 5.25rem;
+      max-width: 5.25rem;
     }
   }
 }
@@ -428,10 +474,12 @@ html[dir="rtl"] .nav-drawer.open {
     opacity: 0;
   }
 
+  /* Float on media; entrance/hover on frame — avoids transform fights */
+  .director-word.is-director-in .director-word-media {
+    animation: directorFloat 7s var(--ease-out-soft) 1.4s infinite alternate;
+  }
   .director-word.is-director-in .director-word-frame {
-    animation:
-      directorPortraitIn 0.95s var(--ease-out-expo) both,
-      directorFloat 7s var(--ease-out-soft) 1.4s infinite alternate;
+    animation: directorPortraitIn 0.95s var(--ease-out-expo) both;
   }
   .director-word.is-director-in .director-word-glow {
     animation: directorGlowDrift 7s var(--ease-out-soft) 0.8s infinite;
@@ -463,14 +511,16 @@ html[dir="rtl"] .nav-drawer.open {
     }
     .director-word-frame img {
       transition: transform 1.1s var(--ease-out-expo);
+      transform-origin: center 20%;
     }
     .director-word:hover .director-word-frame img {
-      transform: scale(1.03);
+      transform: scale(1.04);
     }
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .director-word-media,
   .director-word-frame,
   .director-word-mark,
   .director-word-quote p,

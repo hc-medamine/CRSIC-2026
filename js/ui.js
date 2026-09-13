@@ -262,14 +262,26 @@ export function applyDirectorWord() {
   if (imgEl && d.portrait) {
     const webp = safeImageSrc(d.portrait_webp || '');
     const parent = imgEl.parentElement;
-    if (webp && parent && parent.tagName !== 'PICTURE') {
-      const picture = document.createElement('picture');
-      const source = document.createElement('source');
-      source.type = 'image/webp';
-      source.srcset = webp;
-      parent.insertBefore(picture, imgEl);
-      picture.appendChild(source);
-      picture.appendChild(imgEl);
+    if (webp && parent) {
+      if (parent.tagName === 'PICTURE') {
+        parent.classList.add('cms-picture');
+        let source = parent.querySelector('source[type="image/webp"]');
+        if (!source) {
+          source = document.createElement('source');
+          source.type = 'image/webp';
+          parent.insertBefore(source, imgEl);
+        }
+        source.srcset = webp;
+      } else {
+        const picture = document.createElement('picture');
+        picture.className = 'cms-picture';
+        const source = document.createElement('source');
+        source.type = 'image/webp';
+        source.srcset = webp;
+        parent.insertBefore(picture, imgEl);
+        picture.appendChild(source);
+        picture.appendChild(imgEl);
+      }
     }
     imgEl.setAttribute('src', d.portrait);
     const alt =

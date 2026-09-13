@@ -3919,27 +3919,25 @@ html[dir="rtl"] .feat-carousel-btn--play.is-paused svg {
 }
 .director-word-frame {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  aspect-ratio: 3 / 4;
+  width: 100%;
   background: linear-gradient(145deg, #f3efe6 0%, #faf8f3 55%, #ebe6da 100%);
   border-radius: 14px;
   overflow: hidden;
-  min-height: 280px;
   border: 1px solid rgba(201, 168, 76, 0.28);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.65) inset,
     0 18px 40px -28px rgba(27, 67, 50, 0.35);
 }
 .director-word-frame img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  max-height: 360px;
-  object-fit: contain;
-  object-position: center;
+  max-height: none;
+  object-fit: cover;
+  object-position: center 18%;
   display: block;
-  border-radius: 10px;
-  position: relative;
   z-index: 1;
 }
 .director-word-glow {
@@ -4008,9 +4006,7 @@ html[dir="rtl"] .director-word-rule {
 }
 @media (max-width: 640px) {
   .director-word { grid-template-columns: 1fr; gap: 1.5rem; }
-  .director-word-media { max-width: 260px; }
-  .director-word-frame { min-height: 240px; }
-  .director-word-frame img { max-height: 300px; }
+  .director-word-media { max-width: 220px; }
   .director-word-mark { font-size: 3.5rem; }
 }
 
@@ -4259,7 +4255,7 @@ html[dir="rtl"] li {
   box-shadow: 0 6px 18px rgba(27, 67, 50, 0.1);
 }
 .event-row-date {
-  flex: 0 0 4.75rem;
+  flex: 0 0 5.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -4267,7 +4263,7 @@ html[dir="rtl"] li {
   gap: 2px;
   background: var(--green-deep);
   color: #fff;
-  padding: 0.85rem 0.5rem;
+  padding: 0.85rem 0.4rem;
   text-align: center;
 }
 .event-row-day {
@@ -4277,8 +4273,11 @@ html[dir="rtl"] li {
   line-height: 1;
 }
 .event-row-month {
-  font-size: 0.7rem;
-  opacity: 0.9;
+  font-size: 0.72rem;
+  opacity: 0.95;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 .event-row-year {
   font-size: 0.65rem;
@@ -4293,6 +4292,24 @@ html[dir="rtl"] li {
   flex-direction: column;
   gap: 0.25rem;
   justify-content: center;
+}
+.event-row-visual {
+  flex: 0 0 clamp(6.5rem, 16vw, 9.5rem);
+  align-self: stretch;
+  min-height: 100%;
+  overflow: hidden;
+  background: #edf4f1;
+  position: relative;
+  border-inline-end: 0.5px solid var(--border-light);
+}
+.event-row-visual img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 .event-row-type {
   font-size: 0.75rem;
@@ -4322,6 +4339,12 @@ html[dir="rtl"] li {
   display: inline-block;
   width: fit-content;
   margin-bottom: 0.1rem;
+}
+
+@media (max-width: 560px) {
+  .event-row-visual {
+    flex-basis: 5.25rem;
+  }
 }
 
 /* Platform filter chips */
