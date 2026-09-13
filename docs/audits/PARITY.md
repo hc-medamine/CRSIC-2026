@@ -1,11 +1,11 @@
-# Arabic–English parity matrix (2026-07-19)
+# Arabic–English parity matrix (2026-07-19; updated 2026-09-13)
 
 **Verdict: partial English parity — not full.**  
-UI chrome for core journeys is bilingual. Editorial JSON (publications, events, news, partners, journals) remains **intentionally Arabic-only** with an English notice + “View Arabic version” control. No machine-translated product copy was invented for those bodies.
+UI chrome for core journeys is bilingual. CMS list types use **EN-when-ready**: `en_status === ready` → filled EN with per-field Arabic fallback and no notice; otherwise Arabic + notice. **Journals** remain intentionally Arabic-only (OJS / `journals.json`). No machine-translated product copy was invented.
 
 Locale URL: `?lang=ar|en` (hash SPA — `/ar`/`/en` path prefixes would need server rewrites; not adopted).
 
-Legend: **Complete** · **Missing translation** · **Functionally inconsistent** · **Intentionally Arabic-only** · **Blocked pending approval**
+Legend: **Complete** · **Missing translation** · **Functionally inconsistent** · **EN-when-ready** · **Intentionally Arabic-only** · **Blocked pending approval**
 
 ## Pages & workflows
 
@@ -13,14 +13,17 @@ Legend: **Complete** · **Missing translation** · **Functionally inconsistent**
 |------|----|----|--------|-------|
 | Primary nav / mega / drawer / bottom tabs | ✓ | ✓ | Complete | `data-i18n` + `data-i18n-aria` |
 | Home hero / stats / dept teasers | ✓ | ✓ | Complete | Chrome via locales |
-| About (mission, vision, axes, strategy) | ✓ | ✓ | Complete | Strategy list wired to `about_strat1–6` |
+| About (mission, vision, axes, strategy) | ✓ | ✓ | Complete | Strategy list wired to `about_strat1–6`; site-pages overlay when published |
 | Org chart labels | ✓ | ✓ | Complete | Stacked mobile layout added |
 | Research tabs / team chrome | ✓ | ✓ | Complete | |
 | Publications UI (filters, search, lightbox chrome) | ✓ | ✓ | Complete | Type badges via `t()` |
-| Publications **body** (title/dept/desc) | ✓ | AR shown + notice | Intentionally Arabic-only | Needs bilingual JSON schema — **Blocked** for full EN |
+| Publications **body** (title/dept/desc) | ✓ | ready → EN; else AR + notice | EN-when-ready | Gate via `en_status` (PR #44) |
 | Events UI | ✓ | ✓ | Complete | |
-| Events **body** | ✓ | AR + notice | Intentionally Arabic-only | **Blocked** for full EN |
-| News / partners / journals **body** | ✓ | AR + notice | Intentionally Arabic-only | **Blocked** for full EN |
+| Events **body** | ✓ | ready → EN; else AR + notice | EN-when-ready | Same gate |
+| News / partners **body** | ✓ | ready → EN; else AR + notice | EN-when-ready | Same gate |
+| Alerts / laws / platforms **body** | ✓ | ready → EN; else AR + notice | EN-when-ready | Cut B — same gate as news |
+| Research groups / projects **body** | ✓ | ready → EN; else AR + notice | EN-when-ready | Cut B — no raw `title_en` when pending |
+| Journals **body** | ✓ | AR + notice | Intentionally Arabic-only | OJS; out of CMS EN-when-ready |
 | Contact form labels / placeholders / success | ✓ | ✓ | Complete | Mailto body localized |
 | Contact address / phone (mixed dir) | ✓ | ✓ | Complete | Phone/email Latin OK in both |
 | Lightbox a11y (dialog, trap, Escape, restore) | ✓ | ✓ | Complete | |
@@ -69,7 +72,7 @@ Covers Escape stack order + `?lang=` parsing. Full keyboard/visual journeys rema
 
 ## Remaining risks & follow-ups
 
-1. **Product:** Approve bilingual content schema for pubs/events/news/partners/journals (or accept Arabic-only editorial forever).
+1. **Product:** Journals stay Arabic-only / OJS unless a future PRD brings them into CMS EN-when-ready.
 2. **Product:** EN privacy/legal if required for institutional compliance.
 3. **Optional:** Path-based `/ar` `/en` if hosting adds rewrite rules.
 4. **Optional:** Automated a11y e2e (Playwright) when a package toolchain is introduced.

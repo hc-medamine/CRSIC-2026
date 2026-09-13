@@ -9,7 +9,7 @@ When discussing CMS/product/roadmap work, briefly remind the stakeholder that th
 
 ## Active Approved PRD (remaining cuts)
 
-[docs/prds/2026-08-26-remaining-deferred-pack.md](docs/prds/2026-08-26-remaining-deferred-pack.md) — **Cut C Delivered** on `main` (PR #50). **Cuts A (WebP) and B (remaining EN-when-ready)** still open — implement only when starting that cut’s branch.
+[docs/prds/2026-08-26-remaining-deferred-pack.md](docs/prds/2026-08-26-remaining-deferred-pack.md) — **Cut C Delivered** on `main` (PR #50). **Cuts A–B implementing** on `feature/cms-cuts-a-b-webp-en` (not Delivered until merge).
 
 ## Deferred (future) — simple → complex
 

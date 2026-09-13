@@ -72,6 +72,13 @@ Estimated time: **~5 minutes**.
 | F1 | No obvious horizontal scroll on a ~375px-wide viewport | ☐ |
 | F2 | With OS “reduce motion” on, heavy animations stay calm | ☐ |
 
+## WebP + EN-when-ready (Cuts A–B)
+
+| # | Check | Pass? |
+|---|--------|-------|
+| Wp2 | Item without `*_webp` still shows JPEG/PNG (no broken image) | ☐ |
+| EnB | Law or research group: EN **pending** → Arabic + notice; **ready** → EN title/body, notice gone | ☐ |
+
 ---
 
 ## G. Automated unit checks (optional)

@@ -19,6 +19,12 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ---
 
+### 2026-09-13 — Cuts A+B **implementing** (WebP + remaining EN)
+
+[prds/2026-08-26-remaining-deferred-pack.md](./prds/2026-08-26-remaining-deferred-pack.md) Cuts A+B on `feature/cms-cuts-a-b-webp-en`. WebP siblings + remaining EN-when-ready + track local media/WebP siblings + restore `serve.json` cache headers. Journals still deferred (OJS).
+
+---
+
 ### 2026-09-03 — Fix publication cover layout (no crop/zoom)
 
 Pub cards + lightbox use `object-fit: contain` in a 3:4 frame (full book art). Detail covers capped ~320×480 (`detail-hero--cover` / covers path). Pubs skip 16:9 `img_card`. Partner marks `contain`. Local `serve.json` no-cache. Branch `fix/images-layouts`.
