@@ -142,13 +142,49 @@
       transform: scale(1.05);
     }
 
-    /* Home event cover: pan right → left on hover */
-    .event-row-visual img {
-      transform: translate3d(0, 0, 0);
-      transition: transform 1.2s var(--ease-out-expo);
+    /*
+     * Home event cover: collapsed until hover/focus, then opens with a
+     * right → left image slide. Touch / reduced-motion keep always-on strip.
+     */
+    .event-row-visual {
+      flex-basis: 0;
+      width: 0;
+      max-width: 0;
+      opacity: 0;
+      border-inline-end-width: 0;
+      pointer-events: none;
+      transition:
+        flex-basis var(--duration-base) var(--ease-out-expo),
+        width var(--duration-base) var(--ease-out-expo),
+        max-width var(--duration-base) var(--ease-out-expo),
+        opacity var(--duration-fast) var(--ease-out-soft),
+        border-inline-end-width var(--duration-fast) var(--ease-out-soft);
     }
-    .event-row:hover .event-row-visual img {
-      transform: translate3d(-21.875%, 0, 0); /* (128% − 100%) / 128% */
+    .event-row-visual img {
+      transform: translate3d(100%, 0, 0);
+      transition: transform 0.75s var(--ease-out-expo);
+    }
+    .event-row:hover .event-row-visual,
+    .event-row:focus-within .event-row-visual {
+      flex-basis: clamp(6.5rem, 16vw, 9.5rem);
+      width: clamp(6.5rem, 16vw, 9.5rem);
+      max-width: clamp(6.5rem, 16vw, 9.5rem);
+      opacity: 1;
+      border-inline-end-width: 0.5px;
+      pointer-events: auto;
+    }
+    .event-row:hover .event-row-visual img,
+    .event-row:focus-within .event-row-visual img {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @media (max-width: 560px) and (hover: hover) and (pointer: fine) {
+    .event-row:hover .event-row-visual,
+    .event-row:focus-within .event-row-visual {
+      flex-basis: 5.25rem;
+      width: 5.25rem;
+      max-width: 5.25rem;
     }
   }
 }
