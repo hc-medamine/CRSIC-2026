@@ -76,8 +76,8 @@ Estimated time: **~5 minutes**.
 
 | # | Check | Pass? |
 |---|--------|-------|
-| Wp2 | Item without `*_webp` still shows JPEG/PNG (no broken image) | ☐ |
-| EnB | Law or research group: EN **pending** → Arabic + notice; **ready** → EN title/body, notice gone | ☐ |
+| Wp2 | Item without `*_webp` still shows JPEG/PNG (no broken image) | ☑ 2026-09-13 — cards with `img_webp` use `<picture>`; 36/36 pub covers load; no broken news imgs (3 text-only cards have no media) |
+| EnB | Law or research group: EN **pending** → Arabic + notice; **ready** → EN title/body, notice gone | ☑ pending 2026-09-13 — laws + research groups show AR titles + “Arabic only” notice under `lang=en` (`data-en-ready=0`). **Ready** half still needs CMS mark-ready + four-eyes (no `en_status: ready` in live JSON yet) |
 
 ---
 

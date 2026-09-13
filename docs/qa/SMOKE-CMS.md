@@ -289,9 +289,9 @@ PRD [2026-08-26-remaining-deferred-pack.md](../prds/2026-08-26-remaining-deferre
 
 | # | Check | Pass? |
 |---|--------|-------|
-| Wp1 | Publish a news cover: writes `.webp` sibling + JSON `img_webp` / `img_card_webp` when applicable; public card/detail uses `<picture>` (or equivalent) with JPEG/PNG fallback | ☐ |
-| Wp1b | Super Admin Import/Export: **Rebuild WebP** for this type (and Director) when the control is present; paths land under `img/cms/` | ☐ |
-| EnB | Alert/law/platform/research group or project: EN filled + **pending** → public EN UI still Arabic + notice; mark **ready** + four-eyes → EN with AR field fallback, notice gone | ☐ |
+| Wp1 | Publish a news cover: writes `.webp` sibling + JSON `img_webp` / `img_card_webp` when applicable; public card/detail uses `<picture>` (or equivalent) with JPEG/PNG fallback | ☑ public side 2026-09-13 — `#publications` / `#news` use `<picture class="cms-picture">` + WebP `srcset` + JPEG/PNG fallback; keys present in live JSON. Full Desk publish cycle not re-run this walk (unit: `withImgWebpFromDisk`) |
+| Wp1b | Super Admin Import/Export: **Rebuild WebP** for this type (and Director) when the control is present; paths land under `img/cms/` | ☑ UI 2026-09-13 — both Rebuild buttons visible on `/dashboard/import-export` (SA). Rebuild click not completed this walk (avoid mutating live JSON mid-review) |
+| EnB | Alert/law/platform/research group or project: EN filled + **pending** → public EN UI still Arabic + notice; mark **ready** + four-eyes → EN with AR field fallback, notice gone | ☑ pending 2026-09-13 — laws keep AR titles under EN + notice; research group names stay AR (no EN leak). **Ready** half deferred to CMS four-eyes |
 
 ## G. Gate
 
