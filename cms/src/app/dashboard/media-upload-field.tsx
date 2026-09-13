@@ -6,7 +6,7 @@ import { cmsMediaSrc } from "@/lib/media/cms-src";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { MediaLightbox } from "./media-lightbox";
 import { ImageCropModal } from "./image-crop-modal";
-import { cardFileFromImage, loadImage, variantsFromCrop } from "./image-variants";
+import { cardFileFromImage, cardFromCrop, loadImage } from "./image-variants";
 import { t } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 
@@ -56,46 +56,66 @@ export function MediaUploadField({
   const previewSrc = cmsMediaSrc(publicPath);
   const isPdf = publicPath.toLowerCase().endsWith(".pdf");
 
+  const postNewFile = useCallback(
+    async (file: File): Promise<{ id: string; publicPath: string } | null> => {
+      const form = new FormData();
+      form.set("file", file);
+      form.set("bucket", bucket);
+      if (imagesOnly) form.set("imagesOnly", "1");
+      const res = await fetch("/api/media", { method: "POST", body: form });
+      const data = (await res.json()) as {
+        ok: boolean;
+        error?: string;
+        asset?: { id: string; publicPath: string };
+      };
+      if (!res.ok || !data.ok || !data.asset) {
+        const msg = data.error ?? t("uploadFailed", lang);
+        setError(msg);
+        cmsToast.error(msg);
+        return null;
+      }
+      return data.asset;
+    },
+    [bucket, imagesOnly, lang],
+  );
+
   const postFile = useCallback(
-    async (file: File) => {
+    async (file: File, opts?: { forceNew?: boolean }) => {
       setPending(true);
       setError(null);
       try {
-        const form = new FormData();
-        form.set("file", file);
-        form.set("bucket", bucket);
-        if (imagesOnly) form.set("imagesOnly", "1");
-
-        const url = mediaId ? `/api/media/${mediaId}` : "/api/media";
-        const res = await fetch(url, { method: "POST", body: form });
-        const data = (await res.json()) as {
-          ok: boolean;
-          error?: string;
-          asset?: { id: string; publicPath: string };
-        };
-        if (!res.ok || !data.ok || !data.asset) {
-          const msg = data.error ?? t("uploadFailed", lang);
-          setError(msg);
-          cmsToast.error(msg);
-          return;
+        let asset: { id: string; publicPath: string } | null;
+        if (opts?.forceNew || !mediaId) {
+          asset = await postNewFile(file);
+        } else {
+          const form = new FormData();
+          form.set("file", file);
+          form.set("bucket", bucket);
+          if (imagesOnly) form.set("imagesOnly", "1");
+          const res = await fetch(`/api/media/${mediaId}`, { method: "POST", body: form });
+          const data = (await res.json()) as {
+            ok: boolean;
+            error?: string;
+            asset?: { id: string; publicPath: string };
+          };
+          if (!res.ok || !data.ok || !data.asset) {
+            const msg = data.error ?? t("uploadFailed", lang);
+            setError(msg);
+            cmsToast.error(msg);
+            return;
+          }
+          asset = data.asset;
         }
+        if (!asset) return;
         let cardPath: string | null = null;
-        if (cropEnabled) {
+        if (cropEnabled && !opts?.forceNew) {
           try {
             const objectUrl = URL.createObjectURL(file);
             try {
               const img = await loadImage(objectUrl);
               const card = await cardFileFromImage(img);
-              const cardForm = new FormData();
-              cardForm.set("file", card);
-              cardForm.set("bucket", bucket);
-              cardForm.set("imagesOnly", "1");
-              const cardRes = await fetch("/api/media", { method: "POST", body: cardForm });
-              const cardData = (await cardRes.json()) as {
-                ok: boolean;
-                asset?: { publicPath: string };
-              };
-              if (cardRes.ok && cardData.ok && cardData.asset) cardPath = cardData.asset.publicPath;
+              const cardAsset = await postNewFile(card);
+              if (cardAsset) cardPath = cardAsset.publicPath;
             } finally {
               URL.revokeObjectURL(objectUrl);
             }
@@ -103,14 +123,35 @@ export function MediaUploadField({
             /* card is optional if the browser cannot decode */
           }
         }
-        onUploaded({ publicPath: data.asset.publicPath, mediaId: data.asset.id, cardPath });
+        onUploaded({ publicPath: asset.publicPath, mediaId: asset.id, cardPath });
         cmsToast.success(t("uploadedShort", lang));
       } finally {
         setPending(false);
         if (inputRef.current) inputRef.current.value = "";
       }
     },
-    [bucket, cropEnabled, imagesOnly, lang, mediaId, onUploaded],
+    [bucket, cropEnabled, imagesOnly, lang, mediaId, onUploaded, postNewFile],
+  );
+
+  const postCropCard = useCallback(
+    async (card: File) => {
+      if (!publicPath) return;
+      setPending(true);
+      setError(null);
+      try {
+        const cardAsset = await postNewFile(card);
+        if (!cardAsset) return;
+        onUploaded({
+          publicPath,
+          mediaId: mediaId ?? "",
+          cardPath: cardAsset.publicPath,
+        });
+        cmsToast.success(t("uploadedShort", lang));
+      } finally {
+        setPending(false);
+      }
+    },
+    [lang, mediaId, onUploaded, postNewFile, publicPath],
   );
 
   const uploadFile = useCallback(
@@ -254,10 +295,10 @@ export function MediaUploadField({
           onApply={(crop) => {
             const imgEl = new Image();
             imgEl.onload = () => {
-              void variantsFromCrop(imgEl, crop)
-                .then(({ master }) => {
+              void cardFromCrop(imgEl, crop)
+                .then((card) => {
                   setCropOpen(false);
-                  return postFile(master);
+                  return postCropCard(card);
                 })
                 .catch((err) => {
                   const msg = err instanceof Error ? err.message : t("actionFailed", lang);

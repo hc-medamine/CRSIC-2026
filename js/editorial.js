@@ -18,13 +18,26 @@ export function isEditorialEnReady(item) {
  * @returns {string}
  */
 function arValue(item, field) {
-  if (field === 'title') return String(item.title || item.t || item.name || '').trim();
+  if (field === 'title') {
+    return String(item.title || item.t || item.name || item.title_ar || '').trim();
+  }
   if (field === 'summary') {
     return String(item.summary || item.desc || item.summary_ar || '').trim();
   }
-  if (field === 'body') return String(item.body || item.body_ar || '').trim();
+  if (field === 'body') return String(item.body || item.body_ar || item.dibaja_ar || '').trim();
   if (field === 'label') return String(item.label || item.type || item.dept || '').trim();
-  if (field === 'name') return String(item.name || item.title || '').trim();
+  if (field === 'name') {
+    return String(item.name || item.name_ar || item.title || item.title_ar || '').trim();
+  }
+  if (field === 'message') return String(item.message_ar || item.message || '').trim();
+  if (field === 'lead') return String(item.lead_ar || item.research_lead_ar || '').trim();
+  if (field === 'questions') {
+    return String(item.questions_ar || item.research_questions_ar || '').trim();
+  }
+  if (field === 'duration') {
+    return String(item.duration_ar || item.research_duration_ar || '').trim();
+  }
+  if (field === 'link_label') return String(item.link_label_ar || '').trim();
   return '';
 }
 
@@ -36,9 +49,14 @@ function arValue(item, field) {
 function enValue(item, field) {
   if (field === 'title') return String(item.title_en || '').trim();
   if (field === 'summary') return String(item.summary_en || '').trim();
-  if (field === 'body') return String(item.body_en || '').trim();
+  if (field === 'body') return String(item.body_en || item.dibaja_en || '').trim();
   if (field === 'label') return String(item.label_en || item.type_en || '').trim();
   if (field === 'name') return String(item.name_en || item.title_en || '').trim();
+  if (field === 'message') return String(item.message_en || '').trim();
+  if (field === 'lead') return String(item.lead_en || '').trim();
+  if (field === 'questions') return String(item.questions_en || '').trim();
+  if (field === 'duration') return String(item.duration_en || '').trim();
+  if (field === 'link_label') return String(item.link_label_en || '').trim();
   return '';
 }
 
@@ -67,6 +85,20 @@ export function editorialCardAttrs(item, lang = getLang()) {
   const attrs = { 'data-en-ready': ready ? '1' : '0' };
   if (lang === 'en') attrs.lang = ready ? 'en' : 'ar';
   return attrs;
+}
+
+/**
+ * Bilingual list entry (research axes/impacts/members) gated by parent en_status.
+ * @param {object|null|undefined} entry
+ * @param {object|null|undefined} parentItem
+ * @param {string} [lang]
+ * @returns {string}
+ */
+export function editorialBilingualEntry(entry, parentItem, lang = getLang()) {
+  if (!entry) return '';
+  const ar = String(entry.ar || entry.name_ar || '').trim();
+  if (lang !== 'en' || !isEditorialEnReady(parentItem)) return ar;
+  return String(entry.en || entry.name_en || '').trim() || ar;
 }
 
 /**

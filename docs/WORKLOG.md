@@ -2,6 +2,10 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
+### 2026-09-13 — Cuts A+B walk (PR #53)
+
+Walked `feature/cms-cuts-a-b-webp-en` on SPA `:5500` + CMS SA. **Pass:** Wp2; EnB **pending** (laws + research groups); Wp1 public `<picture>`+WebP; Wp1b Rebuild UI present; journals blob unchanged vs `main`; CMS 130 / SPA 33 tests green. **Still open for Delivered:** EnB **ready** via CMS mark-ready + four-eyes; optional live Rebuild WebP click. Pub covers `object-fit: contain` confirmed.
+
 | Doc | Role |
 |-----|------|
 | [docs/README.md](./README.md) | Documentation index |
@@ -16,6 +20,12 @@ Living record of architectural and feature work. **Append new changelog entries 
 | **WORKLOG.md** | This file |
 
 Only root [README.md](../README.md) remains at the project root; other docs live under `docs/`.
+
+---
+
+### 2026-09-13 — Cuts A+B **implementing** (WebP + remaining EN)
+
+[prds/2026-08-26-remaining-deferred-pack.md](./prds/2026-08-26-remaining-deferred-pack.md) Cuts A+B on `feature/cms-cuts-a-b-webp-en`. WebP siblings + remaining EN-when-ready + track local media/WebP siblings + restore `serve.json` cache headers. Journals still deferred (OJS).
 
 ---
 

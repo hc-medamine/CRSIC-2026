@@ -1,4 +1,6 @@
-/** Shared public JSON extras: EN-when-ready + card image. */
+/** Shared public JSON extras: EN-when-ready + card image + WebP siblings. */
+
+import { webpPathIfExists } from "@/lib/media/webp";
 
 export type StoryEnFields = {
   en_status: "pending" | "ready";
@@ -52,18 +54,42 @@ export function withImgCard<T extends object>(
   return { ...item, img_card: v };
 }
 
-/** Attach EN-when-ready fields + optional card image for live_payload / public JSON. */
+export function withImgWebpFromDisk<T extends object>(
+  item: T,
+  masterPath?: string | null,
+  cardPath?: string | null,
+): T & { img_webp?: string; img_card_webp?: string } {
+  const img_webp = webpPathIfExists(masterPath);
+  const img_card_webp = webpPathIfExists(cardPath);
+  if (!img_webp && !img_card_webp) return item;
+  return {
+    ...item,
+    ...(img_webp ? { img_webp } : {}),
+    ...(img_card_webp ? { img_card_webp } : {}),
+  };
+}
+
+/** Attach EN-when-ready fields + optional card image + WebP siblings for live_payload / public JSON. */
 export function withPublicStoryFields<T extends object>(
   item: T,
-  row: StoryEnSource & { image_card_path?: string | null; img_card?: string | null },
+  row: StoryEnSource & {
+    image_card_path?: string | null;
+    img_card?: string | null;
+    image_path?: string | null;
+    img?: string | null;
+  },
   opts?: { nameEn?: boolean; typeEn?: string | null },
-): T & StoryEnFields & { img_card?: string; type_en?: string } {
-  let next: T & StoryEnFields & { img_card?: string; type_en?: string } = withStoryEn(
+): T & StoryEnFields & { img_card?: string; img_webp?: string; img_card_webp?: string; type_en?: string } {
+  let next: T &
+    StoryEnFields & { img_card?: string; img_webp?: string; img_card_webp?: string; type_en?: string } = withStoryEn(
     item,
     row,
     opts,
   );
   const typeEn = opts?.typeEn?.trim();
   if (typeEn) next = { ...next, type_en: typeEn };
-  return withImgCard(next, row.image_card_path ?? row.img_card);
+  const cardPath = row.image_card_path ?? row.img_card;
+  next = withImgCard(next, cardPath);
+  const masterPath = row.image_path ?? row.img ?? (item as { img?: string | null }).img;
+  return withImgWebpFromDisk(next, masterPath, cardPath);
 }

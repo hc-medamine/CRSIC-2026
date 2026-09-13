@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { withImgCard, withPublicStoryFields, withStoryEn } from "./storyPublic";
+import { withImgCard, withImgWebpFromDisk, withPublicStoryFields, withStoryEn } from "./storyPublic";
 
 describe("withStoryEn", () => {
   it("treats missing en_status as pending and omits empty EN fields", () => {
@@ -26,6 +26,14 @@ describe("withImgCard", () => {
   it("adds img_card only when a path is present", () => {
     assert.deepEqual(withImgCard({ img: "img/a.png" }, "  "), { img: "img/a.png" });
     assert.equal(withImgCard({ img: "img/a.png" }, "img/a-card.jpg").img_card, "img/a-card.jpg");
+  });
+});
+
+describe("withImgWebpFromDisk", () => {
+  it("omits keys when siblings are missing", () => {
+    assert.deepEqual(withImgWebpFromDisk({ img: "img/a.jpg" }, "img/a.jpg", "img/a-card.jpg"), {
+      img: "img/a.jpg",
+    });
   });
 });
 

@@ -622,7 +622,7 @@ Deep links may pass `data-tab` / `data-filter` on navigable elements.
 | API                  | `t(key)`, `setLang`, `applyTranslations` in `js/i18n.js`                                                                    |
 | HTML attrs           | `data-i18n`, `data-i18n-html`, `data-i18n-placeholder`, `data-i18n-aria` |
 | URL locale           | `?lang=ar\|en` (hash routes unchanged; no `/ar`/`/en` path prefix) |
-| Content bilingualism | **UI chrome** bilingual; editorial JSON bodies Arabic-only with EN notice — [docs/audits/PARITY.md](./docs/audits/PARITY.md) |
+| Content bilingualism | **UI chrome** bilingual; CMS editorial types **EN-when-ready** (journals Arabic-only / OJS) — [docs/audits/PARITY.md](./docs/audits/PARITY.md) |
 
 ### 6.5 Media assets
 
@@ -811,7 +811,7 @@ No separate staging config files exist in-repo.
 
 ### Known issues / gaps
 
-1. **Editorial content language** — pubs/events/news/partners/journals bodies are intentionally Arabic-only in EN UI (notice + switch); full bilingual schema **blocked pending approval** — see [docs/audits/PARITY.md](./docs/audits/PARITY.md).
+1. **Editorial content language** — CMS types use **EN-when-ready** (`ready` → EN with AR field fallback; pending/missing → AR + notice). **Journals** stay Arabic-only / OJS. See [docs/audits/PARITY.md](./docs/audits/PARITY.md).
 2. **Contact depends on a local mail client** — no server-side mailer or form API.
 3. **Audit TODOs are closed**; no `TODO`/`FIXME` markers remain in app JS for open defects.
 4. **Home featured playlist** is empty until Reviewer/SA publishes `/dashboard/featured-news` (SPA fallback is live).
@@ -821,7 +821,7 @@ No separate staging config files exist in-repo.
 | Priority | Item |
 |----------|------|
 | Medium | Dual-field or locale-keyed content if EN parity is required |
-| Medium | Further image compression / WebP for covers and `img/cms/` |
+| Medium | Further image compression / WebP for covers and `img/cms/` — in progress on `feature/cms-cuts-a-b-webp-en` |
 | Low | Introduce SPA linting/formatting once the team grows |
 
 ### Product direction
@@ -834,7 +834,7 @@ Own **internal CMS + PostgreSQL** (`cms/`): authenticated users with roles and p
 2. Server list pagination — **Delivered** [docs/prds/2026-08-22-cms-list-load-more.md](./docs/prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more)
 3. Soft-delete recycle bin — **Delivered** [docs/prds/2026-08-22-cms-recycle-bin.md](./docs/prds/2026-08-22-cms-recycle-bin.md) (PR #34)
 4. Bulk ops / clone / import-export UI — **list bulk unpublish/recycle on all CMS content types** (news PR #36; events/publications + remaining types PR #37). **Clone Cut 1 Delivered** ([PRD](./docs/prds/2026-08-22-cms-clone-import-export.md), PR #42). **JSON zip I/E Delivered** (PR #44). Picker bulk + sort: [PRD](./docs/prds/2026-08-24-cms-import-export-bulk-sort.md) (**Delivered**)
-5–7. Extra media optimize, remaining EN-when-ready, static institutional pages — [docs/prds/2026-08-26-remaining-deferred-pack.md](./docs/prds/2026-08-26-remaining-deferred-pack.md). **Cut C** (site pages) implementing on `feature/cms-site-pages`. Cover crop + news/events/pubs/partners EN-when-ready already shipped (PR #44).
+5–7. Extra media optimize, remaining EN-when-ready, static institutional pages — [docs/prds/2026-08-26-remaining-deferred-pack.md](./docs/prds/2026-08-26-remaining-deferred-pack.md). **Cut C Delivered** (PR #50). **Cuts A–B implementing** on `feature/cms-cuts-a-b-webp-en`. Cover crop + news/events/pubs/partners EN-when-ready already shipped (PR #44).
 8. Journals in CMS (OJS remains) — **still deferred**; out of the 2026-08-26 pack
 
 **Cancelled (do not re-open):** scheduled / timed auto-publish (2026-07-21, confirmed 2026-08-22). Publish stays manual Approve → Publish.
@@ -849,7 +849,7 @@ Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Core spec: [d
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-08-26** (Cut C site pages implementing; remaining-deferred pack) |
+| Last updated     | **2026-09-13** (Cuts A–B implementing on `feature/cms-cuts-a-b-webp-en`) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes

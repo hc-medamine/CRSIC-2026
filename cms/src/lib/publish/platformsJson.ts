@@ -3,6 +3,11 @@ import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
 import { seoFromRow, withPublicSeo, type PublicSeoFields } from "@/lib/content/seo";
 import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
+import {
+  withImgWebpFromDisk,
+  withPublicStoryFields,
+  type StoryEnFields,
+} from "@/lib/publish/storyPublic";
 
 export type PlatformKind = "visual" | "radio" | "mobility";
 
@@ -11,15 +16,13 @@ export type PublicPlatformItem = {
   slug: string;
   kind: PlatformKind;
   title: string;
-  titleEn?: string;
   summary: string;
-  summaryEn?: string;
   body?: string;
-  bodyEn?: string;
   img?: string;
   externalUrl?: string;
   media?: { kind: string; src: string; alt?: string }[];
-} & PublicSeoFields;
+} & PublicSeoFields &
+  StoryEnFields & { img_webp?: string };
 
 type PayloadSource = {
   id: string;
@@ -34,6 +37,7 @@ type PayloadSource = {
   platform_kind: PlatformKind | null;
   attachments?: unknown;
   public_slug?: string | null;
+  en_status?: string | null;
   meta_title_ar?: string | null;
   meta_title_en?: string | null;
   meta_description_ar?: string | null;
@@ -69,24 +73,29 @@ export function buildPlatformPayload(row: PayloadSource): PublicPlatformItem {
   if (!img && media.length === 0 && !externalUrl) {
     throw new Error("Provide media/image or an external URL before publishing");
   }
-  const item = withPublicSeo(
+  return withPublicStoryFields(
+    withPublicSeo(
+      {
+        id: row.id,
+        slug: row.public_slug?.trim() || row.id,
+        kind,
+        title: row.title_ar.trim(),
+        summary: row.summary_ar?.trim() || "",
+        ...(bodyAr ? { body: bodyAr } : {}),
+        ...(img ? { img } : {}),
+        ...(externalUrl ? { externalUrl } : {}),
+        ...(media.length ? { media } : {}),
+      },
+      row,
+    ),
     {
-      id: row.id,
-      slug: row.public_slug?.trim() || row.id,
-      kind,
-      title: row.title_ar.trim(),
-      summary: row.summary_ar?.trim() || "",
+      en_status: row.en_status,
+      title_en: row.title_en,
+      summary_en: row.summary_en,
+      body_en: bodyEn,
+      image_path: img || null,
     },
-    row,
-  ) as PublicPlatformItem;
-  if (row.title_en?.trim()) item.titleEn = row.title_en.trim();
-  if (row.summary_en?.trim()) item.summaryEn = row.summary_en.trim();
-  if (bodyAr) item.body = bodyAr;
-  if (bodyEn) item.bodyEn = bodyEn;
-  if (img) item.img = img;
-  if (externalUrl) item.externalUrl = externalUrl;
-  if (media.length > 0) item.media = media;
-  return item;
+  );
 }
 
 function publicPlatformsPath(): string {
@@ -103,6 +112,7 @@ export async function rebuildPublicPlatformsJson(): Promise<{ count: number; pat
   const platforms: PublicPlatformItem[] = result.rows.map((row) => ({
     ...row.live_payload,
     ...seoFromRow(row.live_payload),
+    ...withImgWebpFromDisk(row.live_payload, row.live_payload.img),
   }));
   const path = publicPlatformsPath();
   const dir = dirname(path);

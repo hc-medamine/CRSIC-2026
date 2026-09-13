@@ -1,12 +1,21 @@
 {
   "headers": [
     {
-      "source": "**/*",
+      "source": "**/*.@(jpg|jpeg|png|webp|gif|mp4|svg)",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache"
-        }
+        { "key": "Cache-Control", "value": "public, max-age=2592000, immutable" }
+      ]
+    },
+    {
+      "source": "**/*.@(js|css)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
+    },
+    {
+      "source": "data/*.json",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" }
       ]
     }
   ]

@@ -3,7 +3,8 @@ import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { appendWorkflowComment } from "@/lib/content/comments";
-import { buildPartnerPayload, rebuildPublicPartnersJson } from "@/lib/publish/partnersJson";
+import { prepareContentImagesForPublish } from "@/lib/media/publishImages";
+import { buildPartnerPayload, buildPartnerPayloadForItem, rebuildPublicPartnersJson } from "@/lib/publish/partnersJson";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
 import { mutateThenRebuildPublic } from "@/lib/publish/safeRebuild";
 import {
@@ -14,6 +15,7 @@ import {
   assertOrgAllowsContentType,
 } from "@/lib/content/permissions";
 import { notifyOnSubmit } from "@/lib/content/delegation";
+import { isReviewerDecisionStatus, canSubmitStatus, submitStatusError, isEditableStatus } from "@/lib/content/reviewWorkflow";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
 import { unpublishMutateMaybeRebuild, shouldNotifyUnpublish, type SilentUnpublishOpts } from "@/lib/content/silentUnpublish";
 import { normalizeSeoInput, seoSnapshotFields, type SeoInput } from "@/lib/content/seo";
@@ -228,7 +230,7 @@ export async function createPartner(user: SessionUser, input: PartnerInput): Pro
 export async function updatePartnerDraft(user: SessionUser, id: string, input: PartnerInput) {
   const existing = await getPartnerById(id);
   if (!existing) throw new Error("Not found");
-  if (!["draft", "changes_requested"].includes(existing.status)) {
+  if (!isEditableStatus(existing.status)) {
     throw new Error("Only draft or changes_requested items can be edited");
   }
   if (existing.created_by !== user.id && user.role !== "super_admin") {
@@ -248,6 +250,7 @@ export async function updatePartnerDraft(user: SessionUser, id: string, input: P
       partner_scope = $13, partner_date = $14, partner_emoji = $15, image_path = $16,
       meta_title_ar = $17, meta_title_en = $18, meta_description_ar = $19,
       meta_description_en = $20, og_image = $21,
+      status = CASE WHEN status = 'unpublished' THEN 'draft' ELSE status END,
       updated_at = NOW()
      WHERE id = $1 AND content_type = 'partner'
      RETURNING *`,
@@ -288,7 +291,9 @@ async function notifyReviewers(itemId: string, title: string, body: string, link
 export async function submitPartner(user: SessionUser, id: string, checklistConfirmed: boolean) {
   const existing = await getPartnerById(id);
   if (!existing) throw new Error("Not found");
-  if (!["draft", "changes_requested"].includes(existing.status)) throw new Error("Cannot submit in current status");
+  if (!canSubmitStatus(existing.status)) {
+    throw new Error(submitStatusError(existing.status));
+  }
   if (existing.created_by !== user.id && user.role !== "super_admin") throw new Error("Only the author can submit");
   if (!checklistConfirmed) throw new Error("Editorial checklist must be confirmed");
   if (!existing.title_ar.trim()) throw new Error("Partner name (AR) is required");
@@ -339,7 +344,7 @@ export async function requestPartnerChanges(user: SessionUser, id: string, note:
   const existing = await getPartnerById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
-  if (existing.status !== "submitted") throw new Error("Item is not awaiting review");
+  if (!isReviewerDecisionStatus(existing.status)) throw new Error("Item is not awaiting review");
   if (!note.trim()) throw new Error("Change request note is required");
   const result = await query<PartnerItem>(
     `UPDATE content_items SET status = 'changes_requested', review_note = $2, updated_by = $3, updated_at = NOW()
@@ -364,7 +369,7 @@ export async function approvePartner(user: SessionUser, id: string) {
   const existing = await getPartnerById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
-  if (existing.status !== "submitted") throw new Error("Item is not awaiting review");
+  if (!isReviewerDecisionStatus(existing.status)) throw new Error("Item is not awaiting review");
   const result = await query<PartnerItem>(
     `UPDATE content_items SET status = 'approved', review_note = NULL, updated_by = $2, updated_at = NOW()
      WHERE id = $1 RETURNING *`,
@@ -387,7 +392,7 @@ export async function rejectPartner(user: SessionUser, id: string, note: string)
   const existing = await getPartnerById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
-  if (existing.status !== "submitted") throw new Error("Item is not awaiting review");
+  if (!isReviewerDecisionStatus(existing.status)) throw new Error("Item is not awaiting review");
   if (!note.trim()) throw new Error("Rejection note is required");
   const result = await query<PartnerItem>(
     `UPDATE content_items SET status = 'rejected', review_note = $2, updated_by = $3, updated_at = NOW()
@@ -420,7 +425,8 @@ export async function publishPartner(user: SessionUser, id: string) {
     titleAr: existing.title_ar,
     existingSlug: existing.public_slug,
   });
-  const payload = buildPartnerPayload({ ...existing, public_slug: slug });
+  const prepared = await prepareContentImagesForPublish(existing);
+  const payload = buildPartnerPayload({ ...prepared, public_slug: slug });
   const item = await mutateThenRebuildPublic({
     itemId: id,
     mutate: async () => {
@@ -455,7 +461,7 @@ export async function unpublishPartner(user: SessionUser, id: string, opts: Sile
   if (existing.status !== "published") throw new Error("Item is not published");
   const mutate = async () => {
     const result = await query<PartnerItem>(
-      `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
+      `UPDATE content_items SET status = 'draft', live_payload = NULL, live_at = NULL,
         needs_post_review = FALSE, emergency_published_at = NULL,
         emergency_published_by = NULL, emergency_reason = NULL,
         updated_by = $2, updated_at = NOW()
@@ -465,7 +471,7 @@ export async function unpublishPartner(user: SessionUser, id: string, opts: Sile
     return result.rows[0];
   };
   const item = await unpublishMutateMaybeRebuild(id, mutate, rebuildPublicPartnersJson, opts);
-  await addRevision(item.id, "unpublished", snapshotOf(item), user.id, "Unpublished");
+  await addRevision(item.id, "draft", snapshotOf(item), user.id, "Unpublished");
   if (shouldNotifyUnpublish(opts)) {
     await createNotification({
       userId: item.created_by,

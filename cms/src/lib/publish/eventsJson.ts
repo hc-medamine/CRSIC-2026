@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
+import { prepareContentImagesForPublish } from "@/lib/media/publishImages";
 import {
   buildMediaList,
   primaryImageSrc,
@@ -115,6 +116,7 @@ export function buildEventPayload(
       title_en: row.title_en,
       summary_en: row.summary_en,
       body_en: sanitizeBodyHtml(row.body_en) || null,
+      image_path: row.image_path ?? primary,
       image_card_path: row.image_card_path,
     },
     { typeEn: row.event_type_en },
@@ -131,6 +133,7 @@ export async function buildEventPayloadForItem(
   row: PayloadSource,
   usedSlugs?: Set<string>,
 ): Promise<StoredEventPayload> {
+  const prepared = await prepareContentImagesForPublish(row);
   const byline = row.id ? await loadPublicByline(row.id) : {
     editor_ar: "",
     editor_en: "",
@@ -139,7 +142,7 @@ export async function buildEventPayloadForItem(
     publisher_ar: PUBLIC_PUBLISHER_AR,
     publisher_en: PUBLIC_PUBLISHER_EN,
   };
-  return buildEventPayload({ ...row, ...byline }, usedSlugs);
+  return buildEventPayload({ ...prepared, ...byline }, usedSlugs);
 }
 
 function publicEventsPath(): string {

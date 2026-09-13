@@ -4,7 +4,7 @@ import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { appendWorkflowComment } from "@/lib/content/comments";
 import {
-  buildPublicationPayload,
+  buildPublicationPayloadForItem,
   rebuildPublicPublicationsJson,
 } from "@/lib/publish/publicationsJson";
 import { persistImageCardPath } from "@/lib/content/imageCard";
@@ -20,6 +20,7 @@ import {
   assertOrgAllowsContentType,
 } from "@/lib/content/permissions";
 import { notifyOnSubmit } from "@/lib/content/delegation";
+import { isReviewerDecisionStatus, canSubmitStatus, submitStatusError, isEditableStatus } from "@/lib/content/reviewWorkflow";
 import { assertNotAwayFrozen, refreshUserFromDb } from "@/lib/content/ooo";
 import { normalizeSeoInput, seoSnapshotFields, type SeoInput } from "@/lib/content/seo";
 import type { ContentStatus } from "@/lib/content/news";
@@ -263,7 +264,7 @@ export async function updatePublicationDraft(
 ) {
   const existing = await getPublicationById(id);
   if (!existing) throw new Error("Not found");
-  if (!["draft", "changes_requested"].includes(existing.status)) {
+  if (!isEditableStatus(existing.status)) {
     throw new Error("Only draft or changes_requested items can be edited");
   }
   if (existing.created_by !== user.id && user.role !== "super_admin") {
@@ -293,6 +294,7 @@ export async function updatePublicationDraft(
       attachments = $17::jsonb, public_slug = COALESCE($18, public_slug),
       meta_title_ar = $19, meta_title_en = $20, meta_description_ar = $21,
       meta_description_en = $22, og_image = $23,
+      status = CASE WHEN status = 'unpublished' THEN 'draft' ELSE status END,
       updated_at = NOW()
      WHERE id = $1 AND content_type = 'publication'
      RETURNING *`,
@@ -339,8 +341,8 @@ export async function submitPublication(
 ) {
   const existing = await getPublicationById(id);
   if (!existing) throw new Error("Not found");
-  if (!["draft", "changes_requested"].includes(existing.status)) {
-    throw new Error("Cannot submit in current status");
+  if (!canSubmitStatus(existing.status)) {
+    throw new Error(submitStatusError(existing.status));
   }
   if (existing.created_by !== user.id && user.role !== "super_admin") {
     throw new Error("Only the author can submit");
@@ -402,7 +404,7 @@ export async function requestPublicationChanges(user: SessionUser, id: string, n
   const existing = await getPublicationById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
-  if (existing.status !== "submitted") throw new Error("Item is not awaiting review");
+  if (!isReviewerDecisionStatus(existing.status)) throw new Error("Item is not awaiting review");
   if (!note.trim()) throw new Error("Change request note is required");
   const result = await query<PublicationItem>(
     `UPDATE content_items SET status = 'changes_requested', review_note = $2, updated_by = $3, updated_at = NOW()
@@ -427,7 +429,7 @@ export async function approvePublication(user: SessionUser, id: string) {
   const existing = await getPublicationById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
-  if (existing.status !== "submitted") throw new Error("Item is not awaiting review");
+  if (!isReviewerDecisionStatus(existing.status)) throw new Error("Item is not awaiting review");
   const result = await query<PublicationItem>(
     `UPDATE content_items SET status = 'approved', review_note = NULL, updated_by = $2, updated_at = NOW()
      WHERE id = $1 RETURNING *`,
@@ -450,7 +452,7 @@ export async function rejectPublication(user: SessionUser, id: string, note: str
   const existing = await getPublicationById(id);
   if (!existing) throw new Error("Not found");
   await assertReviewer(user, existing);
-  if (existing.status !== "submitted") throw new Error("Item is not awaiting review");
+  if (!isReviewerDecisionStatus(existing.status)) throw new Error("Item is not awaiting review");
   if (!note.trim()) throw new Error("Rejection note is required");
   const result = await query<PublicationItem>(
     `UPDATE content_items SET status = 'rejected', review_note = $2, updated_by = $3, updated_at = NOW()
@@ -486,7 +488,7 @@ export async function publishPublication(user: SessionUser, id: string) {
     titleAr: existing.title_ar,
     existingSlug: existing.public_slug,
   });
-  const payload = buildPublicationPayload({ ...existing, public_slug: slug });
+  const payload = await buildPublicationPayloadForItem({ ...existing, public_slug: slug });
   const item = await mutateThenRebuildPublic({
     itemId: id,
     mutate: async () => {
@@ -532,7 +534,7 @@ export async function unpublishPublication(
   if (existing.status !== "published") throw new Error("Item is not published");
   const mutate = async () => {
     const result = await query<PublicationItem>(
-      `UPDATE content_items SET status = 'unpublished', live_payload = NULL, live_at = NULL,
+      `UPDATE content_items SET status = 'draft', live_payload = NULL, live_at = NULL,
         needs_post_review = FALSE, emergency_published_at = NULL,
         emergency_published_by = NULL, emergency_reason = NULL,
         updated_by = $2, updated_at = NOW()
@@ -549,7 +551,7 @@ export async function unpublishPublication(
           mutate,
           rebuild: rebuildPublicPublicationsJson,
         });
-  await addRevision(item.id, "unpublished", snapshotOf(item), user.id, "Unpublished");
+  await addRevision(item.id, "draft", snapshotOf(item), user.id, "Unpublished");
   if (opts.notify !== false) {
     await createNotification({
       userId: item.created_by,

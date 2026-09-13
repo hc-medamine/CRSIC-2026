@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
+import { prepareContentImagesForPublish } from "@/lib/media/publishImages";
 import {
   buildMediaList,
   primaryImageSrc,
@@ -151,6 +152,7 @@ export function buildNewsPayload(row: PayloadSource, usedSlugs?: Set<string>): S
       summary_en: row.summary_en,
       body_en: sanitizeBodyHtml(row.body_en) || null,
       label_en: row.label_en,
+      image_path: row.image_path,
       image_card_path: row.image_card_path,
     },
   );
@@ -168,8 +170,9 @@ export async function buildNewsPayloadForItem(
   row: PayloadSource,
   usedSlugs?: Set<string>,
 ): Promise<StoredNewsPayload> {
+  const prepared = await prepareContentImagesForPublish(row);
   const byline = row.id ? await loadPublicByline(row.id) : bylineFromRow(row);
-  return buildNewsPayload({ ...row, ...byline }, usedSlugs);
+  return buildNewsPayload({ ...prepared, ...byline }, usedSlugs);
 }
 
 function publicNewsPath(): string {

@@ -90,7 +90,9 @@ export async function proposeReviewOwner(
 ): Promise<void> {
   const effective = (await refreshUserFromDb(user.id)) ?? user;
   await assertNotAwayFrozen(effective);
-  if (!canReview(effective)) throw new Error("Reviewer or Super Admin role required");
+  if (effective.role !== "super_admin") {
+    throw new Error("Only Super Admin can set review owner");
+  }
 
   const item = await getItem(contentItemId);
   if (!item) throw new Error("Not found");
@@ -103,43 +105,7 @@ export async function proposeReviewOwner(
     throw new Error("Four-eyes: review owner cannot be the item author");
   }
 
-  if (effective.role === "super_admin") {
-    await applyReviewOwner(effective, item, target.id, target.display_name);
-    return;
-  }
-
-  await query(
-    `UPDATE content_items SET
-       review_owner_proposed_id = $2,
-       review_owner_proposed_by = $3,
-       review_owner_proposed_at = NOW(),
-       updated_by = $3,
-       updated_at = NOW()
-     WHERE id = $1`,
-    [contentItemId, target.id, effective.id],
-  );
-
-  await writeAudit({
-    actor: effective,
-    action: "content.review_owner_proposed",
-    entityType: item.content_type,
-    entityId: item.id,
-    summary: `Proposed review owner ${target.display_name} for "${item.title_ar}"`,
-    metadata: { proposedId: target.id },
-  });
-
-  const sas = await query<{ id: string }>(
-    `SELECT id FROM users WHERE is_active = TRUE AND role = 'super_admin'`,
-  );
-  await notifyUserIds(
-    sas.rows.map((r) => r.id),
-    {
-      type: `${item.content_type}.review_owner_proposed`,
-      title: "Review owner proposal needs confirmation",
-      body: `${item.title_ar} → ${target.display_name}`,
-      linkPath: `/dashboard/${contentPathSegment(item.content_type)}/${item.id}`,
-    },
-  );
+  await applyReviewOwner(effective, item, target.id, target.display_name);
 }
 
 export async function confirmReviewOwner(

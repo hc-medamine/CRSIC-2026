@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, renameSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { query } from "@/lib/db";
+import { prepareContentImagesForPublish } from "@/lib/media/publishImages";
 import {
   buildMediaList,
   primaryImageSrc,
@@ -83,10 +84,19 @@ export function buildPublicationPayload(
       summary_en: row.summary_en,
       body_en: sanitizeBodyHtml(row.body_en) || null,
       label_en: row.label_en,
+      image_path: cover || row.image_path,
       image_card_path: row.image_card_path,
     },
   );
   return { ...publicBase, cover };
+}
+
+export async function buildPublicationPayloadForItem(
+  row: PayloadSource,
+  usedSlugs?: Set<string>,
+): Promise<StoredPubPayload> {
+  const prepared = await prepareContentImagesForPublish(row);
+  return buildPublicationPayload(prepared, usedSlugs);
 }
 
 function publicPublicationsPath(): string {

@@ -1,9 +1,9 @@
 /**
  * News card — safe DOM builder (no innerHTML).
  */
-import { cmsCardImageSrc } from '../data.js';
+import { cmsCardImageSrc, cmsResponsiveSources } from '../data.js';
 import { editorialCardAttrs, editorialField } from '../editorial.js';
-import { el, safeImageSrc } from '../utils.js';
+import { el, createPictureImg } from '../utils.js';
 import { createContentByline } from './contentByline.js';
 
 const GRADIENTS = [
@@ -45,21 +45,21 @@ function createPlaceholderSvg() {
 /**
  * @param {object} n
  * @param {number} i
+ * @param {{ linkToDetail?: boolean }} [opts]
  * @returns {HTMLElement}
  */
-export function createNewsCard(n, i) {
+export function createNewsCard(n, i, opts = {}) {
+  const { linkToDetail = false } = opts;
   let mediaChild;
   const title = editorialField(n, 'title');
   const label = editorialField(n, 'label');
-  const src = safeImageSrc(cmsCardImageSrc(n));
-  if (src) {
-    mediaChild = el('img', {
+  const sources = cmsResponsiveSources(n, 'card');
+  if (sources.fallback) {
+    mediaChild = createPictureImg({
+      fallbackSrc: sources.fallback,
+      webpSrc: sources.webp,
       className: 'news-thumb',
-      attrs: {
-        src,
-        alt: title || '',
-        loading: 'lazy',
-      },
+      alt: title || '',
     });
   } else {
     mediaChild = el('div', {
@@ -77,6 +77,34 @@ export function createNewsCard(n, i) {
     .toLowerCase();
   const byline = createContentByline(n, { includeDate: true });
   const cardAttrs = editorialCardAttrs(n);
+
+  const body = el('div', {
+    className: 'news-body',
+    children: [
+      el('div', { className: 'news-label', text: label || '' }),
+      el('div', { className: 'news-title card-title', text: title || '' }),
+      byline,
+    ].filter(Boolean),
+  });
+
+  const inner = [
+    el('div', { className: 'card-media', children: [mediaChild] }),
+    body,
+  ];
+
+  if (linkToDetail && slug) {
+    return el('a', {
+      className: 'news-card news-card--link',
+      attrs: {
+        href: `#news/${encodeURIComponent(slug)}`,
+        'data-year': /^\d{4}$/.test(year) ? year : '',
+        'data-q': haystack,
+        ...cardAttrs,
+      },
+      children: inner,
+    });
+  }
+
   return el('article', {
     className: 'news-card news-card--link',
     attrs: slug
@@ -94,17 +122,7 @@ export function createNewsCard(n, i) {
           'data-q': haystack,
           ...cardAttrs,
         },
-    children: [
-      el('div', { className: 'card-media', children: [mediaChild] }),
-      el('div', {
-        className: 'news-body',
-        children: [
-          el('div', { className: 'news-label', text: label || '' }),
-          el('div', { className: 'news-title card-title', text: title || '' }),
-          byline,
-        ].filter(Boolean),
-      }),
-    ],
+    children: inner,
   });
 }
 
