@@ -4290,6 +4290,39 @@ html[dir="rtl"] li {
   gap: 0.25rem;
   justify-content: center;
 }
+.event-row-body--with-visual {
+  flex-direction: row;
+  align-items: stretch;
+  padding: 0;
+  gap: 0;
+}
+.event-row-copy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  justify-content: center;
+  padding-block: 0.85rem;
+  padding-inline: 1rem 1.1rem;
+}
+.event-row-visual {
+  flex: 0 0 clamp(7.5rem, 20vw, 11rem);
+  align-self: stretch;
+  min-height: 100%;
+  overflow: hidden;
+  background: #edf4f1;
+  position: relative;
+}
+.event-row-visual img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
 .event-row-type {
   font-size: 0.75rem;
   color: var(--text-subtle);
@@ -4318,6 +4351,12 @@ html[dir="rtl"] li {
   display: inline-block;
   width: fit-content;
   margin-bottom: 0.1rem;
+}
+
+@media (max-width: 560px) {
+  .event-row-body--with-visual .event-row-visual {
+    flex-basis: 5.75rem;
+  }
 }
 
 /* Platform filter chips */

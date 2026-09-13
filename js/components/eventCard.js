@@ -1,9 +1,10 @@
 /**
  * Event list / year-group / home teaser — safe DOM builders (no innerHTML).
  */
+import { cmsResponsiveSources } from '../data.js';
 import { editorialCardAttrs, editorialField } from '../editorial.js';
 import { t } from '../i18n.js';
-import { el } from '../utils.js';
+import { createPictureImg, el } from '../utils.js';
 import { createContentByline } from './contentByline.js';
 
 /** Short month labels in events.json → longer Arabic display for home cards. */
@@ -36,6 +37,25 @@ function formatHomeEventDate(e) {
 }
 
 /**
+ * @param {object} e
+ * @param {string} title
+ * @returns {HTMLElement|null}
+ */
+function createHomeEventVisual(e, title) {
+  const sources = cmsResponsiveSources(e, 'card');
+  const img = createPictureImg({
+    fallbackSrc: sources.fallback,
+    webpSrc: sources.webp,
+    alt: title || '',
+  });
+  if (!img) return null;
+  return el('div', {
+    className: 'event-row-visual',
+    children: [img],
+  });
+}
+
+/**
  * Home-page upcoming event row — date badge on inline-start, text on inline-end.
  * Distinct from news photo cards and from the featured carousel.
  * @param {object} e
@@ -59,6 +79,32 @@ export function createHomeEventCard(e, i = 0) {
         ? t('ev_badge_upcoming')
         : t('ev_badge_done');
 
+  const copy = el('div', {
+    className: 'event-row-copy',
+    children: [
+      el('span', { className: badgeClass, text: badgeText }),
+      el('div', { className: 'event-row-type', text: type }),
+      el('div', { className: 'event-row-title', text: title }),
+      createContentByline(e, { includeDate: false }),
+      el('div', {
+        className: 'event-row-meta',
+        children: [
+          el('span', { className: 'event-date', text: formatHomeEventDate(e) }),
+          el('span', {
+            className: 'event-album-link',
+            children: [
+              el('span', { className: 'event-album-dot' }),
+              el('span', { text: t('ev_details') }),
+            ],
+          }),
+        ],
+      }),
+    ],
+  });
+
+  const visual = createHomeEventVisual(e, title);
+  const bodyChildren = visual ? [copy, visual] : [copy];
+
   return el('article', {
     className: 'event-row event-card--link',
     attrs: (e && (e.slug || e.id))
@@ -81,26 +127,8 @@ export function createHomeEventCard(e, i = 0) {
         ],
       }),
       el('div', {
-        className: 'event-row-body',
-        children: [
-          el('span', { className: badgeClass, text: badgeText }),
-          el('div', { className: 'event-row-type', text: type }),
-          el('div', { className: 'event-row-title', text: title }),
-          createContentByline(e, { includeDate: false }),
-          el('div', {
-            className: 'event-row-meta',
-            children: [
-              el('span', { className: 'event-date', text: formatHomeEventDate(e) }),
-              el('span', {
-                className: 'event-album-link',
-                children: [
-                  el('span', { className: 'event-album-dot' }),
-                  el('span', { text: t('ev_details') }),
-                ],
-              }),
-            ],
-          }),
-        ],
+        className: visual ? 'event-row-body event-row-body--with-visual' : 'event-row-body',
+        children: bodyChildren,
       }),
     ],
   });
