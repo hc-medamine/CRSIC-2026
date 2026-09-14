@@ -3,8 +3,9 @@
  */
 import { cmsResponsiveSources } from '../data.js';
 import { editorialCardAttrs, editorialField } from '../editorial.js';
+import { eventResume } from '../featuredNews.js';
 import { t } from '../i18n.js';
-import { createPictureImg, el } from '../utils.js';
+import { createPictureImg, el, safeImageSrc } from '../utils.js';
 import { createContentByline } from './contentByline.js';
 
 /** Short month labels in events.json → longer Arabic display for home cards. */
@@ -22,6 +23,15 @@ const MONTH_DISPLAY_AR = {
   نوف: 'نوفمبر',
   ديس: 'ديسمبر',
 };
+
+const EVENT_HOLDER_FALLBACK = [
+  'img/Holders/0.jpg',
+  'img/Holders/1.jpg',
+  'img/Holders/2.jpg',
+  'img/Holders/3.jpg',
+  'img/Holders/4.jpg',
+  'img/Holders/5.jpg',
+];
 
 /**
  * @param {object} e
@@ -42,6 +52,44 @@ function formatHomeEventDate(e) {
   const loc = t('home_event_loc');
   const left = [month, year].filter(Boolean).join(' ');
   return loc ? `${left} – ${loc}` : left;
+}
+
+/**
+ * Readable caption date: day month year.
+ * @param {object} e
+ * @returns {string}
+ */
+function formatEvCardDate(e) {
+  const day = String((e && e.day) || '').trim();
+  const month = displayMonth(e);
+  const year = String((e && e.year) || '').trim();
+  return [day, month, year].filter(Boolean).join(' ');
+}
+
+/**
+ * Stable holder index from slug/id.
+ * @param {object} e
+ * @returns {number}
+ */
+function holderIndexForEvent(e) {
+  const key = String((e && (e.slug || e.id)) || '');
+  let h = 0;
+  for (let i = 0; i < key.length; i += 1) h = (h + key.charCodeAt(i) * (i + 1)) % 997;
+  return h % EVENT_HOLDER_FALLBACK.length;
+}
+
+/**
+ * @param {object} e
+ * @param {string} title
+ * @returns {{ fallback: string, webp: string }}
+ */
+function eventCardImageSources(e, title) {
+  const sources = cmsResponsiveSources(e, 'card');
+  if (sources.fallback) return sources;
+  return {
+    fallback: safeImageSrc(EVENT_HOLDER_FALLBACK[holderIndexForEvent(e)]) || EVENT_HOLDER_FALLBACK[0],
+    webp: '',
+  };
 }
 
 /**
@@ -138,11 +186,18 @@ export function createHomeEventCard(e, i = 0) {
 }
 
 /**
+ * Portfolio-style card for `#events` year lists (PRD 2026-09-14-spa-events-portfolio-cards).
  * @param {object} e
  * @returns {HTMLElement}
  */
 export function createEvCard(e) {
   const status = (e && e.status) || 'upcoming';
+  const title = editorialField(e, 'title');
+  const type = editorialField(e, 'label');
+  const resume = eventResume(e);
+  const dateLine = formatEvCardDate(e);
+  const sources = eventCardImageSources(e, title);
+
   const pill = el('span', {
     className:
       status === 'done'
@@ -158,6 +213,23 @@ export function createEvCard(e) {
           : t('ev_upcoming_pill'),
   });
 
+  const mediaImg = createPictureImg({
+    fallbackSrc: sources.fallback,
+    webpSrc: sources.webp,
+    className: 'ev-card-img',
+    alt: title || '',
+  });
+
+  const captionChildren = [
+    el('div', { className: 'ev-card-date', text: dateLine }),
+    el('div', { className: 'ev-type', text: type }),
+    el('div', { className: 'ev-title', text: title }),
+  ];
+  if (resume) {
+    captionChildren.push(el('p', { className: 'ev-resume', text: resume }));
+  }
+  captionChildren.push(createContentByline(e, { includeDate: false }), pill);
+
   const slug = e.slug || e.id || '';
   return el('div', {
     className: 'ev-card ev-card--link',
@@ -172,21 +244,16 @@ export function createEvCard(e) {
       : editorialCardAttrs(e),
     children: [
       el('div', {
-        className: 'ev-date',
+        className: 'ev-card-media',
+        attrs: { 'aria-hidden': 'true' },
         children: [
-          el('div', { className: 'ev-date-year', text: e.year || '' }),
-          el('div', { className: 'ev-date-day', text: e.day || '' }),
-          el('div', { className: 'ev-date-month', text: displayMonth(e) }),
+          mediaImg || el('div', { className: 'ev-card-media-fallback' }),
+          el('div', { className: 'ev-card-media-overlay' }),
         ],
       }),
       el('div', {
-        className: 'ev-body',
-        children: [
-          el('div', { className: 'ev-type', text: editorialField(e, 'label') }),
-          el('div', { className: 'ev-title', text: editorialField(e, 'title') }),
-          createContentByline(e, { includeDate: false }),
-          pill,
-        ],
+        className: 'ev-body ev-card-caption',
+        children: captionChildren,
       }),
     ],
   });
@@ -209,7 +276,10 @@ export function createEventYearGroups(events) {
         className: 'ev-year-group',
         children: [
           el('div', { className: 'ev-year-label', text: year }),
-          ...groups[year].map(createEvCard),
+          el('div', {
+            className: 'ev-year-grid',
+            children: groups[year].map(createEvCard),
+          }),
         ],
       })
     );

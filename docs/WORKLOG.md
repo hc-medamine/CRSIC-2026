@@ -2,15 +2,27 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
-### 2026-09-14 — Events two-level taxonomy **implementing**
+### 2026-09-14 — Events portfolio-style cards **implementing**
 
-[prds/2026-09-14-spa-cms-events-two-level-taxonomy.md](./prds/2026-09-14-spa-cms-events-two-level-taxonomy.md). SPA tabs فعاليات/ملتقيات + chips; CMS `event_section`/`event_category` (SQL 034); `events.json` → `{ activities, meetings }`. Branch `feature/events-two-level-taxonomy`.
+[prds/2026-09-14-spa-events-portfolio-cards.md](./prds/2026-09-14-spa-events-portfolio-cards.md). `#events` `ev-card` cover + caption + resume; year groups kept. Branch `feature/spa-events-portfolio-cards`.
+
+---
+
+### 2026-09-14 — PRD **Approved**: Events portfolio-style cards
+
+[prds/2026-09-14-spa-events-portfolio-cards.md](./prds/2026-09-14-spa-events-portfolio-cards.md). `#events` year list kept; `ev-card` → cover + caption + resume. Implementing on `feature/spa-events-portfolio-cards`.
+
+---
+
+### 2026-09-14 — Events two-level taxonomy **Delivered** (PR #57)
+
+[prds/2026-09-14-spa-cms-events-two-level-taxonomy.md](./prds/2026-09-14-spa-cms-events-two-level-taxonomy.md). SPA tabs + chips; CMS SQL 034; `{ activities, meetings }`. Merged to `main`.
 
 ---
 
 ### 2026-09-14 — PRD **Approved**: Events two-level taxonomy
 
-[prds/2026-09-14-spa-cms-events-two-level-taxonomy.md](./prds/2026-09-14-spa-cms-events-two-level-taxonomy.md). `#events`: tabs **الفعاليات** / **الملتقيات** + subcategory chips (default الكل); nav + CMS two-level select; remap. Implementing on `feature/events-two-level-taxonomy`.
+[prds/2026-09-14-spa-cms-events-two-level-taxonomy.md](./prds/2026-09-14-spa-cms-events-two-level-taxonomy.md). Delivered via PR #57.
 
 ---
 
