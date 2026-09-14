@@ -19,7 +19,7 @@ Project docs index: [docs/README.md](../docs/README.md).
 | `alerts.json` | `items[]` — site-wide banner, at most one live item (empty array when none) |
 | `research-groups.json` | `items[]` — research groups by `orgUnitId` (CMS-published) |
 | `research-projects.json` | `items[]` — research projects with `groupId`; detail `#research-project/{slug}` |
-| `journals.json` | `journals[]` — **not** CMS; OJS remains |
+| `journals.json` | `journals[]` — **not** CMS; OJS remains; optional `covers[]` under `img/journals/` |
 | `news.json` | `news[]` (**39**, story-date desc). Detail: `id`, `slug`, `summary`, `body`, `media[]`, `date`, editor/reviewer/publisher names |
 | `featured-news.json` | `{ "ids": [] }` — ordered public news ids for Home `#home-feat-carousel`, max 10. Empty → 3 newest news |
 | `laws.json` | `laws[]` — hub `#laws`, detail `#law/{slug}` |

@@ -43,6 +43,7 @@ Product specs for CRSIC live here. **New feature slices follow the PRD-first wor
 | [2026-08-24-cms-desk-production-boost.md](./2026-08-24-cms-desk-production-boost.md) | **Delivered** on `main` (PR #44) | SA JSON zip import/export + cover crop/card variant + EN show-when-ready. |
 | [2026-08-24-cms-import-export-bulk-sort.md](./2026-08-24-cms-import-export-bulk-sort.md) | **Delivered** on `main` | I/E page picker: Load more 20, header sort, bulk **Export selected**. Type lists unchanged. |
 | [2026-08-26-remaining-deferred-pack.md](./2026-08-26-remaining-deferred-pack.md) | **Approved** (2026-08-26) | **Cut C Delivered** (PR #50). Cuts A–B **implementing** on `feature/cms-cuts-a-b-webp-en`. Journals out. |
+| [2026-09-14-spa-journal-cover-shelves.md](./2026-09-14-spa-journal-cover-shelves.md) | **Approved** (2026-09-14) | Append issue-cover shelves to `#journals` cards; local `img/journals/`; OJS unchanged. **Implementing** on `feature/spa-journal-cover-shelves`. |
 
 ## Related
 

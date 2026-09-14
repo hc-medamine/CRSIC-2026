@@ -2,6 +2,18 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
+### 2026-09-14 — SPA journal cover shelves **implementing**
+
+[prds/2026-09-14-spa-journal-cover-shelves.md](./prds/2026-09-14-spa-journal-cover-shelves.md). Gradient identity kept; cover shelf appended (WP + OJS assets in `img/journals/{rsic,ces,rnv,reso}/`). OJS had few per-issue covers online — **2 covers/journal** shipped (PRD allows fewer than 4). Per-journal OJS URLs. Branch `feature/spa-journal-cover-shelves`.
+
+---
+
+### 2026-09-14 — PRD **Approved**: SPA journal cover shelves
+
+[prds/2026-09-14-spa-journal-cover-shelves.md](./prds/2026-09-14-spa-journal-cover-shelves.md). Keep gradient identity; append shelf of up to 4 issue covers; `img/journals/`; OJS SSOT. **Approved** — implementing on `feature/spa-journal-cover-shelves`.
+
+---
+
 ### 2026-09-13 — Cuts A+B walk (PR #53)
 
 Walked `feature/cms-cuts-a-b-webp-en` on SPA `:5500` + CMS SA. **Pass:** Wp2; EnB **pending** (laws + research groups); Wp1 public `<picture>`+WebP; Wp1b Rebuild UI present; journals blob unchanged vs `main`; CMS 130 / SPA 33 tests green. **Still open for Delivered:** EnB **ready** via CMS mark-ready + four-eyes; optional live Rebuild WebP click. Pub covers `object-fit: contain` confirmed.

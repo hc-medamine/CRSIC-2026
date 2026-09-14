@@ -452,7 +452,7 @@ function watchForNewCards() {
     return;
   }
   const TILT_MAX = 7;
-  const tiltSelector = '.pub-card:not([data-tilt]), .journal-card:not([data-tilt])';
+  const tiltSelector = '.pub-card:not([data-tilt])';
 
   function armTilt(card) {
     card.dataset.tilt = '1';
