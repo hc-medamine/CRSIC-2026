@@ -197,6 +197,9 @@ export default async function LoginPage() {
         </div>
         <LoginDevBubbles bubbles={bubbles} lang={lang} enabled={loginBubblesEnabled()} />
         <p className="mt-6 text-center text-xs text-crs-muted">{t("loginFooter", lang)}</p>
+        <p className="mt-2 text-center text-xs leading-relaxed text-crs-muted" dir="auto">
+          {t("developersCredit", lang)}
+        </p>
       </div>
       </main>
     </>

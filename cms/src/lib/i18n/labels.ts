@@ -1630,6 +1630,10 @@ export const LABELS: LabelMap = {
     en: "No email is sent by this app. Contact your Super administrator for access.",
     ar: "لا يُرسل هذا التطبيق بريدًا إلكترونيًا. تواصلوا مع المشرف الأعلى للحصول على الوصول.",
   },
+  developersCredit: {
+    en: "Developers: Senior Research Support Technician Merrah Karim, Senior Research Support Technician Haouassine Mohamed Amine",
+    ar: "المطورون: تقني سامي لدعم البحث مراح كريم، تقني سامي لدعم البحث حواسين محمد أمين",
+  },
   loginTestBubbles: {
     en: "Test only — one-click sign-in",
     ar: "للاختبار فقط — تسجيل دخول بنقرة واحدة",

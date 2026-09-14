@@ -463,10 +463,16 @@ export function CmsChrome({
           </div>
         </aside>
 
-        <div className="min-w-0 flex-1 cms-desk-bg">
-          <div key={pathname} className="cms-page-enter">
+        <div className="flex min-w-0 flex-1 flex-col cms-desk-bg">
+          <div key={pathname} className="cms-page-enter min-w-0 flex-1">
             {children}
           </div>
+          <p
+            className="shrink-0 border-t border-crs-border/70 px-4 py-3 text-center text-[11px] leading-relaxed text-crs-muted"
+            dir="auto"
+          >
+            {t("developersCredit", lang)}
+          </p>
         </div>
       </div>
     </div>
