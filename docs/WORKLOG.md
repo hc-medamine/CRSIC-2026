@@ -2,15 +2,27 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
-### 2026-09-14 — Events portfolio-style cards **implementing**
+### 2026-09-14 — Featured carousel motion **Delivered**
 
-[prds/2026-09-14-spa-events-portfolio-cards.md](./prds/2026-09-14-spa-events-portfolio-cards.md). `#events` `ev-card` cover + caption + resume; year groups kept. Branch `feature/spa-events-portfolio-cards`.
+[prds/2026-09-14-spa-feat-carousel-motion.md](./prds/2026-09-14-spa-feat-carousel-motion.md). A+B+C: crossfade + Ken Burns, caption stagger, autoplay progress; wide-slide absolute stack fix. Stakeholder validated.
+
+---
+
+### 2026-09-14 — PRD **Approved**: Featured carousel motion (A+B+C)
+
+[prds/2026-09-14-spa-feat-carousel-motion.md](./prds/2026-09-14-spa-feat-carousel-motion.md). Home `#home-feat-carousel` motion polish. Delivered on `feature/spa-feat-carousel-motion`.
+
+---
+
+### 2026-09-14 — Events portfolio-style cards **Delivered** (PR #58)
+
+[prds/2026-09-14-spa-events-portfolio-cards.md](./prds/2026-09-14-spa-events-portfolio-cards.md). Year-grouped grid; cover + caption + resume. Merged to `main`.
 
 ---
 
 ### 2026-09-14 — PRD **Approved**: Events portfolio-style cards
 
-[prds/2026-09-14-spa-events-portfolio-cards.md](./prds/2026-09-14-spa-events-portfolio-cards.md). `#events` year list kept; `ev-card` → cover + caption + resume. Implementing on `feature/spa-events-portfolio-cards`.
+[prds/2026-09-14-spa-events-portfolio-cards.md](./prds/2026-09-14-spa-events-portfolio-cards.md). Delivered via PR #58.
 
 ---
 

@@ -3885,7 +3885,9 @@ html[dir="rtl"] body :where(*):not(svg):not(svg *) {
   width: 100%;
 }
 .feat-carousel--wide .feat-carousel-slide {
-  position: relative;
+  /* Must stay absolute — relative stacking pushed slides 2+ below the track (green flash) */
+  position: absolute;
+  inset: 0;
   overflow: hidden;
   background-color: var(--cream-dark, #F3F0E8);
 }
@@ -3899,6 +3901,9 @@ html[dir="rtl"] body :where(*):not(svg):not(svg *) {
   object-fit: contain;
   object-position: center center;
   display: block;
+  transform: scale(1);
+  transform-origin: center center;
+  will-change: transform;
 }
 .feat-carousel--wide .feat-carousel-slide::before {
   z-index: 1;
@@ -4010,13 +4015,24 @@ html[dir="rtl"] .feat-carousel--wide .feat-carousel-kicker {
 
 .feat-carousel-track { position: relative; min-height: 280px; }
 .feat-carousel-slide {
-  display: none;
-  position: relative;
+  display: block;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
   min-height: 280px;
   background-color: var(--green-deep);
+  opacity: 0;
+  /* Keep hidden slides paintable so images can decode before they become active */
+  visibility: visible;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.feat-carousel-slide.is-active { display: block; }
+.feat-carousel-slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 1;
+}
 .feat-carousel-slide::before {
   content: '';
   position: absolute;
@@ -4093,8 +4109,99 @@ html[dir="rtl"] .feat-carousel-btn--play.is-paused svg {
   border: 0;
   background: rgba(255,255,255,0.45);
   cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
-.feat-carousel-dot.is-active { background: var(--gold); }
+.feat-carousel-dot.is-active {
+  background: var(--gold);
+  transform: scale(1.25);
+}
+
+/* Autoplay progress (A+B+C package C) */
+.feat-carousel-progress {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 3px;
+  z-index: 6;
+  background: rgba(255, 255, 255, 0.14);
+  pointer-events: none;
+  overflow: hidden;
+}
+.feat-carousel-progress-bar {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--gold);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+html[dir="rtl"] .feat-carousel-progress-bar {
+  transform-origin: right center;
+}
+.feat-carousel.is-playing .feat-carousel-progress-bar {
+  animation: featCarouselProgress var(--feat-autoplay, 7s) linear forwards;
+}
+
+@keyframes featCarouselProgress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* Ken Burns + caption stagger — only when motion class is set */
+@media (prefers-reduced-motion: no-preference) {
+  .feat-carousel--motion .feat-carousel-slide.is-active .feat-carousel-media {
+    animation: featKenBurns var(--feat-autoplay, 7s) ease-out forwards;
+  }
+  .feat-carousel--motion .feat-carousel-slide--alt.is-active .feat-carousel-media {
+    animation-name: featKenBurnsAlt;
+  }
+  @keyframes featKenBurns {
+    from { transform: scale(1) translate3d(0, 0, 0); }
+    to { transform: scale(1.06) translate3d(-1.5%, -0.8%, 0); }
+  }
+  @keyframes featKenBurnsAlt {
+    from { transform: scale(1.04) translate3d(0, 0, 0); }
+    to { transform: scale(1) translate3d(1.2%, 0.6%, 0); }
+  }
+
+  .feat-carousel--motion .feat-carousel-slide.is-active .feat-carousel-kicker,
+  .feat-carousel--motion .feat-carousel-slide.is-active .feat-carousel-title,
+  .feat-carousel--motion .feat-carousel-slide.is-active .feat-carousel-summary,
+  .feat-carousel--motion .feat-carousel-slide.is-active .feat-carousel-cta {
+    animation: featCaptionIn 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .feat-carousel--motion .feat-carousel-slide.is-active .feat-carousel-title {
+    animation-delay: 0.08s;
+  }
+  .feat-carousel--motion .feat-carousel-slide.is-active .feat-carousel-summary {
+    animation-delay: 0.16s;
+  }
+  .feat-carousel--motion .feat-carousel-slide.is-active .feat-carousel-cta {
+    animation-delay: 0.24s;
+  }
+  @keyframes featCaptionIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feat-carousel-slide {
+    transition: none;
+  }
+  .feat-carousel-progress {
+    display: none;
+  }
+  .feat-carousel-dot.is-active {
+    transform: none;
+  }
+}
 
 .catalog-card {
   display: flex;

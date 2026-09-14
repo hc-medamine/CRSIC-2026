@@ -45,7 +45,8 @@ Product specs for CRSIC live here. **New feature slices follow the PRD-first wor
 | [2026-08-26-remaining-deferred-pack.md](./2026-08-26-remaining-deferred-pack.md) | **Approved** (2026-08-26) | **Cut C Delivered** (PR #50). Cuts A–B **implementing** on `feature/cms-cuts-a-b-webp-en`. Journals out. |
 | [2026-09-14-spa-journal-cover-shelves.md](./2026-09-14-spa-journal-cover-shelves.md) | **Delivered** (2026-09-14) | Cover shelves on `#journals`; PR #56. OJS unchanged. |
 | [2026-09-14-spa-cms-events-two-level-taxonomy.md](./2026-09-14-spa-cms-events-two-level-taxonomy.md) | **Delivered** (2026-09-14) | Events فعاليات/ملتقيات + chips; CMS two-level; PR #57. |
-| [2026-09-14-spa-events-portfolio-cards.md](./2026-09-14-spa-events-portfolio-cards.md) | **Approved** (2026-09-14) | `#events` `ev-card` portfolio chrome + resume; year list kept. Implementing on `feature/spa-events-portfolio-cards`. |
+| [2026-09-14-spa-events-portfolio-cards.md](./2026-09-14-spa-events-portfolio-cards.md) | **Delivered** (2026-09-14) | `#events` portfolio grid cards + resume; PR #58. |
+| [2026-09-14-spa-feat-carousel-motion.md](./2026-09-14-spa-feat-carousel-motion.md) | **Delivered** (2026-09-14) | Home featured carousel: crossfade + Ken Burns, caption stagger, autoplay progress. |
 
 ## Related
 
