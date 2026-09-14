@@ -1,5 +1,6 @@
 /**
  * Featured home news carousel (curated playlist, max 10) — CRSIC brand, vanilla JS.
+ * Motion A+B+C: crossfade + Ken Burns, caption stagger, autoplay progress (PRD 2026-09-14).
  */
 import { cmsCardImageSrc, getFeaturedNewsIds, getNews } from '../data.js';
 import { editorialCardAttrs, editorialField } from '../editorial.js';
@@ -12,6 +13,9 @@ const HOLDER = [
   'img/Holders/1.jpg',
   'img/Holders/2.jpg',
 ];
+
+/** Keep in sync with CSS `--feat-autoplay` / progress animation. */
+const AUTOPLAY_MS = 7000;
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -107,6 +111,9 @@ export function mountFeaturedCarousel(root) {
   const reduce = prefersReducedMotion();
   const slideImages = uniqueSlideImages(items);
 
+  root.style.setProperty('--feat-autoplay', `${AUTOPLAY_MS}ms`);
+  root.classList.toggle('feat-carousel--motion', !reduce);
+
   const track = el('div', {
     className: 'feat-carousel-track',
     attrs: {
@@ -120,7 +127,10 @@ export function mountFeaturedCarousel(root) {
     const summary = newsResume(item);
     const slug = item.slug || item.id || '';
     const slide = el('div', {
-      className: 'feat-carousel-slide' + (i === 0 ? ' is-active' : ''),
+      className:
+        'feat-carousel-slide' +
+        (i === 0 ? ' is-active' : '') +
+        (i % 2 === 1 ? ' feat-carousel-slide--alt' : ''),
       attrs: {
         role: 'listitem',
         'aria-hidden': i === 0 ? 'false' : 'true',
@@ -134,8 +144,10 @@ export function mountFeaturedCarousel(root) {
           attrs: {
             src: imgSrc,
             alt: title,
-            loading: i === 0 ? 'eager' : 'lazy',
+            /* Eager: absolute/opacity-hidden slides are often skipped by lazy IntersectionObserver → green flash */
+            loading: 'eager',
             decoding: 'async',
+            ...(i === 0 ? { fetchpriority: 'high' } : {}),
           },
         }),
       );
@@ -162,6 +174,25 @@ export function mountFeaturedCarousel(root) {
   });
   slides.forEach((s) => track.appendChild(s));
 
+  const progress = el('div', {
+    className: 'feat-carousel-progress',
+    attrs: { 'aria-hidden': 'true' },
+    children: [el('span', { className: 'feat-carousel-progress-bar' })],
+  });
+  const progressBar = progress.firstElementChild;
+
+  function restartProgress() {
+    if (!progressBar || reduce || paused || slides.length < 2) {
+      root.classList.remove('is-playing');
+      return;
+    }
+    root.classList.remove('is-playing');
+    progressBar.style.animation = 'none';
+    void progressBar.offsetWidth;
+    progressBar.style.animation = '';
+    root.classList.add('is-playing');
+  }
+
   function show(i) {
     index = (i + slides.length) % slides.length;
     slides.forEach((s, j) => {
@@ -172,19 +203,27 @@ export function mountFeaturedCarousel(root) {
     if (dots) {
       [...dots.children].forEach((d, j) => d.classList.toggle('is-active', j === index));
     }
+    if (!paused) restartProgress();
   }
 
-  function next() { show(index + 1); }
-  function prev() { show(index - 1); }
+  function next() {
+    show(index + 1);
+  }
+  function prev() {
+    show(index - 1);
+  }
 
   function stop() {
     if (timer) clearInterval(timer);
     timer = null;
+    root.classList.remove('is-playing');
   }
+
   function start() {
     stop();
-    if (reduce || slides.length < 2) return;
-    timer = setInterval(next, 7000);
+    if (reduce || slides.length < 2 || paused) return;
+    restartProgress();
+    timer = setInterval(next, AUTOPLAY_MS);
   }
 
   const controls = el('div', { className: 'feat-carousel-controls' });
@@ -207,21 +246,30 @@ export function mountFeaturedCarousel(root) {
   let paused = reduce;
   if (paused) {
     pauseBtn.classList.add('is-paused');
+    root.classList.add('is-paused');
     setControl(pauseBtn, 'play', t('feat_carousel_play'));
   }
 
-  prevBtn.addEventListener('click', () => { prev(); if (!paused) start(); });
-  nextBtn.addEventListener('click', () => { next(); if (!paused) start(); });
+  prevBtn.addEventListener('click', () => {
+    prev();
+    if (!paused) start();
+  });
+  nextBtn.addEventListener('click', () => {
+    next();
+    if (!paused) start();
+  });
   pauseBtn.addEventListener('click', () => {
     paused = !paused;
     if (paused) {
       stop();
+      root.classList.add('is-paused');
       pauseBtn.classList.add('is-paused');
       setControl(pauseBtn, 'play', t('feat_carousel_play'));
     } else {
-      start();
+      root.classList.remove('is-paused');
       pauseBtn.classList.remove('is-paused');
       setControl(pauseBtn, 'pause', t('feat_carousel_pause'));
+      start();
     }
   });
   controls.append(prevBtn, pauseBtn, nextBtn);
@@ -232,11 +280,18 @@ export function mountFeaturedCarousel(root) {
       className: 'feat-carousel-dot' + (i === 0 ? ' is-active' : ''),
       attrs: { type: 'button', 'aria-label': `${i + 1}` },
     });
-    d.addEventListener('click', () => { show(i); if (!paused) start(); });
+    d.addEventListener('click', () => {
+      show(i);
+      if (!paused) start();
+    });
     dots.appendChild(d);
   });
 
   root.setAttribute('dir', document.documentElement.getAttribute('dir') || 'rtl');
-  replaceChildren(root, [track, controls, dots]);
+  replaceChildren(root, [track, progress, controls, dots]);
   if (!paused) start();
+  else if (!reduce && slides[0]) {
+    /* First slide caption still gets a one-shot stagger when motion is allowed but autoplay off */
+    slides[0].classList.add('is-active');
+  }
 }
