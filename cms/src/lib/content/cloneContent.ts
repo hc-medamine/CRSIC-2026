@@ -46,6 +46,8 @@ type SourceRow = {
   body_ar: string | null;
   body_en: string | null;
   event_scope: string | null;
+  event_section: string | null;
+  event_category: string | null;
   event_day: string | null;
   event_month: string | null;
   event_year: string | null;
@@ -127,8 +129,8 @@ async function loadSource(id: string): Promise<SourceRow | null> {
   const result = await query<SourceRow>(
     `SELECT id, content_type, status, org_unit_id, created_by, recycled_at, en_status,
             title_ar, title_en, label_ar, label_en, summary_ar, summary_en, body_ar, body_en,
-            event_scope, event_day, event_month, event_year, event_type_ar, event_type_en,
-            event_display_status, pub_kind, partner_scope, partner_date, partner_emoji,
+            event_scope, event_section, event_category, event_day, event_month, event_year,
+            event_type_ar, event_type_en, event_display_status, pub_kind, partner_scope, partner_date, partner_emoji,
             alert_link_url, alert_link_label_ar, alert_link_label_en, external_url, platform_kind,
             research_group_id, research_lead_ar, research_lead_en, research_members,
             research_questions_ar, research_questions_en, research_axes,
@@ -181,7 +183,8 @@ export async function cloneContentItem(
       title_ar, title_en, label_ar, label_en, summary_ar, summary_en, body_ar, body_en,
       image_path, image_alt_ar, image_alt_en, attachments, og_image,
       checklist_confirmed, review_note, public_slug, published_at, live_payload, live_at,
-      event_scope, event_day, event_month, event_year, event_type_ar, event_type_en, event_display_status,
+      event_scope, event_section, event_category, event_day, event_month, event_year,
+      event_type_ar, event_type_en, event_display_status,
       pub_kind, partner_scope, partner_date, partner_emoji,
       alert_link_url, alert_link_label_ar, alert_link_label_en, external_url, platform_kind,
       research_group_id, research_lead_ar, research_lead_en, research_members,
@@ -197,13 +200,13 @@ export async function cloneContentItem(
       $6, $7, $8, $9, $10, $11, $12, $13,
       NULL, NULL, NULL, '[]'::jsonb, NULL,
       FALSE, NULL, $14, NULL, NULL, NULL,
-      $15, $16, $17, $18, $19, $20, $21,
-      $22, $23, $24, $25,
-      $26, $27, $28, $29, $30,
-      $31, $32, $33, $34::jsonb,
-      $35, $36, $37::jsonb,
-      $38, $39, $40::jsonb,
-      $41, $42, $43, $44,
+      $15, $16, $17, $18, $19, $20, $21, $22, $23,
+      $24, $25, $26, $27,
+      $28, $29, $30, $31, $32,
+      $33, $34, $35, $36::jsonb,
+      $37, $38, $39::jsonb,
+      $40, $41, $42::jsonb,
+      $43, $44, $45, $46,
       NULL, NULL, NULL, NULL, NULL,
       NULL, NULL, NULL, FALSE,
       NULL
@@ -224,6 +227,8 @@ export async function cloneContentItem(
       source.body_en,
       slug,
       source.event_scope,
+      source.event_section,
+      source.event_category,
       source.event_day,
       source.event_month,
       source.event_year,

@@ -39,7 +39,7 @@ Every `cms/` `npm test` and `db:*` script loads `.env.local` via `--env-file` �
 
 - JSON fields must be plain text — **no HTML** in content strings (bodies may use the sanitized allowlist after CMS publish). UTF-8, no trailing commas.
 - `publications.json`: keep `covers.length === pubs.length`.
-- `data/locales/ar.json` + `en.json`: key sets must stay in sync (currently **350** keys); EN bodies of editorial content are intentionally Arabic-only (see `docs/audits/PARITY.md`).
+- `data/locales/ar.json` + `en.json`: key sets must stay in sync (currently **359** keys); EN bodies of editorial content are intentionally Arabic-only (see `docs/audits/PARITY.md`).
 - `featured-news.json`: `{ "ids": [] }` ordered news ids, max 10; empty → Home featured fallback.
 - Content edit only → update `data/*.json` (+ optionally `docs/WORKLOG.md`); a full README rewrite is not required if schema is unchanged.
 

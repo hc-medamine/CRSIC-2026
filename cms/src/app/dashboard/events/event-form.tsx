@@ -21,6 +21,13 @@ import { AdvancedDisclosure, FormBanner, FormSection, FormStickyActions, Publish
 import { t } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 import type { PublicMediaItem } from "@/lib/publish/media";
+import {
+  EVENT_CATEGORY_TYPE_AR,
+  EVENT_SECTION_CATEGORIES,
+  isValidEventPair,
+  type EventCategoryId,
+  type EventSectionId,
+} from "@/lib/content/eventTaxonomy";
 
 type OrgUnit = { id: string; name_ar: string; name_en: string };
 
@@ -39,12 +46,11 @@ type Initial = {
   imageAltAr: string;
   imageAltEn: string;
   enStatus: "pending" | "ready";
-  eventScope: "intl" | "nat";
+  eventSection: EventSectionId;
+  eventCategory: EventCategoryId;
   eventDay: string;
   eventMonth: string;
   eventYear: string;
-  eventTypeAr: string;
-  eventTypeEn: string;
   eventDisplayStatus: "upcoming" | "ongoing" | "done";
   attachments?: PublicMediaItem[];
   publicSlug?: string | null;
@@ -73,6 +79,26 @@ type Props = {
   canDelete?: boolean;
 };
 
+const CATEGORY_LABEL_KEYS: Record<EventCategoryId, string> = {
+  lecture: "fieldCategoryLecture",
+  visit: "fieldCategoryVisit",
+  training: "fieldCategoryTraining",
+  study_day: "fieldCategoryStudyDay",
+  intl: "fieldCategoryIntl",
+  nat: "fieldCategoryNat",
+  cultural: "fieldCategoryCultural",
+};
+
+function initialTaxonomy(initial?: Initial): {
+  section: EventSectionId;
+  category: EventCategoryId;
+} {
+  if (initial && isValidEventPair(initial.eventSection, initial.eventCategory)) {
+    return { section: initial.eventSection, category: initial.eventCategory };
+  }
+  return { section: "activities", category: "lecture" };
+}
+
 export function EventEditorForm({
   mode,
   orgUnits,
@@ -84,6 +110,7 @@ export function EventEditorForm({
 }: Props) {
   const router = useRouter();
   const lang = useCmsLang();
+  const tax0 = initialTaxonomy(initial);
   const [orgUnitId, setOrgUnitId] = useState(initial?.orgUnitId ?? orgUnits[0]?.id ?? "");
   const [titleAr, setTitleAr] = useState(initial?.titleAr ?? "");
   const [titleEn, setTitleEn] = useState(initial?.titleEn ?? "");
@@ -97,12 +124,11 @@ export function EventEditorForm({
   const [imageAltAr, setImageAltAr] = useState(initial?.imageAltAr ?? "");
   const [imageAltEn, setImageAltEn] = useState(initial?.imageAltEn ?? "");
   const [enStatus, setEnStatus] = useState<"pending" | "ready">(initial?.enStatus ?? "pending");
-  const [eventScope, setEventScope] = useState<"intl" | "nat">(initial?.eventScope ?? "nat");
+  const [eventSection, setEventSection] = useState<EventSectionId>(tax0.section);
+  const [eventCategory, setEventCategory] = useState<EventCategoryId>(tax0.category);
   const [eventDay, setEventDay] = useState(initial?.eventDay ?? "");
   const [eventMonth, setEventMonth] = useState(initial?.eventMonth ?? "");
   const [eventYear, setEventYear] = useState(initial?.eventYear ?? "");
-  const [eventTypeAr, setEventTypeAr] = useState(initial?.eventTypeAr ?? "");
-  const [eventTypeEn, setEventTypeEn] = useState(initial?.eventTypeEn ?? "");
   const [eventDisplayStatus, setEventDisplayStatus] = useState<"upcoming" | "ongoing" | "done">(
     initial?.eventDisplayStatus ?? "upcoming",
   );
@@ -151,12 +177,11 @@ export function EventEditorForm({
       attachments: media,
       publicSlug: publicSlug.trim() || null,
       enStatus,
-      eventScope,
+      eventSection,
+      eventCategory,
       eventDay,
       eventMonth,
       eventYear,
-      eventTypeAr,
-      eventTypeEn,
       eventDisplayStatus,
       metaTitleAr: seo.metaTitleAr,
       metaTitleEn: seo.metaTitleEn,
@@ -273,17 +298,42 @@ export function EventEditorForm({
 
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="text-sm">
-              <span className="font-medium">{t("fieldScope", lang)}</span>
+              <span className="font-medium">{t("fieldEventSection", lang)}</span>
               <select
                 disabled={!editable}
-                value={eventScope}
-                onChange={(e) => setEventScope(e.target.value as "intl" | "nat")}
+                value={eventSection}
+                onChange={(e) => {
+                  const next = e.target.value as EventSectionId;
+                  setEventSection(next);
+                  const cats = EVENT_SECTION_CATEGORIES[next];
+                  if (!cats.includes(eventCategory)) {
+                    setEventCategory(cats[0]);
+                  }
+                }}
                 className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
               >
-                <option value="nat">{t("fieldScopeNational", lang)}</option>
-                <option value="intl">{t("fieldScopeInternational", lang)}</option>
+                <option value="activities">{t("fieldSectionActivities", lang)}</option>
+                <option value="meetings">{t("fieldSectionMeetings", lang)}</option>
               </select>
             </label>
+            <label className="text-sm">
+              <span className="font-medium">{t("fieldEventCategory", lang)}</span>
+              <select
+                disabled={!editable}
+                value={eventCategory}
+                onChange={(e) => setEventCategory(e.target.value as EventCategoryId)}
+                className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
+              >
+                {EVENT_SECTION_CATEGORIES[eventSection].map((id) => (
+                  <option key={id} value={id}>
+                    {t(CATEGORY_LABEL_KEYS[id], lang)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
             <label className="text-sm">
               <span className="font-medium">{t("fieldDisplayStatus", lang)}</span>
               <select
@@ -317,10 +367,6 @@ export function EventEditorForm({
           <label className="text-sm">
             <span className="font-medium">{t("fieldTitleAr", lang)}</span>
             <input dir="rtl" required disabled={!editable} value={titleAr} onChange={(e) => setTitleAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
-          </label>
-          <label className="text-sm">
-            <span className="font-medium">{t("fieldTypeAr", lang)}</span>
-            <input dir="rtl" disabled={!editable} value={eventTypeAr} onChange={(e) => setEventTypeAr(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" placeholder="ملتقى وطني" />
           </label>
           <label className="text-sm">
             <span className="font-medium">{t("fieldSummaryAr", lang)}</span>
@@ -385,10 +431,6 @@ export function EventEditorForm({
           <label className="text-sm">
             <span className="font-medium">{t("fieldTitleEn", lang)}</span>
             <input disabled={!editable} value={titleEn} onChange={(e) => setTitleEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
-          </label>
-          <label className="text-sm">
-            <span className="font-medium">{t("fieldTypeEn", lang)}</span>
-            <input disabled={!editable} value={eventTypeEn} onChange={(e) => setEventTypeEn(e.target.value)} className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink" />
           </label>
           <label className="text-sm">
             <span className="font-medium">{t("fieldSummaryEn", lang)}</span>
@@ -509,7 +551,7 @@ export function EventEditorForm({
           month={eventMonth}
           year={eventYear}
           title={titleAr}
-          type={eventTypeAr}
+          type={EVENT_CATEGORY_TYPE_AR[eventCategory]}
           status={eventDisplayStatus}
           img={imagePath.trim() || undefined}
           slug={publicSlug.trim() || undefined}

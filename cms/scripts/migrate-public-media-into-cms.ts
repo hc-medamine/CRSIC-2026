@@ -299,7 +299,7 @@ async function main() {
   const laws = await rebuildPublicLawsJson();
   const platforms = await rebuildPublicPlatformsJson();
   console.log(
-    `Rebuilt pubs=${pubs.count} news=${news.count} events intl+nat=${events.intl + events.nat} laws=${laws.count} platforms=${platforms.count}`,
+    `Rebuilt pubs=${pubs.count} news=${news.count} events activities+meetings=${events.activities + events.meetings} laws=${laws.count} platforms=${platforms.count}`,
   );
 
   console.log("Recovering partner photos from crsic.dz (enrich --apply)…");

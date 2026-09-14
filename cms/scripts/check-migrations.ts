@@ -56,9 +56,12 @@ async function main() {
       "007_publication_fields.sql",
       "008_media.sql",
       "009_audit_log.sql",
+      "034_event_section_category.sql",
     ];
     const expectedCols = [
       "event_scope",
+      "event_section",
+      "event_category",
       "event_day",
       "event_month",
       "event_year",

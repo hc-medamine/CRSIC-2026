@@ -2,15 +2,27 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
-### 2026-09-14 — SPA journal cover shelves **implementing**
+### 2026-09-14 — Events two-level taxonomy **implementing**
 
-[prds/2026-09-14-spa-journal-cover-shelves.md](./prds/2026-09-14-spa-journal-cover-shelves.md). Gradient identity kept; cover shelf appended (WP + OJS assets in `img/journals/{rsic,ces,rnv,reso}/`). OJS had few per-issue covers online — **2 covers/journal** shipped (PRD allows fewer than 4). Per-journal OJS URLs. Branch `feature/spa-journal-cover-shelves`.
+[prds/2026-09-14-spa-cms-events-two-level-taxonomy.md](./prds/2026-09-14-spa-cms-events-two-level-taxonomy.md). SPA tabs فعاليات/ملتقيات + chips; CMS `event_section`/`event_category` (SQL 034); `events.json` → `{ activities, meetings }`. Branch `feature/events-two-level-taxonomy`.
+
+---
+
+### 2026-09-14 — PRD **Approved**: Events two-level taxonomy
+
+[prds/2026-09-14-spa-cms-events-two-level-taxonomy.md](./prds/2026-09-14-spa-cms-events-two-level-taxonomy.md). `#events`: tabs **الفعاليات** / **الملتقيات** + subcategory chips (default الكل); nav + CMS two-level select; remap. Implementing on `feature/events-two-level-taxonomy`.
+
+---
+
+### 2026-09-14 — SPA journal cover shelves **Delivered** (PR #56)
+
+[prds/2026-09-14-spa-journal-cover-shelves.md](./prds/2026-09-14-spa-journal-cover-shelves.md). Gradient identity kept; one OJS cover per journal under `img/journals/{rsic,ces,rnv,reso}/`. Merged to `main`.
 
 ---
 
 ### 2026-09-14 — PRD **Approved**: SPA journal cover shelves
 
-[prds/2026-09-14-spa-journal-cover-shelves.md](./prds/2026-09-14-spa-journal-cover-shelves.md). Keep gradient identity; append shelf of up to 4 issue covers; `img/journals/`; OJS SSOT. **Approved** — implementing on `feature/spa-journal-cover-shelves`.
+[prds/2026-09-14-spa-journal-cover-shelves.md](./prds/2026-09-14-spa-journal-cover-shelves.md). Keep gradient identity; append shelf of up to 4 issue covers; `img/journals/`; OJS SSOT. Delivered via PR #56.
 
 ---
 

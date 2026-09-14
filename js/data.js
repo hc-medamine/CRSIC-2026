@@ -12,9 +12,9 @@ let covers = [];
 /** @type {object[]} */
 let pubs = [];
 /** @type {object[]} */
-let intlEvents = [];
+let activityEvents = [];
 /** @type {object[]} */
-let natEvents = [];
+let meetingEvents = [];
 /** @type {object[]} */
 let natPartners = [];
 /** @type {object[]} */
@@ -100,8 +100,17 @@ export function loadData() {
         }
       }),
       loadResource('events', 'events.json', (data) => {
-        intlEvents = Array.isArray(data.intl) ? data.intl : [];
-        natEvents = Array.isArray(data.nat) ? data.nat : [];
+        // New shape: activities / meetings. Legacy intl / nat still accepted once.
+        if (Array.isArray(data.activities) || Array.isArray(data.meetings)) {
+          activityEvents = Array.isArray(data.activities) ? data.activities : [];
+          meetingEvents = Array.isArray(data.meetings) ? data.meetings : [];
+        } else {
+          activityEvents = [];
+          meetingEvents = [
+            ...(Array.isArray(data.intl) ? data.intl : []),
+            ...(Array.isArray(data.nat) ? data.nat : []),
+          ];
+        }
       }),
       loadResource('partners', 'partners.json', (data) => {
         natPartners = Array.isArray(data.nat) ? data.nat : [];
@@ -282,13 +291,25 @@ export function getCoverForPub(i) {
 }
 
 /** @returns {object[]} */
-export function getIntlEvents() {
-  return intlEvents;
+export function getActivityEvents() {
+  return activityEvents;
 }
 
 /** @returns {object[]} */
-export function getNatEvents() {
-  return natEvents;
+export function getMeetingEvents() {
+  return meetingEvents;
+}
+
+/**
+ * Events for one section, optionally filtered by subcategory id (`all` = no filter).
+ * @param {'activities'|'meetings'} section
+ * @param {string} [category='all']
+ * @returns {object[]}
+ */
+export function getEventsForSection(section, category = 'all') {
+  const list = section === 'meetings' ? meetingEvents : activityEvents;
+  if (!category || category === 'all') return list;
+  return list.filter((e) => e && e.category === category);
 }
 
 /** Arabic month abbreviations used in events.json → sort rank (1–12). */
@@ -320,11 +341,11 @@ function eventSortKey(e) {
 }
 
 /**
- * Merge international + national events, newest first.
+ * Merge activities + meetings, newest first.
  * @returns {object[]}
  */
 export function getAllEvents() {
-  return [...intlEvents, ...natEvents].sort((a, b) => eventSortKey(b) - eventSortKey(a));
+  return [...activityEvents, ...meetingEvents].sort((a, b) => eventSortKey(b) - eventSortKey(a));
 }
 
 /**

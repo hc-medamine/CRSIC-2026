@@ -22,6 +22,13 @@ import { PublisherPanel } from "@/app/dashboard/publisher-panel";
 import { EscalatePanel } from "@/app/dashboard/escalate-panel";
 import { EmergencyPanel } from "@/app/dashboard/emergency-panel";
 import { EditPageShell } from "@/app/dashboard/content-list-page";
+import {
+  isValidEventPair,
+  resolveLegacyCategory,
+  sectionForCategory,
+  type EventCategoryId,
+  type EventSectionId,
+} from "@/lib/content/eventTaxonomy";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -81,6 +88,17 @@ export default async function EventDetailPage({ params }: Props) {
   const media = item.image_path ? await getMediaByPublicPath(item.image_path) : null;
   const canDelete = await canRecycleFromEditPageAsync(user, item);
 
+  const resolvedCategory: EventCategoryId =
+    (item.event_category && sectionForCategory(item.event_category)
+      ? item.event_category
+      : null) ??
+    resolveLegacyCategory(item.event_type_ar, item.event_scope) ??
+    "nat";
+  const resolvedSection: EventSectionId =
+    item.event_section && isValidEventPair(item.event_section, resolvedCategory)
+      ? item.event_section
+      : (sectionForCategory(resolvedCategory) ?? "meetings");
+
   return (
     <EditPageShell
       breadcrumbs={[
@@ -122,12 +140,11 @@ export default async function EventDetailPage({ params }: Props) {
           imageAltAr: item.image_alt_ar ?? "",
           imageAltEn: item.image_alt_en ?? "",
           enStatus: item.en_status,
-          eventScope: item.event_scope ?? "nat",
+          eventSection: resolvedSection,
+          eventCategory: resolvedCategory,
           eventDay: item.event_day ?? "",
           eventMonth: item.event_month ?? "",
           eventYear: item.event_year ?? "",
-          eventTypeAr: item.event_type_ar ?? "",
-          eventTypeEn: item.event_type_en ?? "",
           eventDisplayStatus: item.event_display_status ?? "upcoming",
           attachments: Array.isArray(item.attachments) ? item.attachments : [],
           publicSlug: item.public_slug,

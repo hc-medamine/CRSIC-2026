@@ -663,7 +663,7 @@ async function runAlignRebuild(
     }
     if (need.events) {
       const events = await rebuildPublicEventsJson();
-      eventCount = events.intl + events.nat;
+      eventCount = events.activities + events.meetings;
     }
     await recordAlignRebuild({
       actor: user,

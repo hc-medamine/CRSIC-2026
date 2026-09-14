@@ -49,7 +49,7 @@ Estimated time: **~5 minutes**.
 | D1 | Publications: filter all / collective / individual | ☐ |
 | D2 | Publications: search narrows cards | ☐ |
 | D3 | Content lightbox opens for **publications, news, and events**; **عرض التفاصيل** opens `#…/{slug}` | ☐ |
-| D4 | Events: intl / nat tabs switch lists | ☐ |
+| D4 | Events: activities / meetings tabs + subcategory chips (الكل default) | ☐ |
 | D5 | Contact: empty submit shakes required fields | ☐ |
 | D6 | Contact: filled submit opens `mailto:contact@crsic.dz` | ☐ |
 | D7 | News card → lightbox → detail; browser back returns | ☐ |

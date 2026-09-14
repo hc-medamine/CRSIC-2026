@@ -7,8 +7,7 @@ import {
   getPub,
   getNews,
   getJournals,
-  getIntlEvents,
-  getNatEvents,
+  getEventsForSection,
   getHomeEvents,
   getNatPartners,
   getIntlPartners,
@@ -24,6 +23,11 @@ import {
 import { t, getLang } from './i18n.js';
 import { applySiteContact } from './sitePages.js';
 import { editorialField, isEditorialEnReady } from './editorial.js';
+import {
+  EVENT_SECTION_CATEGORIES,
+  EVENT_CATEGORY_I18N,
+  resolveEventsNavTab,
+} from './eventTaxonomy.js';
 import {
   prefersReducedMotion,
   el,
@@ -92,7 +96,7 @@ const SECTION_CONTAINERS = {
   publications: ['home-pub-grid', 'pub-grid'],
   news: ['home-news-grid', 'news-grid'],
   journals: ['journals-grid'],
-  events: ['home-events-grid', 'ev-intl-list', 'ev-nat-list'],
+  events: ['home-events-grid', 'ev-activities-list', 'ev-meetings-list'],
   partners: ['nat-partners', 'intl-partners'],
   laws: ['laws-grid'],
   platforms: ['platforms-grid'],
@@ -320,8 +324,8 @@ export function renderAll() {
     const journals = getJournals();
     const homeEvents = getHomeEvents(3);
     const laws = getLaws();
-    const evIntl = document.getElementById('ev-intl-list');
-    const evNat = document.getElementById('ev-nat-list');
+    const evActivities = document.getElementById('ev-activities-list');
+    const evMeetings = document.getElementById('ev-meetings-list');
     const natP = document.getElementById('nat-partners');
     const intlP = document.getElementById('intl-partners');
     const lawsEmpty = document.getElementById('laws-empty');
@@ -370,8 +374,16 @@ export function renderAll() {
       lg.dataset.loaded = '1';
     }
     renderPlatformsGrid();
-    if (evIntl) replaceChildren(evIntl, createEventYearGroups(getIntlEvents()));
-    if (evNat) replaceChildren(evNat, createEventYearGroups(getNatEvents()));
+    if (evActivities) {
+      replaceChildren(evActivities, createEventYearGroups(getEventsForSection('activities', 'all')));
+      evActivities.dataset.loaded = '1';
+    }
+    if (evMeetings) {
+      replaceChildren(evMeetings, createEventYearGroups(getEventsForSection('meetings', 'all')));
+      evMeetings.dataset.loaded = '1';
+    }
+    renderEventsCategoryChips();
+    applyEventsCategoryFilter();
     if (natP) replaceChildren(natP, getNatPartners().map(createPartnerCard));
     if (intlP) replaceChildren(intlP, getIntlPartners().map(createPartnerCard));
     updateContentLocaleNotices();
@@ -594,16 +606,84 @@ export function switchResearchTab(tabId) {
   import('./research.js').then((m) => m.renderResearchGroupsForTab(tabId)).catch(() => {});
 }
 
+/** @type {'activities'|'meetings'} */
+let eventsSection = 'activities';
+/** @type {string} */
+let eventsCategory = 'all';
+
+function fillEventsSectionList(section, category) {
+  const listEl = document.getElementById(`ev-${section}-list`);
+  const emptyEl = document.getElementById(`ev-${section}-empty`);
+  if (!listEl) return;
+  const items = getEventsForSection(section, category);
+  replaceChildren(listEl, createEventYearGroups(items));
+  if (emptyEl) {
+    emptyEl.hidden = items.length > 0;
+  }
+  listEl.dataset.loaded = '1';
+  // Restart soft list entrance (CSS keyframes on .ev-list)
+  listEl.classList.remove('is-filtering');
+  // force reflow so the next add retriggers animation
+  void listEl.offsetWidth;
+  listEl.classList.add('is-filtering');
+}
+
+function renderEventsCategoryChips() {
+  const host = document.getElementById('ev-cat-chips');
+  if (!host) return;
+  const cats = EVENT_SECTION_CATEGORIES[eventsSection] || [];
+  const chips = [
+    el('button', {
+      className: `filter-chip${eventsCategory === 'all' ? ' is-active' : ''}`,
+      text: t('ev_cat_all'),
+      attrs: {
+        type: 'button',
+        'data-ev-cat': 'all',
+        'aria-pressed': eventsCategory === 'all' ? 'true' : 'false',
+      },
+    }),
+    ...cats.map((id) =>
+      el('button', {
+        className: `filter-chip${eventsCategory === id ? ' is-active' : ''}`,
+        text: t(EVENT_CATEGORY_I18N[id] || id),
+        attrs: {
+          type: 'button',
+          'data-ev-cat': id,
+          'aria-pressed': eventsCategory === id ? 'true' : 'false',
+        },
+      }),
+    ),
+  ];
+  replaceChildren(host, chips);
+}
+
+function applyEventsCategoryFilter() {
+  fillEventsSectionList(eventsSection, eventsCategory);
+  updateContentLocaleNotices();
+}
+
+export function setEventsCategory(categoryId) {
+  eventsCategory = categoryId || 'all';
+  renderEventsCategoryChips();
+  applyEventsCategoryFilter();
+}
+
 export function switchEventsTab(tabId) {
-  document.querySelectorAll('#page-events .tab-bar .tab-btn').forEach(b => {
-    b.classList.toggle('active', b.dataset.tab === tabId);
+  const resolved = resolveEventsNavTab(tabId || 'activities');
+  eventsSection = resolved.section;
+  eventsCategory = resolved.category;
+
+  document.querySelectorAll('#page-events .tab-bar .tab-btn').forEach((b) => {
+    b.classList.toggle('active', b.dataset.tab === eventsSection);
   });
-  const evIntl = document.getElementById('ev-intl');
-  const evNat = document.getElementById('ev-nat');
-  if (evIntl) evIntl.classList.toggle('active', tabId === 'intl');
-  if (evNat) evNat.classList.toggle('active', tabId === 'nat');
+  const evActivities = document.getElementById('ev-activities');
+  const evMeetings = document.getElementById('ev-meetings');
+  if (evActivities) evActivities.classList.toggle('active', eventsSection === 'activities');
+  if (evMeetings) evMeetings.classList.toggle('active', eventsSection === 'meetings');
   const evBar = document.querySelector('#page-events .tab-bar');
   if (evBar) updateTabIndicator(evBar);
+  renderEventsCategoryChips();
+  applyEventsCategoryFilter();
 }
 
 export function updateTabIndicator(bar) {
@@ -642,8 +722,8 @@ const STORY_NOTICE_HOSTS = new Set([
   'home-news-grid',
   'news-grid',
   'pub-grid',
-  'ev-intl-list',
-  'ev-nat-list',
+  'ev-activities-list',
+  'ev-meetings-list',
   'nat-partners',
   'intl-partners',
   'laws-grid',
@@ -667,8 +747,8 @@ export function updateContentLocaleNotices() {
     'home-news-grid',
     'news-grid',
     'pub-grid',
-    'ev-intl-list',
-    'ev-nat-list',
+    'ev-activities-list',
+    'ev-meetings-list',
     'journals-grid',
     'nat-partners',
     'intl-partners',
@@ -1133,7 +1213,17 @@ export function bindUIEvents() {
     eventsBar.addEventListener('click', (e) => {
       const btn = e.target.closest('.tab-btn[data-tab]');
       if (!btn) return;
-      switchEventsTab(btn.dataset.tab);
+      // Section tab clicks always reset chip to الكل
+      switchEventsTab(btn.dataset.tab === 'meetings' ? 'meetings' : 'activities');
+    });
+  }
+
+  const evChips = document.getElementById('ev-cat-chips');
+  if (evChips) {
+    evChips.addEventListener('click', (e) => {
+      const btn = e.target.closest('.filter-chip[data-ev-cat]');
+      if (!btn) return;
+      setEventsCategory(btn.dataset.evCat);
     });
   }
 
