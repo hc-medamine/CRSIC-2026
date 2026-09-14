@@ -4,7 +4,7 @@ Living record of architectural and feature work. **Append new changelog entries 
 
 ### 2026-09-14 — Footer developers credit **Approved**
 
-SPA `footer_ministry` + CMS login/dashboard bottom: Merrah Karim & Haouassine Mohamed Amine. On `content/footer-developers-credit`.
+SPA `footer_ministry` + CMS login/dashboard bottom: Merah Abdel Karim & Houacine Mohamed Amine. On `content/footer-developers-credit`.
 
 ---
 
