@@ -47,6 +47,8 @@ const HIGHLIGHT_KEYS = [
   "en_status",
   "image_path",
   "event_scope",
+  "event_section",
+  "event_category",
   "event_day",
   "event_month",
   "event_year",

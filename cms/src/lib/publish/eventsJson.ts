@@ -19,6 +19,16 @@ import {
   type PublicBylineFields,
 } from "@/lib/publish/publicByline";
 import { withPublicStoryFields, type StoryEnFields } from "@/lib/publish/storyPublic";
+import {
+  EVENT_CATEGORY_TYPE_AR,
+  EVENT_CATEGORY_TYPE_EN,
+  isValidEventPair,
+  legacyScopeForCategory,
+  resolveLegacyCategory,
+  sectionForCategory,
+  type EventCategoryId,
+  type EventSectionId,
+} from "@/lib/content/eventTaxonomy";
 
 export type PublicEventItem = {
   id: string;
@@ -28,6 +38,7 @@ export type PublicEventItem = {
   year: string;
   title: string;
   type: string;
+  category: EventCategoryId;
   status: "done" | "upcoming" | "ongoing";
   img?: string;
   summary: string;
@@ -42,8 +53,12 @@ export type PublicEventItem = {
 } & PublicSeoFields &
   StoryEnFields & { img_card?: string; type_en?: string };
 
-/** Public item plus the scope used to bucket it into intl/nat on rebuild. */
-export type StoredEventPayload = PublicEventItem & { scope: "intl" | "nat" };
+/** Public item plus section used to bucket into activities/meetings on rebuild. */
+export type StoredEventPayload = PublicEventItem & {
+  section: EventSectionId;
+  /** Derived legacy scope kept for older live_payload rows during transition. */
+  scope?: "intl" | "nat";
+};
 
 type PayloadSource = {
   id: string;
@@ -56,6 +71,8 @@ type PayloadSource = {
   event_type_ar: string | null;
   event_display_status: "upcoming" | "ongoing" | "done" | null;
   event_scope: "intl" | "nat" | null;
+  event_section?: EventSectionId | string | null;
+  event_category?: EventCategoryId | string | null;
   image_path: string | null;
   image_alt_ar: string | null;
   public_slug: string | null;
@@ -73,6 +90,51 @@ type PayloadSource = {
   image_card_path?: string | null;
 } & Partial<PublicBylineFields>;
 
+function resolveEventTaxonomy(row: {
+  event_section?: string | null;
+  event_category?: string | null;
+  event_type_ar?: string | null;
+  event_scope?: string | null;
+}): { section: EventSectionId; category: EventCategoryId } {
+  const fromCols =
+    row.event_category &&
+    row.event_section &&
+    isValidEventPair(row.event_section, row.event_category)
+      ? (row.event_category as EventCategoryId)
+      : null;
+  const category =
+    fromCols ??
+    resolveLegacyCategory(row.event_type_ar, row.event_scope) ??
+    ("nat" as EventCategoryId);
+  const section =
+    row.event_section && isValidEventPair(row.event_section, category)
+      ? (row.event_section as EventSectionId)
+      : (sectionForCategory(category) ?? "meetings");
+  return { section, category };
+}
+
+function resolveCategoryFromStored(
+  item: Partial<PublicEventItem> & { scope?: string | null; section?: string | null },
+): EventCategoryId {
+  if (item.category && sectionForCategory(item.category)) {
+    return item.category;
+  }
+  return (
+    resolveLegacyCategory(item.type, item.scope) ??
+    (item.scope === "intl" ? "intl" : "nat")
+  );
+}
+
+function resolveSectionFromStored(
+  item: Partial<PublicEventItem> & { scope?: string | null; section?: string | null },
+  category: EventCategoryId,
+): EventSectionId {
+  if (item.section === "activities" || item.section === "meetings") {
+    if (isValidEventPair(item.section, category)) return item.section;
+  }
+  return sectionForCategory(category) ?? "meetings";
+}
+
 /** Public object for an event row (persisted to content_items.live_payload). */
 export function buildEventPayload(
   row: PayloadSource,
@@ -83,6 +145,9 @@ export function buildEventPayload(
   const slug = usedSlugs ? uniqueSlug(base, usedSlugs) : base;
   if (usedSlugs) usedSlugs.add(slug);
   const primary = primaryImageSrc(media) ?? row.image_path ?? undefined;
+  const { section, category } = resolveEventTaxonomy(row);
+  const typeAr = EVENT_CATEGORY_TYPE_AR[category];
+  const typeEn = EVENT_CATEGORY_TYPE_EN[category];
   const publicBase = withPublicStoryFields(
     withPublicSeo(
       {
@@ -92,7 +157,8 @@ export function buildEventPayload(
         month: row.event_month?.trim() || "",
         year: row.event_year?.trim() || "",
         title: row.title_ar.trim(),
-        type: row.event_type_ar?.trim() || "فعالية",
+        type: typeAr,
+        category,
         status:
           row.event_display_status === "done"
             ? ("done" as const)
@@ -119,11 +185,12 @@ export function buildEventPayload(
       image_path: row.image_path ?? primary,
       image_card_path: row.image_card_path,
     },
-    { typeEn: row.event_type_en },
+    { typeEn },
   );
   const item: StoredEventPayload = {
     ...publicBase,
-    scope: row.event_scope === "nat" ? "nat" : "intl",
+    section,
+    scope: legacyScopeForCategory(category),
   };
   if (primary) item.img = primary;
   return item;
@@ -150,12 +217,12 @@ function publicEventsPath(): string {
 }
 
 export async function rebuildPublicEventsJson(): Promise<{
-  intl: number;
-  nat: number;
+  activities: number;
+  meetings: number;
   path: string;
 }> {
   const result = await query<{
-    live_payload: StoredEventPayload;
+    live_payload: StoredEventPayload & { scope?: "intl" | "nat" };
     editor_name_ar: string | null;
     editor_name_en: string | null;
     editor_display: string | null;
@@ -181,11 +248,14 @@ export async function rebuildPublicEventsJson(): Promise<{
      ORDER BY c.live_at DESC NULLS LAST, c.created_at ASC`,
   );
 
-  const intl: PublicEventItem[] = [];
-  const nat: PublicEventItem[] = [];
+  const activities: PublicEventItem[] = [];
+  const meetings: PublicEventItem[] = [];
 
   for (const row of result.rows) {
-    const { scope, ...item } = row.live_payload;
+    const { section: _section, scope, ...rest } = row.live_payload;
+    const item = rest as PublicEventItem & { scope?: "intl" | "nat"; section?: EventSectionId };
+    const category = resolveCategoryFromStored({ ...item, scope });
+    const section = resolveSectionFromStored({ ...item, scope, section: _section }, category);
     const media = buildMediaList(item.media, item.img, undefined);
     const editor = personPublicNames({
       nameAr: row.editor_name_ar,
@@ -216,7 +286,8 @@ export async function rebuildPublicEventsJson(): Promise<{
         month: item.month?.trim() || "",
         year: item.year?.trim() || "",
         title: (item.title ?? "").trim(),
-        type: item.type?.trim() || "فعالية",
+        type: EVENT_CATEGORY_TYPE_AR[category],
+        category,
         status:
           item.status === "done"
             ? "done"
@@ -235,12 +306,12 @@ export async function rebuildPublicEventsJson(): Promise<{
         ...seoFromRow(item),
       },
       item,
-      { typeEn: item.type_en },
+      { typeEn: EVENT_CATEGORY_TYPE_EN[category] },
     );
     const primary = primaryImageSrc(media) ?? item.img;
     if (primary) publicItem.img = primary;
-    if (scope === "nat") nat.push(publicItem);
-    else intl.push(publicItem);
+    if (section === "activities") activities.push(publicItem);
+    else meetings.push(publicItem);
   }
 
   const path = publicEventsPath();
@@ -248,15 +319,18 @@ export async function rebuildPublicEventsJson(): Promise<{
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   if (existsSync(path)) writeFileSync(`${path}.bak`, readFileSync(path));
 
-  const payload = JSON.stringify({ intl, nat }, null, 4);
+  const payload = JSON.stringify({ activities, meetings }, null, 4);
   const tmp = `${path}.tmp`;
   writeFileSync(tmp, payload, "utf8");
   renameSync(tmp, path);
 
-  const check = JSON.parse(readFileSync(path, "utf8")) as { intl: unknown; nat: unknown };
-  if (!Array.isArray(check.intl) || !Array.isArray(check.nat)) {
+  const check = JSON.parse(readFileSync(path, "utf8")) as {
+    activities: unknown;
+    meetings: unknown;
+  };
+  if (!Array.isArray(check.activities) || !Array.isArray(check.meetings)) {
     throw new Error("Published events.json invalid after write");
   }
 
-  return { intl: intl.length, nat: nat.length, path };
+  return { activities: activities.length, meetings: meetings.length, path };
 }

@@ -14,8 +14,8 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/motion.css">
+  <link rel="stylesheet" href="css/style.css?v=events-chips-1">
+  <link rel="stylesheet" href="css/motion.css?v=events-chips-1">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Organization","name":"مركز البحث في العلوم الإسلامية والحضارة","url":"https://crsic.dz","logo":"img/crsic_logo.png","email":"contact@crsic.dz","telephone":"+21329146190","address":{"@type":"PostalAddress","addressLocality":"الأغواط","addressCountry":"DZ"}}
   </script>
@@ -131,18 +131,18 @@
           الفعاليات والتعاون <span class="drop-arrow" aria-hidden="true">▾</span>
         </a>
         <div class="mega-panel mega-panel--single" role="region">
-          <a href="#" data-page="events" data-tab="intl" class="mega-link">
-            <div class="mega-icon">🌍</div>
+          <a href="#" data-page="events" data-tab="activities" class="mega-link">
+            <div class="mega-icon">🎓</div>
             <div>
-              <div class="mega-text-label" data-i18n="nav_events_intl">ملتقيات دولية</div>
-              <div class="mega-text-sub" data-i18n="nav_events_intl_sub">+10 ملتقيات دولية منعقدة</div>
+              <div class="mega-text-label" data-i18n="nav_events_activities">الفعاليات</div>
+              <div class="mega-text-sub" data-i18n="nav_events_activities_sub">محاضرات · زيارات · دورات · أيام دراسية</div>
             </div>
           </a>
-          <a href="#" data-page="events" data-tab="nat" class="mega-link">
-            <div class="mega-icon">🗺️</div>
+          <a href="#" data-page="events" data-tab="meetings" class="mega-link">
+            <div class="mega-icon">🌍</div>
             <div>
-              <div class="mega-text-label" data-i18n="nav_events_nat">ملتقيات وطنية</div>
-              <div class="mega-text-sub" data-i18n="nav_events_nat_sub">+10 ملتقيات وطنية ويوم دراسي</div>
+              <div class="mega-text-label" data-i18n="nav_events_meetings">الملتقيات</div>
+              <div class="mega-text-sub" data-i18n="nav_events_meetings_sub">دولية · وطنية · ثقافية</div>
             </div>
           </a>
           <a href="#" data-page="cooperation" class="mega-link">
@@ -814,23 +814,24 @@
     <section class="page" id="page-events">
       <div class="page-hero">
         <div class="page-hero-inner">
-          <div class="page-hero-tag" data-i18n="events_hero_tag">ملتقيات دولية ووطنية · محاضرات ولقاءات علمية</div>
+          <div class="page-hero-tag" data-i18n="events_hero_tag">فعاليات علمية · ملتقيات دولية ووطنية وثقافية</div>
           <h1 data-i18n="events_hero_h1">الفعاليات والملتقيات العلمية</h1>
-          <p data-i18n="events_hero_p">ينظم المركز سنوياً ملتقيات علمية وطنية ودولية تُعالج قضايا بحثية راهنة وتجمع
-            الباحثين والأكاديميين.</p>
+          <p data-i18n="events_hero_p">ينظم المركز فعاليات علمية (محاضرات وزيارات ودورات وأيام دراسية) وملتقيات دولية ووطنية وثقافية تجمع الباحثين والأكاديميين.</p>
         </div>
       </div>
       <div class="page-body">
         <div class="tab-bar">
-          <button type="button" class="tab-btn active" data-tab="intl" data-i18n="tab_intl_events">الملتقيات
-            الدولية</button>
-          <button type="button" class="tab-btn" data-tab="nat" data-i18n="tab_nat_events">الملتقيات الوطنية</button>
+          <button type="button" class="tab-btn active" data-tab="activities" data-i18n="tab_events_activities">الفعاليات</button>
+          <button type="button" class="tab-btn" data-tab="meetings" data-i18n="tab_events_meetings">الملتقيات</button>
         </div>
-        <div class="tab-panel active" id="ev-intl">
-          <div class="ev-list" id="ev-intl-list"></div>
+        <div class="filter-chips ev-cat-chips" id="ev-cat-chips" role="group" aria-label="تصفية الفئة"></div>
+        <div class="tab-panel active" id="ev-activities">
+          <div class="ev-list" id="ev-activities-list"></div>
+          <p class="catalog-empty" id="ev-activities-empty" hidden data-i18n="ev_cat_empty">لا توجد فعاليات في هذه الفئة حالياً.</p>
         </div>
-        <div class="tab-panel" id="ev-nat">
-          <div class="ev-list" id="ev-nat-list"></div>
+        <div class="tab-panel" id="ev-meetings">
+          <div class="ev-list" id="ev-meetings-list"></div>
+          <p class="catalog-empty" id="ev-meetings-empty" hidden data-i18n="ev_cat_empty">لا توجد ملتقيات في هذه الفئة حالياً.</p>
         </div>
       </div>
     </section>
@@ -1259,9 +1260,8 @@
       </div>
       <div class="drawer-divider"></div>
       <div class="drawer-section-label" data-i18n="drawer_events">الفعاليات والتعاون</div>
-      <a class="drawer-item sub" href="#" data-page="events" data-tab="intl" data-i18n="nav_events_intl">ملتقيات
-        دولية</a>
-      <a class="drawer-item sub" href="#" data-page="events" data-tab="nat" data-i18n="nav_events_nat">ملتقيات وطنية</a>
+      <a class="drawer-item sub" href="#" data-page="events" data-tab="activities" data-i18n="nav_events_activities">الفعاليات</a>
+      <a class="drawer-item sub" href="#" data-page="events" data-tab="meetings" data-i18n="nav_events_meetings">الملتقيات</a>
       <a class="drawer-item sub" href="#" data-page="cooperation" data-i18n="nav_cooperation">الشراكات والتعاون</a>
       <div class="drawer-divider"></div>
       <a class="drawer-item" href="#" data-page="contact" data-i18n="nav_contact_short">اتصل بنا</a>
@@ -1341,7 +1341,7 @@
     </div>
   </nav>
 
-  <script type="module" src="js/main.js?v=journals-shelf-4"></script>
+  <script type="module" src="js/main.js?v=events-taxonomy-2"></script>
 </body>
 
 </html>

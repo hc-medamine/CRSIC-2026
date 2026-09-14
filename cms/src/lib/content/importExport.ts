@@ -33,6 +33,16 @@ import {
 } from "@/lib/content/importExportLogic";
 import { contentListSqlOrderBy, type HeaderSort } from "@/lib/content/headerSort";
 import { paginationBounds, parseListPage, trimHasMore } from "@/lib/content/listPagination";
+import {
+  EVENT_CATEGORY_TYPE_AR,
+  EVENT_CATEGORY_TYPE_EN,
+  isValidEventPair,
+  legacyScopeForCategory,
+  resolveLegacyCategory,
+  sectionForCategory,
+  type EventCategoryId,
+  type EventSectionId,
+} from "@/lib/content/eventTaxonomy";
 
 export type { ImportReport, ImportReportItem, ExportPickerRow } from "@/lib/content/importExportLogic";
 export {
@@ -74,7 +84,8 @@ const SELECT_EXPORT = `
   SELECT ci.id AS source_id, ci.content_type, ci.org_unit_id, ci.en_status,
          ci.title_ar, ci.title_en, ci.label_ar, ci.label_en, ci.summary_ar, ci.summary_en,
          ci.body_ar, ci.body_en, ci.image_path, ci.image_card_path, ci.image_alt_ar, ci.image_alt_en,
-         ci.attachments, ci.og_image, ci.event_scope, ci.event_day, ci.event_month, ci.event_year,
+         ci.attachments, ci.og_image, ci.event_scope, ci.event_section, ci.event_category,
+         ci.event_day, ci.event_month, ci.event_year,
          ci.event_type_ar, ci.event_type_en, ci.event_display_status, ci.pub_kind,
          ci.partner_scope, ci.partner_date, ci.partner_emoji,
          ci.alert_link_url, ci.alert_link_label_ar, ci.alert_link_label_en,
@@ -417,13 +428,37 @@ export async function importCmsZip(user: SessionUser, zipBuf: Buffer): Promise<I
     });
     const status = importAlwaysDraft();
 
+    let eventScope = raw.event_scope;
+    let eventSection: string | null = raw.event_section ?? null;
+    let eventCategory: string | null = raw.event_category ?? null;
+    let eventTypeAr = raw.event_type_ar;
+    let eventTypeEn = raw.event_type_en;
+    if (raw.content_type === "event") {
+      const category: EventCategoryId =
+        (raw.event_category && sectionForCategory(raw.event_category)
+          ? (raw.event_category as EventCategoryId)
+          : null) ??
+        resolveLegacyCategory(raw.event_type_ar, raw.event_scope) ??
+        "nat";
+      const section: EventSectionId =
+        raw.event_section && isValidEventPair(raw.event_section, category)
+          ? (raw.event_section as EventSectionId)
+          : (sectionForCategory(category) ?? "meetings");
+      eventCategory = category;
+      eventSection = section;
+      eventScope = legacyScopeForCategory(category);
+      eventTypeAr = EVENT_CATEGORY_TYPE_AR[category];
+      eventTypeEn = EVENT_CATEGORY_TYPE_EN[category];
+    }
+
     await query(
       `INSERT INTO content_items (
         id, content_type, status, org_unit_id, created_by, updated_by, en_status,
         title_ar, title_en, label_ar, label_en, summary_ar, summary_en, body_ar, body_en,
         image_path, image_card_path, image_alt_ar, image_alt_en, attachments, og_image,
         checklist_confirmed, review_note, public_slug, published_at, live_payload, live_at,
-        event_scope, event_day, event_month, event_year, event_type_ar, event_type_en, event_display_status,
+        event_scope, event_section, event_category, event_day, event_month, event_year,
+        event_type_ar, event_type_en, event_display_status,
         pub_kind, partner_scope, partner_date, partner_emoji,
         alert_link_url, alert_link_label_ar, alert_link_label_en, external_url, platform_kind,
         research_group_id, research_lead_ar, research_lead_en, research_members,
@@ -436,13 +471,13 @@ export async function importCmsZip(user: SessionUser, zipBuf: Buffer): Promise<I
         $8, $9, $10, $11, $12, $13, $14, $15,
         $16, $17, $18, $19, $20::jsonb, $21,
         FALSE, NULL, $22, NULL, NULL, NULL,
-        $23, $24, $25, $26, $27, $28, $29,
-        $30, $31, $32, $33,
-        $34, $35, $36, $37, $38,
-        $39, $40, $41, $42::jsonb,
-        $43, $44, $45::jsonb,
-        $46, $47, $48::jsonb,
-        $49, $50, $51, $52,
+        $23, $24, $25, $26, $27, $28, $29, $30, $31,
+        $32, $33, $34, $35,
+        $36, $37, $38, $39, $40,
+        $41, $42, $43, $44::jsonb,
+        $45, $46, $47::jsonb,
+        $48, $49, $50::jsonb,
+        $51, $52, $53, $54,
         NULL, NULL
       )`,
       [
@@ -468,12 +503,14 @@ export async function importCmsZip(user: SessionUser, zipBuf: Buffer): Promise<I
         JSON.stringify(attachments),
         ogPath,
         slug,
-        raw.event_scope,
+        eventScope,
+        eventSection,
+        eventCategory,
         raw.event_day,
         raw.event_month,
         raw.event_year,
-        raw.event_type_ar,
-        raw.event_type_en,
+        eventTypeAr,
+        eventTypeEn,
         raw.event_display_status,
         raw.pub_kind,
         raw.partner_scope,

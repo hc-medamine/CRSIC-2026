@@ -4444,13 +4444,89 @@ html[dir="rtl"] li {
   }
 }
 
-/* Platform filter chips */
 .filter-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 1.5rem;
 }
+
+/* Events subcategory chips — designed rail under section tabs */
+#page-events .tab-bar {
+  margin-bottom: 0;
+}
+.filter-chips.ev-cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 1.75rem;
+  padding: 0.85rem 1rem;
+  background:
+    linear-gradient(180deg, rgba(27, 67, 50, 0.04), rgba(27, 67, 50, 0.015)),
+    var(--cream-dark);
+  border: 0.5px solid var(--border-light);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+}
+.filter-chips.ev-cat-chips .filter-chip {
+  appearance: none;
+  position: relative;
+  border: 0.5px solid rgba(27, 67, 50, 0.18);
+  background: #fff;
+  color: var(--green-deep);
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  padding: 0.55rem 1.05rem;
+  min-height: 2.45rem;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(27, 67, 50, 0.04);
+  transition:
+    background 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.filter-chips.ev-cat-chips .filter-chip:hover:not(.is-active) {
+  border-color: var(--green-mid);
+  color: var(--green-mid);
+  background: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(27, 67, 50, 0.1);
+}
+.filter-chips.ev-cat-chips .filter-chip.is-active {
+  background: linear-gradient(165deg, var(--green-mid), var(--green-deep));
+  border-color: var(--green-deep);
+  color: var(--cream);
+  font-weight: 600;
+  box-shadow:
+    0 0 0 1px rgba(201, 168, 76, 0.35),
+    0 8px 18px rgba(27, 67, 50, 0.22);
+  transform: translateY(-1px);
+}
+.filter-chips.ev-cat-chips .filter-chip.is-active::after {
+  content: '';
+  position: absolute;
+  inset-inline: 18%;
+  bottom: 5px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gold);
+  opacity: 0.9;
+}
+.filter-chips.ev-cat-chips .filter-chip:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+.filter-chips.ev-cat-chips .filter-chip:active {
+  transform: scale(0.97) translateY(0);
+}
+
 .filter-chip {
   appearance: none;
   border: 0.5px solid var(--border-light);
@@ -4474,6 +4550,19 @@ html[dir="rtl"] li {
 .filter-chip:focus-visible {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
+}
+
+@media (max-width: 560px) {
+  .filter-chips.ev-cat-chips {
+    gap: 0.4rem;
+    padding: 0.7rem 0.75rem;
+    margin-bottom: 1.35rem;
+  }
+  .filter-chips.ev-cat-chips .filter-chip {
+    font-size: 0.78rem;
+    padding: 0.45rem 0.85rem;
+    min-height: 2.25rem;
+  }
 }
 
 .empty-state,

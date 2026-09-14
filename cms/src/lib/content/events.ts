@@ -27,6 +27,14 @@ import {
   type ContentListQuery,
   type ContentListResult,
 } from "@/lib/content/listPagination";
+import {
+  EVENT_CATEGORY_TYPE_AR,
+  EVENT_CATEGORY_TYPE_EN,
+  isValidEventPair,
+  legacyScopeForCategory,
+  type EventCategoryId,
+  type EventSectionId,
+} from "@/lib/content/eventTaxonomy";
 
 async function auditEvent(
   user: SessionUser,
@@ -63,6 +71,8 @@ export type EventItem = {
   image_alt_en: string | null;
   attachments: PublicMediaItem[] | unknown;
   event_scope: "intl" | "nat" | null;
+  event_section: EventSectionId | null;
+  event_category: EventCategoryId | null;
   event_day: string | null;
   event_month: string | null;
   event_year: string | null;
@@ -98,12 +108,11 @@ export type EventInput = {
   attachments?: PublicMediaItem[];
   publicSlug?: string | null;
   enStatus?: "pending" | "ready";
-  eventScope: "intl" | "nat";
+  eventSection: EventSectionId;
+  eventCategory: EventCategoryId;
   eventDay: string;
   eventMonth: string;
   eventYear: string;
-  eventTypeAr: string;
-  eventTypeEn?: string;
   eventDisplayStatus: "upcoming" | "ongoing" | "done";
 } & SeoInput;
 
@@ -117,6 +126,8 @@ function snapshotOf(row: EventItem) {
     summary_ar: row.summary_ar,
     body_ar: row.body_ar,
     event_scope: row.event_scope,
+    event_section: row.event_section,
+    event_category: row.event_category,
     event_day: row.event_day,
     event_month: row.event_month,
     event_year: row.event_year,
@@ -156,11 +167,23 @@ function validateEventFields(input: EventInput) {
   if (!input.eventDay.trim() || !input.eventMonth.trim() || !input.eventYear.trim()) {
     throw new Error("Event day, month, and year are required");
   }
-  if (!input.eventTypeAr.trim()) throw new Error("Event type (AR) is required");
-  if (!["intl", "nat"].includes(input.eventScope)) throw new Error("Invalid event scope");
+  if (!isValidEventPair(input.eventSection, input.eventCategory)) {
+    throw new Error("Invalid event section/category pair");
+  }
   if (!["upcoming", "ongoing", "done"].includes(input.eventDisplayStatus)) {
     throw new Error("Invalid display status");
   }
+}
+
+function derivedEventTaxonomy(input: EventInput) {
+  const category = input.eventCategory;
+  return {
+    eventSection: input.eventSection,
+    eventCategory: category,
+    eventScope: legacyScopeForCategory(category),
+    eventTypeAr: EVENT_CATEGORY_TYPE_AR[category],
+    eventTypeEn: EVENT_CATEGORY_TYPE_EN[category],
+  };
 }
 
 export async function getEventById(id: string): Promise<EventItem | null> {
@@ -209,6 +232,7 @@ export async function createEvent(user: SessionUser, input: EventInput): Promise
   if (!(await canAccessOrg(user, input.orgUnitId))) throw new Error("No permission for this organisation unit");
   await assertOrgAllowsContentType(input.orgUnitId, "event");
   validateEventFields(input);
+  const tax = derivedEventTaxonomy(input);
   const enStatus = input.enStatus ?? (input.titleEn?.trim() ? "ready" : "pending");
   const attachments = normalizeAttachments(input.attachments);
   const primaryImage =
@@ -220,16 +244,16 @@ export async function createEvent(user: SessionUser, input: EventInput): Promise
       content_type, status, org_unit_id, created_by, updated_by, en_status,
       title_ar, title_en, summary_ar, summary_en, body_ar, body_en,
       image_path, image_alt_ar, image_alt_en, attachments,
-      event_scope, event_day, event_month, event_year,
+      event_scope, event_section, event_category, event_day, event_month, event_year,
       event_type_ar, event_type_en, event_display_status,
       meta_title_ar, meta_title_en, meta_description_ar, meta_description_en, og_image
     ) VALUES (
       'event', 'draft', $1, $2, $2, $3,
       $4, $5, $6, $7, $8, $9,
       $10, $11, $12, $13::jsonb,
-      $14, $15, $16, $17,
-      $18, $19, $20,
-      $21, $22, $23, $24, $25
+      $14, $15, $16, $17, $18, $19,
+      $20, $21, $22,
+      $23, $24, $25, $26, $27
     ) RETURNING *`,
     [
       input.orgUnitId,
@@ -245,12 +269,14 @@ export async function createEvent(user: SessionUser, input: EventInput): Promise
       input.imageAltAr?.trim() || null,
       input.imageAltEn?.trim() || null,
       JSON.stringify(attachments),
-      input.eventScope,
+      tax.eventScope,
+      tax.eventSection,
+      tax.eventCategory,
       input.eventDay.trim(),
       input.eventMonth.trim(),
       input.eventYear.trim(),
-      input.eventTypeAr.trim(),
-      input.eventTypeEn?.trim() || null,
+      tax.eventTypeAr,
+      tax.eventTypeEn,
       input.eventDisplayStatus,
       seo.meta_title_ar,
       seo.meta_title_en,
@@ -278,6 +304,7 @@ export async function updateEventDraft(user: SessionUser, id: string, input: Eve
   if (!(await canAccessOrg(user, input.orgUnitId))) throw new Error("No permission for this organisation unit");
   await assertOrgAllowsContentType(input.orgUnitId, "event");
   validateEventFields(input);
+  const tax = derivedEventTaxonomy(input);
   const enStatus = input.enStatus ?? (input.titleEn?.trim() ? "ready" : "pending");
   const attachments = normalizeAttachments(input.attachments);
   const primaryImage =
@@ -294,11 +321,12 @@ export async function updateEventDraft(user: SessionUser, id: string, input: Eve
       title_ar = $5, title_en = $6, summary_ar = $7, summary_en = $8,
       body_ar = $9, body_en = $10, image_path = $11, image_alt_ar = $12, image_alt_en = $13,
       attachments = $14::jsonb,
-      event_scope = $15, event_day = $16, event_month = $17, event_year = $18,
-      event_type_ar = $19, event_type_en = $20, event_display_status = $21,
-      public_slug = COALESCE($22, public_slug),
-      meta_title_ar = $23, meta_title_en = $24, meta_description_ar = $25,
-      meta_description_en = $26, og_image = $27,
+      event_scope = $15, event_section = $16, event_category = $17,
+      event_day = $18, event_month = $19, event_year = $20,
+      event_type_ar = $21, event_type_en = $22, event_display_status = $23,
+      public_slug = COALESCE($24, public_slug),
+      meta_title_ar = $25, meta_title_en = $26, meta_description_ar = $27,
+      meta_description_en = $28, og_image = $29,
       status = CASE WHEN status = 'unpublished' THEN 'draft' ELSE status END,
       updated_at = NOW()
      WHERE id = $1 AND content_type = 'event'
@@ -318,12 +346,14 @@ export async function updateEventDraft(user: SessionUser, id: string, input: Eve
       input.imageAltAr?.trim() || null,
       input.imageAltEn?.trim() || null,
       JSON.stringify(attachments),
-      input.eventScope,
+      tax.eventScope,
+      tax.eventSection,
+      tax.eventCategory,
       input.eventDay.trim(),
       input.eventMonth.trim(),
       input.eventYear.trim(),
-      input.eventTypeAr.trim(),
-      input.eventTypeEn?.trim() || null,
+      tax.eventTypeAr,
+      tax.eventTypeEn,
       input.eventDisplayStatus,
       slugOverride?.trim() || null,
       seo.meta_title_ar,

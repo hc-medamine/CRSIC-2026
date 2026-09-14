@@ -10,7 +10,7 @@ When `CONTENT_BASE_URL` is set (e.g. `https://cdn.example.com/crsic/`), the app 
 |------|--------|
 | `news.json` | `{ "news": object[] }` — `id`, `slug`, `date`, `title`, `label`, `summary`, `body`, `img`, optional `img_card`, optional `img_webp` / `img_card_webp`, `en_status` + EN editorial fields, `media[]`, bylines (`editor_*` from author, `reviewer_*` from review owner, `publisher_*` from CMS `publisher_id` or Boufatah fallback), optional SEO |
 | `featured-news.json` | `{ "ids": string[] }` — ordered public news ids for `#home-feat-carousel`, max 10. Empty or all missing → SPA shows 3 newest news. CMS: `/dashboard/featured-news` |
-| `events.json` | `{ "intl": object[], "nat": object[] }` — detail + `status` (`upcoming` \| `ongoing` \| `done`) + bylines + optional `img_card` / `img_webp` / `img_card_webp` / EN-when-ready + optional SEO |
+| `events.json` | `{ "activities": object[], "meetings": object[] }` — each item has `category` + locked `type` / optional `type_en`; detail + `status` (`upcoming` \| `ongoing` \| `done`) + bylines + optional `img_card` / `img_webp` / `img_card_webp` / EN-when-ready + optional SEO |
 | `publications.json` | `{ "covers": string[], "pubs": object[] }` — SPA cards use **master cover** (not `img_card`; PR #52 layout). Keep `covers.length === pubs.length`. Optional `img_webp` / `en_status` + EN fields |
 | `partners.json` | `{ "nat": object[], "intl": object[] }` — optional summary/body + `en_status` / `name_en` / `img_card` / `img_webp` / `img_card_webp` + SEO |
 | `alerts.json` | `{ "items": object[] }` — at most one live item; optional `en_status` + EN fields |

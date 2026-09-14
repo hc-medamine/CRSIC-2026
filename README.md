@@ -262,16 +262,17 @@ erDiagram
 
 | Field | Type | Rules |
 |-------|------|--------|
-| `intl` / `nat` | `object[]` | International vs national |
+| `activities` / `meetings` | `object[]` | Section buckets (فعاليات / ملتقيات) |
+| `category` | string | Subcategory id: `lecture` \| `visit` \| `training` \| `study_day` \| `intl` \| `nat` \| `cultural` |
 | `day`, `month`, `year` | string | Display fragments (month often abbreviated Arabic) |
-| `title`, `type` | string | Arabic title and event kind label |
+| `title`, `type` | string | Arabic title and locked subcategory label |
 | `en_status`, `title_en`, `summary_en`, `body_en`, `type_en` | optional | EN when ready; missing `en_status` = not ready |
 | `status` | `"upcoming"` \| `"ongoing"` \| `"done"` | Badge on SPA cards |
 | `img` | string (optional) | Detail master; CMS publish uses `img/cms/events/`; if omitted, Holders `0`–`5` cycle |
 | `img_card` | string (optional) | SPA cards when present |
 | `editor_ar` / `editor_en`, `reviewer_ar` / `reviewer_en`, `publisher_ar` / `publisher_en` | display names | Card byline (publisher line is Fariha Boufatah; identical reviewer+publisher collapse to one line) |
 
-Home teaser `#home-events-grid` uses `getHomeEvents(3)` (intl + nat merged, newest first). Full events page still lists all items by year. The Home **featured** strip (`#home-feat-carousel`) is **news**, not events.
+Home teaser `#home-events-grid` uses `getHomeEvents(3)` (activities + meetings merged, newest first). `#events` uses section tabs + subcategory chips (default **الكل**). The Home **featured** strip (`#home-feat-carousel`) is **news**, not events.
 
 #### `partners.json`
 
@@ -362,7 +363,7 @@ Approximate inventory of **shipped public JSON** after WordPress cutover + Home 
 | Resource | Count / contents |
 |----------|------------------|
 | Publications | **36** (`covers` ↔ `pubs`); covers live under `img/cms/covers/` (legacy `img/covers/` still present) |
-| Events | **55** — 14 `intl` + 41 `nat` |
+| Events | **55** — 26 `activities` + 29 `meetings` |
 | Partners | **17** — 5 international + 12 national |
 | Journals | **4** — all link to `https://crsic.dz/ojsre/` (OJS; not authored in CMS) |
 | News | **39** items (story-date sorted) |
@@ -587,7 +588,7 @@ Hash SPA. Default route: `#home` (or empty hash).
 | `#research-project/{slug}` | `page-detail` | Research project |
 | `#publications` | `page-publications` | Filters: all / collective / individual; search |
 | `#publication/{slug}` | `page-detail` | Publication |
-| `#events` | `page-events` | Tabs: intl / nat |
+| `#events` | `page-events` | Tabs: activities / meetings + subcategory chips |
 | `#event/{slug}` | `page-detail` | Event |
 | `#cooperation` | `page-cooperation` | Partners (nav parent: events) |
 | `#partner/{slug}` | `page-detail` | Partner |
@@ -738,7 +739,7 @@ When `CONTENT_BASE_URL` is `https://cdn.example.com/crsic/`:
 | Method | Path                | Response shape                         |
 | ------ | ------------------- | -------------------------------------- |
 | GET    | `publications.json` | `{ covers: string[], pubs: object[] }` |
-| GET    | `events.json`       | `{ intl: object[], nat: object[] }`    |
+| GET    | `events.json`       | `{ activities: object[], meetings: object[] }` |
 | GET    | `partners.json`     | `{ nat: object[], intl: object[] }`    |
 | GET    | `journals.json`     | `{ journals: object[] }`               |
 | GET    | `news.json`         | `{ news: object[] }`                   |

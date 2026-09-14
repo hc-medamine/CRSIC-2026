@@ -14,7 +14,7 @@ Project docs index: [docs/README.md](../docs/README.md).
 | File | Contents |
 |------|----------|
 | `publications.json` | CMS-published `pubs[]` (each item has `media[]`). `covers[]` is a derived parallel array; SPA reads each pub’s `media` first. **36** items; keep `covers.length === pubs.length` |
-| `events.json` | `intl[]` (14) + `nat[]` (41). Detail: `id`, `slug`, `summary`, `body`, `media[]`, `status` (`upcoming` \| `ongoing` \| `done`), bylines |
+| `events.json` | `activities[]` (26) + `meetings[]` (29). Detail: `id`, `slug`, `category`, `summary`, `body`, `media[]`, `status` (`upcoming` \| `ongoing` \| `done`), bylines |
 | `partners.json` | `nat[]` (12) + `intl[]` (5); optional `summary_*` / `body_*` |
 | `alerts.json` | `items[]` — site-wide banner, at most one live item (empty array when none) |
 | `research-groups.json` | `items[]` — research groups by `orgUnitId` (CMS-published) |
@@ -66,7 +66,7 @@ Public deep link: `#publication/{slug}`.
 
 ## Add an event
 
-Append to `intl` or `nat` in `events.json`:
+Prefer creating via CMS (section + subcategory selects). If editing JSON by hand, append to `activities` or `meetings` in `events.json`:
 
 ```json
 {
@@ -74,7 +74,9 @@ Append to `intl` or `nat` in `events.json`:
   "month": "ماي",
   "year": "2026",
   "title": "عنوان الملتقى",
-  "type": "ملتقى وطني",
+  "category": "nat",
+  "type": "ملتقيات وطنية",
+  "type_en": "National conferences",
   "status": "done",
   "img": "img/cms/events/<hash>.jpg",
   "id": "legacy-event-عنوان-الملتقى",
@@ -85,11 +87,12 @@ Append to `intl` or `nat` in `events.json`:
 }
 ```
 
+`category` must be one of: `lecture` \| `visit` \| `training` \| `study_day` (under `activities`) or `intl` \| `nat` \| `cultural` (under `meetings`).  
 `status`: `"upcoming"` \| `"ongoing"` \| `"done"`.  
 `img` / `media` come from CMS publish (`img/cms/events/`). If an event has no image, cards may fall back to `img/Holders/0.jpg`–`5.jpg`.  
 Deep link: `#event/{slug}`.
 
-The home section `#home-events-grid` shows the **3 newest** events (intl + nat merged, sorted by date). The full events page still lists every item by year. The Home **featured** strip is **news** (`featured-news.json`), not events.
+The home section `#home-events-grid` shows the **3 newest** events (activities + meetings merged, sorted by date). `#events` uses section tabs + subcategory chips. The Home **featured** strip is **news** (`featured-news.json`), not events.
 
 ## Add a site alert
 

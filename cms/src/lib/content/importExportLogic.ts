@@ -39,6 +39,8 @@ export type CmsZipItem = {
   attachments: unknown;
   og_image: string | null;
   event_scope: string | null;
+  event_section: string | null;
+  event_category: string | null;
   event_day: string | null;
   event_month: string | null;
   event_year: string | null;

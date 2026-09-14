@@ -38,6 +38,8 @@ const SNAPSHOT_COLUMNS = [
   "attachments",
   "pub_kind",
   "event_scope",
+  "event_section",
+  "event_category",
   "event_day",
   "event_month",
   "event_year",
