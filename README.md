@@ -288,8 +288,14 @@ Home teaser `#home-events-grid` uses `getHomeEvents(3)` (intl + nat merged, newe
 | Field                                  | Type                                    |
 | -------------------------------------- | --------------------------------------- |
 | `journals[]`                           | objects                                 |
+| `id`                                   | optional slug (`rsic`, `ces`, `rnv`, `reso`) |
 | `name`, `freq`, `langs`, `desc`, `url` | strings                                 |
-| `bg`                                   | CSS gradient string for card background |
+| `bg`                                   | CSS gradient string for card identity band |
+| `covers[]`                             | optional; up to 4 issue covers under `img/journals/{id}/` |
+| `covers[].src`, `covers[].alt`         | local image path + accessible label     |
+| `covers[].url`                         | optional issue/archive link (else journal `url`) |
+
+Not CMS-published — OJS remains SSOT ([PRD](./docs/prds/2026-09-14-spa-journal-cover-shelves.md)).
 
 #### `news.json`
 
