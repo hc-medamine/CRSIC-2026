@@ -1079,7 +1079,7 @@ footer.site-footer { background: var(--green-deep); }
 .lightbox-panel {
   background: var(--cream);
   border-radius: 12px;
-  max-width: 580px;
+  max-width: 680px;
   width: 100%;
   overflow: hidden;
   border: 0.5px solid #D4CFC6;
@@ -1115,7 +1115,7 @@ footer.site-footer { background: var(--green-deep); }
 
 .lightbox-shell {
   position: relative;
-  max-width: 580px;
+  max-width: 680px;
   width: 100%;
 }
 
@@ -1124,6 +1124,7 @@ footer.site-footer { background: var(--green-deep); }
   gap: 1.5rem;
   padding: 1.75rem;
   border-bottom: 0.5px solid var(--border-light);
+  align-items: flex-start;
 }
 @media (max-width: 560px) {
   .lightbox-overlay { padding: 0.75rem; align-items: flex-end; }
@@ -1134,22 +1135,23 @@ footer.site-footer { background: var(--green-deep); }
     gap: 1rem;
   }
   .lightbox-cover {
-    width: 100%;
-    max-width: 160px;
+    width: min(100%, 14rem);
+    max-width: 14rem;
     margin-inline: auto;
   }
   .lightbox-panel { border-radius: 12px 12px 0 0; max-height: min(92vh, 720px); overflow-y: auto; }
 }
 .lightbox-cover {
-  width: 120px;
+  width: 13.5rem;
   flex-shrink: 0;
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
-  aspect-ratio: 3/4;
+  aspect-ratio: 3 / 4;
   background: #EDF4F1;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 14px rgba(27, 67, 50, 0.1);
 }
 .lightbox-cover img {
   width: 100%;
@@ -1157,7 +1159,7 @@ footer.site-footer { background: var(--green-deep); }
   object-fit: contain !important;
   object-position: center;
   display: block;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 .lightbox-dept-badge {
   display: inline-block;
