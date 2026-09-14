@@ -2,6 +2,12 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
+### 2026-09-14 — News card lightbox + interior motion **Approved**
+
+Home Center News cards open the content lightbox (not detail hash). Carousel swipe no longer swallows clicks; overlay inert + click-through guard while open; interior reveal (text first, soft cover fade last). Stakeholder validated on `fix/news-card-lightbox`.
+
+---
+
 ### 2026-09-14 — Featured carousel motion **Delivered**
 
 [prds/2026-09-14-spa-feat-carousel-motion.md](./prds/2026-09-14-spa-feat-carousel-motion.md). A+B+C: crossfade + Ken Burns, caption stagger, autoplay progress; wide-slide absolute stack fix. Stakeholder validated.

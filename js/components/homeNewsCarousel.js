@@ -3,6 +3,7 @@
  */
 import { cmsCardImageSrc } from '../data.js';
 import { t } from '../i18n.js';
+import { requestLightboxOpen, isLightboxOpenRequestBlocked } from '../lightboxBus.js';
 import { replaceChildren, safeImageSrc, prefersReducedMotion } from '../utils.js';
 import { createNewsCard } from './newsCard.js';
 import {
@@ -109,7 +110,7 @@ export function mountHomeNewsCarousel(grid, news) {
   if (!carousel) {
     replaceChildren(
       grid,
-      list.slice(0, HOME_NEWS_PAGE_SIZE).map((n, i) => createNewsCard(n, i, { linkToDetail: true })),
+      list.slice(0, HOME_NEWS_PAGE_SIZE).map((n, i) => createNewsCard(n, i)),
     );
     window.dispatchEvent(new Event('crsic:content-locale'));
     return;
@@ -138,7 +139,7 @@ export function mountHomeNewsCarousel(grid, news) {
     const base = index * HOME_NEWS_PAGE_SIZE;
     replaceChildren(
       grid,
-      slice.map((n, i) => createNewsCard(n, base + i, { linkToDetail: true })),
+      slice.map((n, i) => createNewsCard(n, base + i)),
     );
     window.dispatchEvent(new Event('crsic:content-locale'));
   }
@@ -222,14 +223,13 @@ export function mountHomeNewsCarousel(grid, news) {
     startX = e.clientX;
     startY = e.clientY;
     swiping = false;
+    suppressClick = false;
+    // Do not setPointerCapture here — capturing on the grid retargets the
+    // subsequent click to #home-news-grid, so document lightbox delegation
+    // (closest data-lightbox-*) never sees the news card.
     if (eventOnNewsCard(e)) {
       pressing = true;
       stopDwell();
-    }
-    try {
-      grid.setPointerCapture(e.pointerId);
-    } catch {
-      /* ignore */
     }
   }
 
@@ -239,7 +239,11 @@ export function mountHomeNewsCarousel(grid, news) {
     const dy = e.clientY - startY;
     if (!swiping && Math.abs(dx) >= SWIPE_PX && Math.abs(dx) > Math.abs(dy)) {
       swiping = true;
-      suppressClick = true;
+      try {
+        grid.setPointerCapture(e.pointerId);
+      } catch {
+        /* ignore */
+      }
     }
   }
 
@@ -249,28 +253,68 @@ export function mountHomeNewsCarousel(grid, news) {
     const dy = e.clientY - startY;
     const rtl = isRtl();
     const wasPressing = pressing;
+    const didSwipe = swiping && Math.abs(dx) >= SWIPE_PX && Math.abs(dx) > Math.abs(dy);
     pressing = false;
     pointerId = null;
     try {
-      grid.releasePointerCapture(e.pointerId);
+      if (grid.hasPointerCapture(e.pointerId)) grid.releasePointerCapture(e.pointerId);
     } catch {
       /* ignore */
     }
-    if (swiping && Math.abs(dx) >= SWIPE_PX && Math.abs(dx) > Math.abs(dy)) {
+    if (didSwipe) {
+      // Swallow the synthetic click that follows a committed swipe only.
+      suppressClick = true;
       const goNext = rtl ? dx > 0 : dx < 0;
       if (goNext) nextPage();
       else prevPage();
-    } else if (wasPressing && !stickyPaused) {
-      startDwell();
+      window.setTimeout(() => {
+        suppressClick = false;
+      }, 50);
+    } else {
+      suppressClick = false;
+      if (wasPressing && !stickyPaused) startDwell();
     }
     swiping = false;
   }
 
   function onClickCapture(e) {
-    if (!suppressClick) return;
+    if (suppressClick) {
+      e.preventDefault();
+      e.stopPropagation();
+      suppressClick = false;
+      return;
+    }
+    // If pointer capture retargeted the click onto the grid, recover the card
+    // under the pointer and open the lightbox from here.
+    const pathCard =
+      typeof e.composedPath === 'function'
+        ? e.composedPath().find(
+            (n) =>
+              n instanceof HTMLElement &&
+              n.matches('[data-lightbox-type][data-lightbox-slug]'),
+          )
+        : null;
+    let card =
+      pathCard ||
+      (e.target instanceof Element
+        ? e.target.closest('[data-lightbox-type][data-lightbox-slug]')
+        : null);
+    if (!card && typeof e.clientX === 'number') {
+      const under = document.elementFromPoint(e.clientX, e.clientY);
+      card =
+        under instanceof Element
+          ? under.closest('#home-news-grid [data-lightbox-type][data-lightbox-slug]')
+          : null;
+    }
+    if (!(card instanceof HTMLElement) || !grid.contains(card)) return;
+    if (isLightboxOpenRequestBlocked()) return;
     e.preventDefault();
     e.stopPropagation();
-    suppressClick = false;
+    requestLightboxOpen({
+      type: card.dataset.lightboxType,
+      slug: card.dataset.lightboxSlug,
+      triggerEl: card,
+    });
   }
 
   function onPointerOver(e) {

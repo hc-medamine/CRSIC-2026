@@ -35,6 +35,7 @@ import {
   safeImageSrc
 } from './utils.js';
 import { trapFocus, handleEscapeStack } from './a11y.js';
+import { LIGHTBOX_OPEN_EVENT, armLightboxClickGuard, isLightboxOpenRequestBlocked } from './lightboxBus.js';
 import { createPubCard } from './components/pubCard.js';
 import { createEventYearGroups, createHomeEventCard } from './components/eventCard.js';
 import { createPartnerCard } from './components/partnerCard.js';
@@ -791,6 +792,56 @@ if (typeof window !== 'undefined') {
 /** @type {{ type: string, slug: string }|null} */
 let lightboxTarget = null;
 
+const LIGHTBOX_TRIGGER_SEL = '[data-lightbox-type][data-lightbox-slug]';
+
+/**
+ * @param {Event} e
+ * @returns {Element|null}
+ */
+function eventTargetElement(e) {
+  const t = e && e.target;
+  if (t instanceof Element) return t;
+  if (t && t.parentElement instanceof Element) return t.parentElement;
+  return null;
+}
+
+/**
+ * Resolve a lightbox trigger even when pointer capture retargets `event.target`
+ * (e.g. home news carousel swipe handlers on the grid).
+ * Do not use elementFromPoint — that punches through a closing overlay onto cards.
+ * @param {Event} e
+ * @returns {HTMLElement|null}
+ */
+function findLightboxTrigger(e) {
+  const from = eventTargetElement(e);
+  const direct = from && from.closest(LIGHTBOX_TRIGGER_SEL);
+  if (direct instanceof HTMLElement) return direct;
+
+  if (typeof e.composedPath === 'function') {
+    for (const node of e.composedPath()) {
+      if (node instanceof HTMLElement && node.matches(LIGHTBOX_TRIGGER_SEL)) return node;
+    }
+  }
+
+  return null;
+}
+
+/** @type {(() => void) | null} */
+let releaseLightboxClosing = null;
+
+/**
+ * Freeze page chrome under the dialog so items beneath cannot be activated.
+ * @param {boolean} on
+ */
+function setLightboxBackdropInert(on) {
+  const lb = document.getElementById('lightbox');
+  Array.from(document.body.children).forEach((el) => {
+    if (!(el instanceof HTMLElement) || el === lb) return;
+    if (on) el.setAttribute('inert', '');
+    else el.removeAttribute('inert');
+  });
+}
+
 const LB_HOLDER_FALLBACK = [
   'img/Holders/0.jpg',
   'img/Holders/1.jpg',
@@ -899,6 +950,13 @@ export function openLightbox(optsOrIndex, triggerEl) {
   const overlay = document.getElementById('lightbox');
   if (!overlay) return;
 
+  if (releaseLightboxClosing) {
+    releaseLightboxClosing();
+    releaseLightboxClosing = null;
+  }
+  overlay.classList.remove('is-closing');
+  setLightboxBackdropInert(true);
+
   let navIndex = typeof index === 'number' && !Number.isNaN(index) ? index : null;
   if (navIndex == null && content.slug) {
     const found = findPublicationByKey(content.slug);
@@ -985,6 +1043,7 @@ export function openLightbox(optsOrIndex, triggerEl) {
   overlay.setAttribute('aria-hidden', 'false');
   requestAnimationFrame(() => {
     overlay.classList.add('open');
+    playLightboxInteriorReveal(overlay);
     if (releaseLightboxTrap) releaseLightboxTrap();
     const closeBtn = overlay.querySelector('.lightbox-close');
     releaseLightboxTrap = trapFocus(overlay, {
@@ -994,11 +1053,30 @@ export function openLightbox(optsOrIndex, triggerEl) {
   });
 }
 
+/**
+ * Replay cover + caption stagger inside the panel (open or content swap).
+ * @param {HTMLElement} overlay
+ */
+function playLightboxInteriorReveal(overlay) {
+  const panel = overlay && overlay.querySelector('.lightbox-panel');
+  if (!panel) return;
+  panel.classList.remove('is-revealing');
+  if (prefersReducedMotion()) return;
+  // Force reflow so repeated opens / pub-nav swaps re-run keyframes.
+  void panel.offsetWidth;
+  panel.classList.add('is-revealing');
+}
+
 export function closeLightbox() {
   const lb = document.getElementById('lightbox');
   if (!lb || !lb.classList.contains('open')) return;
   lb.classList.remove('open');
+  lb.classList.add('is-closing');
+  const panel = lb.querySelector('.lightbox-panel');
+  if (panel) panel.classList.remove('is-revealing');
   lb.setAttribute('aria-hidden', 'true');
+  // Absorb the same-gesture click that would otherwise hit a card under the overlay.
+  armLightboxClickGuard(500);
   lightboxTarget = null;
   lightboxNav = null;
   if (releaseLightboxTrap) {
@@ -1006,10 +1084,37 @@ export function closeLightbox() {
     releaseLightboxTrap = null;
   }
   lightboxTrigger = null;
+
+  if (releaseLightboxClosing) {
+    releaseLightboxClosing();
+    releaseLightboxClosing = null;
+  }
+  let finished = false;
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    lb.classList.remove('is-closing');
+    setLightboxBackdropInert(false);
+    lb.removeEventListener('transitionend', onEnd);
+    releaseLightboxClosing = null;
+  };
+  const onEnd = (e) => {
+    if (e.target !== lb || e.propertyName !== 'opacity') return;
+    finish();
+  };
+  lb.addEventListener('transitionend', onEnd);
+  const timer = window.setTimeout(finish, 320);
+  releaseLightboxClosing = () => {
+    window.clearTimeout(timer);
+    finish();
+  };
 }
 
 export function closeLightboxOutside(e) {
-  if (e.target === document.getElementById('lightbox')) closeLightbox();
+  if (e.target !== document.getElementById('lightbox')) return;
+  e.preventDefault();
+  e.stopPropagation();
+  closeLightbox();
 }
 
 /**
@@ -1265,10 +1370,26 @@ export function bindUIEvents() {
     initLightboxSwipe(lightbox);
   }
 
+  document.addEventListener(LIGHTBOX_OPEN_EVENT, (e) => {
+    const detail = e && e.detail;
+    if (!detail || !detail.type) return;
+    if (isLightboxOpenRequestBlocked()) return;
+    openLightbox(
+      {
+        type: detail.type,
+        slug: detail.slug,
+        index: detail.index,
+        triggerEl: detail.triggerEl,
+      },
+      detail.triggerEl,
+    );
+  });
+
   document.addEventListener('click', (e) => {
-    const lbCard = e.target.closest('[data-lightbox-type][data-lightbox-slug]');
+    const lbCard = findLightboxTrigger(e);
     if (lbCard) {
       e.preventDefault();
+      if (isLightboxOpenRequestBlocked()) return;
       openLightbox(
         {
           type: lbCard.dataset.lightboxType,
@@ -1279,16 +1400,19 @@ export function bindUIEvents() {
       );
       return;
     }
-    const card = e.target.closest('[data-pub-index]');
+    const from = eventTargetElement(e);
+    const card = from && from.closest('[data-pub-index]');
     if (!card) return;
+    if (isLightboxOpenRequestBlocked()) return;
     const i = parseInt(card.dataset.pubIndex, 10);
     if (!Number.isNaN(i)) openLightbox(i, card);
   });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
-    const lbCard = e.target.closest('[data-lightbox-type][data-lightbox-slug]');
+    const lbCard = findLightboxTrigger(e);
     if (lbCard && e.target === lbCard) {
       e.preventDefault();
+      if (isLightboxOpenRequestBlocked()) return;
       openLightbox(
         {
           type: lbCard.dataset.lightboxType,
@@ -1300,8 +1424,10 @@ export function bindUIEvents() {
       return;
     }
     if (e.key !== 'Enter') return;
-    const card = e.target.closest('[data-pub-index]');
+    const from = eventTargetElement(e);
+    const card = from && from.closest('[data-pub-index]');
     if (!card) return;
+    if (isLightboxOpenRequestBlocked()) return;
     const i = parseInt(card.dataset.pubIndex, 10);
     if (!Number.isNaN(i)) openLightbox(i, card);
   });

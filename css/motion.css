@@ -756,6 +756,117 @@ html[dir="rtl"] .nav-drawer.open {
   }
 }
 
+/* Lightbox interior — cover reveal + caption stagger + actions (open / content swap) */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes lbCoverIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes lbFadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes lbGoldTick {
+    from {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    to {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes lbCloseIn {
+    from {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .lightbox-panel.is-revealing .lightbox-cover > * {
+    animation: lbCoverIn 1s var(--ease-out-soft) 0.36s both;
+  }
+
+  .lightbox-panel.is-revealing .lightbox-cover {
+    background: #edf4f1;
+  }
+
+  .lightbox-panel.is-revealing .lightbox-dept-badge {
+    animation: lbFadeUp 0.42s var(--ease-out-expo) 0.04s both;
+  }
+
+  .lightbox-panel.is-revealing .lightbox-title {
+    animation: lbFadeUp 0.48s var(--ease-out-expo) 0.1s both;
+  }
+
+  .lightbox-panel.is-revealing .lightbox-title::after {
+    content: '';
+    display: block;
+    width: 2.75rem;
+    height: 2px;
+    margin-block-start: 0.4rem;
+    margin-inline-start: auto;
+    border-radius: 1px;
+    background: var(--gold, #c9a84c);
+    transform-origin: right center;
+    animation: lbGoldTick 0.4s var(--ease-out-expo) 0.22s both;
+  }
+
+  html[dir='ltr'] .lightbox-panel.is-revealing .lightbox-title::after {
+    transform-origin: left center;
+    margin-inline-start: 0;
+    margin-inline-end: auto;
+  }
+
+  .lightbox-panel.is-revealing .lightbox-year,
+  .lightbox-panel.is-revealing #lb-byline {
+    animation: lbFadeUp 0.45s var(--ease-out-expo) 0.16s both;
+  }
+
+  .lightbox-panel.is-revealing .lightbox-body > * {
+    animation: lbFadeUp 0.48s var(--ease-out-expo) both;
+  }
+
+  .lightbox-panel.is-revealing .lightbox-desc {
+    animation-delay: 0.22s;
+  }
+
+  .lightbox-panel.is-revealing .content-locale-notice {
+    animation-delay: 0.18s;
+  }
+
+  .lightbox-panel.is-revealing .lightbox-actions {
+    animation-delay: 0.3s;
+  }
+
+  .lightbox-panel.is-revealing .lightbox-close {
+    animation: lbCloseIn 0.35s var(--ease-out-expo) 0.06s both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lightbox-panel.is-revealing .lightbox-title::after {
+    content: none;
+  }
+}
+
 /* Tab indicator — morph to rounded gold pill + soft glow + spring */
 @media (prefers-reduced-motion: no-preference) {
   .tab-bar::after {
