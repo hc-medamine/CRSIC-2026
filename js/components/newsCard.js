@@ -3,6 +3,7 @@
  */
 import { cmsCardImageSrc, cmsResponsiveSources } from '../data.js';
 import { editorialCardAttrs, editorialField } from '../editorial.js';
+import { requestLightboxOpen } from '../lightboxBus.js';
 import { el, createPictureImg } from '../utils.js';
 import { createContentByline } from './contentByline.js';
 
@@ -45,11 +46,11 @@ function createPlaceholderSvg() {
 /**
  * @param {object} n
  * @param {number} i
- * @param {{ linkToDetail?: boolean }} [opts]
+ * @param {{ linkToDetail?: boolean }} [opts] deprecated — cards always open the lightbox; detail via «عرض التفاصيل»
  * @returns {HTMLElement}
  */
 export function createNewsCard(n, i, opts = {}) {
-  const { linkToDetail = false } = opts;
+  void opts;
   let mediaChild;
   const title = editorialField(n, 'title');
   const label = editorialField(n, 'label');
@@ -92,20 +93,7 @@ export function createNewsCard(n, i, opts = {}) {
     body,
   ];
 
-  if (linkToDetail && slug) {
-    return el('a', {
-      className: 'news-card news-card--link',
-      attrs: {
-        href: `#news/${encodeURIComponent(slug)}`,
-        'data-year': /^\d{4}$/.test(year) ? year : '',
-        'data-q': haystack,
-        ...cardAttrs,
-      },
-      children: inner,
-    });
-  }
-
-  return el('article', {
+  const card = el('article', {
     className: 'news-card news-card--link',
     attrs: slug
       ? {
@@ -124,6 +112,19 @@ export function createNewsCard(n, i, opts = {}) {
         },
     children: inner,
   });
+
+  if (slug) {
+    // Open on the card itself so home-carousel pointer capture / click
+    // suppression cannot strand document-level delegation.
+    card.addEventListener('click', (e) => {
+      if (e.defaultPrevented) return;
+      e.preventDefault();
+      e.stopPropagation();
+      requestLightboxOpen({ type: 'news', slug, triggerEl: card });
+    });
+  }
+
+  return card;
 }
 
 /** @deprecated */

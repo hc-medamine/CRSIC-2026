@@ -1074,6 +1074,12 @@ footer.site-footer { background: var(--green-deep); }
   opacity: 1;
   pointer-events: auto;
 }
+/* Keep the overlay as a click sink while fading out so the close gesture
+   cannot fall through onto cards beneath. */
+.lightbox-overlay.is-closing {
+  opacity: 0;
+  pointer-events: auto;
+}
 
 /* [ANIM 4.9] Panel — scale+translateY entrance gives depth feel */
 .lightbox-panel {
