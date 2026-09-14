@@ -2,6 +2,12 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
+### 2026-09-14 — Footer developers credit **Approved**
+
+SPA `footer_ministry` + CMS login/dashboard bottom: Merrah Karim & Haouassine Mohamed Amine. On `content/footer-developers-credit`.
+
+---
+
 ### 2026-09-14 — News card lightbox + interior motion **Approved**
 
 Home Center News cards open the content lightbox (not detail hash). Carousel swipe no longer swallows clicks; overlay inert + click-through guard while open; interior reveal (text first, soft cover fade last). Stakeholder validated on `fix/news-card-lightbox`.
