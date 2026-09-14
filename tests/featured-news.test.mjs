@@ -60,6 +60,21 @@ describe('newsResume', () => {
   });
 });
 
+describe('eventResume', () => {
+  it('returns empty when no summary or body', async () => {
+    const { eventResume } = await import('../js/featuredNews.js');
+    assert.equal(eventResume({ title: 'Only title' }), '');
+  });
+
+  it('truncates long body for cards', async () => {
+    const { eventResume } = await import('../js/featuredNews.js');
+    const long = 'أ'.repeat(250);
+    const out = eventResume({ body: `<p>${long}</p>` });
+    assert.ok(out.endsWith('…'));
+    assert.ok(out.length <= 182);
+  });
+});
+
 describe('featured news locale keys', () => {
   for (const lang of ['ar', 'en']) {
     it(`${lang} has news kicker and CTA`, () => {

@@ -59,14 +59,18 @@ export function resolveFeaturedNews(news, ids, fallbackLimit = FEATURED_NEWS_FAL
 }
 
 /**
- * Featured news teaser: summary, then stripped body. Respects EN-when-ready.
+ * Plain-text resume from summary, else stripped body. Empty when neither exists.
  * @param {object} item
  * @param {string} [lang]
+ * @param {number} [maxLen=180]
  * @returns {string}
  */
-export function newsResume(item, lang) {
+export function editorialResume(item, lang, maxLen = 180) {
+  const limit = Math.max(40, Number(maxLen) || 180);
   const summary = editorialField(item, 'summary', lang);
-  if (summary) return summary;
+  if (summary) {
+    return summary.length > limit ? `${summary.slice(0, limit).trim()}…` : summary;
+  }
 
   const body = String(editorialField(item, 'body', lang) || '')
     .replace(/\\n/g, '\n')
@@ -74,10 +78,32 @@ export function newsResume(item, lang) {
     .replace(/\s+/g, ' ')
     .trim();
   if (body) {
-    return body.length > 320 ? `${body.slice(0, 320).trim()}…` : body;
+    return body.length > limit ? `${body.slice(0, limit).trim()}…` : body;
   }
+  return '';
+}
+
+/**
+ * Featured news teaser: summary, then stripped body; label+date last resort.
+ * @param {object} item
+ * @param {string} [lang]
+ * @returns {string}
+ */
+export function newsResume(item, lang) {
+  const resume = editorialResume(item, lang, 320);
+  if (resume) return resume;
 
   const label = editorialField(item, 'label', lang);
   const date = String((item && item.date) || '').trim();
   return [label, date].filter(Boolean).join(' — ');
+}
+
+/**
+ * Events page card resume (shorter). Empty string when no summary/body.
+ * @param {object} item
+ * @param {string} [lang]
+ * @returns {string}
+ */
+export function eventResume(item, lang) {
+  return editorialResume(item, lang, 180);
 }
