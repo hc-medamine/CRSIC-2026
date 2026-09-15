@@ -1,7 +1,7 @@
-# Arabic–English parity matrix (2026-07-19; updated 2026-09-13)
+# Arabic–English parity matrix (2026-07-19; updated 2026-09-15)
 
 **Verdict: partial English parity — not full.**  
-UI chrome for core journeys is bilingual. CMS list types use **EN-when-ready**: `en_status === ready` → filled EN with per-field Arabic fallback and no notice; otherwise Arabic + notice. **Journals** remain intentionally Arabic-only (OJS / `journals.json`). No machine-translated product copy was invented.
+UI chrome for core journeys is bilingual. CMS list types use **EN-when-ready**: `en_status === ready` → filled EN with per-field Arabic fallback and no notice; otherwise Arabic + notice. **Journals** remain intentionally Arabic-only (OJS / `journals.json`) — Journals-in-CMS is **cancelled** (2026-09-15). No machine-translated product copy was invented.
 
 Locale URL: `?lang=ar|en` (hash SPA — `/ar`/`/en` path prefixes would need server rewrites; not adopted).
 
@@ -72,7 +72,7 @@ Covers Escape stack order + `?lang=` parsing. Full keyboard/visual journeys rema
 
 ## Remaining risks & follow-ups
 
-1. **Product:** Journals stay Arabic-only / OJS unless a future PRD brings them into CMS EN-when-ready.
+1. **Product:** Journals stay Arabic-only / OJS (**cancelled** — never move journals into CMS).
 2. **Product:** EN privacy/legal if required for institutional compliance.
 3. **Optional:** Path-based `/ar` `/en` if hosting adds rewrite rules.
 4. **Optional:** Automated a11y e2e (Playwright) when a package toolchain is introduced.

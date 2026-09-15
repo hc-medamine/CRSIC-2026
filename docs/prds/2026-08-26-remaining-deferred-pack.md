@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Approved** (2026-08-26) — **Cut C Delivered** on `main` (PR #50); Cuts A–B **implementing** |
+| Status | **Delivered** (2026-09-15) — Cuts A–B on `main` (PR #53, 2026-09-13); Cut C on `main` (PR #50) |
 | Date | 2026-08-26 |
 | Author | Stakeholder + agent |
 | Owners | Product / CMS Desk / Public SPA |
@@ -29,7 +29,7 @@ Who feels it: visitors on slow links; English visitors on laws/research; Super A
 
 **Non-goals**
 
-- **Journals in CMS** — OJS / `data/journals.json` stay the source of truth (stakeholder, 2026-08-26).
+- **Journals in CMS** — **cancelled** (stakeholder 2026-09-15): journals **always** stay on OJS / `data/journals.json`. Do not reopen.
 - Scheduled / timed auto-publish (cancelled).
 - Email / SMTP / server-side contact form (mailto stays).
 - Malware scanning (go-live track).
@@ -140,3 +140,5 @@ None blocking if the stakeholder confirms the locks in §10. Confirm before **Ap
 | 2026-08-31 | Cut C walk passed (Sp1–Sp3, G1/G2). Not Delivered until merge to `main`. |
 | 2026-08-31 | Cut C **Delivered** on `main` (PR #50). Cuts A (WebP) and B (remaining EN-when-ready) still open. |
 | 2026-09-13 | Implementing Cuts A+B on `feature/cms-cuts-a-b-webp-en` (after Cut C Delivered). Cover-layout from PR #52 preserved (pubs use master cover, not `img_card`). |
+| 2026-09-13 | Cuts A+B merged to `main` (PR #53). Walk: Wp1/Wp1b/Wp2 passed; EnB pending-path passed (AR + notice). Ready-path is ordinary CMS editorial (mark-ready + four-eyes), not a code gap. |
+| 2026-09-15 | Stakeholder: mark pack **Delivered**. **Journals in CMS cancelled forever** — always OJS; do not list as deferred. |

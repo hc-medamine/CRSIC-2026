@@ -828,23 +828,23 @@ No separate staging config files exist in-repo.
 | Priority | Item |
 |----------|------|
 | Medium | Dual-field or locale-keyed content if EN parity is required |
-| Medium | Further image compression / WebP for covers and `img/cms/` — in progress on `feature/cms-cuts-a-b-webp-en` |
+| Medium | Further image compression / WebP for covers and `img/cms/` — **Delivered** (PR #53 Cut A) |
 | Low | Introduce SPA linting/formatting once the team grows |
 
 ### Product direction
 
 Own **internal CMS + PostgreSQL** (`cms/`): authenticated users with roles and publishing tasks. Public site remains the visitor face; no third-party/external CMS; **no email/SMTP features**. Development continues on `feature/` \| `fix/` \| `content/` \| `docs/` branches; **never commit directly to `main`**. Go-live on `crsic.dz` only when ops say the product works with zero friction.
 
-**CMS deferred backlog** (do not implement without a new Approved PRD; simple → complex):
+**CMS deferred backlog** (do not implement without a new Approved PRD):
 
-1. CMS UI to reassign editor/reviewer/publisher — **Delivered** [docs/prds/2026-08-22-cms-reassign-authorship-ui.md](./docs/prds/2026-08-22-cms-reassign-authorship-ui.md)
-2. Server list pagination — **Delivered** [docs/prds/2026-08-22-cms-list-load-more.md](./docs/prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more)
-3. Soft-delete recycle bin — **Delivered** [docs/prds/2026-08-22-cms-recycle-bin.md](./docs/prds/2026-08-22-cms-recycle-bin.md) (PR #34)
-4. Bulk ops / clone / import-export UI — **list bulk unpublish/recycle on all CMS content types** (news PR #36; events/publications + remaining types PR #37). **Clone Cut 1 Delivered** ([PRD](./docs/prds/2026-08-22-cms-clone-import-export.md), PR #42). **JSON zip I/E Delivered** (PR #44). Picker bulk + sort: [PRD](./docs/prds/2026-08-24-cms-import-export-bulk-sort.md) (**Delivered**)
-5–7. Extra media optimize, remaining EN-when-ready, static institutional pages — [docs/prds/2026-08-26-remaining-deferred-pack.md](./docs/prds/2026-08-26-remaining-deferred-pack.md). **Cut C Delivered** (PR #50). **Cuts A–B implementing** on `feature/cms-cuts-a-b-webp-en`. Cover crop + news/events/pubs/partners EN-when-ready already shipped (PR #44).
-8. Journals in CMS (OJS remains) — **still deferred**; out of the 2026-08-26 pack
+*(No open deferred product slices as of 2026-09-15.)* Historical delivered items stay in [docs/WORKLOG.md](./docs/WORKLOG.md) § Deferred backlog.
 
-**Cancelled (do not re-open):** scheduled / timed auto-publish (2026-07-21, confirmed 2026-08-22). Publish stays manual Approve → Publish.
+**Cancelled (do not re-open):**
+
+- Scheduled / timed auto-publish (2026-07-21, confirmed 2026-08-22). Publish stays manual Approve → Publish.
+- **Journals in CMS** (2026-09-15). Journals **always** stay on OJS / `data/journals.json`.
+
+**Recently delivered pack:** [docs/prds/2026-08-26-remaining-deferred-pack.md](./docs/prds/2026-08-26-remaining-deferred-pack.md) — Cut C (PR #50), Cuts A–B (PR #53).
 
 See [docs/WORKLOG.md](./docs/WORKLOG.md) § Deferred backlog.
 
@@ -856,7 +856,7 @@ Track day-to-day progress in [docs/WORKLOG.md](./docs/WORKLOG.md). Core spec: [d
 
 | Field            | Value                                                                                                                                                          |
 | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last updated     | **2026-09-13** (Cuts A–B implementing on `feature/cms-cuts-a-b-webp-en`) |
+| Last updated     | **2026-09-15** (remaining deferred pack Delivered; Journals-in-CMS cancelled) |
 | Update frequency | After any structural, content-schema, routing, deploy, or toolchain change; otherwise review at least when appending a WORKLOG entry that changes architecture |
 
 ### Checklist: update this README after structural changes

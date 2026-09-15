@@ -1,24 +1,23 @@
 ---
-description: Remind about deferred CMS enhancements — do not start without PRD lock
+description: Remind about cancelled/deferred CMS items — do not reopen without stakeholder lock
 alwaysApply: true
 ---
 
 # CMS deferred backlog (future — not now)
 
-When discussing CMS/product/roadmap work, briefly remind the stakeholder that these are **deferred** (tracked in `docs/WORKLOG.md` § “Deferred backlog”). Do **not** implement them unless they explicitly start a PRD-first slice for that item.
+When discussing CMS/product/roadmap work, briefly remind the stakeholder that items below are **deferred or cancelled** (tracked in `docs/WORKLOG.md` § “Deferred backlog”). Do **not** implement deferred items unless they explicitly start a PRD-first slice. Do **not** reopen cancelled items.
 
-## Active Approved PRD (remaining cuts)
+## Remaining deferred pack — Delivered
 
-[docs/prds/2026-08-26-remaining-deferred-pack.md](docs/prds/2026-08-26-remaining-deferred-pack.md) — **Cut C Delivered** on `main` (PR #50). **Cuts A–B implementing** on `feature/cms-cuts-a-b-webp-en` (not Delivered until merge).
+[docs/prds/2026-08-26-remaining-deferred-pack.md](docs/prds/2026-08-26-remaining-deferred-pack.md) — **Delivered** on `main`: Cut C (PR #50), Cuts A–B (PR #53). No open cuts.
 
 ## Deferred (future) — simple → complex
 
-Do **not** implement these unless they explicitly start a PRD-first slice.
-
-1. Journals in CMS (OJS remains)
+*(Empty — no open deferred product slices. Start a new PRD-first idea when needed.)*
 
 ## Already closed (do not re-open as gaps)
 
+- **Journals in CMS — cancelled** (2026-09-15). Journals **always** stay on OJS / `data/journals.json`. Never add a Journals-in-CMS PRD or reopen as a gap.
 - **Scheduled publish — cancelled** (2026-07-21, confirmed 2026-08-22). Manual Approve → Publish only. No `scheduled` status, cron, or schedule UI. Do not add it back to the deferred list.
 - CMS Recycle bin (PRD 2026-08-22): SA bin unpublished/rejected; restore to draft; purge unused media. On `main` (PR #34).
 - CMS Editor recycle (PRD 2026-08-23): Editors bin own draft/rejected; scoped bin + restore. On `main` (PR #41).
@@ -31,3 +30,4 @@ Do **not** implement these unless they explicitly start a PRD-first slice.
 - CMS list Load more (PRD 2026-08-22): news/events/publications page size 20.
 - Align authorship / Desks (PRD 2026-08-22): claims + Align, assignable publisher, JSON rebuild.
 - Feature-completeness audit critical/functional gaps closed on `main` via PR #17: SEO restore, partner JSON + narrative, research restore, media DELETE 409, comment deeplinks, preview ×7, SPA partner/group detail.
+- Remaining deferred pack (PRD 2026-08-26): WebP + remaining EN-when-ready + site pages — **Delivered** (PRs #50, #53).

@@ -25,7 +25,7 @@
 
 **Non-goals**
 
-- Journals in CMS (still deferred; OJS unchanged).
+- Journals in CMS (**cancelled** 2026-09-15 — always OJS).
 - Changing event detail layout, media, bylines, or display status (`upcoming` / `ongoing` / `done`).
 - Multi-category tagging (one category only).
 - New event content beyond remapping existing items.
