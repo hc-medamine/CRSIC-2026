@@ -2,6 +2,12 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
+### 2026-09-15 — Publication detail meta + card polish
+
+Pub detail/cards: localized badges (no raw `individual`/`collective`); remove card dept line; bolder news titles; covers `object-fit: cover`. On `fix/pub-detail-meta-i18n`.
+
+---
+
 ### 2026-09-15 — Detail pages: center reading column
 
 `#detail-root` uses `margin-inline: auto` so the column is centered in both AR/EN; text stays start-aligned. On `style/detail-column-center`.
