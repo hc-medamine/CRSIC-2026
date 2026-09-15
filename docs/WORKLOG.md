@@ -2,6 +2,12 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
+### 2026-09-15 — Remaining deferred pack **Delivered**; Journals-in-CMS **cancelled**
+
+[prds/2026-08-26-remaining-deferred-pack.md](./prds/2026-08-26-remaining-deferred-pack.md): Cuts A–B already on `main` (PR #53); Cut C (PR #50). Docs status → **Delivered**. Stakeholder: journals **always** OJS — cancelled, not deferred. Local ops: applied `035_featured_playlist_items.sql`; confirmed `data/laws.json` + CMS law rows have no cover images (no republish needed).
+
+---
+
 ### 2026-09-15 — Publication detail meta + card polish
 
 Pub detail/cards: localized badges (no raw `individual`/`collective`); remove card dept line; bolder news titles; covers `object-fit: cover`. On `fix/pub-detail-meta-i18n`.
@@ -90,7 +96,7 @@ Home Center News cards open the content lightbox (not detail hash). Carousel swi
 
 ### 2026-09-13 — Cuts A+B walk (PR #53)
 
-Walked `feature/cms-cuts-a-b-webp-en` on SPA `:5500` + CMS SA. **Pass:** Wp2; EnB **pending** (laws + research groups); Wp1 public `<picture>`+WebP; Wp1b Rebuild UI present; journals blob unchanged vs `main`; CMS 130 / SPA 33 tests green. **Still open for Delivered:** EnB **ready** via CMS mark-ready + four-eyes; optional live Rebuild WebP click. Pub covers `object-fit: contain` confirmed.
+Walked `feature/cms-cuts-a-b-webp-en` on SPA `:5500` + CMS SA. **Pass:** Wp2; EnB pending-path (laws + research groups show AR + notice); Wp1 public `<picture>`+WebP; Wp1b Rebuild UI present; journals blob unchanged vs `main`; CMS 130 / SPA 33 tests green. **Ready-path** = CMS mark-ready + four-eyes (editorial, not a code gap). **Later:** pack marked **Delivered** 2026-09-15 after PR #53 already on `main`.
 
 | Doc | Role |
 |-----|------|
@@ -111,7 +117,7 @@ Only root [README.md](../README.md) remains at the project root; other docs live
 
 ### 2026-09-13 — Cuts A+B **implementing** (WebP + remaining EN)
 
-[prds/2026-08-26-remaining-deferred-pack.md](./prds/2026-08-26-remaining-deferred-pack.md) Cuts A+B on `feature/cms-cuts-a-b-webp-en`. WebP siblings + remaining EN-when-ready + track local media/WebP siblings + restore `serve.json` cache headers. Journals still deferred (OJS).
+[prds/2026-08-26-remaining-deferred-pack.md](./prds/2026-08-26-remaining-deferred-pack.md) Cuts A+B on `feature/cms-cuts-a-b-webp-en`. WebP siblings + remaining EN-when-ready + track local media/WebP siblings + restore `serve.json` cache headers. Journals OJS (later **cancelled** for CMS, 2026-09-15). **Superseded:** pack **Delivered** 2026-09-15 (PR #53).
 
 ---
 
@@ -791,9 +797,11 @@ Remind on CMS/product sessions; do **not** start without stakeholder PRD lock. O
 | 2 | Server list pagination | **Delivered** on `main` — [prds/2026-08-22-cms-list-load-more.md](./prds/2026-08-22-cms-list-load-more.md) (CMS news/events/publications Load more) |
 | 3 | Soft-delete recycle bin | **Delivered** on `main` — [prds/2026-08-22-cms-recycle-bin.md](./prds/2026-08-22-cms-recycle-bin.md) (PR #34) |
 | — | Scheduled publish | **Cancelled** (2026-07-21, confirmed 2026-08-22). Removed from this list. Manual Approve → Publish only. |
+| — | Journals in CMS | **Cancelled** (2026-09-15). Always OJS / `data/journals.json`. Do not reopen. |
 | 4 | Bulk ops / clone / import-export UI | **List bulk** on all CMS content types (news PR #36; events/publications + remaining types PR #37). **Clone Cut 1 Delivered** — [prds/2026-08-22-cms-clone-import-export.md](./prds/2026-08-22-cms-clone-import-export.md) (PR #42). **JSON zip I/E Delivered** (PR #44). Picker bulk + sort: [prds/2026-08-24-cms-import-export-bulk-sort.md](./prds/2026-08-24-cms-import-export-bulk-sort.md) (**Delivered**). |
-| 5–7 | Extra media optimize, remaining EN, static pages | **Draft** — [prds/2026-08-26-remaining-deferred-pack.md](./prds/2026-08-26-remaining-deferred-pack.md). Do not implement until Approved. Journals **out**. |
-| 8 | Journals in CMS | Replace OJS; largest product change — **still deferred** (out of the 2026-08-26 pack) |
+| 5–7 | Extra media optimize, remaining EN, static pages | **Delivered** — [prds/2026-08-26-remaining-deferred-pack.md](./prds/2026-08-26-remaining-deferred-pack.md) (Cut C PR #50; Cuts A–B PR #53). |
+
+*(No open deferred product slices as of 2026-09-15.)*
 
 ---
 
