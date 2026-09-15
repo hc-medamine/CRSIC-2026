@@ -4237,6 +4237,23 @@ html[dir="rtl"] .feat-carousel-progress-bar {
   height: 100%;
   object-fit: contain;
 }
+.catalog-card-media--empty {
+  background:
+    linear-gradient(160deg, rgba(201, 168, 76, 0.12), transparent 55%),
+    linear-gradient(20deg, rgba(27, 67, 50, 0.08), var(--cream-dark));
+}
+.catalog-card-scales {
+  width: 42%;
+  max-width: 7.5rem;
+  height: auto;
+  display: block;
+}
+.catalog-card-scales-green {
+  color: var(--green-deep);
+}
+.catalog-card-scales-gold {
+  color: var(--gold);
+}
 .catalog-card-body { padding: 1rem 1.1rem 1.25rem; display: flex; flex-direction: column; gap: 0.4rem; flex: 1; }
 .catalog-card-kind { font-size: 0.75rem; color: var(--green-mid); font-weight: 600; }
 .catalog-card-title { font-family: 'Amiri', serif; font-size: 1.15rem; color: var(--green-deep); line-height: 1.4; }

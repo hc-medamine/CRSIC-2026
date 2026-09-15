@@ -2,6 +2,14 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
+### 2026-09-15 — Laws & Platforms catalog empty scales mark **Delivered**
+
+[prds/2026-09-15-laws-platforms-catalog-empty-mark.md](./prds/2026-09-15-laws-platforms-catalog-empty-mark.md). Strip misplaced law photos; green-gold scales on imageless cards; legacy thematic platform covers + cleaned copy. On `feature/laws-platforms-catalog-scales`.
+
+---
+
+### 2026-09-15 — Platforms: legacy covers from WordPress
+
 ### 2026-09-14 — Footer developers credit **Approved**
 
 SPA `footer_ministry` + CMS login/dashboard bottom: Merah Abdel Karim & Houacine Mohamed Amine. On `content/footer-developers-credit`.
