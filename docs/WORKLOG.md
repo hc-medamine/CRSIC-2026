@@ -2,6 +2,12 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
+### 2026-09-15 — Home featured playlist news + events **Delivered**
+
+[prds/2026-09-15-home-featured-playlist-news-events.md](./prds/2026-09-15-home-featured-playlist-news-events.md). Mixed max-10; empty → top 10 with covers; news-desk editors only. PR #64.
+
+---
+
 ### 2026-09-15 — Laws & Platforms catalog empty scales mark **Delivered**
 
 [prds/2026-09-15-laws-platforms-catalog-empty-mark.md](./prds/2026-09-15-laws-platforms-catalog-empty-mark.md). Strip misplaced law photos; green-gold scales on imageless cards; legacy thematic platform covers + cleaned copy. On `feature/laws-platforms-catalog-scales`.

@@ -2,9 +2,9 @@
  * Featured home news carousel (curated playlist, max 10) — CRSIC brand, vanilla JS.
  * Motion A+B+C: crossfade + Ken Burns, caption stagger, autoplay progress (PRD 2026-09-14).
  */
-import { cmsCardImageSrc, getFeaturedNewsIds, getNews } from '../data.js';
+import { cmsCardImageSrc, getAllEvents, getFeaturedPlaylistItems, getNews } from '../data.js';
 import { editorialCardAttrs, editorialField } from '../editorial.js';
-import { newsResume, resolveFeaturedNews } from '../featuredNews.js';
+import { eventResume, newsResume, resolveFeaturedPlaylist } from '../featuredNews.js';
 import { t } from '../i18n.js';
 import { el, replaceChildren, safeImageSrc, prefersReducedMotion } from '../utils.js';
 
@@ -99,7 +99,7 @@ function uniqueSlideImages(items) {
  */
 export function mountFeaturedCarousel(root) {
   if (!root) return;
-  const items = resolveFeaturedNews(getNews(), getFeaturedNewsIds());
+  const items = resolveFeaturedPlaylist(getNews(), getAllEvents(), getFeaturedPlaylistItems());
   if (!items.length) {
     root.hidden = true;
     return;
@@ -124,8 +124,10 @@ export function mountFeaturedCarousel(root) {
   const slides = items.map((item, i) => {
     const imgSrc = slideImages[i] || '';
     const title = editorialField(item, 'title');
-    const summary = newsResume(item);
+    const isEvent = item._featType === 'event';
+    const summary = isEvent ? eventResume(item) || newsResume(item) : newsResume(item);
     const slug = item.slug || item.id || '';
+    const detailHash = isEvent ? 'event' : 'news';
     const slide = el('div', {
       className:
         'feat-carousel-slide' +
@@ -165,7 +167,7 @@ export function mountFeaturedCarousel(root) {
         el('a', {
           className: 'feat-carousel-cta',
           text: t('feat_carousel_cta'),
-          attrs: { href: `#news/${encodeURIComponent(slug)}` },
+          attrs: { href: `#${detailHash}/${encodeURIComponent(slug)}` },
         }),
       );
     }

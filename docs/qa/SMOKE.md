@@ -16,7 +16,7 @@ Estimated time: **~5 minutes**.
 | A3 | Three event cards appear on home (`#home-events-grid`) from JSON | ☐ |
 | A4 | News cards appear on home (`#home-news-grid`) | ☐ |
 | A4b | Home news shows 3 cards, fades to the next page as soon as the section is on screen, then ~5s; pause on cards only; card click opens lightbox | ☐ |
-| A4c | Featured Home strip is **news** (not events): kicker/CTA, `#news/{slug}`; empty playlist shows 3 newest news; crossfade + progress bar when autoplay | ☐ |
+| A4c | Featured Home strip: news and/or events playlist; kicker «أخبار مميزة»; news CTA `#news/{slug}`, event CTA `#event/{slug}`; empty playlist → up to 10 newest **with images** (skip imageless); crossfade + progress when autoplay | ☐ |
 | A5 | Hard refresh still works after editing a JSON file | ☐ |
 
 ## B. Navigation & routes

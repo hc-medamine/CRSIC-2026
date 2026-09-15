@@ -9,6 +9,7 @@ import { sanitizeBodyHtml } from "@/lib/content/sanitizeBody";
 import { normalizeAttachments, type PublicMediaItem } from "@/lib/publish/media";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
 import { mutateThenRebuildPublic } from "@/lib/publish/safeRebuild";
+import { pruneFeaturedItem } from "@/lib/content/featuredNews";
 import {
   canAccessContentType,
   canAccessOrg,
@@ -572,6 +573,7 @@ export async function unpublishEvent(user: SessionUser, id: string, opts: Unpubl
           rebuild: rebuildPublicEventsJson,
         });
   await addRevision(item.id, "draft", snapshotOf(item), user.id, "Unpublished");
+  await pruneFeaturedItem("event", id);
   if (opts.notify !== false) {
     await createNotification({
       userId: item.created_by,

@@ -9,47 +9,65 @@ import { useCmsLang } from "@/lib/i18n/cms-lang";
 
 const FEATURED_NEWS_MAX = 10;
 
-type LiveNewsPick = {
+type FeatType = "news" | "event";
+
+type LivePick = {
+  type: FeatType;
   id: string;
   titleAr: string;
   slug: string;
   date: string;
 };
 
+type Entry = { type: FeatType; id: string };
+
 type Initial = {
-  draftIds: string[];
-  liveIds: string[];
+  draftItems: Entry[];
+  liveItems: Entry[];
   publishedAt: string | null;
   updatedAt: string | null;
   usingFallback: boolean;
 };
 
+function entryKey(e: Entry): string {
+  return `${e.type}:${e.id}`;
+}
+
 export function FeaturedNewsForm({
   initial,
   liveNews,
+  liveEvents,
   canPublish,
 }: {
   initial: Initial;
-  liveNews: LiveNewsPick[];
+  liveNews: LivePick[];
+  liveEvents: LivePick[];
   canPublish: boolean;
 }) {
   const router = useRouter();
   const lang = useCmsLang();
-  const [ids, setIds] = useState<string[]>(initial.draftIds);
-  const [addId, setAddId] = useState("");
+  const [items, setItems] = useState<Entry[]>(initial.draftItems || []);
+  const [addKey, setAddKey] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
 
-  const byId = useMemo(() => new Map(liveNews.map((n) => [n.id, n])), [liveNews]);
-  const selected = ids.map((id) => byId.get(id)).filter((n): n is LiveNewsPick => Boolean(n));
-  const available = liveNews.filter((n) => !ids.includes(n.id));
+  const catalog = useMemo(() => [...liveNews, ...liveEvents], [liveNews, liveEvents]);
+  const byKey = useMemo(
+    () => new Map(catalog.map((n) => [entryKey(n), n])),
+    [catalog],
+  );
+  const selectedKeys = useMemo(() => new Set(items.map(entryKey)), [items]);
+  const selected = items
+    .map((e) => byKey.get(entryKey(e)))
+    .filter((n): n is LivePick => Boolean(n));
+  const available = catalog.filter((n) => !selectedKeys.has(entryKey(n)));
   const atCap = selected.length >= FEATURED_NEWS_MAX;
 
   function move(from: number, to: number) {
-    if (to < 0 || to >= ids.length) return;
-    setIds((prev) => {
+    if (to < 0 || to >= items.length) return;
+    setItems((prev) => {
       const next = [...prev];
       const [item] = next.splice(from, 1);
       if (!item) return prev;
@@ -59,22 +77,27 @@ export function FeaturedNewsForm({
   }
 
   function addSelected() {
-    if (!addId || atCap) {
+    if (!addKey || atCap) {
       setError(atCap ? t("featuredNewsMax", lang) : t("featuredNewsPickOne", lang));
       return;
     }
-    if (ids.includes(addId)) return;
-    if (ids.length >= FEATURED_NEWS_MAX) {
+    const [type, id] = addKey.split(":");
+    if ((type !== "news" && type !== "event") || !id) {
+      setError(t("featuredNewsPickOne", lang));
+      return;
+    }
+    if (selectedKeys.has(addKey)) return;
+    if (items.length >= FEATURED_NEWS_MAX) {
       setError(t("featuredNewsMax", lang));
       return;
     }
-    setIds((prev) => [...prev, addId]);
-    setAddId("");
+    setItems((prev) => [...prev, { type, id }]);
+    setAddKey("");
     setError(null);
   }
 
   function removeAt(index: number) {
-    setIds((prev) => prev.filter((_, i) => i !== index));
+    setItems((prev) => prev.filter((_, i) => i !== index));
   }
 
   async function run(action: "save" | "publish") {
@@ -86,7 +109,7 @@ export function FeaturedNewsForm({
         const res = await fetch("/api/featured-news", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "save", ids }),
+          body: JSON.stringify({ action: "save", items }),
         });
         const data = (await res.json()) as { ok?: boolean; error?: string };
         if (!res.ok || !data.ok) throw new Error(data.error || t("featuredNewsSaveFailed", lang));
@@ -94,7 +117,7 @@ export function FeaturedNewsForm({
         const saveRes = await fetch("/api/featured-news", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "save", ids }),
+          body: JSON.stringify({ action: "save", items }),
         });
         const saveData = (await saveRes.json()) as { ok?: boolean; error?: string };
         if (!saveRes.ok || !saveData.ok) {
@@ -145,7 +168,7 @@ export function FeaturedNewsForm({
           ) : (
             selected.map((item, index) => (
               <li
-                key={item.id}
+                key={entryKey(item)}
                 draggable
                 onDragStart={() => setDragIndex(index)}
                 onDragOver={(e) => e.preventDefault()}
@@ -157,6 +180,9 @@ export function FeaturedNewsForm({
                 className="flex min-h-11 items-center gap-2 rounded-xl border border-crs-border bg-crs-surface px-3 py-2"
               >
                 <span className="w-6 shrink-0 text-xs text-crs-muted">{index + 1}</span>
+                <span className="shrink-0 rounded-full border border-crs-border px-2 py-0.5 text-[10px] uppercase tracking-wide text-crs-muted">
+                  {item.type === "event" ? t("events", lang) : t("news", lang)}
+                </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-crs-ink">{item.titleAr}</p>
                   <p className="truncate text-xs text-crs-muted">
@@ -197,23 +223,41 @@ export function FeaturedNewsForm({
           <label className="min-w-[12rem] flex-1 text-sm">
             <span className="font-medium">{t("featuredNewsAdd", lang)}</span>
             <select
-              value={addId}
+              value={addKey}
               disabled={atCap || available.length === 0}
-              onChange={(e) => setAddId(e.target.value)}
+              onChange={(e) => setAddKey(e.target.value)}
               className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink"
             >
               <option value="">{t("featuredNewsPickOne", lang)}</option>
-              {available.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.date ? `${item.date} — ` : ""}
-                  {item.titleAr}
-                </option>
-              ))}
+              {liveNews.filter((n) => !selectedKeys.has(entryKey(n))).length ? (
+                <optgroup label={t("news", lang)}>
+                  {liveNews
+                    .filter((n) => !selectedKeys.has(entryKey(n)))
+                    .map((item) => (
+                      <option key={entryKey(item)} value={entryKey(item)}>
+                        {item.date ? `${item.date} — ` : ""}
+                        {item.titleAr}
+                      </option>
+                    ))}
+                </optgroup>
+              ) : null}
+              {liveEvents.filter((n) => !selectedKeys.has(entryKey(n))).length ? (
+                <optgroup label={t("events", lang)}>
+                  {liveEvents
+                    .filter((n) => !selectedKeys.has(entryKey(n)))
+                    .map((item) => (
+                      <option key={entryKey(item)} value={entryKey(item)}>
+                        {item.date ? `${item.date} — ` : ""}
+                        {item.titleAr}
+                      </option>
+                    ))}
+                </optgroup>
+              ) : null}
             </select>
           </label>
           <button
             type="button"
-            disabled={atCap || !addId}
+            disabled={atCap || !addKey}
             className="inline-flex min-h-11 items-center rounded-xl border border-crs-border bg-crs-surface px-4 py-2 text-sm text-crs-ink hover:bg-crs-bg disabled:opacity-60"
             onClick={addSelected}
           >
