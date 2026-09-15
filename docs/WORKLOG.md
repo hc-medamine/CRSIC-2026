@@ -2,6 +2,12 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
+### 2026-09-15 — Detail pages: center reading column
+
+`#detail-root` uses `margin-inline: auto` so the column is centered in both AR/EN; text stays start-aligned. On `style/detail-column-center`.
+
+---
+
 ### 2026-09-15 — Home featured playlist news + events **Delivered**
 
 [prds/2026-09-15-home-featured-playlist-news-events.md](./prds/2026-09-15-home-featured-playlist-news-events.md). Mixed max-10; empty → top 10 with covers; news-desk editors only. PR #64.
