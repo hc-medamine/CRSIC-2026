@@ -2,6 +2,18 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
+### 2026-09-15 — Home featured fallback: image-bearing only **Approved**
+
+Empty playlist → newest news+events **with covers** (skip imageless). On `feature/home-featured-playlist-events`.
+
+---
+
+### 2026-09-15 — PRD **Approved**: Home featured playlist news + events
+
+[prds/2026-09-15-home-featured-playlist-news-events.md](./prds/2026-09-15-home-featured-playlist-news-events.md). Mixed max-10; empty → top 10 news+events by date; news-desk editors only. Implementing on `feature/home-featured-playlist-events`.
+
+---
+
 ### 2026-09-14 — Footer developers credit **Approved**
 
 SPA `footer_ministry` + CMS login/dashboard bottom: Merah Abdel Karim & Houacine Mohamed Amine. On `content/footer-developers-credit`.

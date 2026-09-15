@@ -4,6 +4,7 @@ import {
   canAccessFeaturedNews,
   canPublishFeaturedNews,
   getSiteFeaturedNews,
+  listLiveEventsForFeatured,
   listLiveNewsForFeatured,
   publishFeaturedNews,
   saveFeaturedNewsDraft,
@@ -16,11 +17,15 @@ export async function GET() {
       return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
     }
     const item = await getSiteFeaturedNews();
-    const liveNews = await listLiveNewsForFeatured(user);
+    const [liveNews, liveEvents] = await Promise.all([
+      listLiveNewsForFeatured(user),
+      listLiveEventsForFeatured(user),
+    ]);
     return NextResponse.json({
       ok: true,
       item,
       liveNews,
+      liveEvents,
       canPublish: canPublishFeaturedNews(user),
     });
   } catch (err) {
@@ -35,13 +40,17 @@ export async function PATCH(req: Request) {
     if (!(await canAccessFeaturedNews(user))) {
       return NextResponse.json({ ok: false, error: "Forbidden" }, { status: 403 });
     }
-    const body = (await req.json()) as { action?: string; ids?: unknown };
+    const body = (await req.json()) as {
+      action?: string;
+      ids?: unknown;
+      items?: unknown;
+    };
     if (body.action === "publish") {
       const item = await publishFeaturedNews(user);
       return NextResponse.json({ ok: true, item });
     }
     if (body.action === "save") {
-      const item = await saveFeaturedNewsDraft(user, body.ids);
+      const item = await saveFeaturedNewsDraft(user, body.items ?? body.ids);
       return NextResponse.json({ ok: true, item });
     }
     return NextResponse.json({ ok: false, error: "Unknown action" }, { status: 400 });

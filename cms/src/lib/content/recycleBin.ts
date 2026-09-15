@@ -1,7 +1,7 @@
 import { query } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth/session";
 import { writeAudit } from "@/lib/audit";
-import { pruneFeaturedNewsItem } from "@/lib/content/featuredNews";
+import { pruneFeaturedItem } from "@/lib/content/featuredNews";
 import type { ContentType } from "@/lib/content/lifecycle";
 import { canAccessContentType, getUserContentTypes } from "@/lib/content/permissions";
 import { purgeMediaIfUnreferenced } from "@/lib/media/store";
@@ -171,8 +171,8 @@ export async function recycleContentItem(user: SessionUser, id: string): Promise
     [id, user.id, item.status],
   );
 
-  if (item.content_type === "news") {
-    await pruneFeaturedNewsItem(id);
+  if (item.content_type === "news" || item.content_type === "event") {
+    await pruneFeaturedItem(item.content_type, id);
   }
 
   await writeAudit({
@@ -246,8 +246,8 @@ async function purgeOne(user: SessionUser, item: ItemRow): Promise<void> {
     },
   });
   await query(`DELETE FROM content_items WHERE id = $1`, [item.id]);
-  if (item.content_type === "news") {
-    await pruneFeaturedNewsItem(item.id);
+  if (item.content_type === "news" || item.content_type === "event") {
+    await pruneFeaturedItem(item.content_type, item.id);
   }
   for (const path of paths) {
     await purgeMediaIfUnreferenced(user, path);

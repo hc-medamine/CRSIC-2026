@@ -7,6 +7,7 @@ import {
   canPublishFeaturedNews,
   getSiteFeaturedNews,
   isUsingFallback,
+  listLiveEventsForFeatured,
   listLiveNewsForFeatured,
 } from "@/lib/content/featuredNews";
 import { EditPageShell } from "@/app/dashboard/content-list-page";
@@ -18,9 +19,10 @@ export default async function FeaturedNewsPage() {
   const user = await requireUser();
   if (!(await canAccessFeaturedNews(user))) redirect("/dashboard");
 
-  const [row, liveNews] = await Promise.all([
+  const [row, liveNews, liveEvents] = await Promise.all([
     getSiteFeaturedNews(),
     listLiveNewsForFeatured(user),
+    listLiveEventsForFeatured(user),
   ]);
   if (!row) {
     return (
@@ -48,13 +50,14 @@ export default async function FeaturedNewsPage() {
     >
       <FeaturedNewsForm
         initial={{
-          draftIds: row.draft_ids || [],
-          liveIds: row.live_ids || [],
+          draftItems: row.draft_items || [],
+          liveItems: row.live_items || [],
           publishedAt: row.published_at ? row.published_at.toISOString() : null,
           updatedAt: row.updated_at.toISOString(),
-          usingFallback: isUsingFallback(row, (row.live_ids || []).length),
+          usingFallback: isUsingFallback(row, (row.live_items || []).length),
         }}
         liveNews={liveNews}
+        liveEvents={liveEvents}
         canPublish={canPublishFeaturedNews(user)}
       />
     </EditPageShell>

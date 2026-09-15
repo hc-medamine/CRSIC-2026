@@ -4,7 +4,7 @@
  * Callers use sync getters after await loadData().
  */
 import { contentUrl } from './config.js';
-import { normalizeFeaturedIds } from './featuredNews.js';
+import { normalizeFeaturedItems } from './featuredNews.js';
 import { safeImageSrc } from './utils.js';
 
 /** @type {string[]} */
@@ -35,8 +35,8 @@ let platforms = [];
 let director = null;
 /** @type {object | null} */
 let sitePages = null;
-/** @type {string[]} */
-let featuredNewsIds = [];
+/** @type {{ type: string, id: string }[]} */
+let featuredPlaylistItems = [];
 
 /** @type {Record<string, string>} resource key → error message */
 const loadErrors = {};
@@ -155,7 +155,7 @@ export function loadData() {
         'featuredNews',
         'featured-news.json',
         (data) => {
-          featuredNewsIds = normalizeFeaturedIds(data && data.ids);
+          featuredPlaylistItems = normalizeFeaturedItems(data);
         },
         { optional: true },
       ),
@@ -378,9 +378,14 @@ export function getNews() {
   return news;
 }
 
-/** Ordered ids from featured-news.json (may be empty → SPA fallback). */
+/** Ordered typed entries from featured-news.json (may be empty → SPA fallback). */
+export function getFeaturedPlaylistItems() {
+  return featuredPlaylistItems;
+}
+
+/** @deprecated Prefer getFeaturedPlaylistItems */
 export function getFeaturedNewsIds() {
-  return featuredNewsIds;
+  return featuredPlaylistItems.filter((e) => e.type === 'news').map((e) => e.id);
 }
 
 /** @returns {object[]} */
