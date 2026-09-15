@@ -25,7 +25,16 @@ function arValue(item, field) {
     return String(item.summary || item.desc || item.summary_ar || '').trim();
   }
   if (field === 'body') return String(item.body || item.body_ar || item.dibaja_ar || '').trim();
-  if (field === 'label') return String(item.label || item.type || item.dept || '').trim();
+  if (field === 'label') {
+    const explicit = String(item.label || '').trim();
+    if (explicit) return explicit;
+    const typ = String(item.type || '').trim().toLowerCase();
+    /* Pub type enums are English keys — prefer dept, never leak "individual"/"collective". */
+    if (typ === 'individual' || typ === 'collective') {
+      return String(item.dept || '').trim();
+    }
+    return String(item.type || item.dept || '').trim();
+  }
   if (field === 'name') {
     return String(item.name || item.name_ar || item.title || item.title_ar || '').trim();
   }

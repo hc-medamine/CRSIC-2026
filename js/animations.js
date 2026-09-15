@@ -451,8 +451,9 @@ function watchForNewCards() {
       && window.matchMedia('(hover: none), (pointer: coarse)').matches) {
     return;
   }
+  /* Pub cards: CSS lift/glow in motion.css — skip tilt here */
   const TILT_MAX = 7;
-  const tiltSelector = '.pub-card:not([data-tilt])';
+  const tiltSelector = '.dept-card:not([data-tilt]), .partner-card:not([data-tilt]), .c-card:not([data-tilt])';
 
   function armTilt(card) {
     card.dataset.tilt = '1';

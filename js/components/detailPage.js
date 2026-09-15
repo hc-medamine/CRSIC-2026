@@ -23,6 +23,18 @@ import { createContentByline } from './contentByline.js';
 import { editorialBilingualEntry, editorialField, editorialLangAttrs } from '../editorial.js';
 
 /**
+ * Localized pub type badge + optional dept (never raw `individual`/`collective` enums).
+ * @param {object} item
+ * @returns {string}
+ */
+function publicationMetaLine(item) {
+  const badge =
+    item && item.type === 'collective' ? t('badge_collective') : t('badge_individual');
+  const dept = String((item && item.dept) || '').trim();
+  return [dept, badge].filter(Boolean).join(' · ');
+}
+
+/**
  * @param {object[]} media
  * @param {string} title
  * @param {{ coverLayout?: boolean, item?: object }} [opts]
@@ -186,7 +198,7 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
     } else if (type === 'publication') {
       backPage = 'publications';
       title = editorialField(item, 'title');
-      metaLine = [editorialField(item, 'label'), item.type].filter(Boolean).join(' · ');
+      metaLine = publicationMetaLine(item);
       summary = editorialField(item, 'summary');
       body = editorialField(item, 'body');
       const cover = item.cover || item.img || '';
@@ -226,7 +238,7 @@ export function renderDetailPage(type, slugOrId, opts = {}) {
     backPage = 'publications';
     if (item) {
       title = editorialField(item, 'title');
-      metaLine = [editorialField(item, 'label'), item.type].filter(Boolean).join(' · ');
+      metaLine = publicationMetaLine(item);
       summary = editorialField(item, 'summary');
       body = editorialField(item, 'body');
       media =

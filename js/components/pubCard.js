@@ -15,7 +15,6 @@ export function createPubCard(p, i) {
   const sources = cmsResponsiveSources(p, 'pub', i);
   const badge = p.type === 'collective' ? t('badge_collective') : t('badge_individual');
   const title = editorialField(p, 'title');
-  const dept = editorialField(p, 'label');
 
   const img = sources.fallback
     ? createPictureImg({
@@ -53,12 +52,6 @@ export function createPubCard(p, i) {
         className: 'pub-meta',
         children: [
           el('div', { className: 'pub-meta-title', text: title || '' }),
-          el('div', {
-            className: 'pub-meta-bottom',
-            children: [
-              el('span', { className: 'pub-meta-dept', text: dept || '' }),
-            ],
-          }),
         ],
       }),
     ],
