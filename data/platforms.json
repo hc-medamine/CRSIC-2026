@@ -2,49 +2,55 @@
     "platforms": [
         {
             "id": "bf2dee65-a98d-4bbe-8688-fdb769655acd",
-            "img": "img/cms/platforms/fe3de00667c94160aa7ea587709ac57e.jpg",
-            "body": "<p>[sp_html5video grid=\"3\" popup_fix=\"true\" category=\"59\"]</p><p>[sp_html5video grid=\"3\" popup_fix=\"true\" category=\"58\"]</p><p>[sp_html5video grid=\"3\" popup_fix=\"true\" category=\"62\"]</p><p>[sp_html5video grid=\"3\" popup_fix=\"true\" category=\"61\"]</p>",
+            "img": "img/cms/platforms/252bb222d269439476d157c72d33e899.jpg",
+            "body": "<p>تستضيف منصة المحاضرات المرئية للمركز تسجيلات ودروسًا وندوات علمية مرتبطة بأنشطة البحث والتكوين.</p><p>تغطي المواضيع الدراسات القرآنية والفقهية، والفكر والعقيدة، والتاريخ الثقافي، والحضارة الإسلامية، بمساهمات باحثي المركز وضيوف أكاديميين.</p><p>يمكن متابعة المحاضرات المنشورة عبر صفحة المنصة ضمن البرنامج العلمي للمركز.</p>",
             "kind": "visual",
             "slug": "منصة-المحاضرات-المرئية",
             "media": [
                 {
-                    "src": "img/cms/platforms/fe3de00667c94160aa7ea587709ac57e.jpg",
+                    "src": "img/cms/platforms/252bb222d269439476d157c72d33e899.jpg",
                     "kind": "image"
                 }
             ],
             "title": "المنصة المحاضرات المرئية",
             "bodyEn": "<p>The Centre’s visual lecture platform hosts recordings, lessons and scientific talks linked to research and training activities.</p><p>Topics cover Qur’anic and fiqh studies, thought and creed, cultural history, and Islamic civilisation, with contributions from Centre researchers and academic guests.</p><p>Published lectures can be followed through the platform page as part of the Centre’s scientific programme.</p>",
-            "summary": "[sp_html5video grid=\"3\" popup_fix=\"true\" category=\"59\"]\n\n[sp_html5video grid=\"3\" popup_fix=\"true\" category=\"58\"]\n\n[sp_html5video grid=\"3\" popup_fix=\"true\" category=\"62\"]\n\n[sp_html5video grid=\"3\" popup_fix=\"true\" category",
+            "summary": "محاضرات مرئية علمية لباحثي المركز وضيوفه في العلوم الإسلامية والحضارة.",
             "titleEn": "Visual lecture platform",
-            "og_image": "img/cms/platforms/fe3de00667c94160aa7ea587709ac57e.jpg",
+            "og_image": "img/cms/platforms/252bb222d269439476d157c72d33e899.jpg",
             "summaryEn": "Scientific video lectures by Centre researchers and guests in Islamic sciences and civilisation.",
-            "img_webp": "img/cms/platforms/fe3de00667c94160aa7ea587709ac57e.webp"
+            "img_webp": "img/cms/platforms/252bb222d269439476d157c72d33e899.webp"
         },
         {
             "id": "bb9cb072-e8c4-4e02-a273-f585cb6e6917",
-            "img": "img/cms/platforms/1b5db76042fc4627a1117b71b100911f.jpg",
+            "img": "img/cms/platforms/6ec65445207769973143304dac67f13e.jpg",
+            "body": "<p>تقدّم المنصة الإذاعية محتوى صوتيًا علميًا ينتجه المركز، بما في ذلك حلقات وحصص في العلوم الإسلامية والحضارة.</p><p>تُنشر البثوث عبر قناة المركز على SoundCloud، للاستماع المباشر ولأرشيف المستمعين والباحثين.</p><p>توسّع المنصة الوصول إلى معرفة المركز خارج إطار اللقاءات الحضورية.</p>",
             "kind": "radio",
             "slug": "منصة-المحاضرات-الإذاعية",
             "media": [
                 {
-                    "src": "img/cms/platforms/1b5db76042fc4627a1117b71b100911f.jpg",
+                    "src": "img/cms/platforms/6ec65445207769973143304dac67f13e.jpg",
                     "kind": "image"
                 }
             ],
             "title": "الحصص الإذاعية صدى الموروث",
             "bodyEn": "<p>The radio lecture platform offers scientific audio content produced by the Centre, including episodes and talks in Islamic sciences and civilisation.</p><p>Broadcasts are published on the Centre’s SoundCloud channel, enabling live listening and an archive for listeners and researchers.</p><p>The platform widens access to the Centre’s knowledge beyond in-person conferences.</p>",
-            "summary": "",
+            "summary": "حصص إذاعية وبثوث صوتية عبر قناة المركز على SoundCloud.",
             "titleEn": "Radio lecture platform",
-            "og_image": "img/cms/platforms/1b5db76042fc4627a1117b71b100911f.jpg",
+            "og_image": "img/cms/platforms/6ec65445207769973143304dac67f13e.jpg",
             "summaryEn": "Radio broadcasts and audio lectures via the Centre’s SoundCloud channel.",
-            "img_webp": "img/cms/platforms/1b5db76042fc4627a1117b71b100911f.webp"
+            "img_webp": "img/cms/platforms/6ec65445207769973143304dac67f13e.webp"
         },
         {
             "id": "af4d4233-a29d-43af-8402-f5cbdfca2699",
-            "body": "<p>مرسـوم رئاسي رقــم 14-196 مؤرخ في 8 رمضـان عام 1435 الموافـق 6 يولـيو سنة 2014 يتـضمن تـنظيم الـتكـوين وتحسين المستوى في الخارج وتسييرهم.</p><p>قرار رقم 255 المؤرخ في 25 فيفري 2024 الذي يحدد معايير الانتقاء للقبول في برنامج الحركية قصيرة المدى وتحسين المستوى في الخارج</p><p>إعلان السيد مدير مركز البحث في العلوم الإسلامية والحضارة عن فتح الترشيحات للحركية قصيرة المدى بالخارج للسنة المالية 2025</p>",
+            "img": "img/cms/platforms/080b57241fb733c7a12ad798f9cf9374.jpg",
+            "body": "<p>يشرف المركز على برامج <strong>الحركية قصيرة المدى</strong> للباحثين والشركاء الوطنيين والدوليين.</p><p>تدعم هذه البرامج تبادل الخبرات والأنشطة البحثية المشتركة والإقامات العلمية القصيرة في المركز أو لدى مؤسسات شريكة.</p><p>تُعلن شروط الأهلية والمواعيد والوثائق المطلوبة عبر القنوات الرسمية للمركز عند فتح كل دعوة.</p><p>مرسـوم رئاسي رقــم 14-196 مؤرخ في 8 رمضـان عام 1435 الموافـق 6 يولـيو سنة 2014 يتـضمن تـنظيم الـتكـوين وتحسين المستوى في الخارج وتسييرهم.</p><p>قرار رقم 255 المؤرخ في 25 فيفري 2024 الذي يحدد معايير الانتقاء للقبول في برنامج الحركية قصيرة المدى وتحسين المستوى في الخارج.</p>",
             "kind": "mobility",
             "slug": "التنقل-قصير-المدى",
             "media": [
+                {
+                    "src": "img/cms/platforms/080b57241fb733c7a12ad798f9cf9374.jpg",
+                    "kind": "image"
+                },
                 {
                     "src": "img/cms/platforms/e439e7ba652a475bac81814a5172d7f0.pdf",
                     "kind": "pdf"
@@ -56,9 +62,11 @@
             ],
             "title": "منصة برنامج الحركية قصيرة المدى وتحسين المستوى في الخارج",
             "bodyEn": "<p>The Centre runs <strong>short-term mobility</strong> programmes for researchers and national and international partners.</p><p>These programmes support exchange of expertise, joint research activities, and short scientific stays at the Centre or with partner institutions.</p><p>Eligibility rules, deadlines and required documents are announced through the Centre’s official channels when each call opens.</p>",
-            "summary": "مرسـوم رئاسي رقــم 14-196 مؤرخ في 8 رمضـان عام 1435 الموافـق 6 يولـيو سنة 2014 يتـضمن تـنظيم الـتكـوين وتحسين المستوى في الخارج وتسييرهم.\n\nقرار رقم 255 المؤرخ في 25 فيفري 2024 الذي يحدد معايير الانتقاء للقبول في برنامج ا",
+            "summary": "برامج حركية قصيرة المدى للباحثين والشركاء لتعزيز التعاون العلمي.",
             "titleEn": "Short-term mobility",
-            "summaryEn": "Short-term mobility programmes for researchers and partners to strengthen scientific cooperation."
+            "og_image": "img/cms/platforms/080b57241fb733c7a12ad798f9cf9374.jpg",
+            "summaryEn": "Short-term mobility programmes for researchers and partners to strengthen scientific cooperation.",
+            "img_webp": "img/cms/platforms/080b57241fb733c7a12ad798f9cf9374.webp"
         }
     ]
 }
