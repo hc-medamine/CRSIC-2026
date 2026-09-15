@@ -1238,8 +1238,14 @@ export const LABELS: LabelMap = {
   createPlatform: { en: "Create platform", ar: "إنشاء منصة" },
   emptyLaws: { en: "No laws yet.", ar: "لا نصوص بعد." },
   emptyPlatforms: { en: "No platforms yet.", ar: "لا منصات بعد." },
-  pageDescLaws: { en: "Manage laws and decrees linked from the public site.", ar: "إدارة القوانين والمراسيم المعروضة على الموقع." },
-  pageDescPlatforms: { en: "Manage visual, radio, and mobility platforms.", ar: "إدارة المنصات المرئية والإذاعية والتنقل." },
+  pageDescLaws: {
+    en: "Manage laws and decrees linked from the public site. Use a cover image only when it belongs to that text; otherwise the public card shows the scales mark.",
+    ar: "إدارة القوانين والمراسيم المعروضة على الموقع. استخدموا صورة غلاف فقط إن كانت تخصّ النص؛ وإلا تظهر علامة الميزان على البطاقة العامة.",
+  },
+  pageDescPlatforms: {
+    en: "Manage visual, radio, and mobility platforms. Card images must belong to the platform; otherwise the public card shows the scales mark.",
+    ar: "إدارة المنصات المرئية والإذاعية والتنقل. صورة البطاقة يجب أن تخصّ المنصة؛ وإلا تظهر علامة الميزان على البطاقة العامة.",
+  },
   fieldExternalUrl: { en: "External URL", ar: "رابط خارجي" },
   fieldPlatformKind: { en: "Platform kind", ar: "نوع المنصة" },
   platformKindVisual: { en: "Visual lectures", ar: "محاضرات مرئية" },

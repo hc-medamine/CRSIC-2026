@@ -30,8 +30,8 @@ Product specs for CRSIC live here. **New feature slices follow the PRD-first wor
 | [2026-08-21-wordpress-cms-spa-cutover.md](./2026-08-21-wordpress-cms-spa-cutover.md) | **Delivered** (2026-08-21) | WP → CMS/SPA owned types; `img/cms/` git-tracked; merged `b1c022c` |
 | [2026-08-21-spa-news-event-card-byline.md](./2026-08-21-spa-news-event-card-byline.md) | **Delivered** (2026-08-21) | News+event cards: date, editor, reviewer, publisher (Boufatah); news sorted by story date |
 | [2026-08-21-home-news-carousel.md](./2026-08-21-home-news-carousel.md) | **Delivered** (2026-08-21) | Home Center News: 3-card paged autoplay, pause, swipe/keyboard; `#news` unchanged |
-| [2026-08-21-home-featured-news-playlist.md](./2026-08-21-home-featured-news-playlist.md) | **Delivered** (2026-08-21) | Home featured strip: curated news playlist max 10, four-eyes; empty → 3 newest. **Extended by** [2026-09-15-home-featured-playlist-news-events.md](./2026-09-15-home-featured-playlist-news-events.md) (**Approved**). |
-| [2026-09-15-home-featured-playlist-news-events.md](./2026-09-15-home-featured-playlist-news-events.md) | **Approved** (2026-09-15) | Mixed news+events featured playlist max 10; empty → top 10 by date mix |
+| [2026-08-21-home-featured-news-playlist.md](./2026-08-21-home-featured-news-playlist.md) | **Delivered** (2026-08-21) | Home featured strip: curated news playlist max 10, four-eyes; empty → 3 newest. **Extended by** [2026-09-15-home-featured-playlist-news-events.md](./2026-09-15-home-featured-playlist-news-events.md) (**Delivered**). |
+| [2026-09-15-home-featured-playlist-news-events.md](./2026-09-15-home-featured-playlist-news-events.md) | **Delivered** (2026-09-15) | Mixed news+events featured playlist max 10; empty → top 10 with covers |
 | [2026-08-22-cms-reassign-authorship-ui.md](./2026-08-22-cms-reassign-authorship-ui.md) | **Delivered** (2026-08-22) | One Desks page (claims + Align); assignable scoped publisher; JSON rebuild + notifies; rebuild status badge |
 | [2026-08-22-cms-list-load-more.md](./2026-08-22-cms-list-load-more.md) | **Delivered** (2026-08-22) | CMS news/events/publications Load more (page size 20); SPA and other lists unchanged |
 | [2026-08-22-cms-recycle-bin.md](./2026-08-22-cms-recycle-bin.md) | **Delivered** (2026-08-22) | SA Recycle bin (unpublished/rejected); restore to draft; purge >90 days on bin open; PR #34 |
@@ -48,6 +48,7 @@ Product specs for CRSIC live here. **New feature slices follow the PRD-first wor
 | [2026-09-14-spa-cms-events-two-level-taxonomy.md](./2026-09-14-spa-cms-events-two-level-taxonomy.md) | **Delivered** (2026-09-14) | Events فعاليات/ملتقيات + chips; CMS two-level; PR #57. |
 | [2026-09-14-spa-events-portfolio-cards.md](./2026-09-14-spa-events-portfolio-cards.md) | **Delivered** (2026-09-14) | `#events` portfolio grid cards + resume; PR #58. |
 | [2026-09-14-spa-feat-carousel-motion.md](./2026-09-14-spa-feat-carousel-motion.md) | **Delivered** (2026-09-14) | Home featured carousel: crossfade + Ken Burns, caption stagger, autoplay progress. |
+| [2026-09-15-laws-platforms-catalog-empty-mark.md](./2026-09-15-laws-platforms-catalog-empty-mark.md) | **Delivered** (2026-09-15) | Laws/platforms: dedicated covers only; green-gold scales empty mark; legacy platform covers. |
 
 ## Related
 

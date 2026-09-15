@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|--------|
-| Status | **Approved** (2026-09-15) |
+| Status | **Delivered** (2026-09-15) |
 | Date | 2026-09-15 |
 | Author | Stakeholder + agent |
 | Owners | Product / CMS + public SPA |

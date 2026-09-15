@@ -132,7 +132,8 @@
     .news-card .card-media img,
     .news-card .card-media .news-thumb,
     .event-card .event-thumb img,
-    .catalog-card-media img {
+    .catalog-card-media img,
+    .catalog-card-scales {
       transition: transform var(--duration-slow) var(--ease-out-expo);
     }
     .news-card:hover .card-media img,
@@ -140,6 +141,9 @@
     .event-card:hover .event-thumb img,
     .catalog-card:hover .catalog-card-media img {
       transform: scale(1.05);
+    }
+    .catalog-card:hover .catalog-card-scales {
+      transform: scale(1.08);
     }
 
     /*

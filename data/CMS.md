@@ -14,8 +14,8 @@ When `CONTENT_BASE_URL` is set (e.g. `https://cdn.example.com/crsic/`), the app 
 | `publications.json` | `{ "covers": string[], "pubs": object[] }` — SPA cards use **master cover** (not `img_card`; PR #52 layout). Keep `covers.length === pubs.length`. Optional `img_webp` / `en_status` + EN fields |
 | `partners.json` | `{ "nat": object[], "intl": object[] }` — optional summary/body + `en_status` / `name_en` / `img_card` / `img_webp` / `img_card_webp` + SEO |
 | `alerts.json` | `{ "items": object[] }` — at most one live item; optional `en_status` + EN fields |
-| `laws.json` | `{ "laws": object[] }` — hub `#laws`; detail `#law/{slug}`; optional `externalUrl`; optional `img_webp` / `en_status` + EN fields |
-| `platforms.json` | `{ "platforms": object[] }` — `kind`: visual \| radio \| mobility; hub `#platforms`; detail `#platform/{slug}`; optional `img_webp` / `en_status` + EN fields |
+| `laws.json` | `{ "laws": object[] }` — hub `#laws`; detail `#law/{slug}`; optional cover (`img` / `media` images) only when dedicated; optional `externalUrl`; optional `img_webp` / `en_status` + EN fields. No cover → SPA catalog scales mark. |
+| `platforms.json` | `{ "platforms": object[] }` — `kind`: visual \| radio \| mobility; hub `#platforms`; detail `#platform/{slug}`; optional dedicated cover; no cover → SPA catalog scales mark; optional `img_webp` / `en_status` + EN fields |
 | `research-groups.json` | `{ "items": object[] }` — optional `img_webp` / `en_status` + EN fields |
 | `research-projects.json` | `{ "items": object[] }` — optional `en_status` + EN fields |
 | `director.json` | singleton `{ quote_ar, quote_en, name_ar, name_en, role_ar, role_en, portrait, optional portrait_webp, … }` — CMS `/dashboard/director`. Soft-fail: SPA keeps locale placeholders |
