@@ -117,16 +117,16 @@ nav.site-nav {
 }
 
 .nav-logo-img {
-  width: 48px;
-  height: 48px;
+  width: min(48px, 5vw);
+  height: min(48px, 5vw);
   object-fit: contain;
   display: block;
   flex-shrink: 0;
 }
 
 .nav-logo-mark {
-  width: 40px;
-  height: 40px;
+  width: min(40px, 4vw);
+  height: min(40px, 4vw);
   border-radius: 50%;
   background: var(--gold);
   display: flex;
@@ -157,6 +157,7 @@ nav.site-nav {
 .nav-links {
   list-style: none;
   display: flex;
+  flex-wrap: wrap;
   gap: 1.75rem;
 }
 /* [ANIM 4.13] Nav links — animated gold underline slides in on hover/active.
@@ -279,8 +280,8 @@ nav.site-nav {
   position: absolute;
   top: -80px;
   left: -80px;
-  width: 420px;
-  height: 420px;
+  width: min(420px, 15vw);
+  height: min(420px, 15vw);
   opacity: 0.05;
   pointer-events: none;
 }
@@ -289,8 +290,8 @@ nav.site-nav {
   position: absolute;
   bottom: 20px;
   right: -40px;
-  width: 260px;
-  height: 260px;
+  width: min(260px, 10vw);
+  height: min(260px, 10vw);
   opacity: 0.04;
   pointer-events: none;
 }
@@ -354,7 +355,7 @@ nav.site-nav {
   font-size: 16px;
   line-height: 1.75;
   font-weight: 300;
-  max-width: 600px;
+  max-width: clamp(25rem, 80vw, 600px);
   margin-bottom: 2.5rem;
 }
 
@@ -456,7 +457,7 @@ a.stat:hover { background: rgba(27,67,50,0.04); }
 }
 .stat-accent {
   display: block;
-  width: 22px;
+  width: min(22px, 3vw);
   height: 2px;
   background: var(--gold);
   margin: 8px auto 0;
@@ -487,6 +488,7 @@ a.stat:hover { background: rgba(27,67,50,0.04); }
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  flex-wrap: wrap;
   margin-bottom: 1.5rem;
 }
 
@@ -501,8 +503,8 @@ a.stat:hover { background: rgba(27,67,50,0.04); }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: clamp(30px, 5vw, 40px);
+  height: clamp(30px, 5vw, 40px);
   padding: 0;
   border: 1px solid var(--gold);
   border-radius: 6px;
@@ -925,7 +927,7 @@ footer.site-footer { background: var(--green-deep); }
   font-size: 12.5px;
   color: #7FA895;
   line-height: 1.85;
-  max-width: 340px;
+  max-width: clamp(20rem, 90vw, 340px);
 }
 
 .footer-col-title {
@@ -938,6 +940,7 @@ footer.site-footer { background: var(--green-deep); }
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 .footer-col-title::before {
   content: '';
@@ -1103,8 +1106,8 @@ footer.site-footer { background: var(--green-deep); }
   background: rgba(0,0,0,0.12);
   border: none;
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
+  width: clamp(32px, 4vw, 44px);
+  height: clamp(32px, 4vw, 44px);
   cursor: pointer;
   font-size: 20px;
   color: #555;
@@ -1145,7 +1148,7 @@ footer.site-footer { background: var(--green-deep); }
   .lightbox-panel { border-radius: 12px 12px 0 0; max-height: min(92vh, 720px); overflow-y: auto; }
 }
 .lightbox-cover {
-  width: 13.5rem;
+  width: clamp(11rem, 20vw, 15rem);
   flex-shrink: 0;
   border-radius: 8px;
   overflow: hidden;
@@ -1761,7 +1764,7 @@ body:has(#page-about.active) #page-about.active .page-hero {
   border-radius: 8px;
   padding: 12px 22px;
   text-align: center;
-  min-width: 190px;
+  min-width: min(10vw, 190px);
 }
 .org-node-root  { background: var(--green-deep); border-color: var(--green-deep); }
 .org-node-root .org-label { color: var(--cream); }
@@ -1798,11 +1801,13 @@ body:has(#page-about.active) #page-about.active .page-hero {
   cursor: default;
   text-decoration: none;
   color: inherit;
+  flex-wrap: wrap;
 }
 a.partner-card-link { cursor: pointer; }
 a.partner-card-link:hover { border-color: var(--green-deep); }
 .partner-mark {
-  width: 42px; height: 42px;
+  width: min(42px, 4vw);
+  height: min(42px, 4vw);
   border-radius: 50%;
   background: #EDF4F1;
   display: flex; align-items: center; justify-content: center;
@@ -1829,6 +1834,11 @@ a.partner-card-link:hover { border-color: var(--green-deep); }
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .partner-card { flex-direction: column; align-items: flex-start; }
+  .partner-mark { margin-bottom: 8px; }
 }
 
 /* ── JOURNAL CARDS ──────────────────────────────────── */
