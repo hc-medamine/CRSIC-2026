@@ -373,13 +373,23 @@ export function CmsChrome({
       </header>
 
       {menuOpen ? (
-        <button
-          type="button"
-          className="fixed inset-0 z-30 bg-crs-ink/40 md:hidden"
-          aria-label={t("menuClose", lang)}
-          onClick={() => setMenuOpen(false)}
-        />
-      ) : null}
+        <>
+          <button
+            type="button"
+            className="fixed inset-0 z-30 bg-crs-ink/40 md:hidden cms-sidebar-backdrop visible"
+            aria-label={t("menuClose", lang)}
+            onClick={() => setMenuOpen(false)}
+          />
+          <button
+            type="button"
+            className="fixed inset-0 z-30 bg-transparent md:hidden cms-sidebar-backdrop visible"
+            aria-label={t("menuClose", lang)}
+            onClick={() => setMenuOpen(false)}
+          />
+        </>
+      ) : (
+        <div className="fixed inset-0 z-30 bg-crs-ink/40 md:hidden cms-sidebar-backdrop" aria-hidden="true" />
+      )}
 
       <div className="flex min-h-[calc(100vh-3.5rem)] md:min-h-screen">
         <aside
@@ -458,15 +468,17 @@ export function CmsChrome({
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col cms-desk-bg">
-          <div key={pathname} className="cms-page-enter min-w-0 flex-1 cms-page-padding">
-            {children}
-          </div>
-          <p
-            className="shrink-0 border-t border-crs-border/70 px-4 py-3 md:px-6 lg:px-8 text-center text-[11px] leading-relaxed text-crs-muted"
-            dir="auto"
-          >
-            {t("developersCredit", lang)}
-          </p>
+          <main className="cms-main-content min-w-0 flex-1 flex-col">
+            <div key={pathname} className="cms-page-enter min-w-0 flex-1 cms-page-padding">
+              {children}
+            </div>
+            <p
+              className="shrink-0 border-t border-crs-border/70 px-4 py-3 md:px-6 lg:px-8 text-center text-[11px] leading-relaxed text-crs-muted"
+              dir="auto"
+            >
+              {t("developersCredit", lang)}
+            </p>
+          </main>
         </div>
       </div>
     </div>

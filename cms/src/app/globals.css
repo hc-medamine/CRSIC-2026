@@ -501,29 +501,98 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
   .cms-sidebar { width: 17rem; }
 }
 
-/* RTL sidebar positioning - sidebar sits on the right in RTL */
-html[dir="rtl"] .cms-sidebar {
-  start: auto;
-  end: 0;
-  border-inline-start: none;
-  border-inline-end: 1px solid var(--crs-border);
-  box-shadow: -1px 0 0 rgba(26,46,38,0.03);
-}
-
-/* RTL mobile: sidebar slides in from right */
+/* Responsive sidebar: fixed off-canvas on mobile, sticky in-flow on desktop */
 @media (width <= 768px) {
+  .cms-sidebar {
+    position: fixed;
+    top: 3.5rem; /* header height */
+    height: calc(100vh - 3.5rem);
+    width: 280px;
+    max-width: 85vw;
+    z-index: 40;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-out;
+  }
+  .cms-sidebar.menu-open {
+    transform: translateX(0);
+  }
+  
+  /* LTR: sidebar on left */
+  html[dir="ltr"] .cms-sidebar {
+    left: 0;
+    border-right: 1px solid var(--crs-border);
+    box-shadow: 1px 0 0 rgba(26,46,38,0.03);
+  }
+  
+  /* RTL: sidebar on right */
   html[dir="rtl"] .cms-sidebar {
+    right: 0;
+    border-left: 1px solid var(--crs-border);
+    box-shadow: -1px 0 0 rgba(26,46,38,0.03);
     transform: translateX(100%);
   }
   html[dir="rtl"] .cms-sidebar.menu-open {
     transform: translateX(0);
   }
+  
+  /* Mobile overlay backdrop */
+  .cms-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 30;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .cms-sidebar-backdrop.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
-/* RTL desktop: sidebar is always visible, no transform needed */
+/* Desktop: sidebar is sticky, part of flex layout */
 @media (width >= 768px) {
-  html[dir="rtl"] .cms-sidebar {
+  .cms-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    max-height: 100vh;
+    flex-shrink: 0;
     transform: none !important;
+    z-index: 10;
+  }
+  
+  @media (width >= 768px) and (width <= 1024px) {
+    .cms-sidebar { width: 14rem; }
+  }
+  
+  @media (width >= 1024px) {
+    .cms-sidebar { width: 17rem; }
+  }
+  
+  /* LTR desktop: sidebar on left, content has margin-left */
+  html[dir="ltr"] .cms-sidebar {
+    left: 0;
+    border-right: 1px solid var(--crs-border);
+  }
+  html[dir="ltr"] .cms-main-content {
+    margin-left: 17rem;
+  }
+  @media (width >= 768px) and (width <= 1024px) {
+    html[dir="ltr"] .cms-main-content { margin-left: 14rem; }
+  }
+  
+  /* RTL desktop: sidebar on right, content has margin-right */
+  html[dir="rtl"] .cms-sidebar {
+    right: 0;
+    border-left: 1px solid var(--crs-border);
+  }
+  html[dir="rtl"] .cms-main-content {
+    margin-right: 17rem;
+  }
+  @media (width >= 768px) and (width <= 1024px) {
+    html[dir="rtl"] .cms-main-content { margin-right: 14rem; }
   }
 }
 
