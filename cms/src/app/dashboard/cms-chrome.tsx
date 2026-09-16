@@ -335,10 +335,10 @@ export function CmsChrome({
   return (
     <CmsLangProvider lang={lang}>
     <div dir={dir} lang={lang} className="min-h-full cms-desk-bg">
-      <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-crs-border bg-crs-surface/95 px-4 backdrop-blur md:hidden">
+      <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-crs-border bg-crs-surface/95 px-4 backdrop-blur md:h-14 md:px-6 lg:px-8">
         <button
           type="button"
-          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-crs-border text-sm text-crs-ink hover:bg-crs-bg"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-crs-border text-sm text-crs-ink hover:bg-crs-bg md:hidden"
           aria-expanded={menuOpen}
           aria-controls="cms-sidebar"
           onClick={() => setMenuOpen((o) => !o)}
@@ -357,15 +357,15 @@ export function CmsChrome({
             alt=""
             width={40}
             height={40}
-            className="h-10 w-10 object-contain"
+            className="h-10 w-10 object-contain md:h-10 md:w-10"
             aria-hidden
           />
-          <span className="text-sm font-semibold text-crs-ink">CRSIC</span>
+          <span className="text-sm font-semibold text-crs-ink md:text-base hidden sm:inline">CRSIC</span>
         </Link>
         <button
           type="button"
           onClick={toggleLang}
-          className="ms-auto min-h-11 rounded-xl border border-crs-border px-3 text-xs text-crs-ink hover:bg-crs-bg"
+          className="ms-auto min-h-11 rounded-xl border border-crs-border px-3 text-xs text-crs-ink hover:bg-crs-bg hidden sm:inline-flex sm:items-center sm:justify-center"
           aria-label={t("langToggleAria", lang)}
         >
           {t("langToggle", lang)}
@@ -384,7 +384,7 @@ export function CmsChrome({
       <div className="flex min-h-[calc(100vh-3.5rem)] md:min-h-screen">
         <aside
           id="cms-sidebar"
-          className={`fixed inset-y-0 start-0 z-40 flex h-dvh max-h-dvh w-[17rem] flex-col border-e border-crs-border bg-crs-surface shadow-[1px_0_0_rgba(26,46,38,0.03)] transition-transform md:sticky md:top-0 md:z-0 md:h-screen md:max-h-screen md:translate-x-0 md:self-start ${
+          className={`fixed inset-y-0 start-0 z-40 flex h-dvh max-h-dvh flex-col border-e border-crs-border bg-crs-surface shadow-[1px_0_0_rgba(26,46,38,0.03)] transition-transform md:sticky md:top-0 md:z-0 md:h-screen md:max-h-screen md:translate-x-0 md:self-start cms-sidebar ${
             /* Off-canvas transforms are max-md only — rtl:translate-x-full must not
                override md:translate-x-0 or the desktop sidebar vanishes in Arabic. */
             menuOpen
@@ -394,7 +394,7 @@ export function CmsChrome({
         >
           <Link
             href="/dashboard"
-            className="flex shrink-0 items-center gap-3 border-b border-crs-border/70 bg-gradient-to-r from-crs-primary/5 via-transparent to-transparent px-4 py-5 outline-none transition-colors hover:bg-crs-bg/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-crs-primary/40"
+            className="flex shrink-0 items-center gap-3 border-b border-crs-border/70 bg-gradient-to-r from-crs-primary/5 via-transparent to-transparent px-4 py-4 md:px-4 md:py-5 outline-none transition-colors hover:bg-crs-bg/60 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-crs-primary/40"
             onClick={() => setMenuOpen(false)}
             aria-label={t("home", lang)}
           >
@@ -404,12 +404,12 @@ export function CmsChrome({
               alt=""
               width={64}
               height={64}
-              className="h-16 w-16 shrink-0 object-contain"
+              className="h-16 w-16 shrink-0 object-contain md:h-14 md:w-14"
               aria-hidden
             />
             <div className="min-w-0">
-              <p className="text-base font-semibold tracking-tight text-crs-ink">CRSIC</p>
-              <p className="text-xs text-crs-muted">{t("contentCms", lang)}</p>
+              <p className="text-base font-semibold tracking-tight text-crs-ink md:text-lg">CRSIC</p>
+              <p className="text-xs text-crs-muted md:text-sm">{t("contentCms", lang)}</p>
             </div>
           </Link>
 
@@ -431,22 +431,22 @@ export function CmsChrome({
             {navBody}
           </nav>
 
-          <div className="shrink-0 border-t border-crs-border p-3">
-            <div className="flex items-center gap-3 rounded-xl px-2 py-2">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-crs-primary/15 text-xs font-semibold text-crs-primary">
+          <div className="shrink-0 border-t border-crs-border p-3 md:p-4">
+            <div className="flex items-center gap-3 rounded-xl px-2 py-2 md:px-3 md:py-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-crs-primary/15 text-xs font-semibold text-crs-primary md:h-10 md:w-10 md:text-sm">
                 {initials(displayName)}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-crs-ink">{displayName}</p>
-                <p className="truncate text-[11px] text-crs-muted">{roleText}</p>
+                <p className="truncate text-sm font-medium text-crs-ink md:text-base">{displayName}</p>
+                <p className="truncate text-[11px] text-crs-muted md:text-xs">{roleText}</p>
               </div>
             </div>
             <p className="sr-only">{email}</p>
-            <div className="mt-2 flex gap-2">
+            <div className="mt-2 flex flex-col gap-2 md:flex-row">
               <button
                 type="button"
                 onClick={toggleLang}
-                className="hidden min-h-10 flex-1 rounded-xl border border-crs-border text-xs text-crs-ink hover:bg-crs-bg md:inline-flex md:items-center md:justify-center"
+                className="min-h-10 flex-1 rounded-xl border border-crs-border text-xs text-crs-ink hover:bg-crs-bg md:inline-flex md:items-center md:justify-center"
                 aria-label={t("langToggleAria", lang)}
               >
                 {t("langToggle", lang)}
@@ -464,11 +464,11 @@ export function CmsChrome({
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col cms-desk-bg">
-          <div key={pathname} className="cms-page-enter min-w-0 flex-1">
+          <div key={pathname} className="cms-page-enter min-w-0 flex-1 cms-page-padding">
             {children}
           </div>
           <p
-            className="shrink-0 border-t border-crs-border/70 px-4 py-3 text-center text-[11px] leading-relaxed text-crs-muted"
+            className="shrink-0 border-t border-crs-border/70 px-4 py-3 md:px-6 lg:px-8 text-center text-[11px] leading-relaxed text-crs-muted"
             dir="auto"
           >
             {t("developersCredit", lang)}

@@ -101,7 +101,7 @@ export function RichBodyEditor({ label, value, onChange, disabled, dir = "auto" 
       </div>
       {!htmlMode ? (
         <div className="mt-1 overflow-hidden rounded-2xl border border-crs-border bg-crs-surface">
-          <div className="flex flex-wrap gap-1 border-b border-crs-border bg-crs-bg px-2 py-1.5">
+          <div className="flex flex-wrap gap-1 border-b border-crs-border bg-crs-bg px-2 py-1.5 cms-toolbar">
             <ToolbarBtn disabled={disabled} onClick={() => run("bold")} label="B" title={t("editorBold", lang)} />
             <ToolbarBtn disabled={disabled} onClick={() => run("italic")} label="I" title={t("editorItalic", lang)} />
             <ToolbarBtn
@@ -129,7 +129,7 @@ export function RichBodyEditor({ label, value, onChange, disabled, dir = "auto" 
             dir={dir}
             contentEditable={!disabled}
             suppressContentEditableWarning
-            className="min-h-[8rem] px-3 py-2 outline-none"
+            className="min-h-[8rem] md:min-h-[12rem] px-3 py-2 outline-none cms-editor"
             onInput={emitFromEditable}
             onBlur={emitFromEditable}
             onPaste={onPaste}
@@ -145,7 +145,7 @@ export function RichBodyEditor({ label, value, onChange, disabled, dir = "auto" 
             lastEmitted.current = e.target.value;
             onChange(e.target.value);
           }}
-          className="mt-1 w-full min-h-11 rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink font-mono text-xs"
+          className="mt-1 w-full min-h-11 md:min-h-[12rem] rounded-xl border border-crs-border bg-crs-surface px-3 py-2 text-sm text-crs-ink font-mono text-xs"
           rows={8}
         />
       )}

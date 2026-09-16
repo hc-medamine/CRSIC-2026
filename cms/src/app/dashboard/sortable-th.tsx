@@ -15,7 +15,7 @@ export function SortableTh({
   kind,
   sort,
   lang,
-  className = "px-4 py-3.5 font-semibold",
+  className = "px-4 py-3.5 font-semibold cms-sortable-th",
   align = "start",
   children,
   onToggle,

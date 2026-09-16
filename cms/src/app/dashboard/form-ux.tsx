@@ -5,20 +5,21 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { t } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 
-/** Visual section inside a content form (one job per block). */
 export function FormSection({
   title,
   hint,
   step,
   children,
+  responsive = true,
 }: {
   title: string;
   hint?: string;
   step?: number;
   children: ReactNode;
+  responsive?: boolean;
 }) {
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-[var(--crs-shadow-soft)] first:mt-0 lg:p-6">
+    <section className={`flex flex-col gap-4 rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-[var(--crs-shadow-soft)] first:mt-0 lg:p-6 ${responsive ? "cms-form-grid" : ""}`}>
       <div className="flex items-start gap-3">
         {typeof step === "number" ? (
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-crs-primary text-xs font-semibold text-white">
@@ -41,15 +42,18 @@ export function AdvancedDisclosure({
   hint,
   step,
   children,
+  defaultOpen,
+  responsive = true,
 }: {
   title: string;
   hint?: string;
   step?: number;
   children: ReactNode;
   defaultOpen?: boolean;
+  responsive?: boolean;
 }) {
   return (
-    <details className="rounded-2xl border border-crs-border bg-crs-surface shadow-[var(--crs-shadow-soft)] open:bg-crs-surface">
+    <details className={`rounded-2xl border border-crs-border bg-crs-surface shadow-[var(--crs-shadow-soft)] open:bg-crs-surface ${responsive ? "cms-form-grid" : ""}`}>
       <summary className="cursor-pointer list-none px-5 py-4 text-sm font-medium text-crs-ink marker:content-none [&::-webkit-details-marker]:hidden">
         <span className="flex min-h-11 items-center gap-3">
           {typeof step === "number" ? (
@@ -69,7 +73,7 @@ export function AdvancedDisclosure({
 }
 
 /** Sticky bottom action bar (Save / Submit) — Direction B edit mockup. */
-export function FormStickyActions({ children }: { children: ReactNode }) {
+export function FormStickyActions({ children, responsive = true }: { children: ReactNode; responsive?: boolean }) {
   const [castShadow, setCastShadow] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -103,11 +107,11 @@ export function FormStickyActions({ children }: { children: ReactNode }) {
       <div ref={sentinelRef} className="h-px" aria-hidden="true" />
       <div
         ref={barRef}
-        className={`sticky bottom-0 z-10 mt-6 rounded-2xl border border-crs-border bg-crs-surface/95 px-4 py-4 backdrop-blur transition-[box-shadow] duration-200 ${
+        className={`sticky bottom-0 z-10 mt-6 rounded-2xl border border-crs-border bg-crs-surface/95 px-4 py-4 md:px-6 lg:px-8 backdrop-blur transition-[box-shadow] duration-200 ${
           castShadow ? "shadow-[var(--crs-shadow-lift)]" : "shadow-[var(--crs-shadow-soft)]"
         }`}
       >
-        <div className="flex flex-wrap items-center justify-end gap-2">{children}</div>
+        <div className={`flex flex-wrap items-center justify-end gap-2 ${responsive ? "cms-form-grid" : ""}`}>{children}</div>
       </div>
     </>
   );
