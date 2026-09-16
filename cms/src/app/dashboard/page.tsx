@@ -86,7 +86,7 @@ export default async function DashboardPage() {
         : t("homeSubtitleEditor", lang);
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
+    <main className="flex w-full flex-col gap-6">
       <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-crs-border bg-gradient-to-br from-crs-surface via-crs-surface to-crs-accent/10 p-5 shadow-[var(--crs-shadow-soft)] lg:p-6">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-crs-ink lg:text-3xl">

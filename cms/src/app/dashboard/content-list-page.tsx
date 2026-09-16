@@ -415,7 +415,7 @@ export function ContentListPage({
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
+    <main className="flex w-full flex-col gap-6 max-w-6xl">
       <PageBreadcrumb items={breadcrumbs} />
       <DeskPageHeader
         title={title}
@@ -669,11 +669,7 @@ export function EditPageShell({
   cloneItemId,
 }: EditShellProps) {
   return (
-    <main
-      className={`mx-auto flex w-full flex-col gap-6 px-6 py-8 font-sans lg:px-10 ${
-        wide ? "max-w-4xl" : "max-w-3xl"
-      }`}
-    >
+    <main className={`flex w-full flex-col gap-6 ${wide ? "max-w-4xl" : "max-w-3xl"}`}>
       <PageBreadcrumb items={breadcrumbs} />
       <DeskPageHeader
         title={title}
