@@ -384,13 +384,7 @@ export function CmsChrome({
       <div className="flex min-h-[calc(100vh-3.5rem)] md:min-h-screen">
         <aside
           id="cms-sidebar"
-          className={`fixed inset-y-0 start-0 z-40 flex h-dvh max-h-dvh flex-col border-e border-crs-border bg-crs-surface shadow-[1px_0_0_rgba(26,46,38,0.03)] transition-transform md:sticky md:top-0 md:z-0 md:h-screen md:max-h-screen md:translate-x-0 md:self-start cms-sidebar ${
-            /* Off-canvas transforms are max-md only — rtl:translate-x-full must not
-               override md:translate-x-0 or the desktop sidebar vanishes in Arabic. */
-            menuOpen
-              ? "translate-x-0"
-              : "max-md:-translate-x-full max-md:rtl:translate-x-full"
-          }`}
+          className={`fixed inset-y-0 z-40 flex h-dvh max-h-dvh flex-col border-e border-crs-border bg-crs-surface shadow-[1px_0_0_rgba(26,46,38,0.03)] transition-transform md:sticky md:top-0 md:z-0 md:h-screen md:max-h-screen md:translate-x-0 md:self-start cms-sidebar ${menuOpen ? "menu-open" : ""}`}
         >
           <Link
             href="/dashboard"

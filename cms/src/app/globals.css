@@ -487,7 +487,10 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
 
 /* Responsive sidebar widths */
 @media (width <= 768px) {
-  .cms-sidebar { width: 100%; max-width: 280px; }
+  .cms-sidebar { 
+    width: 280px; 
+    max-width: 85vw;
+  }
 }
 
 @media (width >= 768px) and (width <= 1024px) {
@@ -496,6 +499,32 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
 
 @media (width >= 1024px) {
   .cms-sidebar { width: 17rem; }
+}
+
+/* RTL sidebar positioning - sidebar sits on the right in RTL */
+html[dir="rtl"] .cms-sidebar {
+  start: auto;
+  end: 0;
+  border-inline-start: none;
+  border-inline-end: 1px solid var(--crs-border);
+  box-shadow: -1px 0 0 rgba(26,46,38,0.03);
+}
+
+/* RTL mobile: sidebar slides in from right */
+@media (width <= 768px) {
+  html[dir="rtl"] .cms-sidebar {
+    transform: translateX(100%);
+  }
+  html[dir="rtl"] .cms-sidebar.menu-open {
+    transform: translateX(0);
+  }
+}
+
+/* RTL desktop: sidebar is always visible, no transform needed */
+@media (width >= 768px) {
+  html[dir="rtl"] .cms-sidebar {
+    transform: none !important;
+  }
 }
 
 /* Responsive page padding */
