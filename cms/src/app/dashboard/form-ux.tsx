@@ -11,12 +11,14 @@ export function FormSection({
   step,
   children,
   responsive = true,
+  stacked = false,
 }: {
   title: string;
   hint?: string;
   step?: number;
   children: ReactNode;
   responsive?: boolean;
+  stacked?: boolean;
 }) {
   return (
     <section className="flex flex-col gap-4 rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-[var(--crs-shadow-soft)] first:mt-0 lg:p-6">
@@ -31,7 +33,7 @@ export function FormSection({
           {hint ? <p className="mt-0.5 text-xs text-crs-muted">{hint}</p> : null}
         </div>
       </div>
-      <div className={`grid gap-3 ${responsive ? "cms-form-grid" : ""}`}>{children}</div>
+      <div className={`grid gap-3 ${responsive ? (stacked ? "cms-form-stack" : "cms-form-grid") : ""}`}>{children}</div>
     </section>
   );
 }

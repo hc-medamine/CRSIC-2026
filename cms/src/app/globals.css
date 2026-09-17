@@ -620,6 +620,13 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
   .cms-form-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
+/* Single-column form stack (forces list layout) */
+.cms-form-stack {
+  display: grid;
+  gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  grid-template-columns: 1fr;
+}
+
 /* Responsive modal sizing */
 .cms-modal-responsive {
   width: calc(100% - 2rem);
