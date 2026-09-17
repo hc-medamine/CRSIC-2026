@@ -563,11 +563,13 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
     z-index: 10;
   }
   
-  @media (width >= 768px) and (width <= 1024px) {
+  /* Tablet: 768px - 1024px */
+  @media (width <= 1024px) {
     .cms-sidebar { width: 14rem; }
   }
   
-  @media (width >= 1024px) {
+  /* Desktop: > 1024px */
+  @media (width > 1024px) {
     .cms-sidebar { width: 17rem; }
   }
   
@@ -579,7 +581,7 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
   html[dir="ltr"] .cms-main-content {
     margin-left: 17rem;
   }
-  @media (width >= 768px) and (width <= 1024px) {
+  @media (width <= 1024px) {
     html[dir="ltr"] .cms-main-content { margin-left: 14rem; }
   }
   
@@ -591,7 +593,7 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
   html[dir="rtl"] .cms-main-content {
     margin-right: 17rem;
   }
-  @media (width >= 768px) and (width <= 1024px) {
+  @media (width <= 1024px) {
     html[dir="rtl"] .cms-main-content { margin-right: 14rem; }
   }
 }
