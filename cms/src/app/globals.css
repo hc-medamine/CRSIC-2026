@@ -574,29 +574,19 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
     .cms-sidebar { width: 17rem; }
   }
   
-  /* LTR desktop: sidebar on left, content has margin-left */
+  /* LTR desktop: sidebar on left */
   html[dir="ltr"] .cms-sidebar {
     left: 0;
     border-right: 1px solid var(--crs-border);
   }
-  html[dir="ltr"] .cms-main-content {
-    margin-left: 17rem;
-  }
-  @media (width <= 1024px) {
-    html[dir="ltr"] .cms-main-content { margin-left: 14rem; }
-  }
   
-  /* RTL desktop: sidebar on right, content has margin-right */
+  /* RTL desktop: sidebar on right */
   html[dir="rtl"] .cms-sidebar {
     right: 0;
     border-left: 1px solid var(--crs-border);
   }
-  html[dir="rtl"] .cms-main-content {
-    margin-right: 17rem;
-  }
-  @media (width <= 1024px) {
-    html[dir="rtl"] .cms-main-content { margin-right: 14rem; }
-  }
+  
+  /* Main content naturally fills remaining space via flex-1, no margins needed */
 }
 
 /* Responsive page padding */
