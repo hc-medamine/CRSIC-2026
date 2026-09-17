@@ -80,6 +80,8 @@ The public SPA has no application backend of its own; contact uses `mailto:`. Op
 
 Full setup: [`cms/README.md`](./cms/README.md). Ops: [`docs/runbooks/CMS-OPS.md`](./docs/runbooks/CMS-OPS.md).
 
+The Desk is responsive (RTL-first): fluid page padding, off-canvas sidebar ≤768px (slides from the correct side in AR/EN) with sticky in-flow sidebar on desktop, content lists collapse into labelled cards on phones (`.cms-table-card-view`), single-column forms on mobile / two columns ≥640px, and viewport-fitting modals.
+
 ---
 
 ## 3. Project structure

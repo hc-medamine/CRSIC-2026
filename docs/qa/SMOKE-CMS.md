@@ -293,6 +293,24 @@ PRD [2026-08-26-remaining-deferred-pack.md](../prds/2026-08-26-remaining-deferre
 | Wp1b | Super Admin Import/Export: **Rebuild WebP** for this type (and Director) when the control is present; paths land under `img/cms/` | ☑ UI 2026-09-13 — both Rebuild buttons visible on `/dashboard/import-export` (SA). Rebuild click not completed this walk (avoid mutating live JSON mid-review) |
 | EnB | Alert/law/platform/research group or project: EN filled + **pending** → public EN UI still Arabic + notice; mark **ready** + four-eyes → EN with AR field fallback, notice gone | ☑ pending-path 2026-09-13 — laws keep AR titles under EN + notice; research group names stay AR (no EN leak). Ready-path = ordinary CMS editorial |
 
+## CMS responsive refactor (mobile ≤768px / tablet / desktop)
+
+`feature/responsive-refactor` — run at **390px**, **768px**, **1280px** widths in DevTools, in **both AR-RTL and EN-LTR**.
+
+| # | Check | Pass? |
+|---|--------|-------|
+| R1 | Sidebar: ≤768px is off-canvas (hidden; hamburger opens it — slides from the **right** in AR, **left** in EN); ≥768px is sticky in-flow and always visible | ☐ |
+| R2 | Mobile drawer: backdrop dims page, tap outside closes, one backdrop only (no double dim), nav links close the drawer | ☐ |
+| R3 | Content lists (`news`, `publications`, `events`, …) on ≤768px render as labelled cards: no horizontal table scroll, every cell shows its localized label (no raw key like `bulkSelect`), AR labels on the correct side | ☐ |
+| R4 | Recycle bin + Import/Export preview tables: same card behaviour on ≤768px; ≥769px back to normal tables (recycle bin still scrolls horizontally if needed) | ☐ |
+| R5 | Forms (e.g. `/dashboard/news/new`): single-column fields on phone; two columns ≥640px; EN/SEO disclosures collapse cleanly | ☐ |
+| R6 | Sticky actions bar (Save / Submit / bulk bar): buttons right-aligned compact row at **all** widths — not stretched into grid columns | ☐ |
+| R7 | Dashboard Home: stat cards 1 → 2 → 4 columns; editor matrix table scrolls horizontally, page has no double padding (padding comes from the page container once) | ☐ |
+| R8 | Media library: grid 1 → 2 → 3 → 4 columns; thumbnails not squashed; delete/blocked dialogs fit a 390px viewport | ☐ |
+| R9 | Modals (clone, bulk confirm, recycle purge, media replace): fit viewport width/height on phones, no clipped content | ☐ |
+| R10 | Header: hamburger hidden ≥768px; language toggle visible on mobile (sidebar footer) and on header ≥640px; no layout flash on load | ☐ |
+| R11 | No console errors at any width/direction; skeleton loading states look right at 390px | ☐ |
+
 ## G. Gate
 
 | # | Check | Pass? |
