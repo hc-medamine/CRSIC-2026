@@ -394,7 +394,7 @@ export function CmsChrome({
       <div className="flex min-h-[calc(100vh-3.5rem)] md:min-h-screen">
         <aside
           id="cms-sidebar"
-          className={`fixed inset-y-0 z-40 flex h-dvh max-h-dvh flex-col border-e border-crs-border bg-crs-surface shadow-[1px_0_0_rgba(26,46,38,0.03)] transition-transform md:sticky md:top-0 md:z-0 md:h-screen md:max-h-screen md:translate-x-0 md:self-start cms-sidebar ${menuOpen ? "menu-open" : ""}`}
+          className={`z-40 flex h-dvh max-h-dvh flex-col bg-crs-surface cms-sidebar ${menuOpen ? "menu-open" : ""}`}
         >
           <Link
             href="/dashboard"
