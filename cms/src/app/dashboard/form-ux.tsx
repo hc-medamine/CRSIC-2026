@@ -19,7 +19,7 @@ export function FormSection({
   responsive?: boolean;
 }) {
   return (
-    <section className={`flex flex-col gap-4 rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-[var(--crs-shadow-soft)] first:mt-0 lg:p-6 ${responsive ? "cms-form-grid" : ""}`}>
+    <section className="flex flex-col gap-4 rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-[var(--crs-shadow-soft)] first:mt-0 lg:p-6">
       <div className="flex items-start gap-3">
         {typeof step === "number" ? (
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-crs-primary text-xs font-semibold text-white">
@@ -31,7 +31,7 @@ export function FormSection({
           {hint ? <p className="mt-0.5 text-xs text-crs-muted">{hint}</p> : null}
         </div>
       </div>
-      <div className="grid gap-3">{children}</div>
+      <div className={`grid gap-3 ${responsive ? "cms-form-grid" : ""}`}>{children}</div>
     </section>
   );
 }
@@ -53,7 +53,7 @@ export function AdvancedDisclosure({
   responsive?: boolean;
 }) {
   return (
-    <details className={`rounded-2xl border border-crs-border bg-crs-surface shadow-[var(--crs-shadow-soft)] open:bg-crs-surface ${responsive ? "cms-form-grid" : ""}`}>
+    <details className="rounded-2xl border border-crs-border bg-crs-surface shadow-[var(--crs-shadow-soft)] open:bg-crs-surface">
       <summary className="cursor-pointer list-none px-5 py-4 text-sm font-medium text-crs-ink marker:content-none [&::-webkit-details-marker]:hidden">
         <span className="flex min-h-11 items-center gap-3">
           {typeof step === "number" ? (
@@ -67,7 +67,7 @@ export function AdvancedDisclosure({
           </span>
         </span>
       </summary>
-      <div className="grid gap-3 border-t border-crs-border/80 px-5 py-5">{children}</div>
+      <div className={`grid gap-3 border-t border-crs-border/80 px-5 py-5 ${responsive ? "cms-form-grid" : ""}`}>{children}</div>
     </details>
   );
 }
