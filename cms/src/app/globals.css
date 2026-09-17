@@ -589,10 +589,14 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
   /* Main content naturally fills remaining space via flex-1, no margins needed */
 }
 
-/* Responsive page padding */
+/* Responsive page padding + centered content container */
 .cms-page-padding {
   padding-inline: clamp(1rem, 3vw, 2rem);
   padding-block: clamp(1rem, 2vw, 2rem);
+  max-width: 72rem; /* 6xl */
+  margin-inline: auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @media (width >= 1024px) {
