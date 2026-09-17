@@ -371,8 +371,8 @@ export function ImportExportClient() {
           <p className="px-5 pb-5 text-sm text-crs-muted">{t("exportItemEmpty", lang)}</p>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px] text-start text-sm">
+            <div className="cms-table-responsive overflow-x-auto">
+              <table className="w-full min-w-[640px] text-start text-sm cms-table-card-view">
                 <thead className="border-b border-crs-border bg-crs-bg/80 text-xs uppercase tracking-wide text-crs-muted">
                   <tr>
                     <th className="w-12 px-2 py-3.5">
@@ -417,21 +417,21 @@ export function ImportExportClient() {
                       className="group relative cms-row-enter border-s-2 border-s-transparent transition-colors hover:border-s-crs-accent hover:bg-crs-accent/5"
                       style={{ "--row-delay": `${Math.min(i, 11) * 45}ms` } as CSSProperties}
                     >
-                      <td className="relative z-10 w-12 px-2 py-3.5">
+                      <td className="relative z-10 w-12 px-2 py-3.5" data-label={t("bulkSelect", lang)}>
                         <DeskListCheckbox
                           checked={selected.has(row.id)}
                           onChange={(checked) => toggleOne(row.id, checked)}
                           label={`${t("bulkSelectRow", lang)}: ${row.titleAr || t("untitled", lang)}`}
                         />
                       </td>
-                      <td className="px-4 py-3.5 font-medium text-crs-ink" dir="auto">
+                      <td className="px-4 py-3.5 font-medium text-crs-ink" dir="auto" data-label={t("colTitle", lang)}>
                         {row.titleAr || t("untitled", lang)}
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-4 py-3.5" data-label={t("colStatus", lang)}>
                         <StatusPill status={row.status} />
                       </td>
-                      <td className="px-4 py-3.5 text-crs-muted">{formatUpdated(rowUpdatedIso(row))}</td>
-                      <td className="relative z-10 px-4 py-3.5">
+                      <td className="px-4 py-3.5 text-crs-muted" data-label={t("colUpdated", lang)}>{formatUpdated(rowUpdatedIso(row))}</td>
+                      <td className="relative z-10 px-4 py-3.5" data-label={t("colActions", lang)}>
                         <button
                           type="button"
                           className={BTN_SECONDARY}
@@ -452,17 +452,17 @@ export function ImportExportClient() {
                   {loadingMore
                     ? Array.from({ length: SKELETON_ROWS }, (_, i) => (
                         <tr key={`sk-${i}`} aria-hidden className="border-s-2 border-s-transparent">
-                          <td className="px-2 py-3.5" />
-                          <td className="px-4 py-3.5">
+                          <td className="px-2 py-3.5" data-label={t("bulkSelect", lang)} />
+                          <td className="px-4 py-3.5" data-label={t("colTitle", lang)}>
                             <div className="cms-skeleton h-4 w-2/5" />
                           </td>
-                          <td className="px-4 py-3.5">
+                          <td className="px-4 py-3.5" data-label={t("colStatus", lang)}>
                             <div className="cms-skeleton h-6 w-24 rounded-full" />
                           </td>
-                          <td className="px-4 py-3.5">
+                          <td className="px-4 py-3.5" data-label={t("colUpdated", lang)}>
                             <div className="cms-skeleton h-4 w-24" />
                           </td>
-                          <td className="px-4 py-3.5">
+                          <td className="px-4 py-3.5" data-label={t("colActions", lang)}>
                             <div className="cms-skeleton h-8 w-16" />
                           </td>
                         </tr>

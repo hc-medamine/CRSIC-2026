@@ -326,108 +326,20 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
   animation: cmsNavSearchIn 220ms var(--cms-ease-out) both;
 }
 
-/* ═══ Responsive utilities & container queries (PRD 2026-09 responsive refactor) ═══ */
+/* ═══ Responsive utilities & container queries (CMS responsive refactor) ═══ */
 
-/* Container query contexts for component-level responsiveness */
+/* Container query context (media library grid adapts to its own width) */
 .cms-container {
   container-type: inline-size;
   container-name: cms;
 }
 
-.cms-container-sm {
-  container-type: inline-size;
-  container-name: cms-sm;
-}
-
-.cms-container-lg {
-  container-type: inline-size;
-  container-name: cms-lg;
-}
-
-/* Fluid spacing scale using clamp */
-:root {
-  --space-xs: clamp(0.25rem, 0.5vw, 0.5rem);
-  --space-sm: clamp(0.5rem, 1vw, 0.75rem);
-  --space-md: clamp(0.75rem, 1.5vw, 1.25rem);
-  --space-lg: clamp(1rem, 2vw, 1.5rem);
-  --space-xl: clamp(1.5rem, 3vw, 2rem);
-  --space-2xl: clamp(2rem, 4vw, 3rem);
-}
-
-/* Fluid typography scale */
-:root {
-  --text-xs: clamp(0.7rem, 0.8vw, 0.75rem);
-  --text-sm: clamp(0.8rem, 0.9vw, 0.875rem);
-  --text-base: clamp(0.9rem, 1vw, 1rem);
-  --text-lg: clamp(1rem, 1.2vw, 1.125rem);
-  --text-xl: clamp(1.125rem, 1.5vw, 1.25rem);
-  --text-2xl: clamp(1.25rem, 2vw, 1.5rem);
-  --text-3xl: clamp(1.5rem, 2.5vw, 2rem);
-  --text-4xl: clamp(2rem, 3vw, 2.5rem);
-}
-
-/* Responsive breakpoint utilities (Tailwind v4 compatible) */
-@media (width <= 640px) {
-  .cms-mobile-hidden { display: none !important; }
-  .cms-mobile-block { display: block !important; }
-  .cms-mobile-flex { display: flex !important; }
-  .cms-mobile-grid { display: grid !important; }
-}
-
-@media (width >= 640px) {
-  .cms-sm-hidden { display: none !important; }
-  .cms-sm-block { display: block !important; }
-  .cms-sm-flex { display: flex !important; }
-  .cms-sm-grid { display: grid !important; }
-}
-
-@media (width >= 768px) {
-  .cms-md-hidden { display: none !important; }
-  .cms-md-block { display: block !important; }
-  .cms-md-flex { display: flex !important; }
-  .cms-md-grid { display: grid !important; }
-}
-
-@media (width >= 1024px) {
-  .cms-lg-hidden { display: none !important; }
-  .cms-lg-block { display: block !important; }
-  .cms-lg-flex { display: flex !important; }
-  .cms-lg-grid { display: grid !important; }
-}
-
-@media (width >= 1280px) {
-  .cms-xl-hidden { display: none !important; }
-  .cms-xl-block { display: block !important; }
-  .cms-xl-flex { display: flex !important; }
-  .cms-xl-grid { display: grid !important; }
-}
-
-/* Fluid grid helpers using container queries */
-@container cms (width <= 400px) {
-  .cms-grid-auto-sm { grid-template-columns: 1fr !important; }
-}
-
-@container cms (width >= 400px) {
-  .cms-grid-auto-sm { grid-template-columns: repeat(2, 1fr) !important; }
-}
-
-@container cms (width >= 640px) {
-  .cms-grid-auto-md { grid-template-columns: repeat(3, 1fr) !important; }
-}
-
-@container cms (width >= 900px) {
-  .cms-grid-auto-lg { grid-template-columns: repeat(4, 1fr) !important; }
-}
-
-/* Responsive table: horizontal scroll on mobile, normal on desktop */
+/* Responsive table: horizontal scroll on mobile, normal on desktop.
+   Tables carry their own Tailwind min-w-[...] utility — don't force one here. */
 .cms-table-responsive {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-}
-
-.cms-table-responsive table {
-  min-width: 640px;
 }
 
 /* Card view for tables on mobile */
@@ -460,40 +372,15 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
   }
 }
 
-/* Fluid image utilities */
+/* Fluid image utility */
 .cms-img-fluid {
   width: 100%;
   height: auto;
   max-width: 100%;
 }
 
-.cms-img-cover {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.cms-img-contain {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-/* Aspect ratio utilities for responsive media */
-.cms-aspect-video { aspect-ratio: 16 / 9; }
-.cms-aspect-square { aspect-ratio: 1 / 1; }
-.cms-aspect-portrait { aspect-ratio: 3 / 4; }
-.cms-aspect-landscape { aspect-ratio: 4 / 3; }
-
-/* Responsive sidebar widths */
-@media (width <= 768px) {
-  .cms-sidebar { 
-    width: 280px; 
-    max-width: 85vw;
-  }
-}
-
-@media (width >= 768px) and (width <= 1024px) {
+/* Responsive sidebar widths (mobile width lives in the off-canvas block below) */
+@media (768px <= width <= 1024px) {
   .cms-sidebar { width: 14rem; }
 }
 
@@ -563,29 +450,19 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
     transform: none !important;
     z-index: 10;
   }
-  
-  /* Tablet: 768px - 1024px */
-  @media (width <= 1024px) {
-    .cms-sidebar { width: 14rem; }
-  }
-  
-  /* Desktop: > 1024px */
-  @media (width > 1024px) {
-    .cms-sidebar { width: 17rem; }
-  }
-  
+
   /* LTR desktop: sidebar on left */
   html[dir="ltr"] .cms-sidebar {
     left: 0;
     border-right: 1px solid var(--crs-border);
   }
-  
+
   /* RTL desktop: sidebar on right */
   html[dir="rtl"] .cms-sidebar {
     right: 0;
     border-left: 1px solid var(--crs-border);
   }
-  
+
   /* Main content naturally fills remaining space via flex-1, no margins needed */
 }
 
@@ -613,10 +490,6 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
 }
 
 @media (width >= 640px) {
-  .cms-form-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (width >= 1024px) {
   .cms-form-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
@@ -662,41 +535,5 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
     padding: clamp(0.5rem, 1vw, 0.875rem);
     font-size: clamp(0.7rem, 0.8vw, 0.75rem);
   }
-}
-
-/* Responsive breadcrumb */
-.cms-breadcrumb {
-  flex-wrap: wrap;
-  gap: clamp(0.25rem, 0.5vw, 0.5rem);
-}
-
-/* Responsive stat cards grid */
-.cms-stats-grid {
-  display: grid;
-  gap: clamp(0.75rem, 1.5vw, 1.25rem);
-  grid-template-columns: 1fr;
-}
-
-@media (width >= 640px) {
-  .cms-stats-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (width >= 1024px) {
-  .cms-stats-grid { grid-template-columns: repeat(4, 1fr); }
-}
-
-/* Responsive queue cards */
-.cms-queue-cards {
-  display: grid;
-  gap: clamp(0.75rem, 1.5vw, 1.25rem);
-  grid-template-columns: 1fr;
-}
-
-@media (width >= 640px) {
-  .cms-queue-cards { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (width >= 1024px) {
-  .cms-queue-cards { grid-template-columns: repeat(3, 1fr); }
 }
 

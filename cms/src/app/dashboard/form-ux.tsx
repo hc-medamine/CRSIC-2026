@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { t } from "@/lib/i18n/labels";
 import { useCmsLang } from "@/lib/i18n/cms-lang";
 
+/** Visual section inside a content form (one job per block). */
 export function FormSection({
   title,
   hint,
@@ -75,7 +76,7 @@ export function AdvancedDisclosure({
 }
 
 /** Sticky bottom action bar (Save / Submit) — Direction B edit mockup. */
-export function FormStickyActions({ children, responsive = true }: { children: ReactNode; responsive?: boolean }) {
+export function FormStickyActions({ children }: { children: ReactNode }) {
   const [castShadow, setCastShadow] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -113,7 +114,7 @@ export function FormStickyActions({ children, responsive = true }: { children: R
           castShadow ? "shadow-[var(--crs-shadow-lift)]" : "shadow-[var(--crs-shadow-soft)]"
         }`}
       >
-        <div className={`flex flex-wrap items-center justify-end gap-2 ${responsive ? "cms-form-grid" : ""}`}>{children}</div>
+        <div className="flex flex-wrap items-center justify-end gap-2">{children}</div>
       </div>
     </>
   );

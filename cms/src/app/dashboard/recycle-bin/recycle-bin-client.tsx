@@ -159,9 +159,9 @@ export function RecycleBinClient({ initialItems, initialStaleIds, canManageBin }
           </div>
         </DeskEmptyState>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-crs-border bg-crs-surface shadow-[var(--crs-shadow-soft)]">
+        <div className="cms-table-responsive overflow-hidden rounded-2xl border border-crs-border bg-crs-surface shadow-[var(--crs-shadow-soft)]">
           <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] text-start text-sm">
+          <table className="w-full min-w-[720px] text-start text-sm cms-table-card-view">
             <thead className="border-b border-crs-border bg-crs-bg/80 text-xs uppercase tracking-wide text-crs-muted">
               <tr>
                 <SortableTh
@@ -215,7 +215,7 @@ export function RecycleBinClient({ initialItems, initialStaleIds, canManageBin }
                     }`}
                     style={{ "--row-delay": `${Math.min(i, 11) * 45}ms` } as CSSProperties}
                   >
-                    <td className="px-4 py-3.5">
+                    <td className="px-4 py-3.5" data-label={t("colTitle", lang)}>
                       <p className="font-medium text-crs-ink" dir="auto">
                         {item.titleAr || t("untitled", lang)}
                       </p>
@@ -227,19 +227,20 @@ export function RecycleBinClient({ initialItems, initialStaleIds, canManageBin }
                         </p>
                       ) : null}
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3.5 text-crs-muted">
+                    <td className="whitespace-nowrap px-4 py-3.5 text-crs-muted" data-label={t("colType", lang)}>
                       {contentTypeLabel(item.contentType, lang)}
                     </td>
-                    <td className="px-4 py-3.5">
+                    <td className="px-4 py-3.5" data-label={t("colStatus", lang)}>
                       <StatusPill status={item.recycledFromStatus} />
                     </td>
                     <td
                       className="whitespace-nowrap px-4 py-3.5 text-crs-muted"
                       title={formatDateTime(item.recycledAt)}
+                      data-label={t("colBinnedAt", lang)}
                     >
                       {relativeShort(item.recycledAt, lang)}
                     </td>
-                    <td className="px-4 py-3.5">
+                    <td className="px-4 py-3.5" data-label={t("sectionActions", lang)}>
                       <div className="flex flex-wrap justify-end gap-2">
                         <button
                           type="button"

@@ -373,20 +373,12 @@ export function CmsChrome({
       </header>
 
       {menuOpen ? (
-        <>
-          <button
-            type="button"
-            className="fixed inset-0 z-30 bg-crs-ink/40 md:hidden cms-sidebar-backdrop visible"
-            aria-label={t("menuClose", lang)}
-            onClick={() => setMenuOpen(false)}
-          />
-          <button
-            type="button"
-            className="fixed inset-0 z-30 bg-transparent md:hidden cms-sidebar-backdrop visible"
-            aria-label={t("menuClose", lang)}
-            onClick={() => setMenuOpen(false)}
-          />
-        </>
+        <button
+          type="button"
+          className="fixed inset-0 z-30 bg-crs-ink/40 md:hidden cms-sidebar-backdrop visible"
+          aria-label={t("menuClose", lang)}
+          onClick={() => setMenuOpen(false)}
+        />
       ) : (
         <div className="fixed inset-0 z-30 bg-crs-ink/40 md:hidden cms-sidebar-backdrop" aria-hidden="true" />
       )}
