@@ -201,7 +201,7 @@ async function main() {
 
   const newsOut = await rebuildPublicNewsJson();
   const eventsOut = await rebuildPublicEventsJson();
-  console.log(`Rebuilt news.json (${newsOut.count}) and events.json (intl ${eventsOut.intl}, nat ${eventsOut.nat}).`);
+  console.log(`Rebuilt news.json (${newsOut.count}) and events.json (activities ${eventsOut.activities}, meetings ${eventsOut.meetings}).`);
 }
 
 main()

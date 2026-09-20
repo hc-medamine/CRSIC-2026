@@ -113,7 +113,7 @@ export function ImportExportClient() {
       .then((result) => {
         if (cancelled || gen !== fetchGen.current) return;
         if ("error" in result) {
-          cmsToast.error(result.error);
+          cmsToast.error(result.error ?? t("actionFailed", lang));
           setLoadError(true);
           setHasMore(false);
           setReady(true);

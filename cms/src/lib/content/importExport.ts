@@ -270,7 +270,7 @@ async function remapMediaPath(
     notes.push("missing_file");
     return null;
   }
-  const file = new File([data], oldPath.split("/").pop() || "file", { type: mime });
+  const file = new File([new Uint8Array(data)], oldPath.split("/").pop() || "file", { type: mime });
   try {
     const asset = await createMediaUpload(user, file, bucketForContentType(type), {
       imagesOnly: mime !== "application/pdf",

@@ -39,12 +39,13 @@ export async function ensureWebpForContentRow(row: ContentImageRow): Promise<voi
 /**
  * Before public JSON: auto card from master when missing, then WebP siblings.
  * Returns the row with image_card_path set when a card was generated.
+ * Generic so callers keep their full row type (id/title_ar/etc.) after the spread.
  */
-export async function prepareContentImagesForPublish(
-  row: ContentImageRow,
-): Promise<ContentImageRow> {
+export async function prepareContentImagesForPublish<T extends ContentImageRow>(
+  row: T,
+): Promise<T> {
   const image_card_path = await ensureCardForContentRow(row);
-  const enriched: ContentImageRow = { ...row, image_card_path: image_card_path ?? row.image_card_path };
+  const enriched = { ...row, image_card_path: image_card_path ?? row.image_card_path };
   await ensureWebpForContentRow(enriched);
   return enriched;
 }

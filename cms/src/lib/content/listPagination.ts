@@ -77,7 +77,7 @@ export function trimHasMore<T>(rows: T[], take: number): { items: T[]; hasMore: 
   return { items: rows.slice(0, take), hasMore: rows.length > take };
 }
 
-export function emptyContentList<T>(page: number): ContentListResult<T> {
+export function emptyContentList<T>(page?: number | string | null): ContentListResult<T> {
   return { items: [], hasMore: false, page: parseListPage(page) };
 }
 

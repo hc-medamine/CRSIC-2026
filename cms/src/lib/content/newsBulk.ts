@@ -236,7 +236,9 @@ export async function bulkNewsActions(
     recycle: async (id) => {
       await recycleContentItem(user, id);
     },
-    rebuildNewsJson: rebuildPublicNewsJson,
+    rebuildNewsJson: async () => {
+      await rebuildPublicNewsJson();
+    },
     pruneFeatured: pruneFeaturedNewsItem,
     restoreUnpublished: async () => {
       for (const [id, state] of snapshots) {

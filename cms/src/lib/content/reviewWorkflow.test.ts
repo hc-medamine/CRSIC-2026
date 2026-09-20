@@ -6,7 +6,7 @@ import {
   isReviewerDecisionStatus,
   normalizeStatusOnEdit,
   submitStatusError,
-} from "./reviewWorkflow.ts";
+} from "./reviewWorkflow";
 
 describe("isReviewerDecisionStatus", () => {
   it("allows submitted and approved", () => {

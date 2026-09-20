@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { cardPublicPathForMaster } from "./cardVariant.ts";
+import { cardPublicPathForMaster } from "./cardVariant";
 
 describe("cardPublicPathForMaster", () => {
   it("derives -card.jpg from master paths", () => {

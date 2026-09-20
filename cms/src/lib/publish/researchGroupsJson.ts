@@ -75,7 +75,7 @@ type PayloadSource = {
 export function buildResearchGroupPayload(row: PayloadSource): PublicResearchGroup {
   const img = row.image_path?.trim() || row.og_image?.trim() || "";
   const enReady = publicEnStatus(row.en_status) === "ready";
-  const base = withPublicStoryFields(
+  const base: PublicResearchGroup = withPublicStoryFields(
     withPublicSeo(
       {
         id: row.id,
