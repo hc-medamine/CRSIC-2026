@@ -45,14 +45,12 @@ export function AdvancedDisclosure({
   hint,
   step,
   children,
-  defaultOpen,
   responsive = true,
 }: {
   title: string;
   hint?: string;
   step?: number;
   children: ReactNode;
-  defaultOpen?: boolean;
   responsive?: boolean;
 }) {
   return (

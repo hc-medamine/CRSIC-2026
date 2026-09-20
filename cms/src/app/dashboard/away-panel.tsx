@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { useRouter } from "next/navigation";
 import { t, tf, localizedDisplayName } from "@/lib/i18n/labels";
@@ -32,48 +32,55 @@ export function AwayPanel({ targetUserId, canManage }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    if (!canManage) return;
-    const q = targetUserId ? `?userId=${encodeURIComponent(targetUserId)}` : "";
-    const res = await fetch(`/api/content/away${q}`);
-    const data = (await res.json()) as {
-      ok: boolean;
-      away?: {
-        isAway: boolean;
-        awayUntil: string | null;
-        awayDelegateName: string | null;
-        awayDelegateNameAr: string | null;
-        awayDelegateNameEn: string | null;
-      };
-      editors?: Editor[];
-      error?: string;
-    };
-    if (!res.ok || !data.ok) {
-      const msg = data.error ?? t("awayLoadFailed", lang);
-      setError(msg);
-      cmsToast.error(msg);
-      return;
-    }
-    setIsAway(Boolean(data.away?.isAway));
-    setAwayUntil(data.away?.awayUntil ? data.away.awayUntil.slice(0, 10) : "");
-    setDelegateName(
-      data.away
-        ? localizedDisplayName(
-            {
-              displayName: data.away.awayDelegateName,
-              nameAr: data.away.awayDelegateNameAr,
-              nameEn: data.away.awayDelegateNameEn,
-            },
-            lang,
-          ) || null
-        : null,
-    );
-    setEditors(data.editors ?? []);
-  }, [canManage, lang, targetUserId]);
+  /** Bumped after a save so the effect below refetches (set-state-in-effect rule). */
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
+    if (!canManage) return;
+    let cancelled = false;
+    async function load() {
+      const q = targetUserId ? `?userId=${encodeURIComponent(targetUserId)}` : "";
+      const res = await fetch(`/api/content/away${q}`);
+      const data = (await res.json()) as {
+        ok: boolean;
+        away?: {
+          isAway: boolean;
+          awayUntil: string | null;
+          awayDelegateName: string | null;
+          awayDelegateNameAr: string | null;
+          awayDelegateNameEn: string | null;
+        };
+        editors?: Editor[];
+        error?: string;
+      };
+      if (cancelled) return;
+      if (!res.ok || !data.ok) {
+        const msg = data.error ?? t("awayLoadFailed", lang);
+        setError(msg);
+        cmsToast.error(msg);
+        return;
+      }
+      setIsAway(Boolean(data.away?.isAway));
+      setAwayUntil(data.away?.awayUntil ? data.away.awayUntil.slice(0, 10) : "");
+      setDelegateName(
+        data.away
+          ? localizedDisplayName(
+              {
+                displayName: data.away.awayDelegateName,
+                nameAr: data.away.awayDelegateNameAr,
+                nameEn: data.away.awayDelegateNameEn,
+              },
+              lang,
+            ) || null
+          : null,
+      );
+      setEditors(data.editors ?? []);
+    }
     void load();
-  }, [load]);
+    return () => {
+      cancelled = true;
+    };
+  }, [canManage, lang, targetUserId, reloadKey]);
 
   if (!canManage) return null;
 
@@ -102,7 +109,7 @@ export function AwayPanel({ targetUserId, canManage }: Props) {
       const msg = action === "set" ? t("awaySetSuccess", lang) : t("awayClearedSuccess", lang);
       setMessage(msg);
       cmsToast.success(msg);
-      await load();
+      setReloadKey((k) => k + 1);
       router.refresh();
     } finally {
       setPending(false);

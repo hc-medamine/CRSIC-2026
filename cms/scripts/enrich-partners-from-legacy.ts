@@ -91,7 +91,7 @@ function stripTags(html: string): string {
   return decodeEntities(html.replace(/<[^>]+>/g, " "));
 }
 
-function listPosts(html: string, scope: Scope): Array<{ title: string; href: string; img: string | null; dateHint: string | null }> {
+function listPosts(html: string): Array<{ title: string; href: string; img: string | null; dateHint: string | null }> {
   const blocks = html.split(/wp-show-posts-inner/);
   const out: Array<{ title: string; href: string; img: string | null; dateHint: string | null }> = [];
   for (const block of blocks.slice(1)) {
@@ -161,7 +161,7 @@ function extractDetail(html: string): { summaryAr: string; bodyAr: string; ogIma
 
 async function scrapeScope(scope: Scope, url: string): Promise<ScrapedPost[]> {
   const listHtml = await fetchHtml(url);
-  const cards = listPosts(listHtml, scope);
+  const cards = listPosts(listHtml);
   const posts: ScrapedPost[] = [];
   for (const card of cards) {
     const detailHtml = await fetchHtml(card.href);

@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { formatDateTime } from "@/lib/format-datetime";
 import { t, localizedDisplayName, type CmsLang } from "@/lib/i18n/labels";
@@ -38,10 +38,9 @@ export function CommentThread({ contentItemId, refreshToken }: Props) {
   const [loading, setLoading] = useState(true);
   const [pending, setPending] = useState(false);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
       const res = await fetch(`/api/content/${contentItemId}/comments`);
       const data = (await res.json()) as {
         ok: boolean;
@@ -49,22 +48,24 @@ export function CommentThread({ contentItemId, refreshToken }: Props) {
         comments?: Comment[];
         canComment?: boolean;
       };
+      if (cancelled) return;
       if (!res.ok || !data.ok) {
         const msg = data.error ?? t("commentsLoadFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
+      setError(null);
       setComments(data.comments ?? []);
       setCanComment(Boolean(data.canComment));
-    } finally {
-      setLoading(false);
     }
-  }, [contentItemId]);
-
-  useEffect(() => {
-    void load();
-  }, [load, refreshToken]);
+    void load().finally(() => {
+      if (!cancelled) setLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [contentItemId, lang, refreshToken]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();

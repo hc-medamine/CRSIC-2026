@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { formatDateTime } from "@/lib/format-datetime";
@@ -77,29 +77,33 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
   const [restoring, setRestoring] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
+  /** Bumped after a restore so the effect below refetches (set-state-in-effect rule). */
+  const [reloadKey, setReloadKey] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
       const res = await fetch(`/api/content/${contentItemId}/revisions`);
       const data = (await res.json()) as { ok: boolean; error?: string; revisions?: Revision[] };
+      if (cancelled) return;
       if (!res.ok || !data.ok || !data.revisions) {
         const msg = data.error ?? t("revisionsLoadFailed", lang);
         setError(msg);
         cmsToast.error(msg);
         return;
       }
+      setError(null);
       setRevisions(data.revisions);
       setSelectedId((prev) => prev ?? data.revisions?.[0]?.id ?? null);
       setCompareId((prev) => prev ?? data.revisions?.[1]?.id ?? null);
-    } finally {
-      setLoading(false);
     }
-  }, [contentItemId]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
+    void load().finally(() => {
+      if (!cancelled) setLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [contentItemId, lang, reloadKey]);
 
   async function restore() {
     if (!selectedId) return;
@@ -121,7 +125,7 @@ export function RevisionHistory({ contentItemId, contentType, canRestore }: Prop
       }
       setMessage(t("revisionsRestored", lang));
       cmsToast.success(t("revisionsRestored", lang));
-      await load();
+      setReloadKey((k) => k + 1);
       router.refresh();
     } finally {
       setRestoring(false);

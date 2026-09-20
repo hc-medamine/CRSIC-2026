@@ -2,6 +2,13 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
+### 2026-09-20 — chore: CMS lint clean (4 errors + 7 warnings → 0)
+
+The four `react-hooks/set-state-in-effect` errors were real React-Compiler complaints, not noise: `away-panel`, `comment-thread`, `review-owner-panel` and `revision-history` called an outer `useCallback` loader (`void load()`) from `useEffect`, which the rule cannot see through. Aligned them with the shape already accepted elsewhere in the CMS (`publisher-panel`, `reassign-author`, `import-export-client`): the async loader is declared **inside** the effect with a `cancelled` guard and state is applied only after `await`. Post-save refreshes (away set/clear, revision restore) no longer call `load()` from an effect path — the handler bumps a `reloadKey` state that the effect depends on. `setLoading`/`setError` left the effect's synchronous path (`loading` starts `true`, cleared in a promise `.finally()`; the error clears on the next success), which also removes the reload flicker. Warnings cleared: unused `writeFileSync` (smoke script), unused `scope` param on `listPosts`, unused `defaultOpen` prop on `AdvancedDisclosure` (dead API — no caller ever passed it), unused imports `writePublicDirectorJson` (`content/director.ts`) and `buildPartnerPayloadForItem` (`content/partners.ts`). Verified: `npm run lint` **0 problems**, `tsc --noEmit` 0 errors, CMS tests 137/137, `db:smoke` **SMOKE PASS** (snapshots restored; `data/*.json` reverted). No behavior, route, or data change.
+
+---
+
+
 ### 2026-09-20 — fix: `next build` type-check green (29 → 0 tsc errors)
 
 Pre-existing `next build` failure (backfill script) + 29 `tsc --noEmit` errors fixed, no behavior changes: `prepareContentImagesForPublish` is now generic so publish call sites keep their full row type (`id`/`title_ar` no longer lost through `ContentImageRow`); `PublisherPersonInput` flattened (intersecting `PersonNameInput`'s `null` member with an object type collapsed to `never`); research payload builders annotate `base` as `PublicResearchGroup`/`PublicResearchProject` so `withPublicStoryFields`'s narrowed return keeps the EN fields; `emptyContentList` accepts the raw list page (`parseListPage` already handled it); misc: missing `NextRequest` import (assignable-users), `cmsToast.info` (featured-news), `?? actionFailed` toast fallback (import/export), `new Uint8Array` for `File` parts (import), bulk rebuild adapter wrapped, backfill log updated to the events rebuild return shape, `.ts` import extensions dropped in two tests, law payload test cast. Verified: tsc 0, `next build` ✅, CMS tests 137/137, `db:smoke` **SMOKE PASS** re-run, SPA tests 40/40.

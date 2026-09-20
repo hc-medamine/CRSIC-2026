@@ -8,7 +8,7 @@
  * Usage: npm run db:smoke
  * Cleanup only: npm run db:cleanup:smoke
  */
-import { readFileSync, writeFileSync, existsSync, copyFileSync, readdirSync, unlinkSync } from "node:fs";
+import { readFileSync, existsSync, copyFileSync, readdirSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { query } from "../src/lib/db";
 import { hashPassword, verifyPassword } from "../src/lib/auth/password";
