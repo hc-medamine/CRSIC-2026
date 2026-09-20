@@ -2,6 +2,12 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
+### 2026-09-20 — fix: CMS buttons dead over LAN (`172.16.1.37:3000`) + login dock clipping
+
+Reported "login bubbles not working". Real root cause: **Next.js 16 dev cross-origin protection** — the dev server blocks dev-only assets from any origin other than the one it initialized with (`localhost`). Via `http://172.16.1.37:3000/login` the SSR HTML rendered (6 bubble pills present) but `/_next/*` chunks returned **403**, React never hydrated, so every button (bubbles, sign-in, lang toggle) was dead; `localhost` was unaffected. Verified with a host-comparison probe (chunk 403 on LAN, 200 on localhost; login API + session fine on both). Fix: `allowedDevOrigins: ["172.16.1.37"]` in `cms/next.config.ts` (dev-only key, ignored by production builds; update the list if the DHCP IP changes). Bonus fixes while tracing: login `main` used `overflow-hidden` + `justify-center`, so on short viewports the bubble dock was clipped with no scroll — now `overflow-x-hidden overflow-y-auto` + `my-auto` (`cms/src/app/login/page.tsx`); deduped four identical `EDITOR_EMAIL` lines in `.env.local` → `EDITOR1_EMAIL…EDITOR4_EMAIL` (dotenv keeps only the last duplicate, so the env-only bubble fallback showed a single editor). CMS tests 137/137 pass; both hosts re-verified green. Lint errors in dashboard panels are pre-existing (see 2026-09-17 note).
+
+---
+
 ### 2026-09-17 — CMS responsive refactor **Delivered** (branch close-out)
 
 `feature/responsive-refactor` (10 commits): container-query + fluid utilities, off-canvas RTL/LTR sidebar, mobile table card-view, responsive forms/modals/media grid. Close-out fix pass on top: added the missing `bulkSelect` label (mobile card-view showed the raw key), single sidebar backdrop (was two stacked buttons), sticky actions bar restored to flex (grid stretched Save/Submit), dead CSS pruned (~160 lines: unused breakpoint/grid/stats/aspect utilities + fluid var scales), nested media queries flattened, card-view extended to **Recycle bin** and **Import/Export preview** tables. Known issue (pre-existing on `main`, not this branch): `next build` fails type-check in `scripts/backfill-news-event-bylines.ts` (`eventsOut.intl`/`nat`) and `tsc` reports 28 pre-existing errors in `src/lib/**` + 3 in `src/app/**` — untouched by this branch. Smoke: new responsive section in `docs/qa/SMOKE-CMS.md`.
