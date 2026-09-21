@@ -2,6 +2,13 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
+### 2026-09-21 — docs: cancel CMS UX & layout refactor plan (stakeholder decision)
+
+The planned "CMS UX & layout refactor phases" (pre-filled Sunday-session prompt in `docs/ux/CMS-UX-REFACTOR-PROMPT.md`) is **cancelled before any phase started** — no inventory/audit/plan docs were produced and no code was written against it. Removed the prompt doc and the now-empty `docs/ux/`, dropped its two index entries in `docs/README.md`. Any future UX work re-enters through the PRD-first workflow when the stakeholder raises it. Housekeeping in the same window: merged `feature/responsive-refactor` into `main` (`a430bfe`, 43 files +856/−219; manual walkthrough L1–L6 + responsive 2A–2C passed, Phase 3 A–H deferred by the stakeholder) and deleted the branch local + remote.
+
+---
+
+
 ### 2026-09-20 — chore: CMS lint clean (4 errors + 7 warnings → 0)
 
 The four `react-hooks/set-state-in-effect` errors were real React-Compiler complaints, not noise: `away-panel`, `comment-thread`, `review-owner-panel` and `revision-history` called an outer `useCallback` loader (`void load()`) from `useEffect`, which the rule cannot see through. Aligned them with the shape already accepted elsewhere in the CMS (`publisher-panel`, `reassign-author`, `import-export-client`): the async loader is declared **inside** the effect with a `cancelled` guard and state is applied only after `await`. Post-save refreshes (away set/clear, revision restore) no longer call `load()` from an effect path — the handler bumps a `reloadKey` state that the effect depends on. `setLoading`/`setError` left the effect's synchronous path (`loading` starts `true`, cleared in a promise `.finally()`; the error clears on the next success), which also removes the reload flicker. Warnings cleared: unused `writeFileSync` (smoke script), unused `scope` param on `listPosts`, unused `defaultOpen` prop on `AdvancedDisclosure` (dead API — no caller ever passed it), unused imports `writePublicDirectorJson` (`content/director.ts`) and `buildPartnerPayloadForItem` (`content/partners.ts`). Verified: `npm run lint` **0 problems**, `tsc --noEmit` 0 errors, CMS tests 137/137, `db:smoke` **SMOKE PASS** (snapshots restored; `data/*.json` reverted). No behavior, route, or data change.
