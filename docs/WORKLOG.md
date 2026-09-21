@@ -2,6 +2,12 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
+### 2026-09-21 — fix: recycle/publish-flow SQL bug found during Phase 3 walkthrough (Block D)
+
+While the stakeholder ran the Phase 3 A–H walkthrough (resumed after the merge), Block D's unpublish step surfaced a 500. Root cause: `hasUnpublishRevision()` in `cms/src/lib/content/recycleBin.ts` queried `content_revisions.summary`, but the column is `change_summary` (migration 005) — any Super Admin action that renders recycle eligibility for a **draft** item with an unpublish history (e.g. the edit page right after unpublishing) threw `column "summary" does not exist`. Fixed the column name; verified the corrected query against the live DB and 137/137 CMS tests + eslint pass. Unpublish itself was never broken: both walkthrough items reached `draft` + `Unpublished` revision in the DB; the overlay fired on the post-unpublish page render. The "unpublished news still on SPA" symptom was stale browser cache — the public JSON had already dropped it.
+
+Walkthrough side-effect on `data/*.json`: every CMS publish/unpublish runs a full public-JSON rebuild **from the DB**, which currently holds far fewer published items (9 news / 20 events) than the committed legacy JSON (WP-cutover content the SPA still serves) — the rebuild clobbers the rich files. Restored `data/news.json` / `data/events.json` from git. **Operational hazard until cutover completes:** do not publish/unpublish real content via the CMS before the DB is fully populated (backfill `live_payload`s / finish `db:cutover:wordpress`), or the public site loses the legacy items. Walkthrough test rows (drafts, recycle-bin junk, `walkthrough.*` user, 4 `img/cms/events/` uploads) still in the DB pending final cleanup.
+
 ### 2026-09-21 — docs: cancel CMS UX & layout refactor plan (stakeholder decision)
 
 The planned "CMS UX & layout refactor phases" (pre-filled Sunday-session prompt in `docs/ux/CMS-UX-REFACTOR-PROMPT.md`) is **cancelled before any phase started** — no inventory/audit/plan docs were produced and no code was written against it. Removed the prompt doc and the now-empty `docs/ux/`, dropped its two index entries in `docs/README.md`. Any future UX work re-enters through the PRD-first workflow when the stakeholder raises it. Housekeeping in the same window: merged `feature/responsive-refactor` into `main` (`a430bfe`, 43 files +856/−219; manual walkthrough L1–L6 + responsive 2A–2C passed, Phase 3 A–H deferred by the stakeholder) and deleted the branch local + remote.

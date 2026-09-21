@@ -56,7 +56,7 @@ export function canManageRecycleBin(user: SessionUser): boolean {
 
 async function hasUnpublishRevision(itemId: string): Promise<boolean> {
   const result = await query<{ n: number }>(
-    `SELECT 1 AS n FROM content_revisions WHERE content_item_id = $1 AND summary = 'Unpublished' LIMIT 1`,
+    `SELECT 1 AS n FROM content_revisions WHERE content_item_id = $1 AND change_summary = 'Unpublished' LIMIT 1`,
     [itemId],
   );
   return result.rows.length > 0;
