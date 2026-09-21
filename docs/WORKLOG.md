@@ -2,6 +2,11 @@
 
 Living record of architectural and feature work. **Append new changelog entries at the top.**
 
+### 2026-09-21 — fix: user creation is atomic (phantom login bubbles from Block B)
+
+Walkthrough Block B follow-up, stakeholder-reported: three "المحرر · 2Phase3 Walkthrough" login bubbles existed although the create dialog had errored. Root cause: `POST /api/users` committed the `users` INSERT first, then `replaceUserScopes()` threw the desk-exclusivity 409 — no rollback, so every "failed" create left an orphan user (retries stacked them; login bubbles are DB-driven, so each orphan instantly became a bubble). Four phantom users (+ their claims and audit refs) were purged. Fix in `cms/src/app/api/users/route.ts`: the same guardrail assertions now run **pre-flight** with a nil-UUID sentinel before the INSERT (pure reads — every real holder is reported as a conflict), plus a compensating rollback in the catch (scopes, claims, user) for any post-INSERT failure. Verified live over HTTP: desk-conflict create → 409 with **zero orphan rows**; a valid create (`law` desk) → user + scopes persist; test user cleaned up. `tsc` 0, eslint 0. Side finding: the media purge cascade deleted repo-tracked images referenced only by committed public JSON (lib reference scan reads the DB only) — files restored from git; guardrail for real JSON-referenced media still owed.
+
+
 ### 2026-09-21 — fix: recycle/publish-flow SQL bug found during Phase 3 walkthrough (Block D)
 
 While the stakeholder ran the Phase 3 A–H walkthrough (resumed after the merge), Block D's unpublish step surfaced a 500. Root cause: `hasUnpublishRevision()` in `cms/src/lib/content/recycleBin.ts` queried `content_revisions.summary`, but the column is `change_summary` (migration 005) — any Super Admin action that renders recycle eligibility for a **draft** item with an unpublish history (e.g. the edit page right after unpublishing) threw `column "summary" does not exist`. Fixed the column name; verified the corrected query against the live DB and 137/137 CMS tests + eslint pass. Unpublish itself was never broken: both walkthrough items reached `draft` + `Unpublished` revision in the DB; the overlay fired on the post-unpublish page render. The "unpublished news still on SPA" symptom was stale browser cache — the public JSON had already dropped it.

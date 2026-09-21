@@ -6,6 +6,9 @@ import { clientMeta, writeAudit } from "@/lib/audit";
 import {
   ALL_CONTENT_TYPES,
   allOrgUnitIds,
+  assertEditorContentTypesExclusive,
+  assertEditorTypesAllowedByOrgs,
+  assertReviewerOrgsExclusive,
   listUsers,
   replaceUserScopes,
   type ContentType,
@@ -94,6 +97,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Pre-flight: run the same guardrail assertions replaceUserScopes() enforces,
+    // BEFORE the user row exists. The sentinel id matches no real user, so every
+    // existing desk holder is reported as a conflict. Without this, a desk
+    // conflict threw after the INSERT had already committed — the "failed"
+    // create stayed in the DB and appeared as a phantom login bubble
+    // (Phase-3 walkthrough finding, 2026-09-21).
+    const PENDING_USER_SENTINEL = "00000000-0000-0000-0000-000000000000";
+    if (role === "reviewer") {
+      await assertReviewerOrgsExclusive(PENDING_USER_SENTINEL, orgUnitIds);
+    }
+    if (role === "editor") {
+      await assertEditorTypesAllowedByOrgs(orgUnitIds, contentTypes);
+      await assertEditorContentTypesExclusive(PENDING_USER_SENTINEL, contentTypes, orgUnitIds);
+    }
+
     const passwordHash = await hashPassword(password);
     const inserted = await query<{ id: string }>(
       `INSERT INTO users (email, password_hash, display_name, name_ar, name_en, role)
@@ -109,17 +127,35 @@ export async function POST(request: NextRequest) {
       ],
     );
     const userId = inserted.rows[0].id;
-    await replaceUserScopes(userId, orgUnitIds, contentTypes, { role });
+    try {
+      await replaceUserScopes(userId, orgUnitIds, contentTypes, { role });
 
-    await writeAudit({
-      actor: admin,
-      action: "user.create",
-      entityType: "user",
-      entityId: userId,
-      summary: `Created user ${email} (${role})`,
-      metadata: { email, role, orgUnitIds, contentTypes },
-      ...meta,
-    });
+      await writeAudit({
+        actor: admin,
+        action: "user.create",
+        entityType: "user",
+        entityId: userId,
+        summary: `Created user ${email} (${role})`,
+        metadata: { email, role, orgUnitIds, contentTypes },
+        ...meta,
+      });
+    } catch (err) {
+      // Compensating rollback: any failure after the INSERT (desk conflict that
+      // slips past pre-flight, scope write, audit) must not leave a half-created
+      // user behind — otherwise it shows up as a phantom login bubble.
+      for (const sql of [
+        `DELETE FROM user_org_scopes WHERE user_id = $1`,
+        `DELETE FROM user_content_scopes WHERE user_id = $1`,
+        `DELETE FROM editor_content_type_claims WHERE editor_id = $1`,
+        `DELETE FROM reviewer_org_claims WHERE reviewer_id = $1`,
+        `DELETE FROM users WHERE id = $1`,
+      ]) {
+        await query(sql, [userId]).catch((cleanupErr) => {
+          console.error("user create rollback failed for", userId, cleanupErr);
+        });
+      }
+      throw err;
+    }
 
     return NextResponse.json({ ok: true, id: userId });
   } catch (err) {
