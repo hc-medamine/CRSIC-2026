@@ -401,9 +401,16 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
     transition: transform 0.3s ease-out;
     border-inline-end: 1px solid var(--crs-border);
     box-shadow: 1px 0 0 rgba(26,46,38,0.03);
+    /* Keep the closed drawer fully hidden: on an overflowing/zoomed page the
+       translated-off-canvas panel can otherwise show as a visible sliver
+       (seen on /dashboard @390px RTL). Delayed hide preserves slide-out. */
+    visibility: hidden;
+    transition: transform 0.3s ease-out, visibility 0s 0.3s;
   }
   .cms-sidebar.menu-open {
     transform: translateX(0);
+    visibility: visible;
+    transition: transform 0.3s ease-out, visibility 0s 0s;
   }
   
   /* LTR: sidebar on left */
@@ -421,6 +428,8 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
   }
   html[dir="rtl"] .cms-sidebar.menu-open {
     transform: translateX(0);
+    visibility: visible;
+    transition: transform 0.3s ease-out, visibility 0s 0s;
   }
   
   /* Mobile overlay backdrop */
@@ -448,6 +457,7 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
     max-height: 100vh;
     flex-shrink: 0;
     transform: none !important;
+    visibility: visible !important;
     z-index: 10;
   }
 
@@ -473,7 +483,9 @@ html[dir="rtl"] .cms-form textarea:user-invalid {
   max-width: 72rem; /* 6xl */
   margin-inline: auto;
   width: 100%;
+  min-width: 0;
   box-sizing: border-box;
+  overflow-x: clip; /* page content must never widen the viewport on phones */
 }
 
 @media (width >= 1024px) {

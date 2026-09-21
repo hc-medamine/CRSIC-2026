@@ -64,7 +64,7 @@ export function QueueCard({
   const lang = useCmsLang();
   const visible = items.slice(0, 5);
   return (
-    <section className="cms-card-lift flex flex-col rounded-2xl border border-crs-border bg-crs-surface shadow-[0_1px_3px_rgba(26,46,38,0.06)]">
+    <section className="cms-card-lift flex min-w-0 flex-col rounded-2xl border border-crs-border bg-crs-surface shadow-[0_1px_3px_rgba(26,46,38,0.06)]">
       <div className="flex items-start gap-3 border-b border-crs-border/70 px-4 py-4">
         <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-crs-primary/10 text-crs-primary">
           {icon}
@@ -160,7 +160,7 @@ export function StatCard({
   detail?: string;
 }) {
   const body = (
-    <div className="cms-card-lift flex items-center gap-3 rounded-2xl border border-crs-border bg-crs-surface px-4 py-3.5 shadow-[0_1px_3px_rgba(26,46,38,0.06)]">
+    <div className="cms-card-lift flex min-w-0 items-center gap-3 overflow-hidden rounded-2xl border border-crs-border bg-crs-surface px-4 py-3.5 shadow-[0_1px_3px_rgba(26,46,38,0.06)]">
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-crs-accent/15 text-crs-primary">
         {icon}
       </span>

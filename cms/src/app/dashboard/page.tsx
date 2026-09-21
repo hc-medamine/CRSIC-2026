@@ -86,7 +86,7 @@ export default async function DashboardPage() {
         : t("homeSubtitleEditor", lang);
 
   return (
-    <main className="flex w-full flex-col gap-6">
+    <main className="flex w-full min-w-0 flex-col gap-6">
       <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-crs-border bg-gradient-to-br from-crs-surface via-crs-surface to-crs-accent/10 p-5 shadow-[var(--crs-shadow-soft)] lg:p-6">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-crs-ink lg:text-3xl">
@@ -115,8 +115,8 @@ export default async function DashboardPage() {
           <h2 className="text-sm font-semibold text-red-950">{t("needsPostPublicationReview", lang)}</h2>
           <ul className="mt-3 divide-y divide-crs-border/70">
             {needsPostReview.map((p) => (
-              <li key={p.id} className="py-3">
-                <Link href={p.href} className="font-medium text-crs-ink underline" dir="auto">
+              <li key={p.id} className="min-w-0 py-3">
+                <Link href={p.href} className="block min-w-0 break-words font-medium text-crs-ink underline" dir="auto">
                   {p.title}
                 </Link>
               </li>
@@ -130,8 +130,8 @@ export default async function DashboardPage() {
           <h2 className="text-sm font-semibold text-crs-ink">{t("pendingReviewOwnerProposals", lang)}</h2>
           <ul className="mt-3 divide-y divide-crs-border/70">
             {pendingOwners.map((p) => (
-              <li key={p.id} className="py-3">
-                <Link href={p.href} className="font-medium text-crs-ink underline" dir="auto">
+              <li key={p.id} className="min-w-0 py-3">
+                <Link href={p.href} className="block min-w-0 break-words font-medium text-crs-ink underline" dir="auto">
                   {p.title}
                 </Link>
               </li>
@@ -141,7 +141,7 @@ export default async function DashboardPage() {
       ) : null}
 
       <section aria-label={t("statsOverview", lang)}>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 [&>*]:min-w-0">
           <StatCard
             label={t("statsDrafts", lang)}
             value={draftsQueue.length}
@@ -183,7 +183,7 @@ export default async function DashboardPage() {
         </section>
       ) : null}
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-3 [&>*]:min-w-0">
         {canReview ? (
           <QueueCard
             title={t("reviewInbox", lang)}
