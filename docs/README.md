@@ -16,7 +16,6 @@ Project docs live under `docs/`. The root [README.md](../README.md) remains the 
 | [audits/PARITY.md](./audits/PARITY.md) | AR/EN parity matrix (partial EN) |
 | [prds/](./prds/) | Product requirement documents — see root README §5.1 (PRD-first) |
 | [designs/](./designs/) | Engineering design docs (impl gated on approval) |
-| [ux/CMS-UX-REFACTOR-PROMPT.md](./ux/CMS-UX-REFACTOR-PROMPT.md) | Pre-filled agent prompt for the upcoming CMS UX & layout refactor (Sunday session agenda + phases + verification gate) |
 | [../data/README.md](../data/README.md) | Public JSON / locale editor guide |
 | [../data/CMS.md](../data/CMS.md) | `CONTENT_BASE_URL` publish contract |
 
@@ -39,8 +38,6 @@ docs/
 │   └── PARITY.md      # i18n parity matrix
 ├── designs/
 │   └── *.md           # Engineering designs (approve before code)
-├── ux/
-│   └── CMS-UX-REFACTOR-PROMPT.md  # Next-session CMS UX refactor agent prompt (pre-filled)
 └── prds/
     ├── README.md      # How to add PRDs
     └── TEMPLATE.md    # Concise PRD template
