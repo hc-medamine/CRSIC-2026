@@ -4,7 +4,6 @@ import { writeAudit } from "@/lib/audit";
 import { getUserOrgIds } from "@/lib/content/permissions";
 import {
   buildDirectorPayload,
-  writePublicDirectorJson,
   writePublicDirectorJsonAsync,
   type PublicDirector,
 } from "@/lib/publish/directorJson";

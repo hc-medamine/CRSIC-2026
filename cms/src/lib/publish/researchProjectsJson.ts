@@ -76,7 +76,7 @@ type PayloadSource = {
 /** Public object for a research_project row (persisted to content_items.live_payload). */
 export function buildResearchProjectPayload(row: PayloadSource): PublicResearchProject {
   const enReady = publicEnStatus(row.en_status) === "ready";
-  const base = withPublicStoryFields(
+  const base: PublicResearchProject = withPublicStoryFields(
     withPublicSeo(
       {
         id: row.id,

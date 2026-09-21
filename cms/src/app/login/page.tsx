@@ -168,14 +168,14 @@ export default async function LoginPage() {
       <main
         dir={dir}
         lang={lang}
-        className={`cms-desk-bg relative flex min-h-screen flex-col justify-center overflow-hidden px-6 py-16 ${
+        className={`cms-desk-bg relative flex min-h-screen flex-col overflow-x-hidden overflow-y-auto px-6 py-16 ${
           lang === "ar" ? "font-[family-name:var(--font-tajawal)]" : "font-sans"
         }`}
       >
       <div className="absolute end-6 top-6 z-10">
         <LoginLangToggle lang={lang} />
       </div>
-      <div className="relative mx-auto w-full max-w-md">
+      <div className="relative mx-auto my-auto w-full max-w-md">
         <div className="rounded-2xl border border-crs-border bg-crs-surface/95 p-8 shadow-[var(--crs-shadow-lift)]">
           <div className="mb-6 flex flex-col items-center text-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}

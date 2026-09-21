@@ -4,7 +4,7 @@ import { writeAudit } from "@/lib/audit";
 import { createNotification } from "@/lib/notifications";
 import { appendWorkflowComment } from "@/lib/content/comments";
 import { prepareContentImagesForPublish } from "@/lib/media/publishImages";
-import { buildPartnerPayload, buildPartnerPayloadForItem, rebuildPublicPartnersJson } from "@/lib/publish/partnersJson";
+import { buildPartnerPayload, rebuildPublicPartnersJson } from "@/lib/publish/partnersJson";
 import { resolvePublicSlug } from "@/lib/publish/resolveSlug";
 import { mutateThenRebuildPublic } from "@/lib/publish/safeRebuild";
 import {

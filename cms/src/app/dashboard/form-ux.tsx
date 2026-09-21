@@ -11,11 +11,15 @@ export function FormSection({
   hint,
   step,
   children,
+  responsive = true,
+  stacked = false,
 }: {
   title: string;
   hint?: string;
   step?: number;
   children: ReactNode;
+  responsive?: boolean;
+  stacked?: boolean;
 }) {
   return (
     <section className="flex flex-col gap-4 rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-[var(--crs-shadow-soft)] first:mt-0 lg:p-6">
@@ -30,7 +34,7 @@ export function FormSection({
           {hint ? <p className="mt-0.5 text-xs text-crs-muted">{hint}</p> : null}
         </div>
       </div>
-      <div className="grid gap-3">{children}</div>
+      <div className={`grid gap-3 ${responsive ? (stacked ? "cms-form-stack" : "cms-form-grid") : ""}`}>{children}</div>
     </section>
   );
 }
@@ -41,12 +45,13 @@ export function AdvancedDisclosure({
   hint,
   step,
   children,
+  responsive = true,
 }: {
   title: string;
   hint?: string;
   step?: number;
   children: ReactNode;
-  defaultOpen?: boolean;
+  responsive?: boolean;
 }) {
   return (
     <details className="rounded-2xl border border-crs-border bg-crs-surface shadow-[var(--crs-shadow-soft)] open:bg-crs-surface">
@@ -63,7 +68,7 @@ export function AdvancedDisclosure({
           </span>
         </span>
       </summary>
-      <div className="grid gap-3 border-t border-crs-border/80 px-5 py-5">{children}</div>
+      <div className={`grid gap-3 border-t border-crs-border/80 px-5 py-5 ${responsive ? "cms-form-grid" : ""}`}>{children}</div>
     </details>
   );
 }
@@ -103,7 +108,7 @@ export function FormStickyActions({ children }: { children: ReactNode }) {
       <div ref={sentinelRef} className="h-px" aria-hidden="true" />
       <div
         ref={barRef}
-        className={`sticky bottom-0 z-10 mt-6 rounded-2xl border border-crs-border bg-crs-surface/95 px-4 py-4 backdrop-blur transition-[box-shadow] duration-200 ${
+        className={`sticky bottom-0 z-10 mt-6 rounded-2xl border border-crs-border bg-crs-surface/95 px-4 py-4 md:px-6 lg:px-8 backdrop-blur transition-[box-shadow] duration-200 ${
           castShadow ? "shadow-[var(--crs-shadow-lift)]" : "shadow-[var(--crs-shadow-soft)]"
         }`}
       >

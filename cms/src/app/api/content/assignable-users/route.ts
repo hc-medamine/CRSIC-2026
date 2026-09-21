@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getSession, sessionTimeoutMs } from "@/lib/auth/session";
 import { listAssignableUsers } from "@/lib/content/lifecycle";
 

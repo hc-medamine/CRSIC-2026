@@ -3,11 +3,12 @@
  * Creates/uses smoke Editor + Reviewer, runs news four-eyes path, unpublishes,
  * restores public JSON snapshots during the run, then always purges smoke/test
  * DB rows (keeping real staff + editorial content).
+ * Public JSON is always restored from snapshots, even when a step fails.
  *
  * Usage: npm run db:smoke
  * Cleanup only: npm run db:cleanup:smoke
  */
-import { readFileSync, writeFileSync, existsSync, copyFileSync } from "node:fs";
+import { readFileSync, existsSync, copyFileSync, readdirSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { query } from "../src/lib/db";
 import { hashPassword, verifyPassword } from "../src/lib/auth/password";
@@ -36,11 +37,7 @@ import {
   unpublishAlert,
 } from "../src/lib/content/alerts";
 import { addComment, listCommentsForItem } from "../src/lib/content/comments";
-import {
-  confirmReviewOwner,
-  escalateItem,
-  proposeReviewOwner,
-} from "../src/lib/content/delegation";
+import { escalateItem, proposeReviewOwner } from "../src/lib/content/delegation";
 import {
   confirmPostReview,
   emergencyPublish,
@@ -125,6 +122,21 @@ function restoreNewsSnapshot(snap: string) {
   }
 }
 
+/** Safety net: if a run fails mid-flight, restore any public JSON still snapped. */
+function restoreLeftoverSmokeSnapshots() {
+  const dataDir = join(process.cwd(), "..", "data");
+  for (const f of readdirSync(dataDir)) {
+    if (!f.endsWith(".smoke-snap")) continue;
+    const snap = join(dataDir, f);
+    const real = join(dataDir, f.replace(/\.smoke-snap$/, ""));
+    if (existsSync(real)) {
+      copyFileSync(snap, real);
+      console.log(`Restored ${f.replace(/\.smoke-snap$/, "")} from smoke snapshot`);
+    }
+    unlinkSync(snap);
+  }
+}
+
 async function main() {
   console.log("Pre-smoke cleanup (purge leftover smoke/test rows)…");
   console.log(await cleanupSmokeData());
@@ -134,6 +146,7 @@ async function main() {
   } finally {
     console.log("Post-smoke cleanup (purge smoke/test rows; keep real data)…");
     console.log(await cleanupSmokeData());
+    restoreLeftoverSmokeSnapshots();
   }
 }
 
@@ -277,21 +290,14 @@ async function runSmoke() {
     enStatus: "pending",
   });
   await submitNews(editor, delDraft.id, true);
-  await proposeReviewOwner(reviewer, delDraft.id, reviewer.id);
-  const pending = await query<{ review_owner_proposed_id: string | null }>(
-    `SELECT review_owner_proposed_id FROM content_items WHERE id = $1`,
-    [delDraft.id],
-  );
-  if (!pending.rows[0]?.review_owner_proposed_id) {
-    throw new Error("Expected pending review owner proposal");
-  }
-  await confirmReviewOwner(saUser, delDraft.id, true);
+  // SA-only delegation (current product): SA sets the review owner directly.
+  await proposeReviewOwner(saUser, delDraft.id, reviewer.id);
   const owned = await query<{ review_owner_id: string | null }>(
     `SELECT review_owner_id FROM content_items WHERE id = $1`,
     [delDraft.id],
   );
   if (owned.rows[0]?.review_owner_id !== reviewer.id) {
-    throw new Error("Expected confirmed review_owner_id");
+    throw new Error("Expected review_owner_id set by Super Admin");
   }
 
   await escalateItem(editor, delDraft.id, "Smoke escalate note");

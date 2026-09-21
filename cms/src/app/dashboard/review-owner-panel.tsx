@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { cmsToast } from "@/app/dashboard/cms-toast";
 import { useRouter } from "next/navigation";
 import { t, tf, localizedDisplayName, roleLabel } from "@/lib/i18n/labels";
@@ -40,16 +40,19 @@ export function ReviewOwnerPanel({
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    if (!canPropose && !canConfirm) return;
-    const res = await fetch("/api/content/review-owner?kind=eligible");
-    const data = (await res.json()) as { ok: boolean; users?: Eligible[] };
-    if (data.ok && data.users) setUsers(data.users);
-  }, [canPropose, canConfirm]);
-
   useEffect(() => {
+    if (!canPropose && !canConfirm) return;
+    let cancelled = false;
+    async function load() {
+      const res = await fetch("/api/content/review-owner?kind=eligible");
+      const data = (await res.json()) as { ok: boolean; users?: Eligible[] };
+      if (!cancelled && data.ok && data.users) setUsers(data.users);
+    }
     void load();
-  }, [load]);
+    return () => {
+      cancelled = true;
+    };
+  }, [canPropose, canConfirm]);
 
   async function run(action: string, extra?: Record<string, unknown>) {
     setPending(true);

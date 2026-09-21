@@ -134,7 +134,7 @@ export function FeaturedNewsForm({
       const toast =
         action === "publish" ? t("featuredNewsPublished", lang) : t("featuredNewsSaved", lang);
       setMessage(toast);
-      cmsToast(toast);
+      cmsToast.info(toast);
       router.refresh();
     } catch (err) {
       const text = err instanceof Error ? err.message : t("featuredNewsSaveFailed", lang);

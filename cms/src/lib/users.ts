@@ -255,9 +255,21 @@ export async function listEditorContentTypeClaims(): Promise<EditorContentTypeCl
   return result.rows;
 }
 
+/** Ephemeral smoke accounts (created + purged by db:smoke). Exempt from desk/claim guardrails. */
+async function isEphemeralSmokeUser(userId: string): Promise<boolean> {
+  const result = await query<{ present: boolean }>(
+    `SELECT EXISTS(SELECT 1 FROM users WHERE id = $1 AND email ILIKE 'smoke.%') AS present`,
+    [userId],
+  );
+  return result.rows[0]?.present === true;
+}
+
 /**
  * Reject if content types collide with another Editor.
  * SPA types: global. Research types: per overlapping org.
+ * Ephemeral smoke users skip the check as claimant: the guardrail protects real
+ * staff desks, and the seeded staff already holds every desk type — smoke runs
+ * must be able to claim them side by side (smoke rows are purged afterwards).
  */
 export async function assertEditorContentTypesExclusive(
   editorId: string,
@@ -265,6 +277,7 @@ export async function assertEditorContentTypesExclusive(
   orgUnitIds: string[],
 ): Promise<void> {
   if (contentTypes.length === 0) return;
+  if (await isEphemeralSmokeUser(editorId)) return;
 
   const spa = contentTypes.filter(isSpaContentType);
   if (spa.length > 0) {
@@ -326,6 +339,14 @@ export async function assertEditorTypesAllowedByOrgs(
   }
 }
 
+/**
+ * Mirror user_content_scopes into editor_content_type_claims (desk ownership).
+ * ON CONFLICT DO NOTHING: ephemeral smoke claimants skip the exclusivity guardrail,
+ * so an existing real holder keeps the desk claim; the smoke user still gets its
+ * runtime scopes and is purged afterwards. Human assignments are guarded by
+ * assertEditorContentTypesExclusive before this runs, so nothing is silently
+ * swallowed on the normal path.
+ */
 async function syncEditorContentTypeClaims(
   editorId: string,
   contentTypes: ContentType[],
@@ -336,14 +357,16 @@ async function syncEditorContentTypeClaims(
     if (isSpaContentType(ct)) {
       await query(
         `INSERT INTO editor_content_type_claims (content_type, editor_id, org_unit_id)
-         VALUES ($1, $2, NULL)`,
+         VALUES ($1, $2, NULL)
+         ON CONFLICT DO NOTHING`,
         [ct, editorId],
       );
     } else if (isResearchContentType(ct)) {
       for (const orgId of orgUnitIds) {
         await query(
           `INSERT INTO editor_content_type_claims (content_type, editor_id, org_unit_id)
-           VALUES ($1, $2, $3)`,
+           VALUES ($1, $2, $3)
+           ON CONFLICT DO NOTHING`,
           [ct, editorId, orgId],
         );
       }
@@ -608,12 +631,14 @@ export async function getManagedUserById(id: string): Promise<ManagedUser | null
 
 /**
  * Reject if any org unit is already claimed by a different reviewer.
+ * Ephemeral smoke users skip the check as claimant — see assertEditorContentTypesExclusive.
  */
 export async function assertReviewerOrgsExclusive(
   reviewerId: string,
   orgUnitIds: string[],
 ): Promise<void> {
   if (orgUnitIds.length === 0) return;
+  if (await isEphemeralSmokeUser(reviewerId)) return;
   const result = await query<{ org_unit_id: string; reviewer_id: string; email: string }>(
     `SELECT c.org_unit_id, c.reviewer_id, u.email
      FROM reviewer_org_claims c
@@ -630,11 +655,15 @@ export async function assertReviewerOrgsExclusive(
   }
 }
 
+/** Sync reviewer org claims. ON CONFLICT DO NOTHING: ephemeral smoke reviewers may
+ * overlap a real holder (assertion skipped for smoke claimants); real holder keeps
+ * the claim. Human assignments are guarded by assertReviewerOrgsExclusive first. */
 async function syncReviewerOrgClaims(userId: string, orgUnitIds: string[]) {
   await query(`DELETE FROM reviewer_org_claims WHERE reviewer_id = $1`, [userId]);
   for (const orgId of orgUnitIds) {
     await query(
-      `INSERT INTO reviewer_org_claims (org_unit_id, reviewer_id) VALUES ($1, $2)`,
+      `INSERT INTO reviewer_org_claims (org_unit_id, reviewer_id) VALUES ($1, $2)
+       ON CONFLICT (org_unit_id) DO NOTHING`,
       [orgId, userId],
     );
   }

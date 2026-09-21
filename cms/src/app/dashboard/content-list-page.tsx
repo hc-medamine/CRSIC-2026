@@ -415,7 +415,7 @@ export function ContentListPage({
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8 font-sans lg:px-10">
+    <main className="flex w-full flex-col gap-6 max-w-6xl">
       <PageBreadcrumb items={breadcrumbs} />
       <DeskPageHeader
         title={title}
@@ -454,8 +454,8 @@ export function ContentListPage({
           )}
         </DeskEmptyState>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-crs-border bg-crs-surface shadow-[var(--crs-shadow-soft)]">
-          <table className="w-full min-w-[640px] text-start text-sm">
+        <div className="cms-table-responsive overflow-hidden rounded-2xl border border-crs-border bg-crs-surface shadow-[var(--crs-shadow-soft)]">
+          <table className="w-full min-w-[640px] text-start text-sm cms-table-card-view">
             <thead className="border-b border-crs-border bg-crs-bg/80 text-xs uppercase tracking-wide text-crs-muted">
               <tr>
                 {bulk ? (
@@ -511,7 +511,7 @@ export function ContentListPage({
                   style={{ "--row-delay": `${Math.min(i, 11) * 45}ms` } as CSSProperties}
                 >
                   {bulk ? (
-                    <td className="relative z-10 w-12 px-2 py-3.5">
+                    <td className="relative z-10 w-12 px-2 py-3.5" data-label={t("bulkSelect", lang)}>
                       <DeskListCheckbox
                         checked={selected.has(item.id)}
                         onChange={(checked) => toggleOne(item.id, checked)}
@@ -519,7 +519,7 @@ export function ContentListPage({
                       />
                     </td>
                   ) : null}
-                  <td className="px-4 py-3.5">
+                  <td className="px-4 py-3.5" data-label={t("colTitle", lang)}>
                     <Link
                       href={item.href}
                       className="font-medium text-crs-ink after:absolute after:inset-0 group-hover:text-crs-primary"
@@ -531,16 +531,16 @@ export function ContentListPage({
                       <p className="relative mt-0.5 text-xs text-crs-muted pointer-events-none">{item.meta}</p>
                     ) : null}
                   </td>
-                  <td className="relative px-4 py-3.5 pointer-events-none">
+                  <td className="relative px-4 py-3.5 pointer-events-none" data-label={t("colStatus", lang)}>
                     <StatusPill status={item.status} />
                   </td>
-                  <td className="relative px-4 py-3.5 pointer-events-none">
+                  <td className="relative px-4 py-3.5 pointer-events-none" data-label={t("colEn", lang)}>
                     <EnStatusBadge status={item.enStatus} />
                   </td>
-                  <td className="relative whitespace-nowrap px-4 py-3.5 text-crs-muted pointer-events-none">
+                  <td className="relative whitespace-nowrap px-4 py-3.5 text-crs-muted pointer-events-none" data-label={t("colUpdated", lang)}>
                     {formatUpdated(item.updatedAt)}
                   </td>
-                  <td className="relative z-10 px-4 py-3.5">
+                  <td className="relative z-10 px-4 py-3.5" data-label={t("colActions", lang)}>
                     <button
                       type="button"
                       className="inline-flex min-h-11 items-center rounded-lg border border-crs-border bg-crs-surface px-3 py-1.5 text-xs font-medium text-crs-ink hover:bg-crs-bg"
@@ -558,20 +558,20 @@ export function ContentListPage({
               {loadingMore
                 ? Array.from({ length: SKELETON_ROWS }).map((_, i) => (
                     <tr key={`sk-${i}`} aria-hidden className="border-s-2 border-s-transparent">
-                      {bulk ? <td className="px-2 py-3.5" /> : null}
-                      <td className="px-4 py-3.5">
+                      {bulk ? <td className="px-2 py-3.5" data-label={t("bulkSelect", lang)} /> : null}
+                      <td className="px-4 py-3.5" data-label={t("colTitle", lang)}>
                         <div className="cms-skeleton h-4 w-2/5" />
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-4 py-3.5" data-label={t("colStatus", lang)}>
                         <div className="cms-skeleton h-6 w-24 rounded-full" />
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-4 py-3.5" data-label={t("colEn", lang)}>
                         <div className="cms-skeleton h-6 w-16 rounded-full" />
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-4 py-3.5" data-label={t("colUpdated", lang)}>
                         <div className="cms-skeleton h-4 w-24" />
                       </td>
-                      <td className="px-4 py-3.5">
+                      <td className="px-4 py-3.5" data-label={t("colActions", lang)}>
                         <div className="cms-skeleton h-8 w-16" />
                       </td>
                     </tr>
@@ -669,11 +669,7 @@ export function EditPageShell({
   cloneItemId,
 }: EditShellProps) {
   return (
-    <main
-      className={`mx-auto flex w-full flex-col gap-6 px-6 py-8 font-sans lg:px-10 ${
-        wide ? "max-w-4xl" : "max-w-3xl"
-      }`}
-    >
+    <main className={`flex w-full flex-col gap-6 ${wide ? "max-w-4xl" : "max-w-3xl"}`}>
       <PageBreadcrumb items={breadcrumbs} />
       <DeskPageHeader
         title={title}

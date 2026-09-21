@@ -27,10 +27,18 @@ export function personPublicNames(person: PersonNameInput): { ar: string; en: st
   return { ar, en: en || ar };
 }
 
-export type PublisherPersonInput = PersonNameInput & {
+/**
+ * Flat object type (NOT `PersonNameInput & {…}` — intersecting `null` with an
+ * object type collapses to `never` and drops the null member, breaking callers
+ * that pass explicit null).
+ */
+export type PublisherPersonInput = {
+  nameAr?: string | null;
+  nameEn?: string | null;
+  displayName?: string | null;
   role?: string | null;
   isActive?: boolean | null;
-};
+} | null;
 
 /**
  * Public publisher names (F1): assigned active Reviewer names, else Boufatah.

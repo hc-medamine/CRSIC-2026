@@ -69,7 +69,7 @@ export function HomeOnboarding({ lang }: { lang: CmsLang }) {
   }
 
   return (
-    <section className="rounded-2xl border border-crs-primary/20 bg-gradient-to-br from-crs-primary/10 via-crs-surface to-crs-accent/10 p-5 shadow-[var(--crs-shadow-soft)]">
+    <section className="min-w-0 rounded-2xl border border-crs-primary/20 bg-gradient-to-br from-crs-primary/10 via-crs-surface to-crs-accent/10 p-5 shadow-[var(--crs-shadow-soft)]">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <h2 className="text-base font-semibold text-crs-ink">{t("onboardingTitle", lang)}</h2>
@@ -90,7 +90,7 @@ export function HomeOnboarding({ lang }: { lang: CmsLang }) {
           {t("onboardingGotIt", lang)}
         </button>
       </div>
-      <ol className="mt-4 grid gap-2 sm:grid-cols-3">
+      <ol className="mt-4 grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-3 [&>*]:min-w-0">
         {[t("onboardingStep1", lang), t("onboardingStep2", lang), t("onboardingStep3", lang)].map(
           (step, i) => (
             <li

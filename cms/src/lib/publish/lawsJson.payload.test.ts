@@ -20,7 +20,7 @@ describe("buildLawPayload EN-when-ready", () => {
     assert.equal(ready.title_en, "Law");
     assert.equal(ready.summary_en, "Summary");
     assert.equal(ready.body_en, "<p>Body</p>");
-    assert.equal(ready.titleEn, undefined);
+    assert.equal((ready as Record<string, unknown>).titleEn, undefined);
   });
 
   it("keeps pending without inventing EN on the public title", () => {

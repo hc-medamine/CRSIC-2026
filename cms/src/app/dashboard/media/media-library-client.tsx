@@ -240,7 +240,7 @@ export function MediaLibraryClient({ initialItems, allowedBuckets, fetchLimit }:
         </DeskEmptyState>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-crs-border bg-crs-surface shadow-[var(--crs-shadow-soft)]">
-        <ul className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 cms-container">
           {visibleItems.map((item) => {
             const src = cmsMediaSrc(item.publicPath);
             const pdf = item.mimeType.includes("pdf") || isPdfPath(item.publicPath);
@@ -256,7 +256,7 @@ export function MediaLibraryClient({ initialItems, allowedBuckets, fetchLimit }:
                 className="flex flex-col gap-2 rounded-2xl border border-crs-border bg-crs-bg/40 p-3"
               >
                 {pdf || !src ? (
-                  <div className="flex h-36 items-center justify-center rounded-xl bg-crs-bg text-sm font-semibold uppercase text-crs-muted">
+                  <div className="flex h-36 md:h-40 items-center justify-center rounded-xl bg-crs-bg text-sm font-semibold uppercase text-crs-muted">
                     PDF
                   </div>
                 ) : (
@@ -267,7 +267,7 @@ export function MediaLibraryClient({ initialItems, allowedBuckets, fetchLimit }:
                     aria-label={t("mediaPreview", lang)}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src} alt="" className="h-36 w-full object-cover" />
+                    <img src={src} alt="" className="h-36 md:h-40 w-full object-cover cms-img-fluid" />
                   </button>
                 )}
                 <div className="min-w-0">
@@ -350,7 +350,7 @@ export function MediaLibraryClient({ initialItems, allowedBuckets, fetchLimit }:
           aria-modal="true"
           aria-labelledby="media-delete-title"
         >
-          <div className="cms-modal-panel w-full max-w-md rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-lg">
+          <div className="cms-modal-responsive cms-modal-panel rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-lg">
             <h2 id="media-delete-title" className="text-base font-semibold text-crs-ink">
               {t("mediaDeleteTitle", lang)}
             </h2>
@@ -389,7 +389,7 @@ export function MediaLibraryClient({ initialItems, allowedBuckets, fetchLimit }:
           aria-modal="true"
           aria-labelledby="media-blocked-title"
         >
-          <div className="cms-modal-panel max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-lg">
+          <div className="cms-modal-responsive cms-modal-panel max-h-[85vh] overflow-y-auto rounded-2xl border border-crs-border bg-crs-surface p-5 shadow-lg">
             <h2 id="media-blocked-title" className="text-base font-semibold text-crs-ink">
               {t("mediaBlockedTitle", lang)}
             </h2>

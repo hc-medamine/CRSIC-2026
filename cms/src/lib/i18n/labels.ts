@@ -1129,6 +1129,7 @@ export const LABELS: LabelMap = {
 
   // Lists
   colTitle: { en: "Title", ar: "العنوان" },
+  bulkSelect: { en: "Select", ar: "تحديد" },
   colStatus: { en: "Status", ar: "الحالة" },
   colEn: { en: "EN", ar: "EN" },
   colUpdated: { en: "Updated", ar: "آخر تحديث" },

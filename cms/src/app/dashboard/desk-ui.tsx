@@ -76,11 +76,7 @@ export function AdminPageShell({
   actions?: ReactNode;
 }) {
   return (
-    <main
-      className={`mx-auto flex w-full flex-col gap-6 px-6 py-8 font-sans lg:px-10 ${
-        wide ? "max-w-6xl" : "max-w-3xl"
-      }`}
-    >
+    <main className={`flex w-full flex-col gap-6 ${wide ? "max-w-6xl" : "max-w-3xl"}`}>
       <PageBreadcrumb items={breadcrumbs} />
       <DeskPageHeader title={title} subtitle={subtitle} actions={actions} />
       {children}
